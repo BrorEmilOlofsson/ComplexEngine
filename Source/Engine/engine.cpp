@@ -10,6 +10,7 @@
 #include "Utility/File/FileUtility.hpp"
 #include "Engine/Reflection/EngineRegistration.hpp"
 #include "Utility/GraphicsBufferData.hpp"
+#include "Utility/EngineDirectories.hpp"
 #include <External/nlohmann/json.hpp>
 #include <fstream>
 #include <dwmapi.h>
@@ -57,7 +58,7 @@ namespace Simple
 
 		CheckAndCopySettingsFiles();
 		LoadSettingsFromJson();
-		mOperatingSystem->LoadCursors("Assets\\Cursors");
+		mOperatingSystem->LoadCursors(std::string(Directory::Assets) + std::string("Cursors"));
 
 		mOperatingSystem->GetWindow(mMainWindow).Show();
 

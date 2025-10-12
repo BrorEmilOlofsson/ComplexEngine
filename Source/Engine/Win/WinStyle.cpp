@@ -18,11 +18,11 @@ namespace Simple
 		for (const std::filesystem::path& cursorPath : absolutePaths)
 		{
 			const std::filesystem::path name = cursorPath.filename();
-			const std::filesystem::path relativePath = ConvertAbsolutePathToRelativePath(cursorPath);
-			const std::wstring relativePathW = ToWString(relativePath.string());
+			const HCURSOR cursor = LoadCursorFromFile(cursorPath.c_str());
 
-			mCursors.emplace(name, LoadCursorFromFileW(relativePathW.c_str()));
-			assert(mCursors[name] && "Failed to load Custom Cursor");
+			assert(cursor != nullptr && "Failed to load Custom Cursor");
+
+			mCursors.emplace(name, cursor);
 		}
 	}
 

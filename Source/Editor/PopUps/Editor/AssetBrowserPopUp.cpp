@@ -16,7 +16,9 @@ namespace Simple
 
 	static void* GetSRVFromIconType(const eIconType iconType, AssetManager& assetManager)
 	{
-		return assetManager.GetTexture(GetPath(iconType))->GetShaderResourceView();
+		TextureAssetHandle handle = assetManager.GetTexture(GetPath(iconType));
+		assert(handle);
+		return handle->GetShaderResourceView();
 	}
 
 	static void* GetSRVFromFileExtension(const std::filesystem::path& extension, const std::filesystem::path& directory, const std::filesystem::path& fileName, AssetManager& assetManager)

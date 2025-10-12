@@ -35,6 +35,7 @@
 
 #include "Editor/Utility/EditorUtilities.hpp"
 #include "Utility/ImGui/ImGuiUtility.hpp"
+#include "Utility/EngineDirectories.hpp"
 #include "Editor/Utility/EditorBlackboardKeys.hpp"
 
 #include "Engine/ECSEngine/Components/TransformComponent.hpp"

@@ -38,21 +38,22 @@ workspace "FootballGame" -- Workspace, is not same as Project. Anything configur
 	
 	debugdir(dirs.Bin)
 
-	defines { -- Create Global Macro For Strings.
+	configurations { -- Create Configurations For This WorkSpace
+		"Debug_Editor",
+		"Release_Editor",
+		"Debug_Game",
+		"Release_Game"
+	}
+
+	defines { -- Create Global Macros For Strings.
 
 		'SIMPLE_DIR_ROOT="' .."../" .. '"',
 
 		'SIMPLE_DIR_DEPENDENCIES="' .."../Dependencies/" .. '"',
 		'SIMPLE_DIR_DEPENDENCIES_FORCE="' .."../Dependencies/Settings/Always_Force_Copy/" .. '"',
 		'SIMPLE_DIR_DEPENDENCIES_SETTINGS="' .."../Dependencies/Settings/" .. '"',
-		'SIMPLE_DIR_ASSETS="' .. "Assets" .. '"',
 		'SIMPLE_DIR_SETTINGS="' .."Settings/" .. '"',
 		'SIMPLE_DIR_SHADERS="' .. "Shaders/" .. '"',
-		'SIMPLE_DIR_TEXTURES="' .. "Assets/Textures/" .. '"',
-		'SIMPLE_DIR_NAVMESH="' .. "Assets/Navmesh/" .. '"',
-		'SIMPLE_DIR_AUDIO="' .. "Assets/Audio/" .. '"',
-		'SIMPLE_DIR_MODELS="' .. "Assets/Models/" .. '"',
-		'SIMPLE_DIR_SCENES="' .. "Assets\\\\Scenes" .. '"', -- Editor thing, all paths in future should be using \\ instead of /
 
 		'SIMPLE_SETTINGS_IMGUI="' .."Settings/imgui.ini" .. '"',
 		'SIMPLE_SETTINGS_GAME="' .. "Settings/game_settings.json" .. '"',
@@ -62,19 +63,31 @@ workspace "FootballGame" -- Workspace, is not same as Project. Anything configur
 		
 		'SIMPLE_DIR_MINIDUMP="' .."../Temp/Minidumps/".. '"',
 		'SIMPLE_FILENAME_STACKTRACES="' .."../Temp/StackTraces/stack_traces.txt".. '"',
-		'SIMPLE_FILENAME_PROFILER="'  .. "../Temp/Profilers/profiler_data.prof" .. '"',
+		'SIMPLE_FILENAME_PROFILER="' .. "../Temp/Profilers/profiler_data.prof" .. '"',
 		'SIMPLE_FILENAME_NEWSCENE="NewScene.scene"',
 		'SIMPLE_FILENAME_DEBUGJSON="debug_settings.json"',
 		"IMGUI_DEFINE_MATH_OPERATORS"
 	}
 
+	filter { "configurations:*Game" }
+		defines {
+			'SIMPLE_DIR_ASSETS="' .. "Assets/" .. '"',
+			'SIMPLE_DIR_TEXTURES="' .. "Assets/Textures/" .. '"',
+			'SIMPLE_DIR_NAVMESH="' .. "Assets/Navmesh/" .. '"',
+			'SIMPLE_DIR_AUDIO="' .. "Assets/Audio/" .. '"',
+			'SIMPLE_DIR_MODELS="' .. "Assets/Models/" .. '"',
+			'SIMPLE_DIR_SCENES="' .. "Assets/Scenes" .. '"',
+		}
 
-	configurations { -- Create Configurations For This WorkSpace
-		"Debug_Editor",
-		"Release_Editor",
-		"Debug_Game",
-		"Release_Game"
-	}
+	filter { "configurations:*Editor" }
+		defines {
+			'SIMPLE_DIR_ASSETS="' .. "../Assets/" .. '"',
+			'SIMPLE_DIR_TEXTURES="' .. "../Assets/Textures/" .. '"',
+			'SIMPLE_DIR_NAVMESH="' .. "../Assets/Navmesh/" .. '"',
+			'SIMPLE_DIR_AUDIO="' .. "../Assets/Audio/" .. '"',
+			'SIMPLE_DIR_MODELS="' .. "../Assets/Models/" .. '"',
+			'SIMPLE_DIR_SCENES="' .. "../Assets/Scenes" .. '"',
+		}
 
 	filter "configurations:Debug_Editor" -- Global Configurations Settings
 		defines { "_DEBUG_EDITOR", "_DEBUG", "_EDITOR",  }

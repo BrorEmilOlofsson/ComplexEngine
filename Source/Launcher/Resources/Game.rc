@@ -1,3 +1,7 @@
 #include "resource.h"
 
+#ifdef _GAME
 IDI_ICON1               ICON                    "..//..//..//Bin/Assets/Icons/Hamster.ico"
+#elif _EDITOR
+IDI_ICON1               ICON                    "..//..//../Assets/Icons/Hamster.ico"
+#endif

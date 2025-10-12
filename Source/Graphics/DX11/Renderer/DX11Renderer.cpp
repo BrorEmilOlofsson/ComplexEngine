@@ -7,6 +7,7 @@
 #include "Utility/Asset/AssetManager.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
 #include "Graphics/Texture/Texture.hpp"
+#include "Utility/EngineDirectories.hpp"
 #include <fstream>
 #include <cassert>
 
@@ -76,7 +77,7 @@ namespace Simple
 		mBoxRenderer.Init(*mDevice.Get(), ShapeCreator3000::CreateCube());
 
 		mWireBoundingBoxDrawer.Init(*mDevice.Get(), assetManager);
-		mTextRenderer.Init(mDeviceContext.Get(), mDevice.Get(), L"Assets/Fonts/arial.spritefont");
+		mTextRenderer.Init(mDeviceContext.Get(), mDevice.Get(), ToWString(Directory::Assets) + std::wstring(L"Fonts/arial.spritefont"));
 	}
 
 	void DX11Renderer::Render(const RenderState& renderState, AssetManager& assetManager,

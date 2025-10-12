@@ -87,26 +87,24 @@ namespace Simple
 
 	inline constexpr std::filesystem::path GetPathByTextureType(const eTextureType type)
 	{
+		auto getPath = [](const std::filesystem::path& relativePath)
+			{
+				return std::filesystem::path(SIMPLE_DIR_TEXTURES) / relativePath;
+			};
 		switch (type)
 		{
 		case eTextureType::Default:
-			return std::filesystem::path("Assets\\Textures\\T_SimpleTexture_C.dds");
-			break;
+			return getPath("T_SimpleTexture_C.dds");
 		case eTextureType::Default_Albedo:
-			return std::filesystem::path("Assets\\Textures\\Materials\\T_DefaultMaterial_C.dds");
-			break;
+			return getPath("Materials\\T_DefaultMaterial_C.dds");
 		case eTextureType::Default_Normal:
-			return std::filesystem::path("Assets\\Textures\\Materials\\T_DefaultMaterial_N.dds");
-			break;
+			return getPath("Materials\\T_DefaultMaterial_N.dds");
 		case eTextureType::Default_Material:
-			return std::filesystem::path("Assets\\Textures\\Materials\\T_DefaultMaterial_M.dds");
-			break;
+			return getPath("Materials\\T_DefaultMaterial_M.dds");
 		case eTextureType::Simple:
-			return std::filesystem::path("Assets\\Textures\\T_Hamster_C.dds");
-			break;
+			return getPath("T_Hamster_C.dds");
 		case eTextureType::DirectionalLight:
-			return std::filesystem::path("Assets\\Textures\\T_Sunlight_C.dds");
-			break;
+			return getPath("T_Sunlight_C.dds");
 		}
 
 		return std::filesystem::path();
@@ -114,18 +112,22 @@ namespace Simple
 
 	inline constexpr std::filesystem::path GetPath(const eSkyBox skyBox)
 	{
+		auto getPath = [](const std::filesystem::path& relativePath)
+		{
+			return std::filesystem::path(SIMPLE_DIR_TEXTURES) / relativePath;
+		};
 		switch (skyBox)
 		{
 		case eSkyBox::DayCloud:
-			return std::filesystem::path("Assets\\Textures\\Cubemaps\\T_DayCloud_E.dds");
+			return getPath("Cubemaps\\T_DayCloud_E.dds");
 		case eSkyBox::NightStar:
-			return std::filesystem::path("Assets\\Textures\\Cubemaps\\T_NightStars_E.dds");
+			return getPath("Cubemaps\\T_NightStars_E.dds");
 		case eSkyBox::DayGrassland:
-			return std::filesystem::path("Assets\\Textures\\Cubemaps\\T_CloudAnime_E.dds");
+			return getPath("Cubemaps\\T_CloudAnime_E.dds");
 		case eSkyBox::AutumnForest:
-			return std::filesystem::path("Assets\\Textures\\Cubemaps\\T_AutumnForest_E.dds");
+			return getPath("Cubemaps\\T_AutumnForest_E.dds");
 		case eSkyBox::TGA_Skansen:
-			return std::filesystem::path("Assets\\Textures\\Cubemaps\\T_Skansen_E.dds");
+			return getPath("Cubemaps\\T_Skansen_E.dds");
 		}
 		return std::filesystem::path();
 	}
@@ -133,30 +135,34 @@ namespace Simple
 
 	inline constexpr std::filesystem::path GetPath(const eIconType iconType)
 	{
+		auto getPath = [](const std::filesystem::path& relativePath)
+			{
+				return std::filesystem::path(SIMPLE_DIR_TEXTURES) / relativePath;
+			};
 		switch (iconType)
 		{
 		case eIconType::FBX:
-			return std::filesystem::path("Assets\\Textures\\Icons_Editor\\Icon_FBX.dds");
+			return getPath("Icons_Editor\\Icon_FBX.dds");
 		case eIconType::Folder:
-			return std::filesystem::path("Assets\\Textures\\Icons_Editor\\Icon_Folder.dds");
+			return getPath("Icons_Editor\\Icon_Folder.dds");
 		case eIconType::CubeMap:
-			return std::filesystem::path("Assets\\Textures\\Icons_Editor\\Icon_CubeMap.dds");
+			return getPath("Icons_Editor\\Icon_CubeMap.dds");
 		case eIconType::PNG:
-			return std::filesystem::path("Assets\\Textures\\Icons_Editor\\Icon_PNG.dds");
+			return getPath("Icons_Editor\\Icon_PNG.dds");
 		case eIconType::JPG:
-			return std::filesystem::path("Assets\\Textures\\Icons_Editor\\Icon_JPG.dds");
+			return getPath("Icons_Editor\\Icon_JPG.dds");
 		case eIconType::OBJ:
-			return std::filesystem::path("Assets\\Textures\\Icons_Editor\\Icon_OBJ.dds");
+			return getPath("Icons_Editor\\Icon_OBJ.dds");
 		case eIconType::MP3:
-			return std::filesystem::path("Assets\\Textures\\Icons_Editor\\Icon_MP3.dds");
+			return getPath("Icons_Editor\\Icon_MP3.dds");
 		case eIconType::Scene:
-			return std::filesystem::path("Assets\\Textures\\Icons_Editor\\Icon_Scene.dds");
+			return getPath("Icons_Editor\\Icon_Scene.dds");
 		case eIconType::Cursor:
-			return std::filesystem::path("Assets\\Textures\\Icons_Editor\\Icon_Cursor.dds");
+			return getPath("Icons_Editor\\Icon_Cursor.dds");
 		case eIconType::FlyScript:
-			return std::filesystem::path("Assets\\Textures\\Icons_Editor\\Icon_FlyScript.dds");
+			return getPath("Icons_Editor\\Icon_FlyScript.dds");
 		case eIconType::Unknown:
-			return std::filesystem::path("Assets\\Textures\\Icons_Editor\\Icon_Question.dds");
+			return getPath("Icons_Editor\\Icon_Question.dds");
 		}
 		return std::filesystem::path();
 	}

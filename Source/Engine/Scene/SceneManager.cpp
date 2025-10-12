@@ -134,7 +134,7 @@ namespace Simple
 		const nlohmann::json gameSettings = jsonData["Game_Settings"];
 		file.close();
 
-		const std::filesystem::path sceneFilePath = std::filesystem::absolute(gameSettings["Start_Scene_RelativePath"]);
+		const std::filesystem::path sceneFilePath = std::filesystem::absolute(std::filesystem::path(SIMPLE_DIR_SCENES) / gameSettings["Start_Scene_RelativePath"]);
 		std::ifstream sceneFile(sceneFilePath);
 
 		if (!sceneFile.is_open())

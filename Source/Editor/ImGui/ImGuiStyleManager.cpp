@@ -15,7 +15,7 @@ namespace Simple
 		icons_config.MergeMode = true;
 		icons_config.PixelSnapH = true;
 
-		io.Fonts->AddFontFromFileTTF(std::filesystem::absolute("Assets\\Fonts\\fa-solid-900.ttf").string().c_str(), 11.0f, &icons_config, icons_ranges);
+		io.Fonts->AddFontFromFileTTF(std::filesystem::absolute(std::filesystem::path(Directory::Assets) / "Fonts/fa-solid-900.ttf").string().c_str(), 11.0f, &icons_config, icons_ranges);
 		io.Fonts->Build();
 	}
 
