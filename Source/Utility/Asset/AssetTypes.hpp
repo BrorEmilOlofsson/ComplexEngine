@@ -1,0 +1,7 @@
+#pragma once
+#include "Utility/Asset/TextureAsset.hpp"
+#include "Utility/Asset/MeshAsset.hpp"
+#include "Utility/Asset/AnimationAsset.hpp"
+#include "Utility/Asset/SkeletonAsset.hpp"
+#include "Utility/Asset/PixelShaderAsset.hpp"
+#include "Utility/Asset/VertexShaderAsset.hpp"

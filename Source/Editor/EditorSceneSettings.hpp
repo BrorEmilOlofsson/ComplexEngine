@@ -1,0 +1,14 @@
+#pragma once
+#include "Utility/Math/TransformMode.hpp"
+
+namespace Simple
+{
+	struct EditorSceneSettings final
+	{
+		bool useSnap = false;
+		float snapValue = 1.0f;
+		bool showGrid = false;
+		eTransformMode transformMode = eTransformMode::Local;
+		bool showUnitVectorInScene = false;
+	};
+}

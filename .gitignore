@@ -1,0 +1,13 @@
+
+.vs/
+
+*.suo
+*.vcxproj
+*.vcxproj.filters
+*.sln
+*.pdb
+*.aps
+
+[Bb]in
+[Ll]ocal
+[Tt]emp

@@ -1,0 +1,71 @@
+#include "Editor/Precompiled/EditorPch.hpp"
+#include "StructCreatorWindow.hpp"
+#include "NodeScriptingWindow.hpp"
+#include "FlyScriptEditorUtilities.hpp"
+
+namespace Simple
+{
+
+	StructCreatorWindow::StructCreatorWindow(NodeScriptingWindow* aParentWindow)
+		: myParentWindow(aParentWindow)
+	{
+	}
+
+	void StructCreatorWindow::Update()
+	{
+		if (!myGenericDataType)
+		{
+			return;
+		}
+
+		if (ImGui::Begin(std::string("Create Struct - " + std::string(myGenericDataType.GetName())).c_str()))
+		{
+			if (ImGui::Button("Create Variable"))
+			{
+				myGenericDataType.CreateMemberVariable(Fly::GenericDataTypeProxy(Fly::GetDataTypeID<bool>()), "Var", nullptr);
+			}
+
+			ImGui::Separator();
+
+			auto members = myGenericDataType.GetMemberVariables();
+
+
+			for (auto& member : members)
+			{
+				ShowStructMember(member);
+
+				ImGui::Separator();
+			}
+		}
+
+		ImGui::End();
+	}
+
+	void StructCreatorWindow::ShowStructMember(Fly::VariableProxy aVariable)
+	{
+
+		Fly::VarID varID = aVariable.GetID();
+		std::string name(aVariable.GetName());
+
+		if (ImGui::InputString<32>(Combine("##StructVariableName", varID).c_str(), name))
+		{
+			aVariable.SetName(name, &myParentWindow->GetCommandTracker());
+		}
+
+		Fly::GenericDataTypeProxy currentDataType(aVariable.GetDataTypeID());
+		if (DataTypeComboEditableFilter(Combine("##VarDataType", varID).c_str(), currentDataType))
+		{
+			aVariable.SetDataType(currentDataType, &myParentWindow->GetCommandTracker());
+		}
+
+		aVariable.ViewAndEditDefaultValue(&myParentWindow->GetCommandTracker());
+
+		ImGui::SameLine();
+
+		if (ImGui::Button(Combine("Destroy##DestroyVariable", varID).c_str()))
+		{
+			aVariable.Destroy(&myParentWindow->GetCommandTracker());
+
+		}
+	}
+}

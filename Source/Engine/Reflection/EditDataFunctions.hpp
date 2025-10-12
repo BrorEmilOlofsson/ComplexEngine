@@ -1,0 +1,264 @@
+#pragma once
+#include "Utility/Math/Vector2.hpp"
+#include "Utility/Math/Vector3.hpp"
+#include "Utility/Math/Vector4.hpp"
+#include "Utility/Math/Transform3.hpp"
+#include "Utility/Math/UnitVector2.hpp"
+#include "Utility/Math/UnitVector3.hpp"
+#include "Utility/Color.hpp"
+#include "Utility/RGBColor.hpp"
+#include "Utility/Shapes/AABB2.hpp"
+#include "Utility/Shapes/AABB3.hpp"
+#include "Engine/ECS/EntityID.hpp"
+#include "Engine/Reflection/DataTypeID.hpp"
+#include "Utility/Blackboard.hpp"
+#include "Engine/Collision/CollisionShape.hpp"
+#include "Utility/EnumUtility.hpp"
+#include "Engine/Reflection/ViewAndEditResult.hpp"
+#include "Utility/Asset/AssetTypes.hpp"
+#include "Graphics/Light/PointLight.hpp"
+#include "Graphics/Light/DirectionalLight.hpp"
+#include "Utility/Camera.hpp"
+
+#include <string>
+#include <array>
+#include <External/imgui/imgui.h>
+
+namespace Fly
+{
+	class ClassInstanceProxy;
+}
+
+namespace Simple
+{
+
+	constexpr const std::string& GetVariableName(const Blackboard& blackboard)
+	{
+		return blackboard.Get<Key_VariableName>();
+	}
+
+	ViewAndEditResult ViewAndEditDataPtr(const DataTypeID dataTypeID, void* dataPtr, const Blackboard& blackboard);
+
+	ViewAndEditResult ViewAndEditValue(char& value, const std::string& blackboard);
+	ViewAndEditResult ViewAndEditValue(bool& value, const std::string& variableName);
+	ViewAndEditResult ViewAndEditValue(int& value, const std::string& variableName);
+	ViewAndEditResult ViewAndEditValue(float& value, const std::string& variableName);
+	ViewAndEditResult ViewAndEditValue(std::string& value, const std::string& variableName);
+
+	ViewAndEditResult ViewAndEditValue(Vector2f& value, const std::string& variableName);
+	ViewAndEditResult ViewAndEditValue(Vector2i& value, const std::string& variableName);
+	ViewAndEditResult ViewAndEditValue(Vector2l& value, const std::string& variableName);
+	ViewAndEditResult ViewAndEditValue(Vector3f& value, const std::string& variableName);
+	ViewAndEditResult ViewAndEditValue(Vector4f& value, const std::string& variableName);
+	ViewAndEditResult ViewAndEditValue(Point2f& value, const std::string& variableName);
+	ViewAndEditResult ViewAndEditValue(Point2i& value, const std::string& variableName);
+	ViewAndEditResult ViewAndEditValue(Point2l& value, const std::string& variableName);
+	ViewAndEditResult ViewAndEditValue(Point3f& value, const std::string& variableName);
+	ViewAndEditResult ViewAndEditValue(UnitVector2f& value, const std::string& variableName);
+	ViewAndEditResult VisualizeInScene(UnitVector3f& value, const Point3f& origin, const Camera& camera, class RenderList& renderList);
+	ViewAndEditResult ViewAndEditValue(UnitVector3f& value, const Blackboard& blackboard);
+	ViewAndEditResult ViewAndEditValue(Color& value, const std::string& variableName);
+	ViewAndEditResult ViewAndEditValue(RGBColor& value, const std::string& variableName);
+
+	template<typename T>
+	ViewAndEditResult ViewAndEditValue(Degrees<T>& degrees, const std::string& variableName)
+	{
+		return ViewAndEditValue(degrees.Value(), variableName);
+	}
+
+	template<typename T>
+	ViewAndEditResult ViewAndEditValue(Radians<T>& radians, const std::string& variableName)
+	{
+		Degrees<T> degrees = ToDegrees(radians);
+		auto v = ViewAndEditValue(degrees, variableName);
+		radians = ToRadians(degrees);
+		return v;
+	}
+
+	template<typename T>
+	ViewAndEditResult ViewAndEditValue(AABB2<T>& aabb, const std::string&)
+	{
+		ViewAndEditResult viewAndEditResult;
+
+		{
+			Point2<T> center = aabb.GetCenter();
+			ViewAndEditResult centerViewAndEditResult = ViewAndEditValue(center, "Center");
+			viewAndEditResult |= centerViewAndEditResult;
+			if (centerViewAndEditResult.isEdited)
+			{
+				aabb.SetCenter(center);
+			}
+		}
+		{
+			Vector2<T> extent = aabb.GetExtent();
+			ViewAndEditResult extentViewAndEditResult = ViewAndEditValue(extent, "Extent");
+			viewAndEditResult |= extentViewAndEditResult;
+			if (extentViewAndEditResult.isEdited)
+			{
+				aabb.SetExtent(extent);
+			}
+		}
+
+		return viewAndEditResult;
+	}
+
+	ViewAndEditResult ViewAndEditValue(Transform& value, const std::string& variableName);
+	ViewAndEditResult ViewAndEditValue(PointLight& pointLight, const std::string& variableName);
+	ViewAndEditResult ViewAndEditValue(DirectionalLight& directionalLight, const Blackboard& blackboard);
+	ViewAndEditResult ViewAndEditValue(Camera& camera, const Blackboard& blackboard);
+
+	ViewAndEditResult ViewAndEditValue(CollisionShape& collisionShape, const Blackboard& blackboard);
+	template<typename T>
+	ViewAndEditResult ViewAndEditValue(AABB3<T>& aabb, const std::string&)
+	{
+		ViewAndEditResult viewAndEditResult;
+
+		{
+			Point3<T> center = aabb.GetCenter();
+			ViewAndEditResult centerViewAndEditResult = ViewAndEditValue(center, "Center");
+			viewAndEditResult |= centerViewAndEditResult;
+			if (centerViewAndEditResult.myIsEdited)
+			{
+				aabb.SetCenter(center);
+			}
+		}
+		{
+			Vector3<T> extent = aabb.GetExtent();
+			ViewAndEditResult extentViewAndEditResult = ViewAndEditValue(extent, "Extent");
+			viewAndEditResult |= extentViewAndEditResult;
+			if (extentViewAndEditResult.myIsEdited)
+			{
+				aabb.SetExtent(extent);
+			}
+		}
+
+		return viewAndEditResult;
+	}
+
+	ViewAndEditResult ViewAndEditValue(Ray3f& ray, const Blackboard& blackboard);
+
+	ViewAndEditResult ViewAndEditValue(EntityID& entityID, const std::string& variableName);
+
+	ViewAndEditResult ViewAndEditValue(MeshAssetHandle& meshAsset, const Blackboard& blackboard);
+	ViewAndEditResult ViewAndEditValue(TextureAssetHandle& textureAsset, const Blackboard& blackboard);
+	ViewAndEditResult ViewAndEditValue(PixelShaderAssetHandle& shaderAsset, const Blackboard& blackboard);
+	ViewAndEditResult ViewAndEditValue(VertexShaderAssetHandle& shaderAsset, const Blackboard& blackboard);
+	ViewAndEditResult ViewAndEditValue(SkeletonAssetHandle& skeletonAsset, const Blackboard& blackboard);
+	ViewAndEditResult ViewAndEditValue(AnimationAssetHandle& animationAsset, const Blackboard& blackboard);
+
+	ViewAndEditResult ViewAndEditValue(std::array<TextureAssetHandle, 3>& textureAssets, const Blackboard& blackboard);
+
+
+	template<typename T> requires std::is_enum_v<T>
+	ViewAndEditResult ViewAndEditValue(T& value, const std::string& variableName)
+	{
+		ViewAndEditResult viewAndEditResult;
+		std::string_view currentName = EnumToString(value);
+		if (ImGui::BeginCombo(variableName.c_str(), std::string(currentName).c_str()))
+		{
+			constexpr std::size_t enumCount = EnumCount<T>::value;
+			for (size_t i = 0; i < enumCount; i++)
+			{
+				const T v = static_cast<T>(i);
+				if (ImGui::Selectable(std::string(EnumToString(v)).c_str()))
+				{
+					value = v;
+					viewAndEditResult.isEdited = true;
+				}
+			}
+			viewAndEditResult.isActive = true;
+			ImGui::EndCombo();
+		}
+		return viewAndEditResult;
+	}
+
+	template<typename T>
+		requires requires(T& value)
+	{
+		{ ViewAndEditValue(value, std::string{}) } -> std::same_as<ViewAndEditResult>;
+	}
+	ViewAndEditResult ViewAndEditValue(T& value, const Blackboard& blackboard)
+	{
+		return ViewAndEditValue(value, GetVariableName(blackboard));
+	}
+
+	
+}
+
+namespace std
+{
+	template<typename T>
+	Simple::ViewAndEditResult ViewAndEditValue(std::vector<T>& vector, const Simple::Blackboard& blackboard)
+	{
+		static size_t currentPopupIndex = 0;
+		static constexpr const char* VectorElementPopupStrID = "Vector Element Popup";
+		Simple::ViewAndEditResult result;
+
+		for (size_t i = 0; i < vector.size(); ++i)
+		{
+			bool vectorElementBtnWasPressed = false;
+			if constexpr (std::same_as<T, bool>)
+			{
+				bool b = vector[i];
+				result.isActive |= Simple::ViewAndEditDataPtr(Simple::GetDataTypeID<T>(), &b, blackboard).isActive;
+				vector[i] = b;
+
+				ImGui::SameLine();
+
+				ImGui::PushID(&b);
+				vectorElementBtnWasPressed = ImGui::Button("...");
+				ImGui::PopID();
+
+			}
+			else
+			{
+				T& data = vector[i];
+				result.isActive |= Simple::ViewAndEditDataPtr(Simple::GetDataTypeID<T>(), &data, blackboard).isActive;
+				ImGui::SameLine();
+
+				ImGui::PushID(&data);
+				vectorElementBtnWasPressed = ImGui::Button("...");
+				ImGui::PopID();
+			}
+
+
+
+			if (vectorElementBtnWasPressed)
+			{
+				ImGui::OpenPopup(VectorElementPopupStrID);
+				currentPopupIndex = i;
+			}
+		}
+
+		if (ImGui::BeginPopup(VectorElementPopupStrID))
+		{
+			if (ImGui::MenuItem("Delete"))
+			{
+				vector.erase(begin(vector) + currentPopupIndex);
+			}
+
+			if (ImGui::MenuItem("Insert Before"))
+			{
+				vector.insert(begin(vector) + currentPopupIndex, T());
+			}
+
+			if (ImGui::MenuItem("Reset Value"))
+			{
+				vector[currentPopupIndex] = T();
+			}
+
+			result.isActive = true;
+
+			ImGui::EndPopup();
+		}
+
+		if (ImGui::Button("Add"))
+		{
+			vector.emplace_back();
+
+			result.isActive |= ImGui::IsItemActive();
+		}
+
+		return result;
+	}
+}
