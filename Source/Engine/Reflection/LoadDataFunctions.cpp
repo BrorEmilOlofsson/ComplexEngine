@@ -132,21 +132,26 @@ namespace Simple
 
 	static void FromJSON(MeshAssetHandle& mesh, const nlohmann::json& json, AssetManager& assetManager)
 	{
-		const std::string filePath = json;
+		const std::filesystem::path filePath = json;
 
 		if (filePath.empty())
 		{
 			return;
 		}
+		const std::filesystem::path absolutePath = std::filesystem::absolute(SIMPLE_DIR_ASSETS / filePath);
 
-		if (std::filesystem::exists(filePath) || filePath.find("Primitive") != std::string::npos)
+		if (std::filesystem::exists(absolutePath) || absolutePath.string().find("Primitive") != std::string::npos)
 		{
-			mesh = assetManager.GetMesh(filePath);
+			mesh = assetManager.GetMesh(absolutePath);
+			if (!mesh)
+			{
+				Console::Print("Mesh Error: Could not find mesh: " + absolutePath.string(), ConsoleTextColor::Red);
+			}
 		}
 		else
 		{
-			const std::string text = "Mesh Error: Could not find file at " + filePath + ". Primitive Mesh has replaced.";
-			Console::Print(text.c_str(), Simple::ConsoleTextColor::Red);
+			const std::string text = "Mesh Error: Could not find file at " + absolutePath.string() + ". Primitive Mesh has replaced.";
+			Console::Print(text, ConsoleTextColor::Red);
 		}
 	}
 
@@ -157,17 +162,27 @@ namespace Simple
 
 	static void FromJSON(TextureAssetHandle& texture, const nlohmann::json& json, AssetManager& assetManager)
 	{
-		const std::string filePath = json;
+		const std::filesystem::path filePath = json;
 
-		if (std::filesystem::exists(filePath))
+		if (filePath.empty())
 		{
-			texture = assetManager.GetTexture(filePath.c_str());
+			return;
+		}
+
+		const std::filesystem::path absolutePath = std::filesystem::absolute(SIMPLE_DIR_ASSETS / filePath);
+		if (std::filesystem::exists(absolutePath))
+		{
+			texture = assetManager.GetTexture(absolutePath);
+			if (!texture)
+			{
+				Console::Print("Texture Error: Could not find texture: " + absolutePath.string(), ConsoleTextColor::Red);
+			}
 		}
 		else
 		{
 			texture = assetManager.GetTexture(GetPathByTextureType(eTextureType::Default_Albedo));
-			const std::string text = "Texture Error: Could not find file at " + filePath + ". Default Texture has replaced.";
-			Simple::Console::Print(text.c_str(), Simple::ConsoleTextColor::Red);
+			const std::string text = "Texture Error: Could not find file at " + absolutePath.string() + ". Default Texture has replaced.";
+			Console::Print(text, ConsoleTextColor::Red);
 		}
 	}
 
@@ -259,30 +274,33 @@ namespace Simple
 
 	static void CustomFromJSON(std::array<TextureAssetHandle, 3>& textureAssets, const nlohmann::json& json, AssetManager& assetManager)
 	{
-		std::string albedoTexture;
-		std::string normalTexture;
-		std::string materialTexture;
 
-		auto a = [&textureAssets, &assetManager](const std::filesystem::path& texturePath, const std::size_t index) -> std::tuple<bool, std::string>
+		auto load = [&textureAssets, &assetManager](const std::filesystem::path& texturePath, const std::size_t index) -> std::tuple<bool, std::filesystem::path>
 			{
-				if (!texturePath.empty() && std::filesystem::exists(texturePath))
+				const std::filesystem::path absolutePath = std::filesystem::absolute(SIMPLE_DIR_ASSETS / texturePath);
+				if (!absolutePath.empty() && std::filesystem::exists(absolutePath))
 				{
-					textureAssets[index] = assetManager.GetTexture(texturePath);
+					const TextureAssetHandle handle = assetManager.GetTexture(absolutePath);
+					if (!handle)
+					{
+						return { false, absolutePath };
+					}
+					textureAssets[index] = handle;
 					return { true, "" };
 				}
 
-				return { false, texturePath.string() };
+				return { false, absolutePath };
 			};
 
-		for (size_t i = 0; i < textureAssets.size(); ++i)
+		for (std::size_t i = 0; i < textureAssets.size(); ++i)
 		{
-			auto [isValidFile, loadFailureText] = a(json[GetNameBySlot(i)], i);
+			auto [isValidFile, loadFailureText] = load(json[GetNameBySlot(i)], i);
 
 			if (!isValidFile)
 			{
 				textureAssets[i] = assetManager.GetTexture(GetPathByTextureType(eTextureType::Default_Albedo));
-				const std::string text = "Texture Error: Could not find file at " + loadFailureText + ". Default Texture has replaced.";
-				Simple::Console::Print(text.c_str(), Simple::ConsoleTextColor::Red);
+				const std::string text = "Texture Error: Could not find file at " + loadFailureText.string() + ". Default Texture has replaced.";
+				Console::Print(text, ConsoleTextColor::Red);
 			}
 		}
 	}

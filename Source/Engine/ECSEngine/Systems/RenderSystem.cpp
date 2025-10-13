@@ -145,6 +145,10 @@ namespace Simple
 
 		ecs.ForEach([&](const EntityID entityID, const MeshComponent& meshComponent)
 			{
+				if (!meshComponent.mesh)
+				{
+					return;
+				}
 				const Transform worldTransform = GetWorldTransform(ecs, entityID);
 				if (shouldRenderBoundingBox)
 				{

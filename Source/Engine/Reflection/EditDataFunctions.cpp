@@ -727,7 +727,7 @@ namespace Simple
 
 		if (meshAsset)
 		{
-			meshFilePath += meshAsset->GetName();
+			meshFilePath = meshAsset->GetName();
 		}
 
 		ImGui::AlignTextToFramePadding();
@@ -740,8 +740,8 @@ namespace Simple
 
 		if (const ImGuiPayload* currentPayload = ImGui::GetDragDropPayload())
 		{
-			const std::filesystem::path payloadData = std::filesystem::path(reinterpret_cast<const char*>(currentPayload->Data));
-			const std::filesystem::path extension = payloadData.extension();
+			const std::filesystem::path path = std::filesystem::path(reinterpret_cast<const char*>(currentPayload->Data));
+			const std::filesystem::path extension = path.extension();
 
 			if (extension.string() == ".fbx")
 			{
@@ -749,8 +749,7 @@ namespace Simple
 				{
 					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Assets_Browser"))
 					{
-						const std::filesystem::path meshRelativePath = ConvertAbsolutePathToRelativePath(CheckAndReturnAsAbsolutePath(payloadData));
-						meshAsset = assetManager.GetMesh(meshRelativePath);
+						meshAsset = assetManager.GetMesh(path);
 						viewAndEditResult.isEdited = true;
 						viewAndEditResult.isActive = true;
 					}
@@ -1167,8 +1166,8 @@ namespace Simple
 
 			if (const ImGuiPayload* currentPayload = ImGui::GetDragDropPayload())
 			{
-				const std::filesystem::path payloadData = std::filesystem::path(reinterpret_cast<const char*>(currentPayload->Data));
-				const std::filesystem::path extension = payloadData.extension();
+				const std::filesystem::path path = std::filesystem::path(reinterpret_cast<const char*>(currentPayload->Data));
+				const std::filesystem::path extension = path.extension();
 
 				if (extension.string() == ".dds")
 				{
@@ -1176,8 +1175,7 @@ namespace Simple
 					{
 						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Assets_Browser"))
 						{
-							const std::filesystem::path fileName = ConvertAbsolutePathToRelativePath(payloadData);
-							TextureAssetHandle textureAsset = assetManager.GetTexture(fileName);
+							TextureAssetHandle textureAsset = assetManager.GetTexture(path);
 
 							void* shaderResourceView = textureAsset->GetShaderResourceView();
 
