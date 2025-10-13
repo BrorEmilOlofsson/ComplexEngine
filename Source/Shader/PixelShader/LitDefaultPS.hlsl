@@ -74,15 +74,15 @@ float3 CalculatePointLight(PixelInputType input)
     float3 color = float3(0, 0, 0);
     for (uint i = 0; i < UsedPointLights; i++)
     {
-        if (IsInRange(input.worldPosition.xyz, PointLights[i].position, PointLights[i].range))
+        if (IsInRange(input.WorldPosition.xyz, PointLights[i].Position, PointLights[i].Range))
         {
             color += CalculatePointLightColor(
-                input.worldPosition.xyz,
-                input.normal,
-                PointLights[i].position,
-                PointLights[i].color.rgb,
-                PointLights[i].range,
-                PointLights[i].intensity
+                input.WorldPosition.xyz,
+                input.Normal,
+                PointLights[i].Position,
+                PointLights[i].Color.rgb,
+                PointLights[i].Range,
+                PointLights[i].Intensity
             );
         }
     }
@@ -96,9 +96,9 @@ float4 CalculatePixelColor(float3 directionalLightDir, float3 directionalLightCo
     float3 camPos, float3 albedoColor, PixelInputType input)
 {
     
-    const float3 directionalLight = CalculateDirectionalLightColor(input.worldPosition.xyz, input.normal, directionalLightDir, directionalLightColor, directionalLightIntensity);
+    const float3 directionalLight = CalculateDirectionalLightColor(input.WorldPosition.xyz, input.Normal, directionalLightDir, directionalLightColor, directionalLightIntensity);
 
-    const float3 specularColor = CalculateSpecularHighlight(specularIntensity, specularPower, directionalLightDir, input.worldPosition.xyz, input.normal, camPos);
+    const float3 specularColor = CalculateSpecularHighlight(specularIntensity, specularPower, directionalLightDir, input.WorldPosition.xyz, input.Normal, camPos);
     
     const float3 ambientLight = ambientLightColor * ambientLightIntensity;
     const float3 pointLightColor = CalculatePointLight(input);
@@ -111,7 +111,7 @@ float4 CalculatePixelColor(float3 directionalLightDir, float3 directionalLightCo
 
 float4 main(PixelInputType input) : SV_TARGET
 {
-    float3 albedo = GlobalAlbedo.Sample(GlobalDefaultSampler, input.uv).rgb;
+    float3 albedo = GlobalAlbedo.Sample(GlobalDefaultSampler, input.UV).rgb;
 
     return CalculatePixelColor(
         DirectionLightDirection,

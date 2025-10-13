@@ -4,18 +4,18 @@ PixelInputType main(VertexInputType input)
 {
     PixelInputType output;
     
-    float4 vertexObjectPos = input.position;
+    float4 vertexObjectPos = input.Position;
     float4 vertexWorldPos = mul(vertexObjectPos, ModelToWorldMatrix);
     
-    output.position = vertexWorldPos;
-    output.worldPosition = vertexWorldPos;
-    output.uv = float2(input.uv.x, 1.0 - input.uv.y);
+    output.Position = vertexWorldPos;
+    output.WorldPosition = vertexWorldPos;
+    output.UV = float2(input.UV.x, 1.0 - input.UV.y);
     
-    output.normal = input.normal;
-    output.tangent = input.tangent;
-    output.bitangent = input.bitangent;
+    output.Normal = input.Normal;
+    output.Tangent = input.Tangent;
+    output.Bitangent = input.Bitangent;
     
-    output.color = input.color;
+    output.Color = input.Color;
     
     return output;
 }

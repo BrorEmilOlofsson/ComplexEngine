@@ -76,10 +76,10 @@ cbuffer PointLightBufferData : register(b6)
 {
     struct PointLightData
     {
-        float3 color;
-        float intensity;
-        float3 position;
-        float range;
+        float3 Color;
+        float Intensity;
+        float3 Position;
+        float Range;
     } PointLights[SIMPLE_MAX_POINTLIGHTS];
     
     uint UsedPointLights;
@@ -115,38 +115,37 @@ struct FullScreenVertexToPixel
 
 struct PixelOutput
 {
-    float4 color : SV_Target;
+    float4 Color : SV_Target;
 };
 
-struct GBufferOutput
+struct GBufferPSOutput
 {
-    float4 albedo : SV_TARGET0;
-    float4 normal : SV_TARGET1;
-    float4 material : SV_TARGET2;
-    float4 position : SV_TARGET3;
-    float4 ambientOcclusionAndCustom : SV_TARGET4;
+    float4 Albedo : SV_TARGET0;
+    float4 Normal : SV_TARGET1;
+    float4 Material : SV_TARGET2;
+    float4 Position : SV_TARGET3;
 };
 
 struct VertexInputType
 {
-    float4 position : POSITION0;
-    float4 color : COLOR0;
-    float4 bones : BONES0;
-    float4 weights : WEIGHTS0;
-    float3 normal : NORMAL0;
-    float3 tangent : TANGENT0;
-    float3 bitangent : BITANGENT0;
-    float2 uv : TEXCOORD0;
+    float4 Position : POSITION0;
+    float4 Color : COLOR0;
+    float4 Bones : BONES0;
+    float4 Weights : WEIGHTS0;
+    float3 Normal : NORMAL0;
+    float3 Tangent : TANGENT0;
+    float3 Bitangent : BITANGENT0;
+    float2 UV : TEXCOORD0;
     //float4x4 instanceTransform : INSTANCE_TRANSFORM;
 };
 
 struct PixelInputType
 {
-    float4 position : SV_POSITION0;
-    float4 worldPosition : WORLDPOSITION0;
-    float4 color : COLOR0;
-    float3 normal : NORMAL0;
-    float3 tangent : TANGENT0;
-    float3 bitangent : BITANGENT0;
-    float2 uv : TEXCOORD0;
+    float4 Position : SV_POSITION0;
+    float4 WorldPosition : WORLDPOSITION0;
+    float4 Color : COLOR0;
+    float3 Normal : NORMAL0;
+    float3 Tangent : TANGENT0;
+    float3 Bitangent : BITANGENT0;
+    float2 UV : TEXCOORD0;
 };
