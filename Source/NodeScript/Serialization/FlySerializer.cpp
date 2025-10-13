@@ -14,24 +14,11 @@ constexpr const char* CUSTOM_EVENT_FILE_NAME = "CustomEvents.fly";
 namespace FLY_NAMESPACE
 {
 
-	static std::filesystem::path GetFileDirectory(const std::string_view aFilePath)
-	{
-		std::string fileDirectory = std::string(aFilePath);
-		const char lastChar = fileDirectory[fileDirectory.size() - 1];
-		if (lastChar != '/')
-		{
-			fileDirectory += "/";
-		}
-
-		return std::filesystem::path(std::filesystem::current_path().string() + "/" + fileDirectory);
-	}
-
 	namespace Internal
 	{
 
-		void LoadFlyFile(std::string_view aFilePath)
+		void LoadFlyFile(const std::filesystem::path& filePath)
 		{
-			const std::filesystem::path filePath = aFilePath;
 			std::ifstream ifs(filePath);
 			const std::string file((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
 
@@ -58,12 +45,11 @@ namespace FLY_NAMESPACE
 		}
 
 
-		void SaveDataType(const DataType& aDataType, std::string_view aFilePath)
+		void SaveDataType(const DataType& dataType, const std::filesystem::path& fileDirectory)
 		{
-			std::filesystem::path fileDirectory = aFilePath;
-			std::filesystem::path filePath = fileDirectory.string() + "/" + aDataType.Name() + FLY_FILE_EXTENSION;
+			const std::filesystem::path filePath = fileDirectory / dataType.Name() / FLY_FILE_EXTENSION;
 
-			std::filesystem::create_directories(std::string(aFilePath));
+			std::filesystem::create_directories(filePath);
 			if (!std::filesystem::exists(fileDirectory))
 			{
 				throw std::runtime_error("Failed to create directory: " + fileDirectory.string());
@@ -83,7 +69,7 @@ namespace FLY_NAMESPACE
 			nlohmann::json jsonDoc;
 
 			jsonDoc["Type"] = "Struct";
-			jsonDoc["Name"] = aDataType.Name();
+			jsonDoc["Name"] = dataType.Name();
 
 			nlohmann::json& dataJson = jsonDoc["Data"];
 
@@ -91,9 +77,9 @@ namespace FLY_NAMESPACE
 				dataJson["Variables"] = nlohmann::json::array();
 				nlohmann::json& variableDataJson = dataJson["Variables"];
 
-				for (VarID varID{ 0 }; varID < aDataType.GetVariableContainer().GetVariableCount(); ++varID)
+				for (VarID varID{ 0 }; varID < dataType.GetVariableContainer().GetVariableCount(); ++varID)
 				{
-					const Variable& variable = aDataType.GetVariableContainer().GetVariable(varID);
+					const Variable& variable = dataType.GetVariableContainer().GetVariable(varID);
 
 					if (variable.IsDestroyed())
 					{
@@ -187,12 +173,12 @@ namespace FLY_NAMESPACE
 			}
 		}
 
-		//void SaveStruct(const Struct& aStruct, std::string_view aFilePath)
+		//void SaveStruct(const Struct& aStruct, std::string_view filePath)
 		//{
-		//	std::filesystem::path fileDirectory = aFilePath;
+		//	std::filesystem::path fileDirectory = filePath;
 		//	std::filesystem::path filePath = fileDirectory.string() + "/" + aStruct.mName + FLY_FILE_EXTENSION;
 
-		//	std::filesystem::create_directories(std::string(aFilePath));
+		//	std::filesystem::create_directories(std::string(filePath));
 		//	if (!std::filesystem::exists(fileDirectory))
 		//	{
 		//		throw std::runtime_error("Failed to create directory: " + fileDirectory.string());
@@ -322,12 +308,11 @@ namespace FLY_NAMESPACE
 		//	}
 		//}
 
-		void SaveClass(const Class& aClass, const std::string_view aFilePath)
+		void SaveClass(const Class& c, const std::filesystem::path& fileDirectory)
 		{
-			std::filesystem::path fileDirectory = GetFileDirectory(aFilePath);
-			std::filesystem::path filePath = fileDirectory.string() + aClass.mName + FLY_FILE_EXTENSION;
+			const std::filesystem::path filePath = fileDirectory.string() + c.mName + FLY_FILE_EXTENSION;
 
-			std::filesystem::create_directories(std::string(aFilePath));
+			std::filesystem::create_directories(filePath);
 			if (!std::filesystem::exists(fileDirectory))
 			{
 				throw std::runtime_error("Failed to create directory: " + fileDirectory.string());
@@ -343,13 +328,13 @@ namespace FLY_NAMESPACE
 				return;
 			}
 
-			const NodeGraph& eventGraph = aClass.mEventGraph.GetNodeGraph();
+			const NodeGraph& eventGraph = c.mEventGraph.GetNodeGraph();
 
 			nlohmann::json jsonDoc;
 
 			jsonDoc["Type"] = "Class";
-			jsonDoc["Name"] = aClass.mName;
-			jsonDoc["Target"] = GetDataTypeManager().Find(aClass.mTargetID)->Name();
+			jsonDoc["Name"] = c.mName;
+			jsonDoc["Target"] = GetDataTypeManager().Find(c.mTargetID)->Name();
 
 			nlohmann::json& dataJson = jsonDoc["Data"];
 			std::unordered_map<NodeID, NodeID> cleanedNodeIDs;
@@ -443,9 +428,9 @@ namespace FLY_NAMESPACE
 				dataJson["Variables"] = nlohmann::json::array();
 				nlohmann::json& variableDataJson = dataJson["Variables"];
 
-				for (VarID varID{ 0 }; varID < aClass.mVariableContainer.GetVariableCount(); ++varID)
+				for (VarID varID{ 0 }; varID < c.mVariableContainer.GetVariableCount(); ++varID)
 				{
-					const Variable& variable = aClass.mVariableContainer.GetVariable(varID);
+					const Variable& variable = c.mVariableContainer.GetVariable(varID);
 
 					if (variable.IsDestroyed())
 					{
@@ -611,9 +596,8 @@ namespace FLY_NAMESPACE
 			}
 		}
 
-		void LoadAllFlyFiles(const std::string_view aFilePath)
+		void LoadAllFlyFiles(const std::filesystem::path& fileDirectory)
 		{
-			std::filesystem::path fileDirectory = GetFileDirectory(aFilePath);
 
 			if (!std::filesystem::exists(fileDirectory) || !std::filesystem::is_directory(fileDirectory))
 			{
@@ -636,11 +620,10 @@ namespace FLY_NAMESPACE
 			}
 		}
 
-		void CreateCopyOfClass(const Class& aClass, const std::string_view aFilePath, const std::string_view aCopyName)
+		void CreateCopyOfClass(const Class& c, const std::filesystem::path& fileDirectory, const std::string_view copyName)
 		{
-			const std::filesystem::path fileDirectory = GetFileDirectory(aFilePath);
-			std::string filePath = fileDirectory.string() + aClass.mName + FLY_FILE_EXTENSION;
-			std::string copyPath = fileDirectory.string() + std::string(aCopyName) + FLY_FILE_EXTENSION;
+			std::string filePath = fileDirectory.string() + c.mName + FLY_FILE_EXTENSION;
+			std::string copyPath = fileDirectory.string() + std::string(copyName) + FLY_FILE_EXTENSION;
 
 			if (std::filesystem::copy_file(filePath, copyPath))
 			{
@@ -652,11 +635,11 @@ namespace FLY_NAMESPACE
 			}
 		}
 
-		void SaveCustomEvents(const std::string_view aFilePath)
+		void SaveCustomEvents(const std::filesystem::path& fileDirectory)
 		{
-			const std::filesystem::path filePath = GetFileDirectory(aFilePath).string() + CUSTOM_EVENT_FILE_NAME;
+			const std::filesystem::path filePath = std::filesystem::absolute(fileDirectory) / CUSTOM_EVENT_FILE_NAME;
 
-			if (!std::filesystem::create_directories(aFilePath))
+			if (!std::filesystem::create_directories(filePath))
 			{
 				throw std::runtime_error("Failed to create directory for writing: " + filePath.string());
 				return;
@@ -714,9 +697,9 @@ namespace FLY_NAMESPACE
 			ofs.close();
 		}
 
-		void LoadCustomEvents(const std::string_view aFilePath)
+		void LoadCustomEvents(const std::filesystem::path& fileDirectory)
 		{
-			const std::string filePath = GetFileDirectory(aFilePath).string() + CUSTOM_EVENT_FILE_NAME;
+			const std::filesystem::path filePath = fileDirectory / CUSTOM_EVENT_FILE_NAME;
 			std::ifstream ifs(filePath);
 			std::string file(
 				(std::istreambuf_iterator<char>(ifs)),

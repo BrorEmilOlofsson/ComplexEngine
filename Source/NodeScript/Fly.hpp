@@ -29,12 +29,12 @@ namespace FLY_NAMESPACE
 	void InitializeFoundation();
 	void DestroyFoundation();
 
-	void LoadAllFlyFiles(std::string_view filePath);
-	void SaveCustomEvents(std::string_view filePath);
+	void LoadAllFlyFiles(const std::filesystem::path& filePath);
+	void SaveCustomEvents(const std::filesystem::path& filePath);
 
-	GenericDataTypeProxy CreateStruct(std::string_view name, std::string_view savePath);
-	ClassProxy CreateClass(GenericDataTypeProxy targetProxy, std::string_view name, std::string_view aSavePath);
-	ClassProxy CreateClassWithoutTarget(std::string_view aName, std::string_view aSavePath);
+	GenericDataTypeProxy CreateStruct(std::string_view name, const std::filesystem::path& savePath);
+	ClassProxy CreateClass(GenericDataTypeProxy targetProxy, std::string_view name, const std::filesystem::path& savePath);
+	ClassProxy CreateClassWithoutTarget(std::string_view name, const std::filesystem::path& savePath);
 
 	[[nodiscard]] GenericDataTypeProxy FindDataTypeByName(std::string_view name);
 	[[nodiscard]] ClassProxy FindClassByName(std::string_view name);

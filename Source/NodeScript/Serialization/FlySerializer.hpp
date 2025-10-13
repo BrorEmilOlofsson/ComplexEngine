@@ -11,22 +11,22 @@ namespace FLY_NAMESPACE
 
 	namespace Internal
 	{
-		void SaveDataType(const DataType& aDataType, std::string_view aFilePath);
-		void LoadDataType(const nlohmann::json& aJsonData);
-		void LoadDataType(const nlohmann::json& aJsonData, DataType& aDataType);
-		//void SaveStruct(const Struct& aStruct, std::string_view aFilePath);
-		//void LoadStruct(const nlohmann::json& aJsonData);
-		//void LoadStruct(const nlohmann::json& aJsonData, Struct& aStruct);
-		void SaveClass(const Class& aClass, std::string_view aFilePath);
-		void LoadClass(const nlohmann::json& aJsonData);
-		void LoadClass(const nlohmann::json& aJsonData, Class& aClass);
+		void SaveDataType(const DataType& dataType, const std::filesystem::path& filePath);
+		void LoadDataType(const nlohmann::json& jsonData);
+		void LoadDataType(const nlohmann::json& jsonData, DataType& dataType);
+		//void SaveStruct(const Struct& aStruct, std::string_view filePath);
+		//void LoadStruct(const nlohmann::json& jsonData);
+		//void LoadStruct(const nlohmann::json& jsonData, Struct& aStruct);
+		void SaveClass(const Class& c, const std::filesystem::path& filePath);
+		void LoadClass(const nlohmann::json& jsonData);
+		void LoadClass(const nlohmann::json& jsonData, Class& c);
 
-		void LoadAllFlyFiles(std::string_view aFilePath);
+		void LoadAllFlyFiles(const std::filesystem::path& filePath);
 
-		void CreateCopyOfClass(const Class& aClass, std::string_view aFilePath, std::string_view aCopyName);
+		void CreateCopyOfClass(const Class& c, const std::filesystem::path& filePath, std::string_view copyName);
 
-		void SaveCustomEvents(std::string_view aFilePath);
-		void LoadCustomEvents(std::string_view aFilePath);
+		void SaveCustomEvents(const std::filesystem::path& filePath);
+		void LoadCustomEvents(const std::filesystem::path& filePath);
 	}
 
 

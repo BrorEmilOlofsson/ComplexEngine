@@ -21,31 +21,31 @@ namespace FLY_NAMESPACE
 		Foundation::GetInstance().Destroy();
 	}
 
-	void LoadAllFlyFiles(const std::string_view filePath)
+	void LoadAllFlyFiles(const std::filesystem::path& filePath)
 	{
 		Internal::LoadAllFlyFiles(filePath);
 	}
 
-	void SaveCustomEvents(const std::string_view filePath)
+	void SaveCustomEvents(const std::filesystem::path& filePath)
 	{
 		Internal::SaveCustomEvents(filePath);
 	}
 
-	GenericDataTypeProxy CreateStruct(std::string_view name, std::string_view savePath)
+	GenericDataTypeProxy CreateStruct(std::string_view name, const std::filesystem::path& savePath)
 	{
 		const DataTypeID dataTypeID = Internal::CreateStruct(name);
 		Internal::SaveDataType(*Internal::GetDataTypeByID(dataTypeID), savePath);
 		return GenericDataTypeProxy(dataTypeID);
 	}
 
-	ClassProxy CreateClass(const GenericDataTypeProxy aTargetProxy, const std::string_view name, const std::string_view savePath)
+	ClassProxy CreateClass(const GenericDataTypeProxy targetProxy, const std::string_view name, const std::filesystem::path& savePath)
 	{
-		ClassID createdClassID = Internal::CreateClass(aTargetProxy.GetID(), name);
+		const ClassID createdClassID = Internal::CreateClass(targetProxy.GetID(), name);
 		Internal::SaveClass(Internal::GetClassByID(createdClassID), savePath);
 		return ClassProxy(createdClassID);
 	}
 
-	ClassProxy CreateClassWithoutTarget(const std::string_view name, const std::string_view savePath)
+	ClassProxy CreateClassWithoutTarget(const std::string_view name, const std::filesystem::path& savePath)
 	{
 		return CreateClass(GenericDataTypeProxy(GetDataTypeID<None*>()), name, savePath);
 	}

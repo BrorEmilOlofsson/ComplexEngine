@@ -35,11 +35,11 @@ namespace Simple
 		void BeginPlay();
 		void EndPlay();
 
-		void ReloadSceneFromFile(const std::filesystem::path& aSceneName);
+		void ReloadSceneFromFile(const std::filesystem::path& sceneName);
 
-		void ChangeScene(const std::filesystem::path& aSceneName);
-		void ChangeSceneName(const std::string& aNewSceneName);
-		void CreateNewScene(const std::filesystem::path& aFilePath);
+		void ChangeScene(const std::filesystem::path& sceneName);
+		void ChangeSceneName(const std::string& newSceneName);
+		void CreateNewScene(const std::filesystem::path& filePath);
 
 		void AddOnScenePreLoadFunction(std::function<void()> function);
 		void AddOnScenePostLoadFunction(std::function<void(Scene&)> function);

@@ -166,9 +166,7 @@ namespace Simple
 
 		Scene& scene = mScenes.at(mSceneInfos.at(sceneName).id);
 
-		const std::string name = "LoadScene: " + mSceneInfos.at(sceneName).name;
-
-		SceneLoader::LoadScene(scene, mSceneInfos.at(sceneName).relativePath, *mBlackboard.lock());
+		SceneLoader::LoadScene(scene, std::filesystem::path(SIMPLE_DIR_SCENES) / sceneName, *mBlackboard.lock());
 
 		return true;
 	}
@@ -180,7 +178,7 @@ namespace Simple
 		sceneInfo.id = mNextSceneID++;
 		sceneInfo.name = ConvertFilePathToPrettyName(sceneName, false);
 		sceneInfo.relativePath = sceneName;
-		sceneInfo.absolutePath = std::filesystem::absolute(std::filesystem::path(sceneName));
+		sceneInfo.absolutePath = std::filesystem::absolute(sceneName);
 
 		mSceneInfos[sceneName] = sceneInfo;
 

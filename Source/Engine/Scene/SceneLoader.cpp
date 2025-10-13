@@ -201,6 +201,10 @@ namespace Simple
 				Simple::Console::Print(" has been updated due to changes in the source code", Simple::ConsoleTextColor::White, true);
 			}
 		}
+		else
+		{
+			Console::Print(filePath.string() + " does not exist", ConsoleTextColor::Red);
+		}
 	}
 
 	void SceneLoader::CreateNewSceneFile(const std::filesystem::path& filePath)

@@ -1,5 +1,5 @@
 #pragma once
-
+#include <filesystem>
 
 class SimpleNodeScript final
 {
@@ -9,5 +9,6 @@ public:
 
 	void Init();
 
-	static constexpr const char* ASSET_FILE_PATH = "Assets/FlyClasses";
+	static inline std::filesystem::path ASSET_FILE_PATH = std::filesystem::path(SIMPLE_DIR_ASSETS) / "FlyClasses";
+
 };
