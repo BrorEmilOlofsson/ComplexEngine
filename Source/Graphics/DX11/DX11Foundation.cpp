@@ -151,6 +151,28 @@ namespace Simple
 		return data;
 	}
 
+	static LightBufferData CreateLightData(const RenderState& renderState)
+	{
+		LightBufferData lightData;
+		if (renderState.GetDirectionalLight())
+		{
+			const DirectionalLight& dirLight = renderState.GetDirectionalLight().value();
+			lightData.directionalLightDirection = ToVector3(dirLight.direction);
+			lightData.directionalLightColor = dirLight.color;
+			lightData.directionalLightIntensity = dirLight.intensity;
+		}
+		else
+		{
+			lightData.directionalLightColor = Colors::Black;
+		}
+		if (renderState.GetAmbientLight())
+		{
+			lightData.ambientLightColor = renderState.GetAmbientLight()->GetColor();
+			lightData.ambientLightIntensity = renderState.GetAmbientLight()->GetIntensity();
+		}
+		return lightData;
+	}
+
 	void DX11Foundation::Render(const RenderState& renderState)
 	{
 		PROFILER_FUNCTION(profiler::colors::Red);
@@ -173,7 +195,7 @@ namespace Simple
 		if (rtv.GetSize() != renderSize)
 		{
 			auto texture = DX11Factory::CreateRenderTargetTexture(*GetDevice().Get(), DX11Factory::CreateRenderTargetTextureDesc(renderSize));
-			rtv.Init(*GetDevice().Get(), *texture.Get(), renderSize);
+			rtv.Init(*texture.Get(), renderSize);
 
 			mDepthStencilViewManager->Initialize(renderState.GetDepthStencilViewHandle().value(), renderSize);
 
@@ -184,35 +206,12 @@ namespace Simple
 
 		}
 
-		auto viewport = DX11Factory::CreateViewport(renderSize);
-		GetContext().Get()->RSSetViewports(1, &viewport);
-		rtv.Set(*mDepthStencilViewManager->Get(renderState.GetDepthStencilViewHandle().value()).Get());
-
-		mAssetManager->GetTexture(GetPath(eIconType::Scene))->Bind();
-		mSamplerState.Bind(*GetContext().Get());
-
 		mConstantBufferManager.UpdatePointLights(CreatePointLightData(renderState.GetRenderList().GetPointLights()), *GetContext().Get());
 		mConstantBufferManager.UpdateCameraBuffer(*renderState.GetCamera(), renderSize, *GetContext().Get());
 
 
 		{
-			LightBufferData lightData;
-			if (renderState.GetDirectionalLight())
-			{
-				const DirectionalLight& dirLight = renderState.GetDirectionalLight().value();
-				lightData.directionalLightDirection = ToVector3(dirLight.direction);
-				lightData.directionalLightColor = dirLight.color;
-				lightData.directionalLightIntensity = dirLight.intensity;
-			}
-			else
-			{
-				lightData.directionalLightColor = Colors::Black;
-			}
-			if (renderState.GetAmbientLight())
-			{
-				lightData.ambientLightColor = renderState.GetAmbientLight()->GetColor();
-				lightData.ambientLightIntensity = renderState.GetAmbientLight()->GetIntensity();
-			}
+			const LightBufferData lightData = CreateLightData(renderState);
 			mConstantBufferManager.UpdateLightBuffer(lightData, *GetContext().Get());
 		}
 
@@ -222,9 +221,10 @@ namespace Simple
 			*mAssetManager,
 			mAssetManager->GetPixelShader(GetPath(ePixelShaderType::LitDefault)),
 			mAssetManager->GetVertexShader(GetPath(eVertexShaderType::Default)),
-			renderSize,
 			mConstantBufferManager.mColorBuffer,
-			mConstantBufferManager.mTransformBuffer
+			mConstantBufferManager.mTransformBuffer,
+			mRenderTargetManager,
+			mSamplerState
 		);
 	}
 

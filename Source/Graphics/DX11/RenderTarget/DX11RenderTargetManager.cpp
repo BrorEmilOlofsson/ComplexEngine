@@ -6,16 +6,16 @@ namespace Simple
 {
 	DX11RenderTargetManager::DX11RenderTargetManager(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
 		: mDevice(std::move(device))
-		, mContext(context)
+		, mContext(std::move(context))
 	{
 	}
 
 	RenderTargetView DX11RenderTargetManager::Create(Vector2ui size)
 	{
 		static unsigned int nextID = 1; // Start from 1 to avoid zero ID
-		DX11RenderTarget newRenderTarget(mContext);
+		DX11RenderTarget newRenderTarget(mContext, mDevice);
 		auto texture = DX11Factory::CreateRenderTargetTexture(*mDevice.Get(), DX11Factory::CreateRenderTargetTextureDesc(size));
-		newRenderTarget.Init(*mDevice.Get(), *texture.Get(), size);
+		newRenderTarget.Init(*texture.Get(), size);
 		mRenderTargets.emplace(nextID, std::move(newRenderTarget));
 
 		auto id = nextID;

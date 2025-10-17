@@ -152,7 +152,7 @@ namespace Simple
 				const Transform worldTransform = GetWorldTransform(ecs, entityID);
 				if (shouldRenderBoundingBox)
 				{
-					renderList.AddBoundingBox(DrawBoundingBox(worldTransform, meshComponent.mesh->GetBoundingBox()));
+					renderList.AddBoundingBox(DrawBoundingBox(worldTransform, meshComponent.mesh->GetBoundingBox(), Colors::LightGreen));
 				}
 
 				if (!shouldRenderMesh)

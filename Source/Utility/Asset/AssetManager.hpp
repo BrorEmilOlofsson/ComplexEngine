@@ -39,8 +39,7 @@ namespace Simple
 
 		[[nodiscard]] TextureAssetHandle GetTexture(const std::filesystem::path& path)
 		{
-			TextureAsset textureAsset = MapFind(mTextureAssets, std::filesystem::absolute(path));
-			if (textureAsset)
+			if (TextureAsset textureAsset = MapFind(mTextureAssets, std::filesystem::absolute(path)))
 			{
 				return TextureAssetHandle(textureAsset);
 			}
@@ -49,8 +48,7 @@ namespace Simple
 
 		[[nodiscard]] MeshAssetHandle GetMesh(const std::filesystem::path& path)
 		{
-			MeshAsset asset = MapFind(mMeshAssets, std::filesystem::absolute(path));
-			if (asset)
+			if (MeshAsset asset = MapFind(mMeshAssets, std::filesystem::absolute(path)))
 			{
 				return MeshAssetHandle(asset);
 			}
@@ -59,8 +57,7 @@ namespace Simple
 
 		[[nodiscard]] AnimationAssetHandle GetAnimation(const std::filesystem::path& path)
 		{
-			AnimationAsset asset = MapFind(mAnimationAssets, std::filesystem::absolute(path));
-			if (asset)
+			if (AnimationAsset asset = MapFind(mAnimationAssets, std::filesystem::absolute(path)))
 			{
 				return AnimationAssetHandle(asset);
 			}
@@ -69,8 +66,7 @@ namespace Simple
 
 		[[nodiscard]] SkeletonAssetHandle GetSkeleton(const std::filesystem::path& path)
 		{
-			SkeletonAsset asset = MapFind(mSkeletonAssets, std::filesystem::absolute(path));
-			if (asset)
+			if (SkeletonAsset asset = MapFind(mSkeletonAssets, std::filesystem::absolute(path)))
 			{
 				return SkeletonAssetHandle(asset);
 			}
@@ -79,8 +75,7 @@ namespace Simple
 
 		[[nodiscard]] PixelShaderAssetHandle GetPixelShader(const std::filesystem::path& path)
 		{
-			auto asset = MapFind(mPixelShaderAssets, std::filesystem::absolute(path));
-			if (asset)
+			if (PixelShaderAsset asset = MapFind(mPixelShaderAssets, std::filesystem::absolute(path)))
 			{
 				return PixelShaderAssetHandle(asset);
 			}
@@ -89,8 +84,7 @@ namespace Simple
 
 		[[nodiscard]] VertexShaderAssetHandle GetVertexShader(const std::filesystem::path& path)
 		{
-			auto asset = MapFind(mVertexShaderAssets, std::filesystem::absolute(path));
-			if (asset)
+			if (VertexShaderAsset asset = MapFind(mVertexShaderAssets, std::filesystem::absolute(path)))
 			{
 				return VertexShaderAssetHandle(asset);
 			}

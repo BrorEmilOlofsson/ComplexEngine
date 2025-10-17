@@ -63,13 +63,12 @@ namespace Simple
 		OSView os = blackboard.Get<Key_OSView>();
 		EditorSceneSettings& editorSceneSettings = blackboard.Get<Key_EditorSceneSettings>();
 		const InputState& input = blackboard.Get<Key_InputState>();
-
+		input;
 		Blackboard newBlackboard = blackboard;
 		newBlackboard.Insert<Key_CurrentCamera>(mCamera);
 		newBlackboard.Insert<Key_CurrentRenderState>(mRenderState);
 		mEntityComposition.GetECS().Render(newBlackboard);
-		blackboard.Get<Key_OperatingSystem>().Render(mRenderState);
-		//windowView.Render(mRenderState);
+		//blackboard.Get<Key_OperatingSystem>().Render(mRenderState);
 
 		if (ImGui::Begin("Entity Composition Hierarchy"))
 		{
@@ -98,11 +97,11 @@ namespace Simple
 
 		if (ImGui::Begin(GetImGuiName().c_str()))
 		{
-			const AABB2i renderRect = RenderImage(mRenderState.GetRenderTargetView()->GetSRV());
-			//const AABB2i renderRect = RenderImage(windowView.GetAspectRatio(), mRenderState.GetRenderTargetView()->GetSRV());
-			mRenderState.SetRenderRect(renderRect);
+			/*const AABB2i renderRect = RenderImage(mRenderState.GetRenderTargetView()->GetSRV());
 
-			mTransformEntityTool.ShowEntityImGuizmo(
+			mRenderState.SetRenderRect(renderRect);*/
+
+			/*mTransformEntityTool.ShowEntityImGuizmo(
 				mEntityComposition.GetECS(),
 				mSelectedEntityID, 
 				editorSceneSettings.transformMode,
@@ -113,7 +112,7 @@ namespace Simple
 				input, 
 				os, 
 				commandTracker
-			);
+			);*/
 
 			ShowSceneSettingsPopUp(editorSceneSettings);
 		}

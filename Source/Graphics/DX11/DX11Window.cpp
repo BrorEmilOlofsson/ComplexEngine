@@ -56,8 +56,7 @@ namespace Simple
 		, mWindow(window)
 		, mAssetManager(assetManager)
 		, mGraphicsSettings(graphicsSettings)
-		, mBackBuffer(context)
-		, mObjectIDRenderTarget(context)
+		, mBackBuffer(context, device)
 		, mImGuiWindow(CreateImGuiWindow(instantiateImGui, window->GetHandle()))
 		, mDepthStencilViewManager(dsvManager)
 	{
@@ -78,13 +77,13 @@ namespace Simple
 			{
 				auto backBuffer = DX11Factory::GetBackBuffer(*mSwapChain.Get());
 
-				mBackBuffer.InitRenderTargetView(*mDevice.Get(), *backBuffer.Get(), windowSize);
+				mBackBuffer.InitRenderTargetView(*backBuffer.Get(), windowSize);
 
-				{
+				/*{
 					mIDTexture = DX11Factory::CreateRenderTargetTexture(*mDevice.Get(), DX11Factory::CreateObjectSelectionTextureDesc(windowSize));
 					mObjectIDRenderTarget.Init(*mDevice.Get(), *mIDTexture.Get(), windowSize);
-				}
-				{
+				}*/
+				/*{
 
 					D3D11_TEXTURE2D_DESC desc = {};
 					mIDTexture->GetDesc(&desc);
@@ -96,7 +95,7 @@ namespace Simple
 
 					HRESULT hr = mDevice->CreateTexture2D(&desc, nullptr, &mStagingTexture);
 					WIN_CHECK_HRESULT(hr);
-				}
+				}*/
 			}
 
 			Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilState = DX11Factory::CreateDepthBuffer(*mDevice.Get());
@@ -117,28 +116,6 @@ namespace Simple
 
 		PrepareFrame();
 		mBackBuffer.Clear(mGraphicsSettings.lock()->clearColor);
-	}
-
-	static void RenderFullScreen(ID3D11DeviceContext& context, RenderTargetView renderTargetView, DX11SamplerState& samplerState,
-		VertexShaderAssetHandle vertexShader, PixelShaderAssetHandle pixelShader)
-	{
-		ID3D11ShaderResourceView* srv = static_cast<ID3D11ShaderResourceView*>(renderTargetView.GetSRV());
-		context.PSSetShaderResources(0, 1, &srv);
-
-		// Bind sampler state (linear clamp for example)
-		samplerState.Bind(context);
-
-		// Bind fullscreen shaders
-		pixelShader->Bind();
-		vertexShader->Bind();
-
-		// No vertex buffer needed: fullscreen triangle
-		context.IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		context.IASetInputLayout(nullptr);
-
-		// Issue fullscreen draw
-		context.Draw(3, 0);
-
 	}
 
 	void DX11Window::EndFrame(std::optional<RenderTargetView> renderTargetView)
@@ -174,7 +151,7 @@ namespace Simple
 		mConstantBufferManager.UpdatePostProcessBuffer(PostProcessBufferData{}, *mContext.Get());
 
 		mRenderTargetManager.ClearAll(mGraphicsSettings->clearColor);*/
-		mObjectIDRenderTarget.Clear(Colors::White);
+		//mObjectIDRenderTarget.Clear(Colors::White);
 
 		/*for (auto& depthStencilView : mDepthStencilViewManager)
 		{
@@ -182,64 +159,64 @@ namespace Simple
 		}*/
 	}
 
-	static void RenderToObjectIDRenderTarget(ID3D11DeviceContext& context, ID3D11DepthStencilView* dsv,
-		DX11ConstantBuffer<ObjectIDBufferData>& objectIDCB, DX11ConstantBuffer<ColorBufferData>& colorCB, DX11ConstantBuffer<TransformBufferData>& transformBuffer,
-		const RenderState& renderState, DX11Renderer& renderer, AssetManager& assetManager,
-		ID3D11Resource* stagingTexture, ID3D11Resource* idTexture, DX11RenderTarget& objectIDRenderTarget, Point2i cursorPos,
-		Vector2ui windowSize, const AABB2i& renderRect)
-	{
-		PROFILER_FUNCTION(profiler::colors::Blue);
-		context.ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	//static void RenderToObjectIDRenderTarget(ID3D11DeviceContext& context, ID3D11DepthStencilView* dsv,
+	//	DX11ConstantBuffer<ObjectIDBufferData>& objectIDCB, DX11ConstantBuffer<ColorBufferData>& colorCB, DX11ConstantBuffer<TransformBufferData>& transformBuffer,
+	//	const RenderState& renderState, DX11Renderer& renderer, AssetManager& assetManager,
+	//	ID3D11Resource* stagingTexture, ID3D11Resource* idTexture, DX11RenderTarget& objectIDRenderTarget, Point2i cursorPos,
+	//	Vector2ui windowSize, const AABB2i& renderRect)
+	//{
+	//	PROFILER_FUNCTION(profiler::colors::Blue);
+	//	context.ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-		objectIDCB.UpdateAndBind(ObjectIDBufferData{ 20000 }, context);
-		objectIDRenderTarget.Set(*dsv);
+	//	objectIDCB.UpdateAndBind(ObjectIDBufferData{ 20000 }, context);
+	//	objectIDRenderTarget.Set(*dsv);
 
-		renderer.Render(
-			renderState,
-			assetManager,
-			assetManager.GetPixelShader(GetPath(ePixelShaderType::ObjectID)),
-			assetManager.GetVertexShader(GetPath(eVertexShaderType::Default)),
-			windowSize,
-			colorCB,
-			transformBuffer
-		);
+	//	renderer.Render(
+	//		renderState,
+	//		assetManager,
+	//		assetManager.GetPixelShader(GetPath(ePixelShaderType::ObjectID)),
+	//		assetManager.GetVertexShader(GetPath(eVertexShaderType::Default)),
+	//		colorCB,
+	//		transformBuffer,
+	//		renderTar
+	//	);
 
-		const AABB2f windowRect = AABB2f::CreateFromMinAndExtent(Point2f::Zero(), Vector2f(windowSize));
-		const Point2i mappedPos = Point2i(Remap(static_cast<Point2f>(cursorPos), ToAABB<float>(renderRect), windowRect));
+	//	const AABB2f windowRect = AABB2f::CreateFromMinAndExtent(Point2f::Zero(), Vector2f(windowSize));
+	//	const Point2i mappedPos = Point2i(Remap(static_cast<Point2f>(cursorPos), ToAABB<float>(renderRect), windowRect));
 
-		if (IsInside(mappedPos, ToAABB<int>(windowRect)))
-		{
-			PROFILER_BEGIN("Copy Resource");
-			// Copy GPU texture to a staging resource
-			context.CopyResource(stagingTexture, idTexture);
-			PROFILER_END();
+	//	if (IsInside(mappedPos, ToAABB<int>(windowRect)))
+	//	{
+	//		PROFILER_BEGIN("Copy Resource");
+	//		// Copy GPU texture to a staging resource
+	//		context.CopyResource(stagingTexture, idTexture);
+	//		PROFILER_END();
 
-			PROFILER_BEGIN("Map Resource");
-			D3D11_MAPPED_SUBRESOURCE mapped;
-			context.Map(stagingTexture, 0, D3D11_MAP_READ, 0, &mapped);
+	//		PROFILER_BEGIN("Map Resource");
+	//		D3D11_MAPPED_SUBRESOURCE mapped;
+	//		context.Map(stagingTexture, 0, D3D11_MAP_READ, 0, &mapped);
 
-			struct ColorUINT_8 final
-			{
-				uint8_t r = 0;
-				uint8_t g = 0;
-				uint8_t b = 0;
-				uint8_t a = 0;
-			};
+	//		struct ColorUINT_8 final
+	//		{
+	//			uint8_t r = 0;
+	//			uint8_t g = 0;
+	//			uint8_t b = 0;
+	//			uint8_t a = 0;
+	//		};
 
-			const ColorUINT_8* pixelData = reinterpret_cast<const ColorUINT_8*>(mapped.pData);
+	//		const ColorUINT_8* pixelData = reinterpret_cast<const ColorUINT_8*>(mapped.pData);
 
-			const int pitch = mapped.RowPitch / sizeof(ColorUINT_8); // RowPitch is in bytes
-			const int index = static_cast<int>(mappedPos.y * pitch) + static_cast<int>(mappedPos.x);
-			ColorUINT_8 pixel = pixelData[index];
+	//		const int pitch = mapped.RowPitch / sizeof(ColorUINT_8); // RowPitch is in bytes
+	//		const int index = static_cast<int>(mappedPos.y * pitch) + static_cast<int>(mappedPos.x);
+	//		ColorUINT_8 pixel = pixelData[index];
 
-			// Reconstruct ID
-			const uint32_t id = pixel.r | (pixel.g << 8) | (pixel.b << 16) | (pixel.a << 24);
-			id;
+	//		// Reconstruct ID
+	//		const uint32_t id = pixel.r | (pixel.g << 8) | (pixel.b << 16) | (pixel.a << 24);
+	//		id;
 
-			context.Unmap(stagingTexture, 0);
-			PROFILER_END();
-		}
-	}
+	//		context.Unmap(stagingTexture, 0);
+	//		PROFILER_END();
+	//	}
+	//}
 
 	static void ValidateRenderState(const RenderState& renderState)
 	{
@@ -325,7 +302,7 @@ namespace Simple
 		WIN_CHECK_HRESULT(result);
 
 		auto backBuffer = DX11Factory::GetBackBuffer(*mSwapChain.Get());
-		mBackBuffer.InitRenderTargetView(*mDevice.Get(), *backBuffer.Get(), windowSize);
+		mBackBuffer.InitRenderTargetView(*backBuffer.Get(), windowSize);
 
 		//mDepthStencilViewManager.InitializeAll(windowSize);
 		

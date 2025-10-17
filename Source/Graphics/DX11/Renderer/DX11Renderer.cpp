@@ -8,6 +8,9 @@
 #include "Graphics/Mesh/Mesh.hpp"
 #include "Graphics/Texture/Texture.hpp"
 #include "Utility/EngineDirectories.hpp"
+#include "Graphics/DX11/RenderTarget/DX11RenderTarget.hpp"
+#include "Graphics/DX11/DX11GBuffer.hpp"
+#include "Graphics/DX11/RenderTarget/DX11RenderTargetManager.hpp"
 #include <fstream>
 #include <cassert>
 
@@ -58,6 +61,23 @@ namespace Simple
 		}
 	}*/
 
+	static void RenderModels(std::span<const ModelInstance> models, DX11ConstantBuffer<TransformBufferData>& transformCB, ID3D11DeviceContext& context)
+	{
+		for (auto& modelInstance : models)
+		{
+			if (!modelInstance.mesh)
+			{
+				continue;
+			}
+			if (modelInstance.albedoTexture)
+			{
+				modelInstance.albedoTexture->Bind();
+			}
+			transformCB.UpdateAndBind(TransformBufferData{ modelInstance.transform.GetMatrix() }, context);
+			modelInstance.mesh->Render();
+		}
+	}
+
 	DX11Renderer::DX11Renderer(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
 		: mDevice(device)
 		, mDeviceContext(context)
@@ -80,36 +100,81 @@ namespace Simple
 		mTextRenderer.Init(mDeviceContext.Get(), mDevice.Get(), ToWString(Directory::Assets) + std::wstring(L"Fonts/arial.spritefont"));
 	}
 
-	void DX11Renderer::Render(const RenderState& renderState, AssetManager& assetManager,
-		PixelShaderAssetHandle pixelShader, VertexShaderAssetHandle vertexShader, const Vector2ui& windowSize, 
-		DX11ConstantBuffer<ColorBufferData>& colorCB, DX11ConstantBuffer<TransformBufferData>& transformCB)
+	static std::filesystem::path GetShaderPath(std::string_view name)
 	{
+		return std::filesystem::path(SIMPLE_DIR_SHADERS) / (std::string(name) + ".cso");
+	}
+
+	void DX11Renderer::Render(const RenderState& renderState, AssetManager& assetManager,
+		PixelShaderAssetHandle pixelShader, VertexShaderAssetHandle vertexShader,
+		DX11ConstantBuffer<ColorBufferData>& colorCB, DX11ConstantBuffer<TransformBufferData>& transformCB,
+		DX11RenderTargetManager& renderTargetManager, DX11SamplerState& samplerState)
+	{
+		transformCB;
+		vertexShader;
+		pixelShader;
+		colorCB;
+		assetManager;
 		PROFILER_FUNCTION(profiler::colors::Red);
 
-		auto models = renderState.GetRenderList().GetModelInstances();
+		const Vector2ui size = Vector2ui(renderState.GetRenderRect().value_or(AABB2i::CreateFromMinAndExtent(Point2i::Zero(), Vector2i(1600, 900))).GetExtent());
 
-		assetManager.GetPixelShader(GetPath(ePixelShaderType::LitDefault))->Bind();
-		assetManager.GetVertexShader(GetPath(eVertexShaderType::Default))->Bind();
-		for (auto& modelInstance : models)
+		auto viewport = DX11Factory::CreateViewport(size);
+		mDeviceContext->RSSetViewports(1, &viewport);
+
+		static bool firstTime = true;
+		static std::unique_ptr<DX11GBuffer> gBuffer = std::make_unique<DX11GBuffer>(mDeviceContext, mDevice);
+		if (firstTime)
 		{
-			if (!modelInstance.mesh)
-			{
-				continue;
-			}
-			if (modelInstance.albedoTexture)
-			{
-				modelInstance.albedoTexture->Bind();
-			}
-
-			transformCB.UpdateAndBind(TransformBufferData{ modelInstance.transform.GetMatrix() }, *mDeviceContext.Get());
-
-			modelInstance.mesh->Render();
+			gBuffer->Init(size);
+			firstTime = false;
 		}
 
+		gBuffer->Clear();
+
+		if (gBuffer->GetSize() != size)
+		{
+			gBuffer->Resize(size);
+		}
+
+		mDeviceContext->OMSetRenderTargets(
+			static_cast<UINT>(gBuffer->GetRTVArray().size()),
+			gBuffer->GetRTVArray().data(),
+			gBuffer->GetDepthStencilView()
+		);
+
+		assetManager.GetPixelShader(GetShaderPath("GBufferPS"))->Bind();
+		assetManager.GetVertexShader(GetPath(eVertexShaderType::Default))->Bind();
+
+		RenderModels(renderState.GetRenderList().GetModelInstances(), transformCB, *mDeviceContext.Get());
 
 		RenderDebugLines(renderState.GetRenderList(), assetManager, pixelShader, vertexShader, colorCB);
 
-		mTextRenderer.Render(renderState.GetRenderList().GetText3Ds(), *renderState.GetCamera(), windowSize);
+		mTextRenderer.Render(renderState.GetRenderList().GetText3Ds(), *renderState.GetCamera(), size);
+		
+		// (Optional safety) Unbind MRTs before using them as SRVs
+		ID3D11RenderTargetView* nullRTVs[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT] = {};
+		mDeviceContext->OMSetRenderTargets(_countof(nullRTVs), nullRTVs, nullptr);
+
+		auto rtv = renderTargetManager.Get(renderState.GetRenderTargetView().value())->GetRenderTargetView();
+
+		mDeviceContext->OMSetRenderTargets(1, &rtv, nullptr);
+		ID3D11ShaderResourceView* dummy[4] = {};
+		mDeviceContext->PSSetShaderResources(5, 4, dummy); // Clear old
+
+		mDeviceContext->PSSetShaderResources(
+			TextureSlots::GBufferStart, // 5
+			static_cast<UINT>(gBuffer->GetSRVArray().size()),
+			gBuffer->GetSRVArray().data()
+		);
+
+		RenderFullScreen(
+			*mDeviceContext.Get(),
+			renderState.GetRenderTargetView().value(),
+			samplerState,
+			assetManager.GetVertexShader(GetShaderPath("FullScreenQuadVS")),
+			assetManager.GetPixelShader(GetShaderPath("DeferredLightingPS"))
+		);
 	}
 
 	void DX11Renderer::RenderDebugLines(const RenderList& renderList, AssetManager& assetManager, PixelShaderAssetHandle pixelShader,

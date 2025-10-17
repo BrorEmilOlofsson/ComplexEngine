@@ -131,7 +131,6 @@ namespace Simple
 	void Engine::EndFrame()
 	{
 		PROFILER_FUNCTION(profiler::colors::Indigo800);
-		mOperatingSystem->Render(mSceneManager.GetCurrentScene().GetRenderState());
 		std::optional<RenderTargetView> renderTarget = std::nullopt;
 #ifndef _EDITOR
 		renderTarget = mSceneManager.GetCurrentScene().GetRenderState().GetRenderTargetView();
@@ -158,6 +157,7 @@ namespace Simple
 		PROFILER_FUNCTION(profiler::colors::Cyan700);
 
 		mSceneManager.Render();
+		mOperatingSystem->Render(mSceneManager.GetCurrentScene().GetRenderState());
 	}
 
 	WindowView Engine::GetMainWindow() const

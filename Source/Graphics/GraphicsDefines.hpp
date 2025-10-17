@@ -28,6 +28,6 @@ namespace Simple
 		constexpr unsigned int Normal = 1;
 		constexpr unsigned int Material = 2;
 		constexpr unsigned int CubeMap = 4;
-		constexpr unsigned int ShadowMap = 5;
+		constexpr unsigned int GBufferStart = 5;
 	}
 }

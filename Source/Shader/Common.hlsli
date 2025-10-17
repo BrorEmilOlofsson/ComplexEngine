@@ -4,16 +4,16 @@
 
 SamplerState GlobalDefaultSampler : register(s0);
 
-Texture2D GlobalAlbedo : register(t0);
+Texture2D GlobalAlbedoTexture : register(t0);
 Texture2D GlobalNormalTexture : register(t1);
 Texture2D GlobalMaterialTexture : register(t2);
 Texture2D GlobalAmbientOcclusionAndCustom : register(t3);
 TextureCube GlobalCubeMap : register(t4);
 
-Texture2D GlobalBufferAlbedoTexture : register(t5);
-Texture2D GlobalBufferNormalTexture : register(t6);
-Texture2D GlobalBufferMaterialTexture : register(t7);
-Texture2D GlobalBufferPositionTexture : register(t8);
+Texture2D GBufferAlbedoTexture : register(t5);
+Texture2D GBufferNormalTexture : register(t6);
+Texture2D GBufferMaterialTexture : register(t7);
+Texture2D GBufferPositionTexture : register(t8);
 Texture2D GlobalBufferAmbientOcclusionAndCustom : register(t9);
 
 cbuffer CameraBuffer : register(b0)
@@ -45,8 +45,7 @@ cbuffer LightBuffer : register(b3)
     float1 AmbientLightIntensity;
     float3 DirectionalLightColor;
     float1 DirectionalLightIntensity;
-
-    float3 DirectionLightDirection;
+    float3 DirectionalLightDirection;
     float1 SpecularIntensity;
     float1 SpecularPower;
 };
@@ -148,4 +147,10 @@ struct PixelInputType
     float3 Tangent : TANGENT0;
     float3 Bitangent : BITANGENT0;
     float2 UV : TEXCOORD0;
+};
+
+struct TestVSOut
+{
+    float2 UV : TEXCOORD0;
+    float4 Position : SV_POSITION0;
 };

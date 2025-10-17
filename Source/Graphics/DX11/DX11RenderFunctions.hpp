@@ -4,6 +4,8 @@
 #include "Utility/MeshData.hpp"
 #include "Utility/Asset/PixelShaderAsset.hpp"
 #include "Utility/Asset/VertexShaderAsset.hpp"
+#include "Graphics/RenderTarget/RenderTargetView.hpp"
+#include "Graphics/DX11/DX11SamplerState.hpp"
 
 namespace Simple
 {
@@ -78,5 +80,27 @@ namespace Simple
 
 			context.DrawIndexed(static_cast<UINT>(meshData.indices.size()), 0, 0);
 		}
+	}
+
+	inline void RenderFullScreen(ID3D11DeviceContext& context, RenderTargetView renderTargetView, DX11SamplerState& samplerState,
+		VertexShaderAssetHandle vertexShader, PixelShaderAssetHandle pixelShader)
+	{
+		ID3D11ShaderResourceView* srv = static_cast<ID3D11ShaderResourceView*>(renderTargetView.GetSRV());
+		context.PSSetShaderResources(0, 1, &srv);
+
+		// Bind sampler state (linear clamp for example)
+		samplerState.Bind(context);
+
+		// Bind fullscreen shaders
+		pixelShader->Bind();
+		vertexShader->Bind();
+
+		// No vertex buffer needed: fullscreen triangle
+		context.IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		context.IASetInputLayout(nullptr);
+
+		// Issue fullscreen draw
+		context.Draw(3, 0);
+
 	}
 }

@@ -111,10 +111,10 @@ float4 CalculatePixelColor(float3 directionalLightDir, float3 directionalLightCo
 
 float4 main(PixelInputType input) : SV_TARGET
 {
-    float3 albedo = GlobalAlbedo.Sample(GlobalDefaultSampler, input.UV).rgb;
+    float3 albedo = GlobalAlbedoTexture.Sample(GlobalDefaultSampler, input.UV).rgb;
 
     return CalculatePixelColor(
-        DirectionLightDirection,
+        DirectionalLightDirection,
         DirectionalLightColor,
         DirectionalLightIntensity,
         AmbientLightColor,

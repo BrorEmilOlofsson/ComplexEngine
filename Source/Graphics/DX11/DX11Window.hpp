@@ -55,9 +55,6 @@ namespace Simple
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext> mContext;
 		Microsoft::WRL::ComPtr<IDXGISwapChain> mSwapChain;
 		DX11RenderTarget mBackBuffer;
-		DX11RenderTarget mObjectIDRenderTarget;
-		Microsoft::WRL::ComPtr<ID3D11Texture2D> mIDTexture;
-		Microsoft::WRL::ComPtr<ID3D11Texture2D> mStagingTexture;
 		Microsoft::WRL::ComPtr<ID3D11RasterizerState> mRasterizerState;
 		DepthStencilViewHandle mDepthStencilViewHandle;
 
