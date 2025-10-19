@@ -194,8 +194,8 @@ namespace Simple
 		}
 		if (rtv.GetSize() != renderSize)
 		{
-			auto texture = DX11Factory::CreateRenderTargetTexture(*GetDevice().Get(), DX11Factory::CreateRenderTargetTextureDesc(renderSize));
-			rtv.Init(*texture.Get(), renderSize);
+			auto texture = DX11Factory::CreateRenderTargetTexture(*GetDevice().Get(), renderSize);
+			rtv.Resize(*texture.Get(), renderSize);
 
 			mDepthStencilViewManager->Initialize(renderState.GetDepthStencilViewHandle().value(), renderSize);
 
@@ -223,6 +223,7 @@ namespace Simple
 			mAssetManager->GetVertexShader(GetPath(eVertexShaderType::Default)),
 			mConstantBufferManager.mColorBuffer,
 			mConstantBufferManager.mTransformBuffer,
+			mConstantBufferManager.mObjectIDBuffer,
 			mRenderTargetManager,
 			mSamplerState
 		);

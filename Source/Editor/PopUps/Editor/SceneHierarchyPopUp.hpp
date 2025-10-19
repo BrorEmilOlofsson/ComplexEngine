@@ -19,6 +19,7 @@ namespace Simple
 		void OnSceneBeginPlay(Scene& scene) override;
 		void OnSceneEndPlay(Scene& scene) override;
 
+		EntityID& GetSelectedEntityID();
 		EntityID GetSelectedEntityID() const;
 
 	private:

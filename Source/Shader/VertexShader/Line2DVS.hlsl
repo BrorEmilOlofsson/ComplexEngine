@@ -17,6 +17,7 @@ PixelInputType main(VertexInputType input)
     output.Bitangent = input.Bitangent;
    
     output.Color = input.Color;
+    output.ObjectID = ObjectID;
     
     return output;
 }

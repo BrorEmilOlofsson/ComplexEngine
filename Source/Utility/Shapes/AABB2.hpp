@@ -108,4 +108,21 @@ namespace Simple
 		os << "Min: " << aabb.GetMin() << ", Max: " << aabb.GetMax();
 		return os;
 	}
+
+	
 }
+
+// Provide a formatter so std::format/std::println know how to print it
+template<typename T>
+struct std::formatter<Simple::AABB2<T>> : std::formatter<std::string>
+{
+	auto format(const Simple::AABB2<T>& rect, auto& ctx) const
+	{
+		// Format however you like
+		return std::format_to(
+			ctx.out(),
+			"AABB2(Min: {}, Max: {})",
+			rect.GetMin(), rect.GetMax()
+		);
+	}
+};

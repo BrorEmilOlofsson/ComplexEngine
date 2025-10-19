@@ -11,6 +11,7 @@
 #include "Graphics/DX11/RenderTarget/DX11RenderTarget.hpp"
 #include "Graphics/DX11/DX11GBuffer.hpp"
 #include "Graphics/DX11/RenderTarget/DX11RenderTargetManager.hpp"
+#include "Utility/ShapeMath.hpp"
 #include <fstream>
 #include <cassert>
 
@@ -61,7 +62,7 @@ namespace Simple
 		}
 	}*/
 
-	static void RenderModels(std::span<const ModelInstance> models, DX11ConstantBuffer<TransformBufferData>& transformCB, ID3D11DeviceContext& context)
+	static void RenderModels(std::span<const ModelInstance> models, DX11ConstantBuffer<TransformBufferData>& transformCB, DX11ConstantBuffer<ObjectIDBufferData>& objectIDCB, ID3D11DeviceContext& context)
 	{
 		for (auto& modelInstance : models)
 		{
@@ -73,7 +74,9 @@ namespace Simple
 			{
 				modelInstance.albedoTexture->Bind();
 			}
+
 			transformCB.UpdateAndBind(TransformBufferData{ modelInstance.transform.GetMatrix() }, context);
+			objectIDCB.UpdateAndBind(ObjectIDBufferData{ modelInstance.objectID }, context);
 			modelInstance.mesh->Render();
 		}
 	}
@@ -105,9 +108,50 @@ namespace Simple
 		return std::filesystem::path(SIMPLE_DIR_SHADERS) / (std::string(name) + ".cso");
 	}
 
+	static std::optional<uint32_t> ReconstructObjectID(ID3D11DeviceContext& context, ID3D11Texture2D& stagingTexture, ID3D11Texture2D& idTexture, Point2i cursorPos, const AABB2i& renderRect)
+	{
+		const AABB2f windowRect = AABB2f::CreateFromMinAndExtent(Point2f::Zero(), Vector2f(renderRect.GetExtent()));
+		const Point2i mappedPos = Point2i(Remap(Point2f(cursorPos), ToAABB<float>(renderRect), windowRect));
+
+		if (!IsInside(mappedPos, ToAABB<int>(windowRect)))
+		{
+			return std::nullopt;
+		}
+		// Copy GPU texture to a staging resource
+		context.CopyResource(&stagingTexture, &idTexture);
+		PROFILER_END();
+
+		D3D11_MAPPED_SUBRESOURCE mapped{};
+		context.Map(&stagingTexture, 0, D3D11_MAP_READ, 0, &mapped);
+
+		uint32_t* pixels = (uint32_t*)mapped.pData;
+		uint32_t id = pixels[mappedPos.y * (mapped.RowPitch / sizeof(uint32_t)) + mappedPos.x];
+
+		context.Unmap(&stagingTexture, 0);
+		return id;
+	}
+
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> CreateObjectIDStaging(ID3D11Device* device, Vector2ui size)
+	{
+		D3D11_TEXTURE2D_DESC desc = {};
+		desc.Width = size.x;
+		desc.Height = size.y;
+		desc.MipLevels = 1;
+		desc.ArraySize = 1;
+		desc.Format = DXGI_FORMAT_R32_UINT;
+		desc.SampleDesc.Count = 1;
+		desc.Usage = D3D11_USAGE_STAGING;      // CPU readable
+		desc.BindFlags = 0;
+		desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+
+		Microsoft::WRL::ComPtr<ID3D11Texture2D> stagingTexture;
+		device->CreateTexture2D(&desc, nullptr, &stagingTexture);
+		return stagingTexture;
+	}
+
 	void DX11Renderer::Render(const RenderState& renderState, AssetManager& assetManager,
 		PixelShaderAssetHandle pixelShader, VertexShaderAssetHandle vertexShader,
-		DX11ConstantBuffer<ColorBufferData>& colorCB, DX11ConstantBuffer<TransformBufferData>& transformCB,
+		DX11ConstantBuffer<ColorBufferData>& colorCB, DX11ConstantBuffer<TransformBufferData>& transformCB, DX11ConstantBuffer<ObjectIDBufferData>& objectIDCB,
 		DX11RenderTargetManager& renderTargetManager, DX11SamplerState& samplerState)
 	{
 		transformCB;
@@ -122,13 +166,7 @@ namespace Simple
 		auto viewport = DX11Factory::CreateViewport(size);
 		mDeviceContext->RSSetViewports(1, &viewport);
 
-		static bool firstTime = true;
-		static std::unique_ptr<DX11GBuffer> gBuffer = std::make_unique<DX11GBuffer>(mDeviceContext, mDevice);
-		if (firstTime)
-		{
-			gBuffer->Init(size);
-			firstTime = false;
-		}
+		static std::unique_ptr<DX11GBuffer> gBuffer = std::make_unique<DX11GBuffer>(mDeviceContext, mDevice, size);
 
 		gBuffer->Clear();
 
@@ -146,15 +184,25 @@ namespace Simple
 		assetManager.GetPixelShader(GetShaderPath("GBufferPS"))->Bind();
 		assetManager.GetVertexShader(GetPath(eVertexShaderType::Default))->Bind();
 
-		RenderModels(renderState.GetRenderList().GetModelInstances(), transformCB, *mDeviceContext.Get());
+		RenderModels(renderState.GetRenderList().GetModelInstances(), transformCB, objectIDCB, *mDeviceContext.Get());
+
+		objectIDCB.Update(ObjectIDBufferData{}, *mDeviceContext.Get());
 
 		RenderDebugLines(renderState.GetRenderList(), assetManager, pixelShader, vertexShader, colorCB);
 
 		mTextRenderer.Render(renderState.GetRenderList().GetText3Ds(), *renderState.GetCamera(), size);
-		
+
 		// (Optional safety) Unbind MRTs before using them as SRVs
 		ID3D11RenderTargetView* nullRTVs[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT] = {};
 		mDeviceContext->OMSetRenderTargets(_countof(nullRTVs), nullRTVs, nullptr);
+
+		Point2i mouseScreenPos = renderState.mCursorScreenPos;
+
+		auto stagingTexture = CreateObjectIDStaging(mDevice.Get(), size);
+
+		const auto id = ReconstructObjectID(*mDeviceContext.Get(), *stagingTexture.Get(), *gBuffer->mObjectIDTexture.Get(), mouseScreenPos, renderState.GetRenderRect().value());
+
+		const_cast<RenderState&>(renderState).mSelectedObjectID = id.value_or(std::numeric_limits<unsigned int>::max());
 
 		auto rtv = renderTargetManager.Get(renderState.GetRenderTargetView().value())->GetRenderTargetView();
 

@@ -8,10 +8,27 @@
 namespace Simple
 {
 
+	AABB2i GetImGuiRenderRect()
+	{
+		/*ImVec2 available = ImGui::GetContentRegionAvail();
+		available -= ImVec2{ 5, 5 };*/
+
+		//ImVec2 pos = ImGui::GetWindowPos();
+		//ImVec2 size = ImGui::GetWindowSize();
+		ImVec2 pos = ImGui::GetCursorScreenPos();    // Top-left of next item
+		ImVec2 size =ImGui::GetContentRegionAvail();
+
+		return AABB2i::CreateFromMinAndExtent(
+			ToPoint2<int>(pos),
+			ToVector2<int>(size)
+		);
+
+	}
+
 	AABB2i RenderImage(void* textureID)
 	{
 		ImVec2 available = ImGui::GetContentRegionAvail();
-		available -= ImVec2{ 5, 5 };
+		//available -= ImVec2{ 5, 5 };
 
 		// Ensure valid size (avoid 0x0)
 		if (available.x < 1.0f || available.y < 1.0f)
@@ -23,7 +40,6 @@ namespace Simple
 
 		ImVec2 imgMin = ImGui::GetItemRectMin();  // screen-space top-left of the image
 		ImVec2 imgMax = ImGui::GetItemRectMax();  // screen-space bottom-right
-		ImVec2 imgSize = ImGui::GetItemRectSize();
 
 		AABB2i rect = AABB2i::CreateFromMinAndMax(
 			{ (int)imgMin.x, (int)imgMin.y },

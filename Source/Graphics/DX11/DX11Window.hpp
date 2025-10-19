@@ -54,6 +54,7 @@ namespace Simple
 		Microsoft::WRL::ComPtr<ID3D11Device> mDevice;
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext> mContext;
 		Microsoft::WRL::ComPtr<IDXGISwapChain> mSwapChain;
+		Win_Window* mWindow = nullptr;
 		DX11RenderTarget mBackBuffer;
 		Microsoft::WRL::ComPtr<ID3D11RasterizerState> mRasterizerState;
 		DepthStencilViewHandle mDepthStencilViewHandle;
@@ -64,9 +65,6 @@ namespace Simple
 		std::weak_ptr<DX11SamplerState> mSamplerState;
 		std::optional<DX11ImGuiWindow> mImGuiWindow;
 
-		Win_Window* mWindow = nullptr;
-
-		unsigned int mDrawCalls = 0;
 	};
 }
 

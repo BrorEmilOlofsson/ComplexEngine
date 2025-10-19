@@ -140,13 +140,13 @@ namespace Simple
 		const InputState& input = blackboard.Get<Key_InputState>();
 		const float deltaTime = blackboard.Get<Key_DeltaTime>();
 		OSView os = blackboard.Get<Key_OSView>();
+		EditorCommandTracker& commandTracker = blackboard.Get<Key_CommandTracker>();
 		FreeFlyCameraSettings& cameraSettings = blackboard.Get<Key_FreeFlyCameraSettings>();
 		if (IsFocused())
 		{
 			UpdateEditorCamera(mCamera, cameraSettings, deltaTime, windowView, input, os);
 		}
 		SceneManager& sceneManager = blackboard.Get<Key_SceneManager>();
-		sceneManager.GetCurrentScene().GetRenderState().SetCamera(mCamera);
 
 		const EditorSceneSettings& editorSceneSettings = blackboard.Get<Key_EditorSceneSettings>();
 		if (editorSceneSettings.showGrid)
@@ -160,6 +160,28 @@ namespace Simple
 			};
 			RenderGrid3(grid, Colors::Gray, sceneManager.GetCurrentScene().GetRenderState().GetRenderList());
 		}
+
+		if (ImGui::Begin(mImGuiName.c_str()))
+		{
+			RenderState& sceneRenderState = sceneManager.GetCurrentScene().GetRenderState();
+			AABB2i renderRect = GetImGuiRenderRect();
+			sceneRenderState.SetRenderRect(renderRect);
+			mCamera.SetResolution(Vector2ui(renderRect.GetExtent()));
+			sceneRenderState.SetCamera(mCamera);
+
+			sceneRenderState.mCursorScreenPos = os.GetCursorScreenPosition();
+
+			if (input.IsKeyPressed(eInputKey::LMB))
+			{
+				const EntityID entityID{ sceneRenderState.mSelectedObjectID };
+				if (entityID != InvalidEntityID)
+				{
+					SelectEntity(entityID, mHierarchyPopUp.GetSelectedEntityID(), commandTracker);
+				}
+			}
+
+		}
+		ImGui::End();
 	}
 	
 	template<typename T>
@@ -172,7 +194,6 @@ namespace Simple
 	{
 		PROFILER_FUNCTION(profiler::colors::Yellow900);
 		
-		
 		SceneManager& sceneManager = blackboard.Get<Key_SceneManager>();
 		Blackboard newBlackboard = blackboard;
 		newBlackboard.Insert<Key_CurrentRenderState>(sceneManager.GetCurrentScene().GetRenderState());
@@ -181,7 +202,6 @@ namespace Simple
 		const OSView os = blackboard.Get<Key_OSView>();
 		EditorSceneSettings& editorSceneSettings = blackboard.Get<Key_EditorSceneSettings>();
 		
-
 		const WindowView windowView = blackboard.Get<Key_WindowView>();
 		void* sceneTextureID = sceneManager.GetCurrentScene().GetRenderState().GetRenderTargetView()->GetSRV();
 		RenderState& sceneRenderState = sceneManager.GetCurrentScene().GetRenderState();
@@ -200,17 +220,14 @@ namespace Simple
 		{
 			RenderOrientationCube(mCamera);
 
-			//const AABB2i renderRect = RenderImage(ToAspectRatio(windowView.GetClientSize()), sceneTextureID);
 			const AABB2i renderRect = RenderImage(sceneTextureID);
-			sceneRenderState.SetRenderRect(renderRect);
-
-			mCamera.SetResolution(Vector2ui(renderRect.GetExtent()));
+			assert(renderRect == sceneRenderState.GetRenderRect().value());
 
 			mTransformEntityTool.ShowEntityImGuizmo(
 				sceneManager.GetCurrentScene().GetECS(),
 				mHierarchyPopUp.GetSelectedEntityID(),
 				editorSceneSettings.transformMode,
-				renderRect,
+				sceneRenderState.GetRenderRect().value(),
 				editorSceneSettings.useSnap,
 				editorSceneSettings.snapValue,
 				mCamera,

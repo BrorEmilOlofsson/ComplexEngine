@@ -161,21 +161,27 @@ namespace Simple
 	}
 
 	template<typename T, typename BoundsChecker>
-	constexpr Bounds<T, BoundsChecker> Bounds<T, BoundsChecker>::CreateFromMinAndExtent(const T& min, const ExtentType& extent)
+	[[nodiscard]] constexpr Bounds<T, BoundsChecker> Bounds<T, BoundsChecker>::CreateFromMinAndExtent(const T& min, const ExtentType& extent)
 	{
 		return Bounds<T, BoundsChecker>(min, min + extent);
 	}
 
 	template<typename T, typename BoundsChecker>
-	constexpr Bounds<T, BoundsChecker> Bounds<T, BoundsChecker>::CreateFromCenterAndExtent(const T& center, const ExtentType& extent)
+	[[nodiscard]] constexpr Bounds<T, BoundsChecker> Bounds<T, BoundsChecker>::CreateFromCenterAndExtent(const T& center, const ExtentType& extent)
 	{
 		const auto halfExtent = extent / static_cast<ScalarType>(2);
 		return Bounds<T, BoundsChecker>(center - halfExtent, center + halfExtent);
 	}
 
 	template<typename T, typename BoundsChecker>
-	constexpr Bounds<T, BoundsChecker> Bounds<T, BoundsChecker>::CreateFromMinAndMax(const T& min, const T& max)
+	[[nodiscard]] constexpr Bounds<T, BoundsChecker> Bounds<T, BoundsChecker>::CreateFromMinAndMax(const T& min, const T& max)
 	{
 		return Bounds<T, BoundsChecker>(min, max);
+	}
+
+	template<typename T, typename BoundsChecker> requires std::equality_comparable<T>
+	[[nodiscard]] constexpr bool operator==(const Bounds<T, BoundsChecker>& a, const Bounds<T, BoundsChecker>& b)
+	{
+		return a.GetMin() == b.GetMin() && a.GetMax() == b.GetMax();
 	}
 }

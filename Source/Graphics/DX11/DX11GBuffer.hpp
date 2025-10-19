@@ -15,11 +15,9 @@ namespace Simple
 	{
 	public:
 
-		explicit DX11GBuffer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, Microsoft::WRL::ComPtr<ID3D11Device> device);
+		explicit DX11GBuffer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, Microsoft::WRL::ComPtr<ID3D11Device> device, Vector2ui size);
 
-		void Init(Vector2ui size);
-
-		[[nodiscard]] std::array<ID3D11RenderTargetView*, 4> GetRTVArray()
+		[[nodiscard]] std::array<ID3D11RenderTargetView*, 5> GetRTVArray()
 		{
 			return
 			{
@@ -27,10 +25,11 @@ namespace Simple
 				mNormalRT.GetRenderTargetView(),
 				mMaterialRT.GetRenderTargetView(),
 				mPositionRT.GetRenderTargetView(),
+				mObjectIDRT.GetRenderTargetView()
 			};
 		}
 
-		[[nodiscard]] std::array<ID3D11ShaderResourceView*, 4> GetSRVArray()
+		[[nodiscard]] std::array<ID3D11ShaderResourceView*, 5> GetSRVArray()
 		{
 			return
 			{
@@ -38,6 +37,7 @@ namespace Simple
 				mNormalRT.GetShaderResourceView(),
 				mMaterialRT.GetShaderResourceView(),
 				mPositionRT.GetShaderResourceView(),
+				mObjectIDRT.GetShaderResourceView()
 			};
 		}
 
@@ -57,6 +57,11 @@ namespace Simple
 		DX11RenderTarget mNormalRT;
 		DX11RenderTarget mMaterialRT;
 		DX11RenderTarget mPositionRT;
+	public:
+		Microsoft::WRL::ComPtr<ID3D11Texture2D> mObjectIDTexture;
+		Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> mObjectIDUAV;
+	private:
+		DX11RenderTarget mObjectIDRT;
 
 		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> mDepthStencilView;
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext> mContext;

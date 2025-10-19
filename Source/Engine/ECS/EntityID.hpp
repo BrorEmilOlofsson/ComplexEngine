@@ -1,14 +1,13 @@
 #pragma once
 #include <limits>
-
-#undef max
+#include <stdint.h>
 
 namespace Simple
 {
 
 	struct EntityID final
 	{
-		[[nodiscard]] constexpr explicit operator unsigned int() const
+		[[nodiscard]] constexpr explicit operator uint32_t() const
 		{
 			return id;
 		}
@@ -24,7 +23,7 @@ namespace Simple
 		}
 
 
-		unsigned int id = std::numeric_limits<unsigned int>::max();
+		uint32_t id = std::numeric_limits<uint32_t>::max();
 	};
 
 	constexpr EntityID InvalidEntityID = EntityID{};

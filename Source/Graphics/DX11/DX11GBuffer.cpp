@@ -5,26 +5,26 @@
 namespace Simple
 {
 
-	DX11GBuffer::DX11GBuffer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, Microsoft::WRL::ComPtr<ID3D11Device> device)
-		: mAlbedoRT(context, device)
-		, mNormalRT(context, device)
-		, mMaterialRT(context, device)
-		, mPositionRT(context, device)
+	DX11GBuffer::DX11GBuffer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, Microsoft::WRL::ComPtr<ID3D11Device> device, const Vector2ui size)
+		: mAlbedoRT(context, device, *DX11Factory::CreateRenderTargetTexture(*device.Get(), DX11Factory::CreateRenderTargetTextureDesc(size)).Get(), size)
+		, mNormalRT(context, device, *DX11Factory::CreateRenderTargetTexture(*device.Get(), DX11Factory::CreateRenderTargetTextureDesc(size)).Get(), size)
+		, mMaterialRT(context, device, *DX11Factory::CreateRenderTargetTexture(*device.Get(), DX11Factory::CreateRenderTargetTextureDesc(size)).Get(), size)
+		, mPositionRT(context, device, *DX11Factory::CreateRenderTargetTexture(*device.Get(), DX11Factory::CreateRenderTargetTextureDesc(size)).Get(), size)
+		, mObjectIDTexture(DX11Factory::CreateRenderTargetTexture(*device.Get(), DX11Factory::CreateObjectSelectionTextureDesc(size)))
+		, mObjectIDRT(context, device, *mObjectIDTexture.Get(), size)
 		, mContext(context)
 		, mDevice(device)
 	{
-	}
-
-	void DX11GBuffer::Init(Vector2ui size)
-	{
-		auto& device = *mDevice.Get();
-		auto desc = DX11Factory::CreateRenderTargetTextureDesc(size);
-		mAlbedoRT.Init(*DX11Factory::CreateRenderTargetTexture(device, desc).Get(), size);
-		mNormalRT.Init(*DX11Factory::CreateRenderTargetTexture(device, desc).Get(), size);
-		mMaterialRT.Init(*DX11Factory::CreateRenderTargetTexture(device, desc).Get(), size);
-		mPositionRT.Init(*DX11Factory::CreateRenderTargetTexture(device, desc).Get(), size);
-		mDepthStencilView = DX11Factory::CreateDepthStencilView(device, size);
+		mDepthStencilView = DX11Factory::CreateDepthStencilView(*device.Get(), size);
 		mSize = size;
+
+
+		// During Initialization
+		D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
+		uavDesc.Format = DXGI_FORMAT_R32_UINT;
+		uavDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
+
+		mDevice->CreateUnorderedAccessView(mObjectIDTexture.Get(), &uavDesc, &mObjectIDUAV);
 	}
 
 	void DX11GBuffer::Clear()
@@ -32,14 +32,22 @@ namespace Simple
 		static constexpr float clearAlbedo[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 		mContext->ClearRenderTargetView(mAlbedoRT.GetRenderTargetView(), clearAlbedo);
 
-		static const float clearNormal[4] = { 0.5f, 0.5f, 1.0f, 0.0f }; // no metal/rough here
+		static constexpr float clearNormal[4] = { 0.5f, 0.5f, 1.0f, 0.0f }; // no metal/rough here
 		mContext->ClearRenderTargetView(mNormalRT.GetRenderTargetView(), clearNormal);
 
-		static const float clearMaterial[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+		static constexpr float clearMaterial[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 		mContext->ClearRenderTargetView(mMaterialRT.GetRenderTargetView(), clearMaterial);
 
-		static const float clearPos[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+		static constexpr float clearPos[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 		mContext->ClearRenderTargetView(mPositionRT.GetRenderTargetView(), clearPos);
+
+		static constexpr float c[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+		mContext->ClearRenderTargetView(mObjectIDRT.GetRenderTargetView(), c);
+
+
+
+		UINT clearValue[4] = { 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF };
+		mContext->ClearUnorderedAccessViewUint(mObjectIDUAV.Get(), clearValue);
 
 		mContext->ClearDepthStencilView(mDepthStencilView.Get(),
 			D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
@@ -53,10 +61,33 @@ namespace Simple
 		{
 			return;
 		}
-		mAlbedoRT.Resize(size);
-		mNormalRT.Resize(size);
-		mMaterialRT.Resize(size);
-		mPositionRT.Resize(size);
+		mAlbedoRT.Resize(*DX11Factory::CreateRenderTargetTexture(
+			*mDevice.Get(),
+			DX11Factory::CreateRenderTargetTextureDesc(size)
+		).Get(), size);
+		mNormalRT.Resize(*DX11Factory::CreateRenderTargetTexture(
+			*mDevice.Get(),
+			DX11Factory::CreateRenderTargetTextureDesc(size)
+		).Get(), size);
+		mMaterialRT.Resize(*DX11Factory::CreateRenderTargetTexture(
+			*mDevice.Get(),
+			DX11Factory::CreateRenderTargetTextureDesc(size)
+		).Get(), size);
+		mPositionRT.Resize(*DX11Factory::CreateRenderTargetTexture(
+			*mDevice.Get(),
+			DX11Factory::CreateRenderTargetTextureDesc(size)
+		).Get(), size);
+		mObjectIDTexture = DX11Factory::CreateRenderTargetTexture(*mDevice.Get(), DX11Factory::CreateObjectSelectionTextureDesc(size));
+
+
+		// During Initialization
+		D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
+		uavDesc.Format = DXGI_FORMAT_R32_UINT;
+		uavDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
+
+		mDevice->CreateUnorderedAccessView(mObjectIDTexture.Get(), &uavDesc, &mObjectIDUAV);
+
+		mObjectIDRT.Resize(*mObjectIDTexture.Get(), size);
 		mDepthStencilView = DX11Factory::CreateDepthStencilView(*mDevice.Get(), size);
 		mSize = size;
 	}

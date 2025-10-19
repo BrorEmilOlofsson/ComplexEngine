@@ -14,7 +14,8 @@ Texture2D GBufferAlbedoTexture : register(t5);
 Texture2D GBufferNormalTexture : register(t6);
 Texture2D GBufferMaterialTexture : register(t7);
 Texture2D GBufferPositionTexture : register(t8);
-Texture2D GlobalBufferAmbientOcclusionAndCustom : register(t9);
+Texture2D GBufferObjectIDTexture : register(t9);
+//Texture2D GlobalBufferAmbientOcclusionAndCustom : register(t9);
 
 cbuffer CameraBuffer : register(b0)
 {
@@ -123,6 +124,7 @@ struct GBufferPSOutput
     float4 Normal : SV_TARGET1;
     float4 Material : SV_TARGET2;
     float4 Position : SV_TARGET3;
+    uint ObjectID : SV_TARGET4;
 };
 
 struct VertexInputType
@@ -147,6 +149,7 @@ struct PixelInputType
     float3 Tangent : TANGENT0;
     float3 Bitangent : BITANGENT0;
     float2 UV : TEXCOORD0;
+    uint ObjectID : TEXCOORD1;
 };
 
 struct TestVSOut

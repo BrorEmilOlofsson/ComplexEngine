@@ -41,7 +41,7 @@ namespace Simple
 			mHideCursorFunc(mOS);
 		}
 
-		[[nodiscard]] Point2i GetCursorPos() const
+		[[nodiscard]] Point2i GetCursorScreenPosition() const
 		{
 			return mGetCursorPosFunc(mOS);
 		}

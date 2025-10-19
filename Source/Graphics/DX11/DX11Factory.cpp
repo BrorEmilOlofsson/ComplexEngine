@@ -272,12 +272,35 @@ namespace Simple
 		return shaderResourceView;
 	}
 
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> DX11Factory::CreateRenderTargetTexture(ID3D11Device& device, Vector2ui size)
+	{
+		return CreateRenderTargetTexture(device, CreateRenderTargetTextureDesc(size));
+	}
+
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> DX11Factory::CreateRenderTargetTexture(ID3D11Device& device, D3D11_TEXTURE2D_DESC desc)
 	{
 		Microsoft::WRL::ComPtr<ID3D11Texture2D> texture = nullptr;
 		HRESULT result = device.CreateTexture2D(&desc, nullptr, &texture);
 		WIN_CHECK_HRESULT(result);
 		return texture;
+	}
+
+	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> DX11Factory::CreateRenderTargetView(ID3D11Device& device, ID3D11Resource& resource, std::optional<D3D11_RENDER_TARGET_VIEW_DESC> desc)
+	{
+		const auto* descPtr = desc.has_value() ? &desc.value() : nullptr;
+		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> renderTargetView;
+		HRESULT result = device.CreateRenderTargetView(&resource, descPtr, &renderTargetView);
+		WIN_CHECK_HRESULT(result);
+		return renderTargetView;
+	}
+
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> DX11Factory::CreateShaderResourceView(ID3D11Device& device, ID3D11Resource& resource, std::optional<D3D11_SHADER_RESOURCE_VIEW_DESC> desc)
+	{
+		const auto* descPtr = desc.has_value() ? &desc.value() : nullptr;
+		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shaderResourceView;
+		HRESULT result = device.CreateShaderResourceView(&resource, descPtr, &shaderResourceView);
+		WIN_CHECK_HRESULT(result);
+		return shaderResourceView;
 	}
 
 	D3D11_TEXTURE2D_DESC DX11Factory::CreateRenderTargetTextureDesc(Vector2ui size)
@@ -301,10 +324,10 @@ namespace Simple
 		textureDesc.Height = size.y;
 		textureDesc.MipLevels = 1;
 		textureDesc.ArraySize = 1;
-		textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		textureDesc.Format = DXGI_FORMAT_R32_UINT;
 		textureDesc.SampleDesc.Count = 1;
 		textureDesc.Usage = D3D11_USAGE_DEFAULT;
-		textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+		textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
 
 		return textureDesc;
 	}

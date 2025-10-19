@@ -17,6 +17,7 @@ PixelInputType main(VertexInputType input)
     output.Bitangent = normalize(mul(input.Bitangent, (float3x3)ModelToWorldMatrix));
     
     output.Color = input.Color;
+    output.ObjectID = ObjectID;
     
     return output;
 }

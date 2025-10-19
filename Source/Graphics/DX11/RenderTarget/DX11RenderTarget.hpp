@@ -13,15 +13,16 @@ namespace Simple
 	{
 	public:
 
-		DX11RenderTarget(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, Microsoft::WRL::ComPtr<ID3D11Device> device);
+		DX11RenderTarget(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, Microsoft::WRL::ComPtr<ID3D11Device> device, 
+			ID3D11Resource& resource, Vector2ui size, const bool createSRV = true, std::optional<D3D11_RENDER_TARGET_VIEW_DESC> rtvDesc = {}, std::optional<D3D11_SHADER_RESOURCE_VIEW_DESC> srvDesc = {});
 
-		void Init(ID3D11Resource& resource, Vector2ui size, std::optional<D3D11_RENDER_TARGET_VIEW_DESC> desc = {});
+		void InitShaderResourceView(ID3D11Resource& resource, std::optional<D3D11_SHADER_RESOURCE_VIEW_DESC> desc = {});
 		void InitRenderTargetView(ID3D11Resource& resource, Vector2ui size, std::optional<D3D11_RENDER_TARGET_VIEW_DESC> desc = {});
 
 		void Set(ID3D11DepthStencilView& depthStencilView);
 		void Clear(Color color);
 
-		void Resize(Vector2ui size);
+		void Resize(ID3D11Resource& resource, Vector2ui size);
 
 		[[nodiscard]] ID3D11RenderTargetView* GetRenderTargetView();
 		[[nodiscard]] ID3D11ShaderResourceView* GetShaderResourceView();
@@ -34,7 +35,8 @@ namespace Simple
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext> mContext;
 		Microsoft::WRL::ComPtr<ID3D11Device> mDevice;
 		Vector2ui mSize = Vector2ui::Zero();
-		std::optional<D3D11_RENDER_TARGET_VIEW_DESC> mDesc;
+		std::optional<D3D11_RENDER_TARGET_VIEW_DESC> mRTVDesc;
+		std::optional<D3D11_SHADER_RESOURCE_VIEW_DESC> mSRVDesc;
 	};
 
 	inline ID3D11RenderTargetView* DX11RenderTarget::GetRenderTargetView()

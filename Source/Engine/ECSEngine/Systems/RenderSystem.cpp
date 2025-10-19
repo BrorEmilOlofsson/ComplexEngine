@@ -160,7 +160,14 @@ namespace Simple
 					return;
 				}
 
-				renderList.AddModelInstance(ModelInstance(worldTransform, meshComponent.mesh, meshComponent.textures[TextureSlots::Albedo], meshComponent.textures[TextureSlots::Normal], meshComponent.textures[TextureSlots::Material]));
+				renderList.AddModelInstance(ModelInstance(
+					worldTransform,
+					meshComponent.mesh,
+					meshComponent.textures[TextureSlots::Albedo],
+					meshComponent.textures[TextureSlots::Normal],
+					meshComponent.textures[TextureSlots::Material],
+					entityID.id
+				));
 			});
 	}
 

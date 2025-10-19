@@ -1,5 +1,6 @@
 #pragma once
 #include "Vector2.hpp"
+#include <format>
 
 namespace Simple
 {
@@ -114,3 +115,13 @@ namespace Simple
 		return os;
 	}
 }
+
+template<typename T>
+struct std::formatter<Simple::Point2<T>> : std::formatter<std::string>
+{
+	template<typename FormatContext>
+	auto format(const Simple::Point2<T>& point, FormatContext& ctx) const
+	{
+		return std::format_to(ctx.out(), "{{ x: {}, y: {} }}", point.x, point.y);
+	}
+};

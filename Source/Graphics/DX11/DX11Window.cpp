@@ -56,11 +56,10 @@ namespace Simple
 		, mWindow(window)
 		, mAssetManager(assetManager)
 		, mGraphicsSettings(graphicsSettings)
-		, mBackBuffer(context, device)
+		, mBackBuffer(context, device, *DX11Factory::GetBackBuffer(*mSwapChain.Get()).Get(), window->GetClientSize(), false)
 		, mImGuiWindow(CreateImGuiWindow(instantiateImGui, window->GetHandle()))
 		, mDepthStencilViewManager(dsvManager)
 	{
-		
 	}
 
 	void DX11Window::Init()
@@ -75,9 +74,9 @@ namespace Simple
 			mContext->RSSetViewports(1, &viewport);
 
 			{
-				auto backBuffer = DX11Factory::GetBackBuffer(*mSwapChain.Get());
+				//auto backBuffer = ;
 
-				mBackBuffer.InitRenderTargetView(*backBuffer.Get(), windowSize);
+				//mBackBuffer.InitRenderTargetView(*backBuffer.Get(), windowSize);
 
 				/*{
 					mIDTexture = DX11Factory::CreateRenderTargetTexture(*mDevice.Get(), DX11Factory::CreateObjectSelectionTextureDesc(windowSize));
@@ -106,14 +105,12 @@ namespace Simple
 		}
 
 		mDepthStencilViewHandle = mDepthStencilViewManager.lock()->Create(mWindow->GetClientSize());
-		
+
 		mContext->RSSetState(mRasterizerState.Get());
 	}
 
 	void DX11Window::BeginFrame()
 	{
-		mDrawCalls = 0;
-
 		PrepareFrame();
 		mBackBuffer.Clear(mGraphicsSettings.lock()->clearColor);
 	}
@@ -305,7 +302,7 @@ namespace Simple
 		mBackBuffer.InitRenderTargetView(*backBuffer.Get(), windowSize);
 
 		//mDepthStencilViewManager.InitializeAll(windowSize);
-		
+
 		// Initialize depth stencil view
 
 		/*auto texture = DX11Factory::CreateRenderTargetTexture(*mDevice.Get(), DX11Factory::CreateRenderTargetTextureDesc(windowSize));
@@ -324,10 +321,5 @@ namespace Simple
 	void DX11Window::BindBackBuffer()
 	{
 		mBackBuffer.Set(*mDepthStencilViewManager.lock()->Get(mDepthStencilViewHandle).Get());
-	}
-
-	unsigned int DX11Window::GetDrawCalls() const
-	{
-		return mDrawCalls;
 	}
 }

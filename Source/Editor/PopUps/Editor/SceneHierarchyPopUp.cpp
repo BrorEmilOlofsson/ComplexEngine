@@ -124,6 +124,11 @@ namespace Simple
 		mStoredSelectedEntityID = InvalidEntityID;
 	}
 
+	EntityID& SceneHierarchyPopUp::GetSelectedEntityID()
+	{
+		return mSelectedEntityID;
+	}
+
 	EntityID SceneHierarchyPopUp::GetSelectedEntityID() const
 	{
 		return mSelectedEntityID;

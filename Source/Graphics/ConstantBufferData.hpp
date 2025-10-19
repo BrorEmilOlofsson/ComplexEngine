@@ -34,7 +34,7 @@ namespace Simple
 		unsigned int useToneMapping = 0;
 		unsigned int useBloom = 0;
 
-		std::byte padding[4]{};
+		std::byte padding[4];
 	};
 
 	struct alignas(16) LightBufferData final
@@ -48,14 +48,14 @@ namespace Simple
 		float specularIntensity = 1.f;
 		float specularPower = 10.f;
 
-		std::byte padding[12]{};
+		std::byte padding[12];
 	};
 
 	struct alignas(16) PointLightBufferData final
 	{
 		std::array<PointLightData, Global_Max_PointLights> pointLights;
 		unsigned int used = 0;
-		std::byte padding[12]{};
+		std::byte padding[12];
 	};
 
 	struct alignas(16) CameraBufferData final
@@ -68,7 +68,7 @@ namespace Simple
 
 		Vector2ui resolution = Vector2ui(1280, 720);
 
-		std::byte padding[8]{};
+		std::byte padding[8];
 	};
 
 	struct alignas(16) TransformBufferData final
@@ -86,7 +86,7 @@ namespace Simple
 		float totalTime = 0.0f;
 		float deltaTime = 0.0f;
 
-		std::byte padding[8]{};
+		std::byte padding[8];
 	};
 
 	struct alignas(16) JointsBufferData final
@@ -98,13 +98,13 @@ namespace Simple
 	{
 		int skyBoxUseFlooring = 0;
 
-		std::byte padding[12]{};
+		std::byte padding[12];
 	};
 
 	struct alignas(16) ObjectIDBufferData final
 	{
-		unsigned int objectID = std::numeric_limits<unsigned int>::max();
+		uint32_t objectID = std::numeric_limits<uint32_t>::max();
 
-		std::byte padding[12]{};
+		std::byte padding[12];
 	};
 }

@@ -13,9 +13,8 @@ namespace Simple
 	RenderTargetView DX11RenderTargetManager::Create(Vector2ui size)
 	{
 		static unsigned int nextID = 1; // Start from 1 to avoid zero ID
-		DX11RenderTarget newRenderTarget(mContext, mDevice);
 		auto texture = DX11Factory::CreateRenderTargetTexture(*mDevice.Get(), DX11Factory::CreateRenderTargetTextureDesc(size));
-		newRenderTarget.Init(*texture.Get(), size);
+		DX11RenderTarget newRenderTarget(mContext, mDevice, *texture.Get(), size);
 		mRenderTargets.emplace(nextID, std::move(newRenderTarget));
 
 		auto id = nextID;

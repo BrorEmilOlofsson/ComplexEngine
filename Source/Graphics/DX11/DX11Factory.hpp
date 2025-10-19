@@ -34,7 +34,11 @@ namespace Simple
 		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11Buffer> CreateConstantBuffer(ID3D11Device& device, const unsigned int size);
 	
 		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> CreateTexture(ID3D11Device& device, Vector2ui size, const void* memory);
+		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11Texture2D> CreateRenderTargetTexture(ID3D11Device& device, Vector2ui size);
 		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11Texture2D> CreateRenderTargetTexture(ID3D11Device& device, D3D11_TEXTURE2D_DESC desc);
+
+		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11RenderTargetView> CreateRenderTargetView(ID3D11Device& device, ID3D11Resource& resource, std::optional<D3D11_RENDER_TARGET_VIEW_DESC> desc = {});
+		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> CreateShaderResourceView(ID3D11Device& device, ID3D11Resource& resource, std::optional<D3D11_SHADER_RESOURCE_VIEW_DESC> desc = {});
 
 		[[nodiscard]] static D3D11_TEXTURE2D_DESC CreateRenderTargetTextureDesc(Vector2ui size);
 		[[nodiscard]] static D3D11_TEXTURE2D_DESC CreateObjectSelectionTextureDesc(Vector2ui size);
