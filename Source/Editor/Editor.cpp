@@ -72,6 +72,13 @@ namespace Simple
 		MenuItemPopUp* settingsAudioButton = settingsTab.AddPopUp("Audio");
 		MenuItemPopUp* settingsCameraButton = settingsTab.AddPopUp("Camera");
 		MenuItemPopUp* settingsGraphicsButton = settingsTab.AddPopUp("Graphics");
+		settingsTab.AddButton("Save layout")->SetCallback([]()
+			{
+				std::filesystem::path path = SIMPLE_DIR_DEPENDENCIES_SETTINGS;
+				path /= "imgui.ini";
+				std::string strPath = std::filesystem::absolute(path).string();
+				ImGui::SaveIniSettingsToDisk(strPath.c_str());
+			});
 
 		MenuItemPopUp* helpCamercontrolsPopUpButton = helpTab.AddPopUp("Camera Controls");
 

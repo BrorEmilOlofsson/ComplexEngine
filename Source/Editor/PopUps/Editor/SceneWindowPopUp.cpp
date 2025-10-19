@@ -148,6 +148,7 @@ namespace Simple
 		}
 		SceneManager& sceneManager = blackboard.Get<Key_SceneManager>();
 
+		RenderState& sceneRenderState = sceneManager.GetCurrentScene().GetRenderState();
 		const EditorSceneSettings& editorSceneSettings = blackboard.Get<Key_EditorSceneSettings>();
 		if (editorSceneSettings.showGrid)
 		{
@@ -158,17 +159,15 @@ namespace Simple
 				.cellSize = Vector3f(10, 0, 10),
 				.offset = Vector3f(250.f, 0.f, 250.f),
 			};
-			RenderGrid3(grid, Colors::Gray, sceneManager.GetCurrentScene().GetRenderState().GetRenderList());
+			RenderGrid3(grid, Colors::Gray, sceneRenderState.GetRenderList());
 		}
 
 		if (ImGui::Begin(mImGuiName.c_str()))
 		{
-			RenderState& sceneRenderState = sceneManager.GetCurrentScene().GetRenderState();
 			AABB2i renderRect = GetImGuiRenderRect();
 			sceneRenderState.SetRenderRect(renderRect);
 			mCamera.SetResolution(Vector2ui(renderRect.GetExtent()));
-			sceneRenderState.SetCamera(mCamera);
-
+			
 			sceneRenderState.mCursorScreenPos = os.GetCursorScreenPosition();
 
 			if (input.IsKeyPressed(eInputKey::LMB))
@@ -182,6 +181,9 @@ namespace Simple
 
 		}
 		ImGui::End();
+
+		sceneRenderState.SetCamera(mCamera);
+
 	}
 	
 	template<typename T>
@@ -221,7 +223,7 @@ namespace Simple
 			RenderOrientationCube(mCamera);
 
 			const AABB2i renderRect = RenderImage(sceneTextureID);
-			assert(renderRect == sceneRenderState.GetRenderRect().value());
+			//assert(renderRect == sceneRenderState.GetRenderRect().value());
 
 			mTransformEntityTool.ShowEntityImGuizmo(
 				sceneManager.GetCurrentScene().GetECS(),

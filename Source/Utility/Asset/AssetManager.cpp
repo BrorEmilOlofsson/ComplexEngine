@@ -81,7 +81,8 @@ namespace Simple
 
 		loaderMap[L".cso"] = [](const std::filesystem::path& path, AssetManager& assetManager, const AssetLoader& assetLoader)
 			{
-				PROFILER_BEGIN("Load CSO");
+				const std::string s = "Load CSO: " + path.string();
+				PROFILER_BEGIN(s.c_str());
 
 				auto shaderType = GetShaderType(path);
 
