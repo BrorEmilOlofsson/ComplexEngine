@@ -27,7 +27,7 @@ namespace Simple
 		void BeginFrame(const GraphicsBufferData& bufferData);
 		void EndFrame(std::optional<RenderTargetView> renderTarget);
 		void Render();
-		void Render(const RenderState& renderState);
+		void Render(RenderState& renderState);
 
 		[[nodiscard]] Win_Window& GetWindow(const WindowID windowID)
 		{
@@ -95,7 +95,7 @@ namespace Simple
 		os.Render();
 	}
 
-	inline void OSRender(Win_OperatingSystem& os, const RenderState& renderState)
+	inline void OSRender(Win_OperatingSystem& os, RenderState& renderState)
 	{
 		os.Render(renderState);
 	}
@@ -128,6 +128,11 @@ namespace Simple
 	[[nodiscard]] inline DepthStencilViewHandle OSCreateDepthStencilView(Win_OperatingSystem& os, const Vector2ui& size)
 	{
 		return os.GetGraphicsFoundation().CreateDepthStencilView(size);
+	}
+
+	[[nodiscard]] inline RenderContext OSCreateRenderContext(Win_OperatingSystem& os, const Vector2ui& size)
+	{
+		return os.GetGraphicsFoundation().CreateRenderContext(size);
 	}
 
 	inline void OSSetAssetManager(Win_OperatingSystem& os, std::shared_ptr<AssetManager> assetManager)

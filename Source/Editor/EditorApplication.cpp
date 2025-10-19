@@ -2,12 +2,12 @@
 #include "EditorApplication.hpp"
 #include "Engine/Engine.hpp"
 #include "Editor/Editor.hpp"
-#include "Game/GameWorld.hpp"
+#include "Game/Game.hpp"
 
 namespace Simple
 {
 
-	void RunEditor(std::unique_ptr<OperatingSystem> operatingSystem)
+	void RunEditor(OperatingSystem&& operatingSystem)
 	{
 		PROFILER_FUNCTION(profiler::colors::Black)
 		Engine engine(std::move(operatingSystem));
@@ -16,8 +16,7 @@ namespace Simple
 		Editor editor(&engine);
 		editor.Init();
 
-		GameWorld gameWorld;
-		gameWorld.Init();
+		Game game;
 
 		engine.LateInit();
 

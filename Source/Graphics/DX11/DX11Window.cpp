@@ -320,6 +320,6 @@ namespace Simple
 
 	void DX11Window::BindBackBuffer()
 	{
-		mBackBuffer.Set(*mDepthStencilViewManager.lock()->Get(mDepthStencilViewHandle).Get());
+		mBackBuffer.Set(mDepthStencilViewManager.lock()->Get(mDepthStencilViewHandle).Get());
 	}
 }

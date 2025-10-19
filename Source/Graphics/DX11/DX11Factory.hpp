@@ -41,6 +41,8 @@ namespace Simple
 		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> CreateShaderResourceView(ID3D11Device& device, ID3D11Resource& resource, std::optional<D3D11_SHADER_RESOURCE_VIEW_DESC> desc = {});
 
 		[[nodiscard]] static D3D11_TEXTURE2D_DESC CreateRenderTargetTextureDesc(Vector2ui size);
+
+		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11Texture2D> CreateObjectIDStagingTexture(ID3D11Device& device, Vector2ui size);
 		[[nodiscard]] static D3D11_TEXTURE2D_DESC CreateObjectSelectionTextureDesc(Vector2ui size);
 
 		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11VertexShader> CreateVertexShaderAndInputLayout(const std::filesystem::path& path, ID3D11Device& device, Microsoft::WRL::ComPtr<ID3D11InputLayout>& inputLayout);

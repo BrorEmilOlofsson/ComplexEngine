@@ -1,19 +1,18 @@
 #include "Game/Precompiled/GamePch.hpp"
 #include "GameMain.hpp"
 #include "Engine/Engine.hpp"
-#include "Game/GameWorld.hpp"
+#include "Game/Game.hpp"
 
 namespace Simple
 {
 
-	void RunGame(std::unique_ptr<OperatingSystem> aOperatingSystem)
+	void RunGame(OperatingSystem&& operatingSystem)
 	{
 		PROFILER_FUNCTION(profiler::colors::Black);
-		Engine engine(std::move(aOperatingSystem));
+		Engine engine(std::move(operatingSystem));
 		engine.Init();
 
-		GameWorld gameWorld;
-		gameWorld.Init();
+		Game game;
 
 		engine.LateInit();
 

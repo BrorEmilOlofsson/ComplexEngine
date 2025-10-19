@@ -8,6 +8,7 @@
 #include "Graphics/Model/Factory/ShapeCreator3000.hpp"
 #include "Graphics/DX11/Shader/DX11PixelShader.hpp"
 #include "Graphics/DX11/Shader/DX11VertexShader.hpp"
+#include "Graphics/DX11/DX11RenderContext.hpp"
 #include "Graphics/Shader/PixelShader.hpp"
 #include "Graphics/Shader/VertexShader.hpp"
 
@@ -173,7 +174,7 @@ namespace Simple
 		return lightData;
 	}
 
-	void DX11Foundation::Render(const RenderState& renderState)
+	void DX11Foundation::Render(RenderState& renderState)
 	{
 		PROFILER_FUNCTION(profiler::colors::Red);
 
@@ -253,5 +254,12 @@ namespace Simple
 				AddMesh(assetManager, ShapeCreator3000::CreateSkyBox(Vector3f(100, 100, 100)), EnumToString(ePrimitiveShape::SkyBox), *device.Get(), context);
 				AddMesh(assetManager, ShapeCreator3000::CreateSphere(), EnumToString(ePrimitiveShape::Sphere), *device.Get(), context);
 			};
+	}
+
+	RenderContext DX11Foundation::CreateRenderContext(const Vector2ui& size)
+	{
+		DX11RenderContext dx11RenderContext(GetDevice(), GetContext(), size);
+
+		return RenderContext(std::move(dx11RenderContext));
 	}
 }

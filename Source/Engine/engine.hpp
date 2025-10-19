@@ -20,7 +20,7 @@ namespace Simple
 	{
 	public:
 
-		explicit Engine(std::unique_ptr<OperatingSystem> operatingSystem);
+		explicit Engine(OperatingSystem&& operatingSystem);
 		~Engine();
 
 		void Init();
@@ -41,9 +41,9 @@ namespace Simple
 		[[nodiscard]] const SceneManager& GetSceneManager() const { return mSceneManager; }
 		[[nodiscard]] AudioManager& GetAudioManager() { return mAudioManager; }
 		[[nodiscard]] const AudioManager& GetAudioManager() const { return mAudioManager; }
-		[[nodiscard]] OperatingSystem& GetOperatingSystem() { return *mOperatingSystem; }
-		[[nodiscard]] const OperatingSystem& GetOperatingSystem() const { return *mOperatingSystem; }
-		[[nodiscard]] WindowView GetMainWindow() const;
+		[[nodiscard]] OperatingSystem& GetOperatingSystem() { return mOperatingSystem; }
+		[[nodiscard]] const OperatingSystem& GetOperatingSystem() const { return mOperatingSystem; }
+		[[nodiscard]] WindowView GetMainWindow();
 		[[nodiscard]] AssetManager& GetAssetManager() { return *mAssetManager; }
 		[[nodiscard]] GraphicsSettings& GetGraphicsSettings() { return *mGraphicsSettings; }
 		[[nodiscard]] class DataTypeRegistry& GetDataTypeRegistry();
@@ -58,7 +58,7 @@ namespace Simple
 		
 	private:
 
-		std::unique_ptr<OperatingSystem> mOperatingSystem;
+		OperatingSystem mOperatingSystem;
 		[[no_unique_address]] Console mConsole;
 		AudioManager mAudioManager;
 		SceneManager mSceneManager;

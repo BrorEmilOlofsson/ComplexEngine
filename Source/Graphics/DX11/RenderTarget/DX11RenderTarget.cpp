@@ -35,9 +35,14 @@ namespace Simple
 		mRenderTargetView = DX11Factory::CreateRenderTargetView(*mDevice.Get(), resource, descOpt);
 	}
 
-	void DX11RenderTarget::Set(ID3D11DepthStencilView& depthStencilView)
+	void DX11RenderTarget::Set()
 	{
-		mContext->OMSetRenderTargets(1u, mRenderTargetView.GetAddressOf(), &depthStencilView);
+		Set(nullptr);
+	}
+
+	void DX11RenderTarget::Set(ID3D11DepthStencilView* depthStencilView)
+	{
+		mContext->OMSetRenderTargets(1u, mRenderTargetView.GetAddressOf(), depthStencilView);
 	}
 
 	void DX11RenderTarget::Clear(Color color)

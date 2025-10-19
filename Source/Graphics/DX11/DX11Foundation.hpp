@@ -45,7 +45,7 @@ namespace Simple
 		void Init();
 		void Shutdown();
 
-		void Render(const RenderState& renderState);
+		void Render(RenderState& renderState);
 
 		[[nodiscard]] AssetLoader GetAssetLoader() const;
 
@@ -72,6 +72,8 @@ namespace Simple
 		{
 			return mDepthStencilViewManager->Create(size);
 		}
+
+		[[nodiscard]] RenderContext CreateRenderContext(const Vector2ui& size);
 
 		[[nodiscard]] std::shared_ptr<DX11DepthStencilViewManager> GetDepthStencilViewManager()
 		{

@@ -32,12 +32,12 @@ struct Profiler
 namespace Simple
 {
 
-	static std::unique_ptr<OperatingSystem> CreateWindowsOperatingSystem(HINSTANCE hInstance)
+	static OperatingSystem CreateWindowsOperatingSystem(HINSTANCE hInstance)
 	{
-		return std::make_unique<OperatingSystem>(Win_OperatingSystem(hInstance, L"SimpleWindowClass"));
+		return OperatingSystem(Win_OperatingSystem(hInstance, L"SimpleWindowClass"));
 	}
 
-	static void Run(std::unique_ptr<OperatingSystem> operatingSystem);
+	static void Run(OperatingSystem&& operatingSystem);
 }
 
 
@@ -54,7 +54,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR,
 
 namespace Simple
 {
-	using RunFunction = void(*)(std::unique_ptr<OperatingSystem>);
+	using RunFunction = void(*)(OperatingSystem&&);
 
 	static RunFunction GetRunFunction()
 	{
@@ -69,7 +69,7 @@ namespace Simple
 #endif
 	}
 
-	static void Run(std::unique_ptr<OperatingSystem> operatingSystem)
+	static void Run(OperatingSystem&& operatingSystem)
 	{
 		RunFunction runFunction = GetRunFunction();
 

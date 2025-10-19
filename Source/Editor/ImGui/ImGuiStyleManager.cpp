@@ -4,6 +4,19 @@
 
 namespace Simple
 {
+
+	static void LoadImGuiIniFile()
+	{
+		std::filesystem::path iniPath = std::filesystem::absolute("Settings/imgui.ini");
+		if (iniPath.empty())
+		{
+			std::filesystem::path savedSource = std::filesystem::absolute(std::filesystem::path(SIMPLE_DIR_SETTINGS) / "imgui.ini");
+			std::filesystem::copy(savedSource, iniPath);
+		}
+		const std::string iniPathStr = iniPath.string();
+		ImGui::LoadIniSettingsFromDisk(iniPathStr.c_str());
+	}
+
 	static void LoadFonts()
 	{
 		ImGuiIO& io = ImGui::GetIO();
@@ -17,6 +30,9 @@ namespace Simple
 
 		io.Fonts->AddFontFromFileTTF(std::filesystem::absolute(std::filesystem::path(Directory::Assets) / "Fonts/fa-solid-900.ttf").string().c_str(), 11.0f, &icons_config, icons_ranges);
 		io.Fonts->Build();
+
+
+		
 	}
 
 	[[nodiscard]] static std::array<ImVec4, static_cast<std::size_t>(ImGuiCol_COUNT)> LoadColors(ImVec4 darkGrayColor, ImVec4 softBlueColor, ImVec4& interactiveColor, ImVec4& playModeBackgroundColor)
@@ -99,6 +115,7 @@ namespace Simple
 	{
 		ImGui::StyleColorsDark();
 
+		LoadImGuiIniFile();
 		mColors = LoadColors(DarkGrayColor, SoftBlueColor, mInteractiveColor, mPlayModeBackgroundColor);
 		mStyle = LoadStyle();
 		LoadFonts();

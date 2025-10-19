@@ -19,7 +19,7 @@ namespace Simple
 		mConcept->Render();
 	}
 
-	void OperatingSystem::Render(const RenderState& renderState)
+	void OperatingSystem::Render(RenderState& renderState)
 	{
 		mConcept->Render(renderState);
 	}

@@ -317,6 +317,24 @@ namespace Simple
 		return textureDesc;
 	}
 
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> DX11Factory::CreateObjectIDStagingTexture(ID3D11Device& device, Vector2ui size)
+	{
+		D3D11_TEXTURE2D_DESC desc = {};
+		desc.Width = size.x;
+		desc.Height = size.y;
+		desc.MipLevels = 1;
+		desc.ArraySize = 1;
+		desc.Format = DXGI_FORMAT_R32_UINT;
+		desc.SampleDesc.Count = 1;
+		desc.Usage = D3D11_USAGE_STAGING;      // CPU readable
+		desc.BindFlags = 0;
+		desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+
+		Microsoft::WRL::ComPtr<ID3D11Texture2D> stagingTexture;
+		device.CreateTexture2D(&desc, nullptr, &stagingTexture);
+		return stagingTexture;
+	}
+
 	D3D11_TEXTURE2D_DESC DX11Factory::CreateObjectSelectionTextureDesc(Vector2ui size)
 	{
 		D3D11_TEXTURE2D_DESC textureDesc = {};
@@ -334,6 +352,7 @@ namespace Simple
 
 	static std::string LoadCSOData(const std::filesystem::path& path)
 	{
+		PROFILER_FUNCTION(profiler::colors::DeepPurple100);
 		std::string data;
 		const std::filesystem::path psFilepath = std::filesystem::absolute(path);
 
@@ -346,14 +365,16 @@ namespace Simple
 	Microsoft::WRL::ComPtr<ID3D11VertexShader> DX11Factory::CreateVertexShaderAndInputLayout(const std::filesystem::path& path,
 		ID3D11Device& device, Microsoft::WRL::ComPtr<ID3D11InputLayout>& inputLayout)
 	{
+		PROFILER_FUNCTION(profiler::colors::DeepPurple100);
 		const std::string data = LoadCSOData(path);
 
 		Microsoft::WRL::ComPtr<ID3D11VertexShader> vertexShader;
 		{
-
+			PROFILER_BEGIN("DX11 create vertex shader")
 			const HRESULT result = device.CreateVertexShader(data.data(), data.size(), nullptr, &vertexShader);
 
 			WIN_CHECK_HRESULT(result);
+			PROFILER_END();
 		}
 
 		{
@@ -370,9 +391,11 @@ namespace Simple
 				
 			};
 
+			PROFILER_BEGIN("DX11 create input layout")
 			const HRESULT result = device.CreateInputLayout(inputLayoutDesc.data(), static_cast<UINT>(inputLayoutDesc.size()), data.data(), data.size(), &inputLayout);
 
 			WIN_CHECK_HRESULT(result);
+			PROFILER_END();
 
 		}
 

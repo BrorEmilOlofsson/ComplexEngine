@@ -51,6 +51,10 @@ namespace Simple
 		void Resize(Vector2ui size);
 
 		[[nodiscard]] Vector2ui GetSize() const { return mSize; }
+
+		void SetRenderTargets();
+		void SetShaderResources();
+
 	private:
 
 		DX11RenderTarget mAlbedoRT;

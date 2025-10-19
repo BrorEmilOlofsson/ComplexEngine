@@ -108,48 +108,23 @@ namespace Simple
 		return std::filesystem::path(SIMPLE_DIR_SHADERS) / (std::string(name) + ".cso");
 	}
 
-	static std::optional<uint32_t> ReconstructObjectID(ID3D11DeviceContext& context, ID3D11Texture2D& stagingTexture, ID3D11Texture2D& idTexture, Point2i cursorPos, const AABB2i& renderRect)
+
+	static constexpr Point2i MapToRenderRect(const Point2i mouseScreenPos, const AABB2i& renderRect)
 	{
 		const AABB2f windowRect = AABB2f::CreateFromMinAndExtent(Point2f::Zero(), Vector2f(renderRect.GetExtent()));
-		const Point2i mappedPos = Point2i(Remap(Point2f(cursorPos), ToAABB<float>(renderRect), windowRect));
-
-		if (!IsInside(mappedPos, ToAABB<int>(windowRect)))
-		{
-			return std::nullopt;
-		}
-		// Copy GPU texture to a staging resource
-		context.CopyResource(&stagingTexture, &idTexture);
-		PROFILER_END();
-
-		D3D11_MAPPED_SUBRESOURCE mapped{};
-		context.Map(&stagingTexture, 0, D3D11_MAP_READ, 0, &mapped);
-
-		uint32_t* pixels = (uint32_t*)mapped.pData;
-		uint32_t id = pixels[mappedPos.y * (mapped.RowPitch / sizeof(uint32_t)) + mappedPos.x];
-
-		context.Unmap(&stagingTexture, 0);
-		return id;
+		const Point2i mappedPos = Point2i(Remap(Point2f(mouseScreenPos), ToAABB<float>(renderRect), windowRect));
+		return mappedPos;
 	}
 
-	Microsoft::WRL::ComPtr<ID3D11Texture2D> CreateObjectIDStaging(ID3D11Device* device, Vector2ui size)
+	bool IsInsideRenderRect(const Point2i& mouseScreenPos, const AABB2i& renderRect)
 	{
-		D3D11_TEXTURE2D_DESC desc = {};
-		desc.Width = size.x;
-		desc.Height = size.y;
-		desc.MipLevels = 1;
-		desc.ArraySize = 1;
-		desc.Format = DXGI_FORMAT_R32_UINT;
-		desc.SampleDesc.Count = 1;
-		desc.Usage = D3D11_USAGE_STAGING;      // CPU readable
-		desc.BindFlags = 0;
-		desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+		const AABB2f windowRect = AABB2f::CreateFromMinAndExtent(Point2f::Zero(), Vector2f(renderRect.GetExtent()));
+		const Point2i mappedPos = MapToRenderRect(mouseScreenPos, renderRect);
 
-		Microsoft::WRL::ComPtr<ID3D11Texture2D> stagingTexture;
-		device->CreateTexture2D(&desc, nullptr, &stagingTexture);
-		return stagingTexture;
+		return IsInside(mappedPos, ToAABB<int>(windowRect));
 	}
 
-	void DX11Renderer::Render(const RenderState& renderState, AssetManager& assetManager,
+	void DX11Renderer::Render(RenderState& renderState, AssetManager& assetManager,
 		PixelShaderAssetHandle pixelShader, VertexShaderAssetHandle vertexShader,
 		DX11ConstantBuffer<ColorBufferData>& colorCB, DX11ConstantBuffer<TransformBufferData>& transformCB, DX11ConstantBuffer<ObjectIDBufferData>& objectIDCB,
 		DX11RenderTargetManager& renderTargetManager, DX11SamplerState& samplerState)
@@ -166,20 +141,21 @@ namespace Simple
 		auto viewport = DX11Factory::CreateViewport(size);
 		mDeviceContext->RSSetViewports(1, &viewport);
 
-		static std::unique_ptr<DX11GBuffer> gBuffer = std::make_unique<DX11GBuffer>(mDeviceContext, mDevice, size);
+		//static std::unique_ptr<DX11GBuffer> gBuffer = std::make_unique<DX11GBuffer>(mDeviceContext, mDevice, size);
 
-		gBuffer->Clear();
+		RenderContext& renderContext = *renderState.GetRenderContext();
+		renderContext.ClearBuffers();
+		//gBuffer->Clear();
 
-		if (gBuffer->GetSize() != size)
+		if (renderContext.GetBufferSize() != size)
 		{
-			gBuffer->Resize(size);
+			renderContext.ResizeBuffers(size);
+			//gBuffer->Resize(size);
 		}
 
-		mDeviceContext->OMSetRenderTargets(
-			static_cast<UINT>(gBuffer->GetRTVArray().size()),
-			gBuffer->GetRTVArray().data(),
-			gBuffer->GetDepthStencilView()
-		);
+
+
+		renderContext.SetGBufferRenderTargets();
 
 		assetManager.GetPixelShader(GetShaderPath("GBufferPS"))->Bind();
 		assetManager.GetVertexShader(GetPath(eVertexShaderType::Default))->Bind();
@@ -198,23 +174,35 @@ namespace Simple
 
 		Point2i mouseScreenPos = renderState.mCursorScreenPos;
 
-		auto stagingTexture = CreateObjectIDStaging(mDevice.Get(), size);
+		//auto stagingTexture = DX11Factory::CreateObjectIDStagingTexture(mDevice.Get(), size);
 
-		const auto id = ReconstructObjectID(*mDeviceContext.Get(), *stagingTexture.Get(), *gBuffer->mObjectIDTexture.Get(), mouseScreenPos, renderState.GetRenderRect().value());
 
-		const_cast<RenderState&>(renderState).mSelectedObjectID = id.value_or(std::numeric_limits<unsigned int>::max());
+		if (IsInsideRenderRect(mouseScreenPos, renderState.GetRenderRect().value()))
+		{
+			const Point2i mappedPos = MapToRenderRect(mouseScreenPos, renderState.GetRenderRect().value());
+
+			//const auto id = ReconstructObjectID(*mDeviceContext.Get(), *stagingTexture.Get(), *gBuffer->mObjectIDTexture.Get(), mouseScreenPos, renderState.GetRenderRect().value());
+			uint32_t id = renderContext.GetObjectIDAt(mappedPos);
+			const_cast<RenderState&>(renderState).mSelectedObjectID = id;
+		}
+		else
+		{
+			const_cast<RenderState&>(renderState).mSelectedObjectID = std::numeric_limits<uint32_t>::max();
+		}
 
 		auto rtv = renderTargetManager.Get(renderState.GetRenderTargetView().value())->GetRenderTargetView();
 
-		mDeviceContext->OMSetRenderTargets(1, &rtv, nullptr);
-		ID3D11ShaderResourceView* dummy[4] = {};
+			renderContext.SetOutputRenderTarget();
+			mDeviceContext->OMSetRenderTargets(1, &rtv, nullptr);
+			ID3D11ShaderResourceView* dummy[4] = {};
 		mDeviceContext->PSSetShaderResources(5, 4, dummy); // Clear old
 
-		mDeviceContext->PSSetShaderResources(
-			TextureSlots::GBufferStart, // 5
-			static_cast<UINT>(gBuffer->GetSRVArray().size()),
-			gBuffer->GetSRVArray().data()
-		);
+		renderContext.SetGBufferShaderResources();
+		//mDeviceContext->PSSetShaderResources(
+		//	TextureSlots::GBufferStart, // 5
+		//	static_cast<UINT>(gBuffer->GetSRVArray().size()),
+		//	gBuffer->GetSRVArray().data()
+		//);
 
 		RenderFullScreen(
 			*mDeviceContext.Get(),

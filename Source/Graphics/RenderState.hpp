@@ -9,6 +9,7 @@
 #include "Graphics/Light/AmbientLight.hpp"
 #include "Graphics/RenderTarget/RenderTargetView.hpp"
 #include "Graphics/DepthBuffer/DepthStencilViewHandle.hpp"
+#include "Graphics/RenderContext.hpp"
 
 namespace Simple
 {
@@ -28,6 +29,7 @@ namespace Simple
 		[[nodiscard]] constexpr const std::optional<AABB2i>& GetRenderRect() const noexcept;
 		[[nodiscard]] constexpr const std::optional<RenderTargetView>& GetRenderTargetView() const noexcept;
 		[[nodiscard]] constexpr const std::optional<DepthStencilViewHandle>& GetDepthStencilViewHandle() const noexcept;
+		[[nodiscard]] constexpr RenderContext* GetRenderContext() noexcept;
 		
 		constexpr void SetSkyBox(const SkyBox& skyBox) noexcept;
 		constexpr void SetDirectionalLight(const DirectionalLight& directionalLight) noexcept;
@@ -36,6 +38,7 @@ namespace Simple
 		constexpr void SetRenderRect(const AABB2i& renderRect) noexcept;
 		constexpr void SetRenderTargetView(const RenderTargetView& renderTargetView) noexcept;
 		constexpr void SetDepthStencilViewHandle(const DepthStencilViewHandle& handle);
+		constexpr void SetRenderContext(RenderContext&& renderContext);
 
 		constexpr void Reset();
 
@@ -52,6 +55,7 @@ namespace Simple
 		std::optional<AABB2i> mRenderRect;
 		std::optional<RenderTargetView> mRenderTargetView;
 		std::optional<DepthStencilViewHandle> mDepthStencilViewHandle;
+		std::unique_ptr<RenderContext> mRenderContext;
 	};
 
 	constexpr RenderList& RenderState::GetRenderList() noexcept
@@ -99,6 +103,11 @@ namespace Simple
 		return mDepthStencilViewHandle;
 	}
 
+	constexpr RenderContext* RenderState::GetRenderContext() noexcept
+	{
+		return mRenderContext.get();
+	}
+
 	constexpr void RenderState::SetSkyBox(const SkyBox& skyBox) noexcept
 	{
 		mSkyBox = skyBox;
@@ -132,6 +141,11 @@ namespace Simple
 	constexpr void RenderState::SetDepthStencilViewHandle(const DepthStencilViewHandle& handle)
 	{
 		mDepthStencilViewHandle = handle;
+	}
+
+	constexpr void RenderState::SetRenderContext(RenderContext&& renderContext)
+	{
+		mRenderContext = std::make_unique<RenderContext>(std::move(renderContext));
 	}
 
 	constexpr void RenderState::Reset()

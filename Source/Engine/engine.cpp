@@ -19,7 +19,7 @@
 namespace Simple
 {
 
-	Engine::Engine(std::unique_ptr<OperatingSystem> operatingSystem)
+	Engine::Engine(OperatingSystem&& operatingSystem)
 		: mOperatingSystem(std::move(operatingSystem))
 	{
 		RegisterEngineComponents();
@@ -33,8 +33,8 @@ namespace Simple
 		mBlackboard = std::make_shared<Blackboard>();
 		mAssetManager = std::make_shared<AssetManager>();
 		mGraphicsSettings = std::make_shared<GraphicsSettings>();
-		mOperatingSystem->SetAssetManager(mAssetManager);
-		mOperatingSystem->SetGraphicsSettings(mGraphicsSettings);
+		mOperatingSystem.SetAssetManager(mAssetManager);
+		mOperatingSystem.SetGraphicsSettings(mGraphicsSettings);
 	}
 
 	Engine::~Engine()
@@ -47,8 +47,8 @@ namespace Simple
 	{
 		ECSRegistry::Get().SetBlackboard(mBlackboard);
 		mAssetManager->LoadAssets();
-		mOperatingSystem->Init();
-		mMainWindow = mOperatingSystem->MakeWindow(Vector2ui(1600, 900), L"SimpleEngine");
+		mOperatingSystem.Init();
+		mMainWindow = mOperatingSystem.MakeWindow(Vector2ui(1600, 900), L"SimpleEngine");
 
 		//mAudioManager.Init();
 		mFrameTimer.Start();
@@ -58,9 +58,9 @@ namespace Simple
 
 		CheckAndCopySettingsFiles();
 		LoadSettingsFromJson();
-		mOperatingSystem->LoadCursors(std::string(Directory::Assets) + std::string("Cursors"));
+		mOperatingSystem.LoadCursors(std::string(Directory::Assets) + std::string("Cursors"));
 
-		mOperatingSystem->GetWindow(mMainWindow).Show();
+		mOperatingSystem.GetWindow(mMainWindow).Show();
 
 		mBlackboard->Insert<Key_GraphicsSettings>(*mGraphicsSettings);
 		mBlackboard->Insert<Key_AssetManager>(*mAssetManager);
@@ -73,13 +73,15 @@ namespace Simple
 	{
 		mSceneManager.Init(mBlackboard);
 
-		mSceneManager.GetCurrentScene().GetRenderState().SetRenderTargetView(mOperatingSystem->CreateRenderTarget(mOperatingSystem->GetWindow(mMainWindow).GetClientSize()));
-		mSceneManager.GetCurrentScene().GetRenderState().SetDepthStencilViewHandle(mOperatingSystem->CreateDepthStencilView(mOperatingSystem->GetWindow(mMainWindow).GetClientSize()));
+		mSceneManager.GetCurrentScene().GetRenderState().SetRenderTargetView(mOperatingSystem.CreateRenderTarget(mOperatingSystem.GetWindow(mMainWindow).GetClientSize()));
+		mSceneManager.GetCurrentScene().GetRenderState().SetDepthStencilViewHandle(mOperatingSystem.CreateDepthStencilView(mOperatingSystem.GetWindow(mMainWindow).GetClientSize()));
+		RenderContext r = mOperatingSystem.CreateRenderContext(mOperatingSystem.GetWindow(mMainWindow).GetClientSize());
+		mSceneManager.GetCurrentScene().GetRenderState().SetRenderContext(std::move(r));
 	}
 
 	void Engine::Shutdown()
 	{
-		mOperatingSystem->Shutdown();
+		mOperatingSystem.Shutdown();
 	}
 
 	bool Engine::BeginFrame()
@@ -90,15 +92,15 @@ namespace Simple
 		GraphicsBufferData bufferData;
 		bufferData.frameTimer = mFrameTimer;
 		bufferData.totalTimer = mTotalTimer;
-		mOperatingSystem->BeginFrame(bufferData);
+		mOperatingSystem.BeginFrame(bufferData);
 
-		const WindowFrameBuffer& windowFrameBuffer = mOperatingSystem->GetWindow(mMainWindow).GetFrameBuffer();
+		const WindowFrameBuffer& windowFrameBuffer = mOperatingSystem.GetWindow(mMainWindow).GetFrameBuffer();
 		if (windowFrameBuffer.hasQuit)
 		{
 			return false;
 		}
 
-		mInputState = mOperatingSystem->GetWindow(mMainWindow).GetInputState();
+		mInputState = mOperatingSystem.GetWindow(mMainWindow).GetInputState();
 		mInputManager.Update(mInputState);
 
 		if (!windowFrameBuffer.droppedFiles.empty())
@@ -106,7 +108,7 @@ namespace Simple
 			FileUtility::CopyFiles(windowFrameBuffer.droppedFiles, mCurrentDropPath);
 		}
 
-		mSceneManager.GetCurrentScene().BeginFrame(mOperatingSystem->GetWindow(mMainWindow).GetClientSize(), mInputState.GetMousePosition());
+		mSceneManager.GetCurrentScene().BeginFrame(mOperatingSystem.GetWindow(mMainWindow).GetClientSize(), mInputState.GetMousePosition());
 
 		return !mShouldExit.load();
 	}
@@ -135,7 +137,7 @@ namespace Simple
 #ifndef _EDITOR
 		renderTarget = mSceneManager.GetCurrentScene().GetRenderState().GetRenderTargetView();
 #endif
-		mOperatingSystem->EndFrame(renderTarget);
+		mOperatingSystem.EndFrame(renderTarget);
 		if (!mGraphicsSettings->vSync)
 		{
 			SyncToFPSCap(mFrameTimer.GetLastTimepoint(), mGraphicsSettings->fPSCap);
@@ -157,12 +159,12 @@ namespace Simple
 		PROFILER_FUNCTION(profiler::colors::Cyan700);
 
 		mSceneManager.Render();
-		mOperatingSystem->Render(mSceneManager.GetCurrentScene().GetRenderState());
+		mOperatingSystem.Render(mSceneManager.GetCurrentScene().GetRenderState());
 	}
 
-	WindowView Engine::GetMainWindow() const
+	WindowView Engine::GetMainWindow()
 	{
-		return mOperatingSystem->GetWindow(mMainWindow);
+		return mOperatingSystem.GetWindow(mMainWindow);
 	}
 
 	DataTypeRegistry& Engine::GetDataTypeRegistry()

@@ -1,6 +1,7 @@
 #include "Graphics/Precompiled/GraphicsPch.hpp"
 #include "DX11VertexShader.hpp"
-#include "Graphics/DX11/DX11Factory.hpp"
+
+#ifdef _WIN32
 
 namespace Simple
 {
@@ -20,3 +21,5 @@ namespace Simple
 		mContext->IASetInputLayout(mInputLayout.Get());
 	}
 }
+
+#endif

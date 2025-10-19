@@ -1,11 +1,11 @@
 #pragma once
+
+#ifdef _WIN32
+
 #include <wrl/client.h>
+#include <d3d11.h>
 #include <filesystem>
 
-struct ID3D11VertexShader;
-struct ID3D11InputLayout;
-struct ID3D11Device;
-struct ID3D11DeviceContext;
 
 namespace Simple
 {
@@ -35,3 +35,5 @@ namespace Simple
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext> mContext;
 	};
 }
+
+#endif // _WIN32

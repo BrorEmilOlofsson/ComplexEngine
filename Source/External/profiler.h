@@ -10,7 +10,7 @@
 
 #define PROFILER_ENABLED 1
 #else
-#define PROFILER_ENABLED 0
+#define PROFILER_ENABLED 1
 #endif
 
 #if PROFILER_ENABLED

@@ -2,7 +2,8 @@
 
 namespace Simple
 {
-	
-	void RunEditor(std::unique_ptr<class OperatingSystem> operatingSystem);
+	class OperatingSystem;
+
+	void RunEditor(OperatingSystem&& operatingSystem);
 
 }

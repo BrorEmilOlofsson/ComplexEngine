@@ -104,7 +104,7 @@ namespace Simple
 
 	}
 
-	void Win_OperatingSystem::Render(const RenderState& renderState)
+	void Win_OperatingSystem::Render(RenderState& renderState)
 	{
 		mGraphicsFoundation.Render(renderState);
 	}

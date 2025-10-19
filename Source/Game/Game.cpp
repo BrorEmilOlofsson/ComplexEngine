@@ -1,5 +1,5 @@
 #include "Game/Precompiled/GamePch.hpp"
-#include "Game/GameWorld.hpp"
+#include "Game/Game.hpp"
 #include "Football/FootballTeam.hpp"
 #include "Football/FootballCompetition.hpp"
 #include "Football/FootballCompetitionSeason.hpp"
@@ -14,8 +14,59 @@
 
 namespace Simple
 {
-	GameWorld::GameWorld()
-	{
+	Game::Game()
+	{	/*auto teams = MakeTeams();
+		const auto players = GeneratePlayers(teams);
+		std::vector<FootballMatch> matches;
+
+		FootballCompetition premierLeague;
+		FootballCompetitionSeason premierLeague2425;
+
+		for (size_t i = 0; i < size(teams); i++)
+		{
+			premierLeague2425.AddTeam(FootballTeamID(i));
+		}
+
+		premierLeague.SetName("Premier League");
+
+		std::chrono::time_point t1 = std::chrono::high_resolution_clock::now();
+		auto pairings = GenerateLeaguePairings(premierLeague2425);
+		std::chrono::time_point t2 = std::chrono::high_resolution_clock::now();
+		std::chrono::duration<double, std::milli> d = t2 - t1;
+		std::cout << d << std::endl;
+		pairings;
+
+		for (size_t i = 0; i < size(pairings); i++)
+		{
+			matches.push_back(FootballMatch(pairings[i].first, pairings[i].second));
+		}
+
+		std::vector<FootballMatchID> matchIDs;
+		matchIDs.reserve(size(matches));
+
+		for (size_t i = 0; i < size(matches); i++)
+		{
+			matchIDs.push_back(FootballMatchID(i));
+		}
+		premierLeague2425.AddMatches(matchIDs);
+
+		for (FootballMatch& match : matches)
+		{
+			QuickSimMatch(match);
+		}
+
+		PrintSquads(teams, players);
+
+		const FootballTable table = CreateTable(premierLeague2425, matches);
+		PrintTable(table, teams);
+
+		std::optional<double> t = Physics::CalculateTheta<double, eQuadraticReturn::Min>(Physics::Speed(28.69), 36.21, 2.3, 0.11);
+
+		std::cout << t.value() << std::endl;
+		t;*/
+
+
+
 	}
 
 
@@ -249,59 +300,4 @@ namespace Simple
 		}
 	}
 
-	void GameWorld::Init()
-	{
-		/*auto teams = MakeTeams();
-		const auto players = GeneratePlayers(teams);
-		std::vector<FootballMatch> matches;
-
-		FootballCompetition premierLeague;
-		FootballCompetitionSeason premierLeague2425;
-
-		for (size_t i = 0; i < size(teams); i++)
-		{
-			premierLeague2425.AddTeam(FootballTeamID(i));
-		}
-
-		premierLeague.SetName("Premier League");
-
-		std::chrono::time_point t1 = std::chrono::high_resolution_clock::now();
-		auto pairings = GenerateLeaguePairings(premierLeague2425);
-		std::chrono::time_point t2 = std::chrono::high_resolution_clock::now();
-		std::chrono::duration<double, std::milli> d = t2 - t1;
-		std::cout << d << std::endl;
-		pairings;
-
-		for (size_t i = 0; i < size(pairings); i++)
-		{
-			matches.push_back(FootballMatch(pairings[i].first, pairings[i].second));
-		}
-
-		std::vector<FootballMatchID> matchIDs;
-		matchIDs.reserve(size(matches));
-
-		for (size_t i = 0; i < size(matches); i++)
-		{
-			matchIDs.push_back(FootballMatchID(i));
-		}
-		premierLeague2425.AddMatches(matchIDs);
-
-		for (FootballMatch& match : matches)
-		{
-			QuickSimMatch(match);
-		}
-
-		PrintSquads(teams, players);
-
-		const FootballTable table = CreateTable(premierLeague2425, matches);
-		PrintTable(table, teams);
-
-		std::optional<double> t = Physics::CalculateTheta<double, eQuadraticReturn::Min>(Physics::Speed(28.69), 36.21, 2.3, 0.11);
-
-		std::cout << t.value() << std::endl;
-		t;*/
-
-
-
-	}
 }

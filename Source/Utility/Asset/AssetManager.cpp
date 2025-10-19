@@ -104,10 +104,14 @@ namespace Simple
 				}
 				case eShaderT::Vertex:
 				{
+					PROFILER_BEGIN("Load vertex shader");
 					auto asset = assetLoader.LoadVertexShader(path);
+					PROFILER_END();
 					if (asset)
 					{
+						PROFILER_BEGIN("Add shader");
 						assetManager.AddVertexShader(path, asset);
+						PROFILER_END();
 					}
 					break;
 				}

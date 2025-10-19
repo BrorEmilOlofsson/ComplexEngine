@@ -225,6 +225,8 @@ namespace Simple
 			const AABB2i renderRect = RenderImage(sceneTextureID);
 			//assert(renderRect == sceneRenderState.GetRenderRect().value());
 
+			
+
 			mTransformEntityTool.ShowEntityImGuizmo(
 				sceneManager.GetCurrentScene().GetECS(),
 				mHierarchyPopUp.GetSelectedEntityID(),
@@ -239,6 +241,20 @@ namespace Simple
 			);
 
 			ShowSceneSettingsPopUp(editorSceneSettings);
+		}
+
+		ImGui::End();
+
+		if (ImGui::Begin("Deferred Render Targets"))
+		{
+
+			auto srvs = sceneRenderState.GetRenderContext()->GetGBufferSRVs();
+			for (auto& srv : srvs)
+			{
+				RenderImage(srv);
+
+			}
+
 		}
 
 		ImGui::End();

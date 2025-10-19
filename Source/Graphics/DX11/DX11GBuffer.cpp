@@ -1,6 +1,7 @@
 #include "Graphics/Precompiled/GraphicsPch.hpp"
 #include "DX11GBuffer.hpp"
 #include "Graphics/DX11/DX11Factory.hpp"
+#include "Graphics/GraphicsDefines.hpp"
 
 namespace Simple
 {
@@ -57,10 +58,6 @@ namespace Simple
 
 	void DX11GBuffer::Resize(Vector2ui size)
 	{
-		if (mSize == size)
-		{
-			return;
-		}
 		mAlbedoRT.Resize(*DX11Factory::CreateRenderTargetTexture(
 			*mDevice.Get(),
 			DX11Factory::CreateRenderTargetTextureDesc(size)
@@ -90,5 +87,25 @@ namespace Simple
 		mObjectIDRT.Resize(*mObjectIDTexture.Get(), size);
 		mDepthStencilView = DX11Factory::CreateDepthStencilView(*mDevice.Get(), size);
 		mSize = size;
+	}
+
+	void DX11GBuffer::SetRenderTargets()
+	{
+		auto rtvArray = GetRTVArray();
+		mContext->OMSetRenderTargets(
+			static_cast<UINT>(rtvArray.size()),
+			rtvArray.data(),
+			GetDepthStencilView()
+		);
+	}
+
+	void DX11GBuffer::SetShaderResources()
+	{
+		auto srvArray = GetSRVArray();
+		mContext->PSSetShaderResources(
+			TextureSlots::GBufferStart, 
+			static_cast<UINT>(srvArray.size()), 
+			srvArray.data()
+		);
 	}
 }
