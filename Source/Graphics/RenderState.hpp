@@ -27,17 +27,14 @@ namespace Simple
 		[[nodiscard]] constexpr const std::optional<DirectionalLight>& GetDirectionalLight() const noexcept;
 		[[nodiscard]] constexpr const std::optional<AmbientLight>& GetAmbientLight() const noexcept;
 		[[nodiscard]] constexpr const std::optional<AABB2i>& GetRenderRect() const noexcept;
-		[[nodiscard]] constexpr const std::optional<RenderTargetView>& GetRenderTargetView() const noexcept;
-		[[nodiscard]] constexpr const std::optional<DepthStencilViewHandle>& GetDepthStencilViewHandle() const noexcept;
 		[[nodiscard]] constexpr RenderContext* GetRenderContext() noexcept;
+		[[nodiscard]] constexpr const RenderContext* GetRenderContext() const noexcept;
 		
 		constexpr void SetSkyBox(const SkyBox& skyBox) noexcept;
 		constexpr void SetDirectionalLight(const DirectionalLight& directionalLight) noexcept;
 		constexpr void SetAmbientLight(const AmbientLight& ambientLight) noexcept;
 		constexpr void SetCamera(const Camera& camera) noexcept;
 		constexpr void SetRenderRect(const AABB2i& renderRect) noexcept;
-		constexpr void SetRenderTargetView(const RenderTargetView& renderTargetView) noexcept;
-		constexpr void SetDepthStencilViewHandle(const DepthStencilViewHandle& handle);
 		constexpr void SetRenderContext(RenderContext&& renderContext);
 
 		constexpr void Reset();
@@ -53,8 +50,6 @@ namespace Simple
 		std::optional<DirectionalLight> mDirectionalLight;
 		std::optional<AmbientLight> mAmbientLight;
 		std::optional<AABB2i> mRenderRect;
-		std::optional<RenderTargetView> mRenderTargetView;
-		std::optional<DepthStencilViewHandle> mDepthStencilViewHandle;
 		std::unique_ptr<RenderContext> mRenderContext;
 	};
 
@@ -93,17 +88,12 @@ namespace Simple
 		return mRenderRect;
 	}
 
-	constexpr const std::optional<RenderTargetView>& RenderState::GetRenderTargetView() const noexcept
-	{
-		return mRenderTargetView;
-	}
-
-	constexpr const std::optional<DepthStencilViewHandle>& RenderState::GetDepthStencilViewHandle() const noexcept
-	{
-		return mDepthStencilViewHandle;
-	}
-
 	constexpr RenderContext* RenderState::GetRenderContext() noexcept
+	{
+		return mRenderContext.get();
+	}
+
+	constexpr const RenderContext* RenderState::GetRenderContext() const noexcept
 	{
 		return mRenderContext.get();
 	}
@@ -131,16 +121,6 @@ namespace Simple
 	constexpr void RenderState::SetRenderRect(const AABB2i& renderRect) noexcept
 	{
 		mRenderRect = renderRect;
-	}
-
-	constexpr void RenderState::SetRenderTargetView(const RenderTargetView& renderTargetView) noexcept
-	{
-		mRenderTargetView = renderTargetView;
-	}
-
-	constexpr void RenderState::SetDepthStencilViewHandle(const DepthStencilViewHandle& handle)
-	{
-		mDepthStencilViewHandle = handle;
 	}
 
 	constexpr void RenderState::SetRenderContext(RenderContext&& renderContext)

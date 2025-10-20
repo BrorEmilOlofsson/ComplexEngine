@@ -14,7 +14,7 @@ namespace Simple
 	{
 	public:
 
-		explicit EntityCompositionPopUp(const std::string& windowName, const RenderTargetView& renderTargetView, const DepthStencilViewHandle dsvHandle);
+		explicit EntityCompositionPopUp(const std::string& name, RenderContext&& renderContext);
 
 		void UpdateInternal(const Blackboard& blackboard) override;
 		void Render(const Blackboard& blackboard) override;

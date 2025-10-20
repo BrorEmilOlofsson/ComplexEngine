@@ -86,7 +86,7 @@ namespace Simple
 		}
 	}
 
-	void Win_OperatingSystem::EndFrame(std::optional<RenderTargetView> renderTarget)
+	void Win_OperatingSystem::EndFrame(RenderContext* renderContext)
 	{
 		for (auto& window : mWindows)
 		{
@@ -95,7 +95,7 @@ namespace Simple
 		mGraphicsFoundation.EndFrame();
 		for (auto& window : mWindows)
 		{
-			window->EndFrame(renderTarget);
+			window->EndFrame(renderContext);
 		}
 	}
 

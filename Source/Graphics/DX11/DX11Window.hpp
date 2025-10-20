@@ -38,16 +38,13 @@ namespace Simple
 		void Init();
 
 		void BeginFrame();
-		void EndFrame(std::optional<RenderTargetView> renderTargetView);
+		void EndFrame(RenderContext* renderContext);
 		void PrepareFrame();
 
 		void OnWindowResize();
 
 		void BindBackBuffer();
 
-	public:
-
-		[[nodiscard]] unsigned int GetDrawCalls() const;
 
 	private:
 

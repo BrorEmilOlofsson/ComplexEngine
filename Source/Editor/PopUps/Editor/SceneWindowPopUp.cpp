@@ -205,7 +205,7 @@ namespace Simple
 		EditorSceneSettings& editorSceneSettings = blackboard.Get<Key_EditorSceneSettings>();
 		
 		const WindowView windowView = blackboard.Get<Key_WindowView>();
-		void* sceneTextureID = sceneManager.GetCurrentScene().GetRenderState().GetRenderTargetView()->GetSRV();
+		void* sceneTextureID = sceneManager.GetCurrentScene().GetRenderState().GetRenderContext()->GetOutputSRV();
 		RenderState& sceneRenderState = sceneManager.GetCurrentScene().GetRenderState();
 		mHierarchyPopUp.Render(newBlackboard);
 		mInspectorPopUp.Render(newBlackboard);
@@ -248,12 +248,23 @@ namespace Simple
 		if (ImGui::Begin("Deferred Render Targets"))
 		{
 
+			// Actual size of render target
+			ImVec2 size = ToImVec2(sceneRenderState.GetRenderRect()->GetExtent());
+			const ImVec2 available = ImGui::GetContentRegionAvail();
+			constexpr int columns = 3;
+			float m = (available.x / columns) / size.x;
+			size *= m;
 			auto srvs = sceneRenderState.GetRenderContext()->GetGBufferSRVs();
+
+			ImGui::Columns(columns);
 			for (auto& srv : srvs)
 			{
-				RenderImage(srv);
-
+				ImGui::Text("Target");
+				ImGui::Image(srv, size);
+				ImGui::NextColumn();
 			}
+
+			ImGui::Columns(1);
 
 		}
 

@@ -12,12 +12,11 @@
 namespace Simple
 {
 
-	EntityCompositionPopUp::EntityCompositionPopUp(const std::string&, const RenderTargetView& renderTargetView, const DepthStencilViewHandle dsvHandle)
+	EntityCompositionPopUp::EntityCompositionPopUp(const std::string&, RenderContext&& renderContext)
 		: PopUp("Entity Composition Viewer")
 		, mEntityComposition(ECSRegistry::Get())
 	{
-		mRenderState.SetRenderTargetView(renderTargetView);
-		mRenderState.SetDepthStencilViewHandle(dsvHandle);
+		mRenderState.SetRenderContext(std::move(renderContext));
 	}
 
 	void EntityCompositionPopUp::UpdateInternal(const Blackboard& blackboard)

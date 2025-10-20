@@ -48,6 +48,16 @@ namespace Simple
 			return mConcept->GetObjectIDAt(point);
 		}
 
+		[[nodiscard]] void* GetOutputRenderTarget()
+		{
+			return mConcept->GetOutputRenderTarget();
+		}
+
+		[[nodiscard]] void* GetOutputSRV()
+		{
+			return mConcept->GetOutputSRV();
+		}
+
 		void ResizeBuffers(const Vector2ui& size)
 		{
 			mConcept->ResizeBuffers(size);
@@ -85,6 +95,8 @@ namespace Simple
 			virtual std::vector<void*> GetGBufferSRVs() = 0;
 			virtual Vector2ui GetBufferSize() = 0;
 			virtual uint32_t GetObjectIDAt(const Point2i& point) = 0;
+			virtual void* GetOutputRenderTarget() = 0;
+			virtual void* GetOutputSRV() = 0;
 			virtual void ResizeBuffers(const Vector2ui& size) = 0;
 			virtual void ClearBuffers() = 0;
 			virtual void SetOutputRenderTarget() = 0;
@@ -122,6 +134,16 @@ namespace Simple
 			uint32_t GetObjectIDAt(const Point2i& point) override
 			{
 				return mObject.GetObjectIDAt(point);
+			}
+
+			void* GetOutputRenderTarget() override
+			{
+				return &mObject.GetOutputRenderTarget();
+			}
+
+			void* GetOutputSRV() override
+			{
+				return mObject.GetOutputSRV();
 			}
 
 			void ResizeBuffers(const Vector2ui& size) override

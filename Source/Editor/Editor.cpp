@@ -95,9 +95,8 @@ namespace Simple
 		std::shared_ptr<SceneWindowPopUp> sceneWindowPopUp = AddPopUpWindow<SceneWindowPopUp>(popUpWindows, "Scene");
 		std::shared_ptr<EntityCompositionPopUp> entityFormulaPopUp = AddPopUpWindow<EntityCompositionPopUp>(
 			popUpWindows, 
-			"Entity Formula",
-			engine.GetOperatingSystem().CreateRenderTarget(engine.GetMainWindow().GetClientSize()),
-			engine.GetOperatingSystem().CreateDepthStencilView(engine.GetMainWindow().GetClientSize())
+			"",
+			engine.GetOperatingSystem().CreateRenderContext(engine.GetMainWindow().GetClientSize())
 		);
 
 		{

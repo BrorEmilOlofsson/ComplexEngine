@@ -25,7 +25,7 @@ namespace Simple
 		void Init();
 		void Shutdown();
 		void BeginFrame(const GraphicsBufferData& bufferData);
-		void EndFrame(std::optional<RenderTargetView> renderTarget);
+		void EndFrame(RenderContext* renderContext);
 		void Render();
 		void Render(RenderState& renderState);
 
@@ -75,9 +75,9 @@ namespace Simple
 		os.BeginFrame(data);
 	}
 
-	inline void OSEndFrame(Win_OperatingSystem& os, std::optional<RenderTargetView> renderTarget)
+	inline void OSEndFrame(Win_OperatingSystem& os, RenderContext* renderContext)
 	{
-		os.EndFrame(renderTarget);
+		os.EndFrame(renderContext);
 	}
 
 	inline void OSInit(Win_OperatingSystem& os)

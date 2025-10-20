@@ -126,8 +126,7 @@ namespace Simple
 
 	void DX11Renderer::Render(RenderState& renderState, AssetManager& assetManager,
 		PixelShaderAssetHandle pixelShader, VertexShaderAssetHandle vertexShader,
-		DX11ConstantBuffer<ColorBufferData>& colorCB, DX11ConstantBuffer<TransformBufferData>& transformCB, DX11ConstantBuffer<ObjectIDBufferData>& objectIDCB,
-		DX11RenderTargetManager& renderTargetManager, DX11SamplerState& samplerState)
+		DX11ConstantBuffer<ColorBufferData>& colorCB, DX11ConstantBuffer<TransformBufferData>& transformCB, DX11ConstantBuffer<ObjectIDBufferData>& objectIDCB, DX11SamplerState& samplerState)
 	{
 		transformCB;
 		vertexShader;
@@ -190,12 +189,12 @@ namespace Simple
 			const_cast<RenderState&>(renderState).mSelectedObjectID = std::numeric_limits<uint32_t>::max();
 		}
 
-		auto rtv = renderTargetManager.Get(renderState.GetRenderTargetView().value())->GetRenderTargetView();
+		//auto rtv = renderTargetManager.Get(renderState.GetRenderTargetView().value())->GetRenderTargetView();
 
-			renderContext.SetOutputRenderTarget();
-			mDeviceContext->OMSetRenderTargets(1, &rtv, nullptr);
-			ID3D11ShaderResourceView* dummy[4] = {};
-		mDeviceContext->PSSetShaderResources(5, 4, dummy); // Clear old
+		renderContext.SetOutputRenderTarget();
+		//mDeviceContext->OMSetRenderTargets(1, &rtv, nullptr);
+		ID3D11ShaderResourceView* dummy[5] = {};
+		mDeviceContext->PSSetShaderResources(TextureSlots::GBufferStart, static_cast<UINT>(renderContext.GetGBufferSRVs().size()), dummy); // Clear old
 
 		renderContext.SetGBufferShaderResources();
 		//mDeviceContext->PSSetShaderResources(
@@ -206,7 +205,7 @@ namespace Simple
 
 		RenderFullScreen(
 			*mDeviceContext.Get(),
-			renderState.GetRenderTargetView().value(),
+		static_cast<DX11RenderTarget*>(renderContext.GetOutputRenderTarget())->GetShaderResourceView(),
 			samplerState,
 			assetManager.GetVertexShader(GetShaderPath("FullScreenQuadVS")),
 			assetManager.GetPixelShader(GetShaderPath("DeferredLightingPS"))

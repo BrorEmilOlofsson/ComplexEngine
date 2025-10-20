@@ -52,9 +52,7 @@ namespace Simple
 		}
 
 		void BeginFrame();
-		void EndFrame(std::optional<RenderTargetView> renderTarget);
-
-		//void Render(const RenderState& renderState);
+		void EndFrame(RenderContext* renderContext);
 
 		void ProcessMessages();
 
@@ -111,9 +109,9 @@ namespace Simple
 		window.BeginFrame();
 	}
 
-	inline void Window_EndFrame(Win_Window& window, std::optional<RenderTargetView> renderTarget)
+	inline void Window_EndFrame(Win_Window& window, RenderContext* renderContext)
 	{
-		window.EndFrame(renderTarget);
+		window.EndFrame(renderContext);
 	}
 
 	/*inline void Window_Update(Win_Window& window, RenderList& renderList)

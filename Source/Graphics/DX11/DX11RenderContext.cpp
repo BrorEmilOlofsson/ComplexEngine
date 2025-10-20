@@ -52,6 +52,16 @@ namespace Simple
 		return ReconstructObjectID(*mContext.Get(), *stagingTexture.Get(), *mGBuffer.mObjectIDTexture.Get(), pos);
 	}
 
+	DX11RenderTarget& DX11RenderContext::GetOutputRenderTarget()
+	{
+		return mOutputRT;
+	}
+
+	ID3D11ShaderResourceView* DX11RenderContext::GetOutputSRV()
+	{
+		return mOutputRT.GetShaderResourceView();
+	}
+
 	void DX11RenderContext::ResizeBuffers(const Vector2ui& size)
 	{
 		mGBuffer.Resize(size);

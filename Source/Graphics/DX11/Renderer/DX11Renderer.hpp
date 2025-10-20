@@ -36,7 +36,7 @@ namespace Simple
 		void Render(RenderState& renderState, AssetManager& assetManager, 
 			PixelShaderAssetHandle pixelShader, VertexShaderAssetHandle vertexShader,
 			DX11ConstantBuffer<ColorBufferData>& colorCB, DX11ConstantBuffer<TransformBufferData>& transformCB, DX11ConstantBuffer<ObjectIDBufferData>& objectIDCB,
-			DX11RenderTargetManager& renderTargetManager, DX11SamplerState& samplerState);
+			DX11SamplerState& samplerState);
 
 	private:
 

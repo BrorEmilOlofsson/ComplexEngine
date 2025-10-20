@@ -9,9 +9,9 @@ namespace Simple
 		mConcept->BeginFrame(bufferData);
 	}
 
-	void OperatingSystem::EndFrame(std::optional<RenderTargetView> renderTarget)
+	void OperatingSystem::EndFrame(RenderContext* renderContext)
 	{
-		mConcept->EndFrame(renderTarget);
+		mConcept->EndFrame(renderContext);
 	}
 
 	void OperatingSystem::Render()

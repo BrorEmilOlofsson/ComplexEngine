@@ -196,11 +196,11 @@ namespace Simple
 		mGraphicsWindow.BeginFrame();
 	}
 
-	void Win_Window::EndFrame(std::optional<RenderTargetView> renderTarget)
+	void Win_Window::EndFrame(RenderContext* renderContext)
 	{
 		try
 		{
-			mGraphicsWindow.EndFrame(renderTarget);
+			mGraphicsWindow.EndFrame(renderContext);
 		}
 		catch (const WinException& exception)
 		{

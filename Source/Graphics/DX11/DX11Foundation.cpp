@@ -123,14 +123,9 @@ namespace Simple
 			throw std::runtime_error("No camera set in RenderState");
 		}
 
-		if (!renderState.GetRenderTargetView())
+		if (renderState.GetRenderContext() == nullptr)
 		{
-			throw std::exception("No render target set in RenderState");
-		}
-
-		if (!renderState.GetDepthStencilViewHandle())
-		{
-			throw std::exception("No depth stencil view set in RenderState");
+			throw std::runtime_error("No render context set in render state");
 		}
 	}
 
@@ -180,31 +175,30 @@ namespace Simple
 
 		ValidateRenderState(renderState);
 
-		DX11RenderTarget* rtvPtr = mRenderTargetManager.Get(*renderState.GetRenderTargetView());
+		//DX11RenderTarget& rtv = *mRenderTargetManager.Get(*renderState.GetRenderTargetView());
 
-		if (rtvPtr == nullptr)
-		{
-			throw std::runtime_error("Invalid Render Target View in RenderState");
-		}
-		DX11RenderTarget& rtv = *rtvPtr;
-
-		const Vector2ui renderSize = Vector2ui(renderState.GetRenderRect().value_or(AABB2i::CreateFromMinAndExtent(Point2i::Zero(), Vector2i(rtv.GetSize()))).GetExtent());
+		const Vector2ui bufferSize = renderState.GetRenderContext()->GetBufferSize();
+		const Vector2ui renderSize = Vector2ui(renderState.GetRenderRect().value_or(
+			AABB2i::CreateFromDefaultAndExtent(Vector2i(bufferSize))).GetExtent());
 		if (renderSize.x == 0 || renderSize.y == 0)
 		{
 			return;
 		}
-		if (rtv.GetSize() != renderSize)
+		if (renderState.GetRenderContext()->GetBufferSize() != renderSize)
 		{
-			auto texture = DX11Factory::CreateRenderTargetTexture(*GetDevice().Get(), renderSize);
+			/*auto texture = DX11Factory::CreateRenderTargetTexture(*GetDevice().Get(), renderSize);
 			rtv.Resize(*texture.Get(), renderSize);
 
 			mDepthStencilViewManager->Initialize(renderState.GetDepthStencilViewHandle().value(), renderSize);
+*/
+
+
+			renderState.GetRenderContext()->ResizeBuffers(renderSize);
 
 			RenderState& r = const_cast<RenderState&>(renderState);
 			Camera camera = *renderState.GetCamera();
 			camera.SetResolution(renderSize);
 			r.SetCamera(camera);
-
 		}
 
 		mConstantBufferManager.UpdatePointLights(CreatePointLightData(renderState.GetRenderList().GetPointLights()), *GetContext().Get());
@@ -225,7 +219,6 @@ namespace Simple
 			mConstantBufferManager.mColorBuffer,
 			mConstantBufferManager.mTransformBuffer,
 			mConstantBufferManager.mObjectIDBuffer,
-			mRenderTargetManager,
 			mSamplerState
 		);
 	}

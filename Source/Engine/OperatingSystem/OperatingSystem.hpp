@@ -25,7 +25,7 @@ namespace Simple
 		}
 
 		void BeginFrame(const GraphicsBufferData& bufferData);
-		void EndFrame(std::optional<RenderTargetView> renderTarget);
+		void EndFrame(RenderContext* renderContext);
 
 		void Render();
 		void Render(RenderState& renderState);
@@ -71,7 +71,7 @@ namespace Simple
 			virtual ~OperatingSystemConcept() = default;
 
 			virtual void BeginFrame(const GraphicsBufferData& data) = 0;
-			virtual void EndFrame(std::optional<RenderTargetView> renderTarget) = 0;
+			virtual void EndFrame(RenderContext* renderContext) = 0;
 			virtual void Init() = 0;
 			virtual void Shutdown() = 0;
 			virtual void Render() = 0;
@@ -102,9 +102,9 @@ namespace Simple
 				OSBeginFrame(mObject, data);
 			}
 
-			void EndFrame(std::optional<RenderTargetView> renderTarget) override
+			void EndFrame(RenderContext* renderContext) override
 			{
-				OSEndFrame(mObject, renderTarget);
+				OSEndFrame(mObject, renderContext);
 			}
 
 			void Init() override

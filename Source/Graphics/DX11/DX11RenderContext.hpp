@@ -13,9 +13,11 @@ namespace Simple
 		
 		DX11RenderContext(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, Vector2ui size);
 
-		std::vector<void*> GetGBufferSRVs();
+		[[nodiscard]] std::vector<void*> GetGBufferSRVs();
 		[[nodiscard]] Vector2ui GetBufferSize() const;
 		[[nodiscard]] uint32_t GetObjectIDAt(const Point2i& point);
+		[[nodiscard]] DX11RenderTarget& GetOutputRenderTarget();
+		[[nodiscard]] ID3D11ShaderResourceView* GetOutputSRV();
 
 		void ResizeBuffers(const Vector2ui& size);
 		void ClearBuffers();

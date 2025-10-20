@@ -62,6 +62,7 @@ namespace Simple
 	public:
 
 		[[nodiscard]] static constexpr Bounds CreateFromMinAndExtent(const T& min, const ExtentType& extent);
+		[[nodiscard]] static constexpr Bounds CreateFromDefaultAndExtent(const ExtentType& extent);
 		[[nodiscard]] static constexpr Bounds CreateFromCenterAndExtent(const T& center, const ExtentType& extent);
 		[[nodiscard]] static constexpr Bounds CreateFromMinAndMax(const T& min, const T& max);
 
@@ -164,6 +165,13 @@ namespace Simple
 	[[nodiscard]] constexpr Bounds<T, BoundsChecker> Bounds<T, BoundsChecker>::CreateFromMinAndExtent(const T& min, const ExtentType& extent)
 	{
 		return Bounds<T, BoundsChecker>(min, min + extent);
+	}
+
+	template<typename T, typename BoundsChecker>
+	[[nodiscard]] constexpr Bounds<T, BoundsChecker> Bounds<T, BoundsChecker>::CreateFromDefaultAndExtent(const ExtentType& extent)
+	{
+		constexpr T d = T{};
+		return Bounds<T, BoundsChecker>(d, d + extent);
 	}
 
 	template<typename T, typename BoundsChecker>

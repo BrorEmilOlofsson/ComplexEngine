@@ -73,8 +73,6 @@ namespace Simple
 	{
 		mSceneManager.Init(mBlackboard);
 
-		mSceneManager.GetCurrentScene().GetRenderState().SetRenderTargetView(mOperatingSystem.CreateRenderTarget(mOperatingSystem.GetWindow(mMainWindow).GetClientSize()));
-		mSceneManager.GetCurrentScene().GetRenderState().SetDepthStencilViewHandle(mOperatingSystem.CreateDepthStencilView(mOperatingSystem.GetWindow(mMainWindow).GetClientSize()));
 		RenderContext r = mOperatingSystem.CreateRenderContext(mOperatingSystem.GetWindow(mMainWindow).GetClientSize());
 		mSceneManager.GetCurrentScene().GetRenderState().SetRenderContext(std::move(r));
 	}
@@ -133,11 +131,11 @@ namespace Simple
 	void Engine::EndFrame()
 	{
 		PROFILER_FUNCTION(profiler::colors::Indigo800);
-		std::optional<RenderTargetView> renderTarget = std::nullopt;
+		RenderContext* renderContext = nullptr;
 #ifndef _EDITOR
-		renderTarget = mSceneManager.GetCurrentScene().GetRenderState().GetRenderTargetView();
+		renderContext = mSceneManager.GetCurrentScene().GetRenderState().GetRenderContext();
 #endif
-		mOperatingSystem.EndFrame(renderTarget);
+		mOperatingSystem.EndFrame(renderContext);
 		if (!mGraphicsSettings->vSync)
 		{
 			SyncToFPSCap(mFrameTimer.GetLastTimepoint(), mGraphicsSettings->fPSCap);
