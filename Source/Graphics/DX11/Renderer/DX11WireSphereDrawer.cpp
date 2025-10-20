@@ -69,6 +69,7 @@ namespace Simple
 
 	void DX11WireSphereDrawer::Render(const DrawSphere& drawSphere, ID3D11DeviceContext& context)
 	{
+		PROFILER_FUNCTION()
 		for (auto& vertex : mMeshData.vertices)
 		{
 			vertex.color = drawSphere.color;

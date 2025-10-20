@@ -18,9 +18,11 @@ namespace Simple
 		[[nodiscard]] uint32_t GetObjectIDAt(const Point2i& point);
 		[[nodiscard]] DX11RenderTarget& GetOutputRenderTarget();
 		[[nodiscard]] ID3D11ShaderResourceView* GetOutputSRV();
+		[[nodiscard]] DX11GBuffer& GetGBuffer();
 
 		void ResizeBuffers(const Vector2ui& size);
 		void ClearBuffers();
+
 
 
 		void SetOutputRenderTarget();

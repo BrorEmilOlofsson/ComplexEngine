@@ -125,7 +125,26 @@ namespace Simple
 
 		if (renderState.GetRenderContext() == nullptr)
 		{
-			throw std::runtime_error("No render context set in render state");
+			throw std::runtime_error("No render context set in RenderState");
+		}
+
+		if (!renderState.GetRenderRect().has_value())
+		{
+			throw std::runtime_error("No render rect set in RenderState");
+		}
+
+		if (renderState.GetRenderRect().value().GetExtent() == Vector2i::Zero())
+		{
+			throw std::runtime_error("Render rect is too small");
+		}
+
+		Camera camera = renderState.GetCamera().value();
+		Matrix4x4f proj = camera.GetProjectionMatrix();
+		Vector2i resolution = renderState.GetRenderRect()->GetExtent();
+		Matrix4x4f expected = Camera::CreatePerspectiveProjectionMatrix(camera.GetHorizontalFoV(), camera.GetNearPlane(), camera.GetFarPlane(), Vector2ui(resolution));
+		if (proj != expected)
+		{
+			throw std::runtime_error("Resolution in camera does not correspond to RenderState resolution");
 		}
 	}
 
@@ -178,8 +197,7 @@ namespace Simple
 		//DX11RenderTarget& rtv = *mRenderTargetManager.Get(*renderState.GetRenderTargetView());
 
 		const Vector2ui bufferSize = renderState.GetRenderContext()->GetBufferSize();
-		const Vector2ui renderSize = Vector2ui(renderState.GetRenderRect().value_or(
-			AABB2i::CreateFromDefaultAndExtent(Vector2i(bufferSize))).GetExtent());
+		const Vector2ui renderSize = Vector2ui(renderState.GetRenderRect()->GetExtent());
 		if (renderSize.x == 0 || renderSize.y == 0)
 		{
 			return;

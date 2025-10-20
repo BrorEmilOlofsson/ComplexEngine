@@ -40,8 +40,7 @@ namespace Simple
 
 	private:
 
-		void RenderDebugLines(const RenderList& renderList, AssetManager& assetManager,
-			PixelShaderAssetHandle pixelShader, VertexShaderAssetHandle vertexShader, DX11ConstantBuffer<ColorBufferData>& colorCB);
+		void RenderDebugLines(const RenderList& renderList, AssetManager& assetManager, VertexShaderAssetHandle vertexShader, DX11ConstantBuffer<ColorBufferData>& colorCB);
 
 
 	private:

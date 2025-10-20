@@ -85,6 +85,7 @@ namespace Simple
 	inline void RenderFullScreen(ID3D11DeviceContext& context, ID3D11ShaderResourceView* srv, DX11SamplerState& samplerState,
 		VertexShaderAssetHandle vertexShader, PixelShaderAssetHandle pixelShader)
 	{
+		PROFILER_FUNCTION();
 		context.PSSetShaderResources(0, 1, &srv);
 
 		// Bind sampler state (linear clamp for example)

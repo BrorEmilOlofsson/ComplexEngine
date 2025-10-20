@@ -33,6 +33,26 @@ namespace Simple
 		RenderContext& operator=(const RenderContext&) = delete;
 		RenderContext& operator=(RenderContext&&) = default;
 
+		template<typename T>
+		[[nodiscard]] T* GetUnderlying()
+		{
+			if (Model<T>* p = dynamic_cast<Model<T>*>(mConcept.get()))
+			{
+				return &p->GetUnderlying();
+			}
+			return nullptr;
+		}
+
+		template<typename T>
+		[[nodiscard]] const T* GetUnderlying() const
+		{
+			if (const Model<T>* p = dynamic_cast<const Model<T>*>(mConcept.get()))
+			{
+				return &p->GetUnderlying();
+			}
+			return nullptr;
+		}
+
 		[[nodiscard]] std::vector<void*> GetGBufferSRVs() const
 		{
 			return mConcept->GetGBufferSRVs();
@@ -119,6 +139,16 @@ namespace Simple
 			explicit Model(T&& object)
 				: mObject(std::move(object))
 			{
+			}
+
+			[[nodiscard]] T& GetUnderlying()
+			{
+				return mObject;
+			}
+
+			[[nodiscard]] const T& GetUnderlying() const
+			{
+				return mObject;
 			}
 
 			std::vector<void*> GetGBufferSRVs() override

@@ -98,10 +98,7 @@ namespace Simple
 				}*/
 			}
 
-			Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilState = DX11Factory::CreateDepthBuffer(*mDevice.Get());
-
-			mContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
-
+			
 			mRasterizerState = DX11Factory::CreateRasterizerState_BackfaceCulling(*mDevice.Get());
 		}
 

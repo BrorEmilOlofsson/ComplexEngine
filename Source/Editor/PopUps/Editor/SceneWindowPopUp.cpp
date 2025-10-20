@@ -240,10 +240,17 @@ namespace Simple
 				commandTracker
 			);
 
+			ImGui::PopStyleVar();
+			ImGui::PopStyleVar();
 			ShowSceneSettingsPopUp(editorSceneSettings);
+
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 3));
 		}
 
 		ImGui::End();
+		ImGui::PopStyleVar();
+		ImGui::PopStyleVar();
 
 		if (ImGui::Begin("Deferred Render Targets"))
 		{
@@ -256,11 +263,15 @@ namespace Simple
 			size *= m;
 			auto srvs = sceneRenderState.GetRenderContext()->GetGBufferSRVs();
 
+			assert(srvs.size() == 5);
+
+			constexpr const char* srvNames[5] = { "Albedo", "Normal", "Material", "Position", "ObjectID" };
+
 			ImGui::Columns(columns);
-			for (auto& srv : srvs)
+			for (std::size_t i = 0; i < srvs.size(); i++)
 			{
-				ImGui::Text("Target");
-				ImGui::Image(srv, size);
+				ImGui::Text("RT: %s", srvNames[i]);
+				ImGui::Image(srvs[i], size);
 				ImGui::NextColumn();
 			}
 
@@ -270,8 +281,6 @@ namespace Simple
 
 		ImGui::End();
 
-		ImGui::PopStyleVar();
-		ImGui::PopStyleVar();
 
 		if (ImGui::Begin(mImGuiName.c_str(), &mIsActive, ImGuiWindowFlags_NoScrollbar))
 		{

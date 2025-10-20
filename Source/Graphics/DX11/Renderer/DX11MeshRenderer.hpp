@@ -30,6 +30,7 @@ namespace Simple
 		template<typename GetTransformMatrixFunc>
 		void Render(ID3D11DeviceContext& context, PixelShaderAssetHandle pixelShader, VertexShaderAssetHandle vertexShader, const auto& drawList, DX11ConstantBuffer<ColorBufferData>& colorCB, GetTransformMatrixFunc&& getTransformMatrixFunction)
 		{
+			PROFILER_FUNCTION();
 			RenderMeshes(context, drawList, mMeshData, mTransformBuffer, colorCB, mVertexBuffer.Get(), mIndexBuffer.Get(), pixelShader, vertexShader, std::forward<GetTransformMatrixFunc>(getTransformMatrixFunction));
 		}
 

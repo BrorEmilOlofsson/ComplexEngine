@@ -62,6 +62,11 @@ namespace Simple
 		return mOutputRT.GetShaderResourceView();
 	}
 
+	DX11GBuffer& DX11RenderContext::GetGBuffer()
+	{
+		return mGBuffer;
+	}
+
 	void DX11RenderContext::ResizeBuffers(const Vector2ui& size)
 	{
 		mGBuffer.Resize(size);

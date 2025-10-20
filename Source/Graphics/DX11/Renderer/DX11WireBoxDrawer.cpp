@@ -16,6 +16,7 @@ namespace Simple
 
 	void DX11WireBoxDrawer::Render(const AABB3f& aabb, const Matrix4x4f& modelToWorldMatrix, const Color& color, ID3D11DeviceContext& context)
 	{
+		PROFILER_FUNCTION();
 		const Point3f minPoint = aabb.GetMin();
 		const Point3f maxPoint = aabb.GetMax();
 

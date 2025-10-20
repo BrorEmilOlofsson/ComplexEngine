@@ -12,55 +12,12 @@
 #include "Graphics/DX11/DX11GBuffer.hpp"
 #include "Graphics/DX11/RenderTarget/DX11RenderTargetManager.hpp"
 #include "Utility/ShapeMath.hpp"
+#include "Graphics/DX11/DX11RenderContext.hpp"
 #include <fstream>
 #include <cassert>
 
 namespace Simple
 {
-
-	//void RenderModel(const Transform& transform, DX11ConstantBuffer<TransformBufferData>& transformBuffer, MeshAssetHandle mesh, ID3D11DeviceContext& context)
-	//{
-	//	TransformBufferData objectBuffer
-	//	{
-	//		transform.GetMatrix()
-	//	};
-
-	//	transformBuffer.UpdateAndBind(objectBuffer, context);
-
-	//	mesh->Render();
-	//}
-
-	//void RenderModels(const RenderList& renderList, DX11ConstantBuffer<TransformBufferData>& transformBuffer, ID3D11DeviceContext& context)
-	//{
-	//	for (auto& r : renderList.mUnlitStaticModels)
-	//	{
-	//		r.pixelShader->Bind();
-	//		r.vertexShader->Bind();
-	//		RenderModel(r.transform, transformBuffer, r.mesh, context);
-	//	}
-
-	//	/*for (auto& r : renderList.myStaticModelsToRender)
-	//	{
-	//		r.albedoTexture->Bind(myDeviceContext.Get());
-	//		RenderModel(r.transform, r.mesh, myDeviceContext.Get());
-	//	}*/
-	//}
-
-	/*void BindTextures(const std::span<Texture* const> textures, ID3D11DeviceContext* context)
-	{
-		for (size_t i = 0; i < size(textures); ++i)
-		{
-			if (Texture* texture = textures[i])
-			{
-				texture->Bind();
-			}
-			else
-			{
-				static ID3D11ShaderResourceView* nullview[1] = { nullptr };
-				context->PSSetShaderResources(static_cast<unsigned int>(i), 1, nullview);
-			}
-		}
-	}*/
 
 	static void RenderModels(std::span<const ModelInstance> models, DX11ConstantBuffer<TransformBufferData>& transformCB, DX11ConstantBuffer<ObjectIDBufferData>& objectIDCB, ID3D11DeviceContext& context)
 	{
@@ -125,36 +82,36 @@ namespace Simple
 	}
 
 	void DX11Renderer::Render(RenderState& renderState, AssetManager& assetManager,
-		PixelShaderAssetHandle pixelShader, VertexShaderAssetHandle vertexShader,
+		PixelShaderAssetHandle, VertexShaderAssetHandle vertexShader,
 		DX11ConstantBuffer<ColorBufferData>& colorCB, DX11ConstantBuffer<TransformBufferData>& transformCB, DX11ConstantBuffer<ObjectIDBufferData>& objectIDCB, DX11SamplerState& samplerState)
 	{
-		transformCB;
-		vertexShader;
-		pixelShader;
-		colorCB;
-		assetManager;
 		PROFILER_FUNCTION(profiler::colors::Red);
+
+		DX11RenderContext* r = renderState.GetRenderContext()->GetUnderlying<DX11RenderContext>();
 
 		const Vector2ui size = Vector2ui(renderState.GetRenderRect().value_or(AABB2i::CreateFromMinAndExtent(Point2i::Zero(), Vector2i(1600, 900))).GetExtent());
 
 		auto viewport = DX11Factory::CreateViewport(size);
 		mDeviceContext->RSSetViewports(1, &viewport);
 
-		//static std::unique_ptr<DX11GBuffer> gBuffer = std::make_unique<DX11GBuffer>(mDeviceContext, mDevice, size);
-
 		RenderContext& renderContext = *renderState.GetRenderContext();
-		renderContext.ClearBuffers();
-		//gBuffer->Clear();
-
 		if (renderContext.GetBufferSize() != size)
 		{
 			renderContext.ResizeBuffers(size);
-			//gBuffer->Resize(size);
 		}
 
+		renderContext.ClearBuffers();
 
+		
 
 		renderContext.SetGBufferRenderTargets();
+
+		Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilState = DX11Factory::CreateDepthBuffer(*mDevice.Get());
+
+		mDeviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
+
+
+		//mDeviceContext->OMSetDepthStencilState()
 
 		assetManager.GetPixelShader(GetShaderPath("GBufferPS"))->Bind();
 		assetManager.GetVertexShader(GetPath(eVertexShaderType::Default))->Bind();
@@ -163,24 +120,17 @@ namespace Simple
 
 		objectIDCB.Update(ObjectIDBufferData{}, *mDeviceContext.Get());
 
-		RenderDebugLines(renderState.GetRenderList(), assetManager, pixelShader, vertexShader, colorCB);
-
-		mTextRenderer.Render(renderState.GetRenderList().GetText3Ds(), *renderState.GetCamera(), size);
-
+		
 		// (Optional safety) Unbind MRTs before using them as SRVs
 		ID3D11RenderTargetView* nullRTVs[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT] = {};
 		mDeviceContext->OMSetRenderTargets(_countof(nullRTVs), nullRTVs, nullptr);
 
 		Point2i mouseScreenPos = renderState.mCursorScreenPos;
 
-		//auto stagingTexture = DX11Factory::CreateObjectIDStagingTexture(mDevice.Get(), size);
-
-
 		if (IsInsideRenderRect(mouseScreenPos, renderState.GetRenderRect().value()))
 		{
 			const Point2i mappedPos = MapToRenderRect(mouseScreenPos, renderState.GetRenderRect().value());
 
-			//const auto id = ReconstructObjectID(*mDeviceContext.Get(), *stagingTexture.Get(), *gBuffer->mObjectIDTexture.Get(), mouseScreenPos, renderState.GetRenderRect().value());
 			uint32_t id = renderContext.GetObjectIDAt(mappedPos);
 			const_cast<RenderState&>(renderState).mSelectedObjectID = id;
 		}
@@ -189,30 +139,43 @@ namespace Simple
 			const_cast<RenderState&>(renderState).mSelectedObjectID = std::numeric_limits<uint32_t>::max();
 		}
 
-		//auto rtv = renderTargetManager.Get(renderState.GetRenderTargetView().value())->GetRenderTargetView();
-
 		renderContext.SetOutputRenderTarget();
-		//mDeviceContext->OMSetRenderTargets(1, &rtv, nullptr);
 		ID3D11ShaderResourceView* dummy[5] = {};
 		mDeviceContext->PSSetShaderResources(TextureSlots::GBufferStart, static_cast<UINT>(renderContext.GetGBufferSRVs().size()), dummy); // Clear old
 
 		renderContext.SetGBufferShaderResources();
-		//mDeviceContext->PSSetShaderResources(
-		//	TextureSlots::GBufferStart, // 5
-		//	static_cast<UINT>(gBuffer->GetSRVArray().size()),
-		//	gBuffer->GetSRVArray().data()
-		//);
 
 		RenderFullScreen(
 			*mDeviceContext.Get(),
-		static_cast<DX11RenderTarget*>(renderContext.GetOutputRenderTarget())->GetShaderResourceView(),
+		r->GetOutputRenderTarget().GetShaderResourceView(),
 			samplerState,
 			assetManager.GetVertexShader(GetShaderPath("FullScreenQuadVS")),
 			assetManager.GetPixelShader(GetShaderPath("DeferredLightingPS"))
 		);
+		
+
+		// Render debug lines
+
+		D3D11_DEPTH_STENCIL_DESC dsDesc = {};
+		dsDesc.DepthEnable = TRUE;
+		dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;   // READ-ONLY
+		dsDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+
+		Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthReadOnlyState;
+		mDevice->CreateDepthStencilState(&dsDesc, &depthReadOnlyState);
+
+		auto rtv = r->GetOutputRenderTarget().GetRenderTargetView();
+		// Re-bind the same GBuffer depth buffer used before!
+		mDeviceContext->OMSetRenderTargets(1, &rtv, r->GetGBuffer().GetDepthStencilView());
+		mDeviceContext->OMSetDepthStencilState(depthReadOnlyState.Get(), 0);
+
+		RenderDebugLines(renderState.GetRenderList(), assetManager, vertexShader, colorCB);
+
+		//mTextRenderer.Render(renderState.GetRenderList().GetText3Ds(), *renderState.GetCamera(), size);
+
 	}
 
-	void DX11Renderer::RenderDebugLines(const RenderList& renderList, AssetManager& assetManager, PixelShaderAssetHandle pixelShader,
+	void DX11Renderer::RenderDebugLines(const RenderList& renderList, AssetManager& assetManager,
 		VertexShaderAssetHandle vertexShader, DX11ConstantBuffer<ColorBufferData>& colorCB)
 	{
 		PROFILER_FUNCTION(profiler::colors::Gold);
@@ -231,7 +194,7 @@ namespace Simple
 			mWireBoundingBoxDrawer.Render(drawBox.boundingBox, drawBox.modelToWorld.GetMatrix(), drawBox.color, *mDeviceContext.Get());
 		}
 
-		mPyramidRenderer.Render(*mDeviceContext.Get(), pixelShader, vertexShader, renderList.GetPyramids(), colorCB,
+		mPyramidRenderer.Render(*mDeviceContext.Get(), unlitPixelShader, vertexShader, renderList.GetPyramids(), colorCB,
 			[](const DrawPyramid& drawPyramid)
 			{
 				Matrix4x4f matrix = CreateMatrixFromY(drawPyramid.direction);

@@ -95,7 +95,7 @@ namespace Simple
 		mContext->OMSetRenderTargets(
 			static_cast<UINT>(rtvArray.size()),
 			rtvArray.data(),
-			GetDepthStencilView()
+			mDepthStencilView.Get()
 		);
 	}
 

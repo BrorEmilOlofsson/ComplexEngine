@@ -25,7 +25,6 @@ namespace Simple
 		newBlackboard.Insert<Key_CurrentCamera>(mCamera);
 		newBlackboard.Insert<Key_CurrentRenderState>(mRenderState);
 
-		mRenderState.SetCamera(mCamera);
 		mEntityComposition.GetECS().EditorUpdate(newBlackboard);
 
 		mRenderState.GetRenderList().AddSphere(DrawSphere{ Spheref(Point3f(0, 0, 10), 5.f), Colors::Salmon });
@@ -51,6 +50,11 @@ namespace Simple
 			};
 			RenderGrid3(grid, Colors::Gray, mRenderState.GetRenderList());
 		}
+
+		const AABB2i renderRect = GetImGuiRenderRect();
+		mRenderState.SetRenderRect(renderRect);
+		mCamera.SetResolution(Vector2ui(renderRect.GetExtent()));
+		mRenderState.SetCamera(mCamera);
 	}
 
 	void EntityCompositionPopUp::Render(const Blackboard& blackboard)
@@ -67,7 +71,7 @@ namespace Simple
 		newBlackboard.Insert<Key_CurrentCamera>(mCamera);
 		newBlackboard.Insert<Key_CurrentRenderState>(mRenderState);
 		mEntityComposition.GetECS().Render(newBlackboard);
-		//blackboard.Get<Key_OperatingSystem>().Render(mRenderState);
+		blackboard.Get<Key_OperatingSystem>().Render(mRenderState);
 
 		if (ImGui::Begin("Entity Composition Hierarchy"))
 		{
@@ -96,9 +100,9 @@ namespace Simple
 
 		if (ImGui::Begin(GetImGuiName().c_str()))
 		{
-			/*const AABB2i renderRect = RenderImage(mRenderState.GetRenderTargetView()->GetSRV());
+			const AABB2i renderRect = RenderImage(mRenderState.GetRenderContext()->GetOutputSRV());
 
-			mRenderState.SetRenderRect(renderRect);*/
+			//mRenderState.SetRenderRect(renderRect);*/
 
 			/*mTransformEntityTool.ShowEntityImGuizmo(
 				mEntityComposition.GetECS(),

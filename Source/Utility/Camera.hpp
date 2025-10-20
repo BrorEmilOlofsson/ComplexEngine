@@ -57,6 +57,7 @@ namespace Simple
 		[[nodiscard]] constexpr Radiansf GetHorizontalFoV() const noexcept;
 
 		[[nodiscard]] constexpr static Matrix4x4f CreatePerspectiveProjectionMatrix(const Radiansf horizontalFoV, const float nearPlane, const float farPlane, const float aspectRatio);
+		[[nodiscard]] constexpr static Matrix4x4f CreatePerspectiveProjectionMatrix(const Radiansf horizontalFoV, const float nearPlane, const float farPlane, const Vector2ui resolution);
 		[[nodiscard]] constexpr static Matrix4x4f CreateOrthographicProjectionMatrix(const float halfSize, const float nearPlane, const float farPlane);
 
 	private:
@@ -169,6 +170,11 @@ namespace Simple
 		matrix(4, 4) = 0.0f;
 
 		return matrix;
+	}
+
+	constexpr Matrix4x4f Camera::CreatePerspectiveProjectionMatrix(const Radiansf horizontalFoV, const float nearPlane, const float farPlane, const Vector2ui resolution)
+	{
+		return CreatePerspectiveProjectionMatrix(horizontalFoV, nearPlane, farPlane, static_cast<float>(resolution.x) / static_cast<float>(resolution.y));
 	}
 
 	constexpr Matrix4x4f Camera::CreateOrthographicProjectionMatrix(const float halfSize, const float nearPlane, const float farPlane)
