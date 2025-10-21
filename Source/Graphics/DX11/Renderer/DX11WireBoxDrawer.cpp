@@ -4,6 +4,8 @@
 #include "Graphics/Shader/PixelShader.hpp"
 #include "Graphics/Shader/VertexShader.hpp"
 
+#ifdef _WIN32
+
 namespace Simple
 {
 
@@ -149,3 +151,5 @@ namespace Simple
 			assert(false && "failed to create IndexBuffer");
 	}
 }
+
+#endif

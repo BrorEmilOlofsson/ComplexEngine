@@ -6,6 +6,8 @@
 #include "Graphics/Shader/PixelShader.hpp"
 #include "Graphics/Shader/VertexShader.hpp"
 
+#ifdef _WIN32
+
 namespace Simple
 {
 
@@ -99,3 +101,5 @@ namespace Simple
 		context.DrawIndexed(static_cast<UINT>(mMeshData.indices.size()), 0, 0);
 	}
 }
+
+#endif

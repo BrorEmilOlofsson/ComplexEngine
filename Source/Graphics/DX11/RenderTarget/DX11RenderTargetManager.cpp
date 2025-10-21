@@ -2,6 +2,8 @@
 #include "DX11RenderTargetManager.hpp"
 #include "Graphics/DX11/DX11Factory.hpp"
 
+#ifdef _WIN32
+
 namespace Simple
 {
 	DX11RenderTargetManager::DX11RenderTargetManager(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
@@ -41,3 +43,5 @@ namespace Simple
 		}
 	}
 }
+
+#endif

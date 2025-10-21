@@ -1,6 +1,8 @@
 #include "Graphics/Precompiled/GraphicsPch.hpp"
 #include "DX11PixelShader.hpp"
 
+#ifdef _WIN32
+
 namespace Simple
 {
 
@@ -20,3 +22,5 @@ namespace Simple
 		mContext->PSSetShader(mPixelShader.Get(), nullptr, 0);
 	}
 }
+
+#endif

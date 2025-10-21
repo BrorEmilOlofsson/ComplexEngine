@@ -194,8 +194,6 @@ namespace Simple
 
 		ValidateRenderState(renderState);
 
-		//DX11RenderTarget& rtv = *mRenderTargetManager.Get(*renderState.GetRenderTargetView());
-
 		const Vector2ui bufferSize = renderState.GetRenderContext()->GetBufferSize();
 		const Vector2ui renderSize = Vector2ui(renderState.GetRenderRect()->GetExtent());
 		if (renderSize.x == 0 || renderSize.y == 0)
@@ -204,12 +202,6 @@ namespace Simple
 		}
 		if (renderState.GetRenderContext()->GetBufferSize() != renderSize)
 		{
-			/*auto texture = DX11Factory::CreateRenderTargetTexture(*GetDevice().Get(), renderSize);
-			rtv.Resize(*texture.Get(), renderSize);
-
-			mDepthStencilViewManager->Initialize(renderState.GetDepthStencilViewHandle().value(), renderSize);
-*/
-
 
 			renderState.GetRenderContext()->ResizeBuffers(renderSize);
 

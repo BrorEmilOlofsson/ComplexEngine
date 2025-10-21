@@ -18,12 +18,15 @@ namespace Simple
 	void SetParentEntity(ECS& ecs, const EntityID parentID, const EntityID childID, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker);
 
 	[[nodiscard]] std::vector<EntityID> GetRootEntities(const ECS& ecs);
+	
 
 	void ShowEntityAddButtons(ECS& ecs, EntityID& selectedEntityID, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker, const std::string& aImGuiTag);
 	void ShowEntityHierarchy(ECS& ecs, ECS& ecsBuffer, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker, const std::string& imGuiTag,
 		EntityID& selectedEntityID);
 	void ShowEntityHierarchyWithAddButtons(ECS& ecs, ECS& ecsBuffer, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker,
-		const std::string& imGuiTag, EntityID& selectedEntityID);
+		const std::string& imGuiTag, EntityID& selectedEntityID, std::optional<EntityID> parentID);
+	
+	void ShowEntityName(ECS& ecs, const EntityID selectedEntityID, const InputState& input);
 	void ShowEntityComponents(ECS& ecs, EntityID entityID, bool& anyItemActiveLastFrame,
 		ECS& ecsBuffer, EntityID& copyEntityID, const Blackboard& blackboard, EditorCommandTracker& commandTracker);
 	void ShowEntityAddComponentButtons(ECS& ecs, EntityID entityID, const class DataTypeRegistry& dataTypeRegistry, EditorCommandTracker& commandTracker);

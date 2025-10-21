@@ -110,7 +110,7 @@ namespace Simple
 				}
 			}
 
-			if (isPlaying == true)
+			if (isPlaying)
 			{
 				ImGui::PopStyleColor(2);
 			}

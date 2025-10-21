@@ -239,7 +239,8 @@ namespace Simple
 		commandTracker.RegisterCommand(EditorCommand(data, command, command, "Remove Component"));
 	}
 
-	void ShowEntityAddButtons(ECS& ecs, EntityID& selectedEntityID, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker, const std::string& imGuiTag)
+	void ShowEntityAddButtons(ECS& ecs, EntityID& selectedEntityID, std::vector<EntityID>& rootEntities, 
+		EditorCommandTracker& commandTracker, const std::string& imGuiTag, std::optional<EntityID> defaultParent)
 	{
 		const std::string addButton = "Add" + imGuiTag;
 		const std::string addSceneObjectButton = "Add Scene Object" + imGuiTag;
@@ -257,7 +258,7 @@ namespace Simple
 			{
 				commandTracker.BeginComposite("Create Entity + Select Entity");
 
-				const EntityID createdEntityID = CreateEntity(ecs, rootEntities, InvalidEntityID, commandTracker);
+				const EntityID createdEntityID = CreateEntity(ecs, rootEntities, defaultParent.value_or(InvalidEntityID), commandTracker);
 
 				SelectEntity(createdEntityID, selectedEntityID, commandTracker);
 
@@ -269,7 +270,7 @@ namespace Simple
 			{
 				commandTracker.BeginComposite("Create Entity + Select Entity");
 
-				const EntityID createdEntityID = CreateEntity(ecs, rootEntities, InvalidEntityID, commandTracker);
+				const EntityID createdEntityID = CreateEntity(ecs, rootEntities, defaultParent.value_or(InvalidEntityID), commandTracker);
 
 				ecs.AddComponent<MeshComponent>(createdEntityID);
 
@@ -522,9 +523,9 @@ namespace Simple
 	}
 
 	void ShowEntityHierarchyWithAddButtons(ECS& ecs, ECS& ecsBuffer, std::vector<EntityID>& rootEntities,
-		EditorCommandTracker& commandTracker, const std::string& imGuiTag, EntityID& selectedEntityID)
+		EditorCommandTracker& commandTracker, const std::string& imGuiTag, EntityID& selectedEntityID, std::optional<EntityID> defaultParent)
 	{
-		ShowEntityAddButtons(ecs, selectedEntityID, rootEntities, commandTracker, imGuiTag);
+		ShowEntityAddButtons(ecs, selectedEntityID, rootEntities, commandTracker, imGuiTag, defaultParent);
 		ImGui::Separator();
 		ShowEntityHierarchy(ecs, ecsBuffer, rootEntities, commandTracker, imGuiTag, selectedEntityID);
 	}
@@ -589,6 +590,40 @@ namespace Simple
 		}
 
 		ImGui::Separator();
+	}
+
+	void ShowEntityName(ECS& ecs, const EntityID selectedEntityID, const InputState& input)
+	{
+		if (selectedEntityID == InvalidEntityID)
+		{
+			return;
+		}
+		NameComponent* nameComponent = ecs.GetComponent<NameComponent>(selectedEntityID);
+		if (nameComponent == nullptr)
+		{
+			throw std::runtime_error("Selected entity does not have a NameComponent");
+		}
+		std::string& selectedEntityName = nameComponent->name;
+
+		char buffer[256]{};
+		CopyString(buffer, selectedEntityName);
+
+		ImGui::PushItemWidth(200);
+
+		if (ImGui::InputTextWithHint("Name", "Entity Name", buffer, sizeof(buffer)))
+		{
+			if (input.IsKeyPressed(eInputKey::Enter))
+			{
+				selectedEntityName = buffer;
+			}
+		}
+
+		ImGui::PopItemWidth();
+
+		ImGui::SameLine(ImGui::GetWindowWidth() - 70);
+		ImGui::Text(std::string("ID: " + std::to_string(selectedEntityID.id)).c_str());
+		ImGui::Separator();
+
 	}
 
 	void ShowEntityComponents(ECS& ecs, const EntityID selectedEntityID, bool& anyItemActiveLastFrame,

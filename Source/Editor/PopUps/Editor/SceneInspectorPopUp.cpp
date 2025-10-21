@@ -18,7 +18,6 @@ namespace Simple
 	{
 		if (ImGui::Begin(imguiName.c_str(), &isActive))
 		{
-			ECS& ecs = sceneManager.GetCurrentScene().GetECS();
 
 			if (selectedEntityID == InvalidEntityID)
 			{
@@ -26,33 +25,9 @@ namespace Simple
 				return;
 			}
 
-			NameComponent* nameComponent = ecs.GetComponent<NameComponent>(selectedEntityID);
-			if (nameComponent == nullptr)
-			{
-				throw std::runtime_error("Selected entity does not have a NameComponent");
-			}
-			std::string& selectedEntityName = nameComponent->name;
-
-			char buffer[256]{};
-			strncpy_s(buffer, selectedEntityName.c_str(), sizeof(buffer));
-			buffer[sizeof(buffer) - 1] = '\0';
-
-			ImGui::PushItemWidth(200);
-
-			if (ImGui::InputTextWithHint("Name", "Entity Name", buffer, sizeof(buffer)))
-			{
-				if (input.IsKeyPressed(eInputKey::Enter))
-				{
-					selectedEntityName = buffer;
-				}
-			}
-
-			ImGui::PopItemWidth();
-
-			ImGui::SameLine(ImGui::GetWindowWidth() - 70);
-			ImGui::Text(std::string("ID: " + std::to_string(selectedEntityID.id)).c_str());
-			ImGui::Separator();
-
+			ECS& ecs = sceneManager.GetCurrentScene().GetECS();
+			
+			ShowEntityName(ecs, selectedEntityID, input);
 
 			const Transform worldTransform = GetWorldTransform(ecs, selectedEntityID);
 

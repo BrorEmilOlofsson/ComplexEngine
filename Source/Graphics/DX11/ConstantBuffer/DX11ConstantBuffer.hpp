@@ -6,8 +6,6 @@
 #include <d3d11.h>
 #include "Graphics/DX11/DX11Factory.hpp"
 
-struct ID3D11Buffer;
-
 namespace Simple
 {
 

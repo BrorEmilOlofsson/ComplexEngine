@@ -99,7 +99,15 @@ namespace Simple
 
 		if (ImGui::Begin(mImGuiName.c_str(), &IsActive()))
 		{
-			ShowEntityHierarchyWithAddButtons(ecs, ecsBuffer, mRootEntities, commandTracker, mImGuiTag, mSelectedEntityID);
+			ShowEntityHierarchyWithAddButtons(
+				ecs, 
+				ecsBuffer, 
+				mRootEntities, 
+				commandTracker, 
+				mImGuiTag, 
+				mSelectedEntityID, 
+				std::nullopt
+			);
 		}
 
 		ImGui::End();

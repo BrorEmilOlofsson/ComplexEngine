@@ -8,6 +8,7 @@
 #include "Editor/EditorSceneSettings.hpp"
 #include "Engine/Utility/DebugShapes.hpp"
 #include "Engine/OperatingSystem/OperatingSystem.hpp"
+#include "Engine/ECSEngine/Utility/ECSTransformUtility.hpp"
 
 namespace Simple
 {
@@ -17,6 +18,8 @@ namespace Simple
 		, mEntityComposition(ECSRegistry::Get())
 	{
 		mRenderState.SetRenderContext(std::move(renderContext));
+		mRootEntities = GetRootEntities(mEntityComposition.GetECS());
+		mEntityComposition.GetECS().GetComponent<NameComponent>(mEntityComposition.GetRootEntity())->name = "Root";
 	}
 
 	void EntityCompositionPopUp::UpdateInternal(const Blackboard& blackboard)
@@ -51,9 +54,13 @@ namespace Simple
 			RenderGrid3(grid, Colors::Gray, mRenderState.GetRenderList());
 		}
 
-		const AABB2i renderRect = GetImGuiRenderRect();
-		mRenderState.SetRenderRect(renderRect);
-		mCamera.SetResolution(Vector2ui(renderRect.GetExtent()));
+		if (ImGui::Begin(mImGuiName.c_str()))
+		{
+			const AABB2i renderRect = GetImGuiRenderRect();
+			mRenderState.SetRenderRect(renderRect);
+			mCamera.SetResolution(Vector2ui(renderRect.GetExtent()));
+		}
+		ImGui::End();
 		mRenderState.SetCamera(mCamera);
 	}
 
@@ -79,20 +86,36 @@ namespace Simple
 			{
 				MergeEntityComposition(mEntityComposition, sceneManager.GetCurrentScene().GetECS());
 			}
-			ShowEntityHierarchyWithAddButtons(mEntityComposition.GetECS(), ecsBuffer, mRootEntities, commandTracker, mImGuiTag, mSelectedEntityID);
+			ShowEntityHierarchyWithAddButtons(
+				mEntityComposition.GetECS(), 
+				ecsBuffer, 
+				mRootEntities, 
+				commandTracker, 
+				mImGuiTag, 
+				mSelectedEntityID,
+				mEntityComposition.GetRootEntity()
+			);
 		}
 
 		ImGui::End();
 
 		if (ImGui::Begin("Entity Composition Inspector"))
 		{
+			if (mSelectedEntityID != InvalidEntityID)
+			{
+				const Transform transform = GetWorldTransform(mEntityComposition.GetECS(), mSelectedEntityID);
+				newBlackboard.Insert<Key_ReferenceTransform>(transform);
+			}
+
+			ShowEntityName(mEntityComposition.GetECS(), mSelectedEntityID, input);
+
 			ShowEntityInspector(
-				mEntityComposition.GetECS(), 
-				mSelectedEntityID, 
-				mAnyItemActiveLastFrame, 
+				mEntityComposition.GetECS(),
+				mSelectedEntityID,
+				mAnyItemActiveLastFrame,
 				ecsBuffer,
-				mCopyEntityID, 
-				blackboard, 
+				mCopyEntityID,
+				newBlackboard,
 				commandTracker
 			);
 		}
@@ -104,18 +127,18 @@ namespace Simple
 
 			//mRenderState.SetRenderRect(renderRect);*/
 
-			/*mTransformEntityTool.ShowEntityImGuizmo(
+			mTransformEntityTool.ShowEntityImGuizmo(
 				mEntityComposition.GetECS(),
-				mSelectedEntityID, 
+				mSelectedEntityID,
 				editorSceneSettings.transformMode,
 				renderRect,
 				editorSceneSettings.useSnap,
 				editorSceneSettings.snapValue,
 				mCamera,
-				input, 
-				os, 
+				input,
+				os,
 				commandTracker
-			);*/
+			);
 
 			ShowSceneSettingsPopUp(editorSceneSettings);
 		}

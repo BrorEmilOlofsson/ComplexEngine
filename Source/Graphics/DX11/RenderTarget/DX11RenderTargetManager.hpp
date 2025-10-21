@@ -4,6 +4,8 @@
 #include <memory>
 #include "Graphics/RenderTarget/RenderTargetView.hpp"
 
+#ifdef _WIN32
+
 namespace Simple
 {
 
@@ -36,3 +38,5 @@ namespace Simple
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext> mContext;
 	};
 }
+
+#endif

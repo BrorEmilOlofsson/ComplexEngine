@@ -13,9 +13,12 @@ namespace Simple
 		[[nodiscard]] constexpr ECS& GetECS() noexcept;
 		[[nodiscard]] constexpr const ECS& GetECS() const noexcept;
 
+		[[nodiscard]] EntityID GetRootEntity() const noexcept;
+
 	private:
 
 		ECS mECS;
+		EntityID mRootEntityID = InvalidEntityID;
 	};
 
 	constexpr ECS& EntityComposition::GetECS() noexcept

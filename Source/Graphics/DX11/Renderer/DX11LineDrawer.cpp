@@ -67,8 +67,6 @@ namespace Simple
 	{
 		const size_t vertexCount = lines.size() * 2;
 
-		//std::println("{}", lines.size());
-
 		for (size_t i = 0; i < lines.size(); ++i)
 		{
 			const size_t startVertex = i * 2;
@@ -86,12 +84,6 @@ namespace Simple
 			mInstanceData.meshData.indices[i] = i;
 		}
 
-
-		//NOTE(v11.3.3): UpdateSubresource eats over 200 fps in Release with just 10 lines?
-		//context->UpdateSubresource(myInstanceData->vertexBuffer.Get(), 0, nullptr, myInstanceData->meshData.vertices.data(), 0, 0);
-		//context->UpdateSubresource(myInstanceData->indexBuffer.Get(), 0, nullptr, myInstanceData->meshData.indices.data(), 0, 0);
-
-		//NOTE(v11.3.3): Mapping data seem faster than UpdateSubsource
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
 		context.Map(mInstanceData.vertexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 		std::memcpy(mappedResource.pData, mInstanceData.meshData.vertices.data(), sizeof(Vertex) * vertexCount);

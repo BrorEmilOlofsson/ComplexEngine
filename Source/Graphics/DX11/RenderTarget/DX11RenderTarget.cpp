@@ -2,6 +2,8 @@
 #include "DX11RenderTarget.hpp"
 #include "Graphics/DX11/DX11Factory.hpp"
 
+#ifdef _WIN32
+
 namespace Simple
 {
 
@@ -59,3 +61,5 @@ namespace Simple
 		InitRenderTargetView(resource, size, mRTVDesc);
 	}
 }
+
+#endif
