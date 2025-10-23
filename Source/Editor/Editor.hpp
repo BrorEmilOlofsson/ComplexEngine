@@ -37,5 +37,6 @@ namespace Simple
 		ImGuiStyleManager mImGuiStyleManager;
 		FreeFlyCameraSettings mFreeFlyCameraSettings;
 		EditorSceneSettings mEditorSceneSettings;
+		EntityCompositionPopUp* mEntityCompositionPopUp = nullptr;
 	};
 }

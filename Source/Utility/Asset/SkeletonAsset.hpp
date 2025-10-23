@@ -6,5 +6,4 @@ namespace Simple
 {
 	using SkeletonAsset = Asset<class Skeleton>;
 	using SkeletonAssetHandle = AssetHandle<class Skeleton>;
-
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/ECS/ECS.hpp"
+#include <filesystem>
 
 namespace Simple
 {
@@ -15,10 +16,25 @@ namespace Simple
 
 		[[nodiscard]] EntityID GetRootEntity() const noexcept;
 
+		[[nodiscard]] const std::filesystem::path& GetPath() const noexcept;
+
+		[[nodiscard]] bool HasChanged() const noexcept
+		{
+			return mHasChanged;
+		}
+
+		void SetHasChanged(const bool hasChanged) noexcept
+		{
+			mHasChanged = hasChanged;
+		}
+
 	private:
 
 		ECS mECS;
 		EntityID mRootEntityID = InvalidEntityID;
+		
+		std::filesystem::path mPath;
+		bool mHasChanged = false;
 	};
 
 	constexpr ECS& EntityComposition::GetECS() noexcept

@@ -9,6 +9,11 @@
 #include "Utility/Camera.hpp"
 #include "Engine/Utility/BlackboardKeys.hpp"
 #include "Engine/Reflection/DataTypeRegistry.hpp"
+#include "Utility/Asset/EntityCompositionAsset.hpp"
+#include "Engine/ECS/EntityComposition.hpp"
+#include "Engine/ECSEngine/Components/EntityCompositionComponent.hpp"
+#include "Engine/ECSEngine/Utility/ECSEntityCompositionUtility.hpp"
+#include "Engine/ECSEngine/Utility/ECSTransformHierarchyUtility.hpp"
 
 namespace Simple
 {
@@ -76,15 +81,19 @@ namespace Simple
 
 		auto doCommand = [](const CreateEntityData& data)
 			{
-				TransformHierarchyComponent* ctc = data.mECS.get().GetComponent<TransformHierarchyComponent>(data.mParentID);
-				ctc->children.insert(begin(ctc->children) + data.mIndex, data.mCreatedEntityID);
+				TransformHierarchyComponent* parentComponent = data.mECS.get().GetComponent<TransformHierarchyComponent>(data.mParentID);
+				parentComponent->children.insert(begin(parentComponent->children) + data.mIndex, data.mCreatedEntityID);
+				TransformHierarchyComponent* childComponent = data.mECS.get().GetComponent<TransformHierarchyComponent>(data.mCreatedEntityID);
+				childComponent->parent = data.mParentID;
 				ECS::EntityView(&data.mECS.get(), data.mCreatedEntityID).SetIsActive(true);
 			};
 
 		auto undoCommand = [](const CreateEntityData& data)
 			{
-				TransformHierarchyComponent* ctc = data.mECS.get().GetComponent<TransformHierarchyComponent>(data.mParentID);
-				ctc->children.erase(begin(ctc->children) + data.mIndex);
+				TransformHierarchyComponent* parentComponent = data.mECS.get().GetComponent<TransformHierarchyComponent>(data.mParentID);
+				parentComponent->children.erase(begin(parentComponent->children) + data.mIndex);
+				TransformHierarchyComponent* childComponent = data.mECS.get().GetComponent<TransformHierarchyComponent>(data.mCreatedEntityID);
+				childComponent->parent = InvalidEntityID;
 				ECS::EntityView(&data.mECS.get(), data.mCreatedEntityID).SetIsActive(false);
 			};
 
@@ -209,6 +218,36 @@ namespace Simple
 		commandTracker.ExecuteCommand(EditorCommand(command, "Select Entity"));
 	}
 
+	static void AddComponentToEntity(ECS& ecs, const EntityID entityID, const std::type_index typeIndex, const std::string& componentName/*, ECS& ecsBuffer*/, EditorCommandTracker& commandTracker)
+	{
+		struct AddComponentData final
+		{
+			ECS* mECS = nullptr;
+			EntityID mEntityID;
+			std::type_index mTypeIndex;
+		};
+
+		AddComponentData data
+		{
+			.mECS = &ecs,
+			.mEntityID = entityID,
+			.mTypeIndex = typeIndex
+		};
+
+		auto doCommand = [](const AddComponentData& data)
+			{
+				data.mECS->GetRegistry().GetComponentType(data.mTypeIndex).addComponentFunction(*data.mECS, data.mEntityID, nullptr);
+
+			};
+
+		auto undoCommand = [](const AddComponentData& data)
+			{
+				data.mECS->RemoveComponent(data.mEntityID, data.mTypeIndex);
+			};
+
+		commandTracker.ExecuteCommand(EditorCommand(data, doCommand, undoCommand, "Add Component (" + componentName + ")"));
+	}
+
 	void RemoveComponent(ECS& ecs, const EntityID entityID, const std::type_index& typeIndex, ECS& ecsBuffer, EditorCommandTracker& commandTracker)
 	{
 		const EntityID copyEntityID = ecs.CopyEntity(entityID, ecsBuffer);
@@ -239,8 +278,8 @@ namespace Simple
 		commandTracker.RegisterCommand(EditorCommand(data, command, command, "Remove Component"));
 	}
 
-	void ShowEntityAddButtons(ECS& ecs, EntityID& selectedEntityID, std::vector<EntityID>& rootEntities, 
-		EditorCommandTracker& commandTracker, const std::string& imGuiTag, std::optional<EntityID> defaultParent)
+	void ShowEntityAddButtons(ECS& ecs, EntityID& selectedEntityID, std::vector<EntityID>& rootEntities,
+		EditorCommandTracker& commandTracker, const std::string& imGuiTag, const EntityID defaultParent)
 	{
 		const std::string addButton = "Add" + imGuiTag;
 		const std::string addSceneObjectButton = "Add Scene Object" + imGuiTag;
@@ -258,7 +297,7 @@ namespace Simple
 			{
 				commandTracker.BeginComposite("Create Entity + Select Entity");
 
-				const EntityID createdEntityID = CreateEntity(ecs, rootEntities, defaultParent.value_or(InvalidEntityID), commandTracker);
+				const EntityID createdEntityID = CreateEntity(ecs, rootEntities, defaultParent, commandTracker);
 
 				SelectEntity(createdEntityID, selectedEntityID, commandTracker);
 
@@ -270,9 +309,9 @@ namespace Simple
 			{
 				commandTracker.BeginComposite("Create Entity + Select Entity");
 
-				const EntityID createdEntityID = CreateEntity(ecs, rootEntities, defaultParent.value_or(InvalidEntityID), commandTracker);
+				const EntityID createdEntityID = CreateEntity(ecs, rootEntities, defaultParent, commandTracker);
 
-				ecs.AddComponent<MeshComponent>(createdEntityID);
+				AddComponentToEntity(ecs, createdEntityID, std::type_index(typeid(MeshComponent)), "Mesh Component", commandTracker);
 
 				SelectEntity(createdEntityID, selectedEntityID, commandTracker);
 
@@ -470,23 +509,6 @@ namespace Simple
 		}
 	}
 
-	std::vector<EntityID> GetRootEntities(const ECS& ecs)
-	{
-		std::vector<EntityID> rootEntities;
-		for (auto entityView : ecs.ViewEntities())
-		{
-			rootEntities.push_back(entityView.GetEntityID());
-		}
-		for (auto [entityID, hierarchyComponent] : ecs.ViewUsingEntityID<TransformHierarchyComponent>())
-		{
-			if (hierarchyComponent.parent != InvalidEntityID)
-			{
-				std::erase(rootEntities, entityID);
-			}
-		}
-		return rootEntities;
-	}
-
 	void ShowEntityHierarchy(ECS& ecs, ECS& ecsBuffer, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker,
 		const std::string& imGuiTag, EntityID& selectedEntityID)
 	{
@@ -523,7 +545,7 @@ namespace Simple
 	}
 
 	void ShowEntityHierarchyWithAddButtons(ECS& ecs, ECS& ecsBuffer, std::vector<EntityID>& rootEntities,
-		EditorCommandTracker& commandTracker, const std::string& imGuiTag, EntityID& selectedEntityID, std::optional<EntityID> defaultParent)
+		EditorCommandTracker& commandTracker, const std::string& imGuiTag, EntityID& selectedEntityID, const EntityID defaultParent)
 	{
 		ShowEntityAddButtons(ecs, selectedEntityID, rootEntities, commandTracker, imGuiTag, defaultParent);
 		ImGui::Separator();
@@ -695,37 +717,6 @@ namespace Simple
 		anyItemActiveLastFrame = anyActiveItem;
 	}
 
-	static void AddComponentToEntity(ECS& ecs, const EntityID entityID, const std::type_index typeIndex, const std::string& componentName/*, ECS& ecsBuffer*/, EditorCommandTracker& commandTracker)
-	{
-		struct AddComponentData final
-		{
-			ECS* mECS = nullptr;
-			EntityID mEntityID;
-			std::type_index mTypeIndex;
-		};
-
-		AddComponentData data
-		{
-			.mECS = &ecs,
-			.mEntityID = entityID,
-			.mTypeIndex = typeIndex
-		};
-
-		auto doCommand = [](const AddComponentData& data)
-			{
-				data.mECS->GetRegistry().GetComponentType(data.mTypeIndex).addComponentFunction(*data.mECS, data.mEntityID, nullptr);
-
-			};
-
-		auto undoCommand = [](const AddComponentData& data)
-			{
-				data.mECS->RemoveComponent(data.mEntityID, data.mTypeIndex);
-			};
-
-		commandTracker.ExecuteCommand(EditorCommand(data, doCommand, undoCommand, "Add Component (" + componentName + ")"));
-	}
-
-
 	void ShowEntityAddComponentButtons(ECS& ecs, const EntityID entityID, const DataTypeRegistry& dataTypeRegistry, EditorCommandTracker& commandTracker)
 	{
 		if (ImGui::Button("Add Component"))
@@ -759,6 +750,29 @@ namespace Simple
 		}
 		ShowEntityComponents(ecs, entityID, anyItemActiveLastFrame, ecsBuffer, copyEntityID, blackboard, commandTracker);
 		ShowEntityAddComponentButtons(ecs, entityID, blackboard.Get<Key_DataTypeRegistry>(), commandTracker);
+	}
+
+	EntityIDConverter MergeECS(ECS& targetECS, const ECS& sourceECS)
+	{
+		auto entityCollectionView = sourceECS.ViewEntities();
+		std::vector<EntityID> entityConverter(entityCollectionView.GetCount());
+		for (auto entity : entityCollectionView)
+		{
+			const EntityID createdEntityID = sourceECS.CopyEntity(entity.GetEntityID(), targetECS);
+			entityConverter[entity.GetEntityID().id] = createdEntityID;
+		}
+		return EntityIDConverter(std::move(entityConverter));
+	}
+
+	void InstantiateEntityComposition(ECS& targetECS, const EntityCompositionAssetHandle& compositionAsset, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker)
+	{
+		commandTracker;
+		const EntityComposition& entityComposition = *compositionAsset.Get();
+		const EntityIDConverter entityConverter = MergeECS(targetECS, entityComposition.GetECS());
+		UpdateEntityIDs(entityComposition.GetECS(), targetECS, entityConverter);
+		const EntityID instantiatedRootEntity = entityConverter[entityComposition.GetRootEntity()];
+		targetECS.AddComponent<EntityCompositionComponent>(instantiatedRootEntity).asset = compositionAsset;
+		rootEntities = GetRootEntities(targetECS);
 	}
 
 	void TeleportCameraToEntity(const ECS& ecs, const EntityID entityID, Camera& camera, const bool changeRotation, const float offsetDistance)

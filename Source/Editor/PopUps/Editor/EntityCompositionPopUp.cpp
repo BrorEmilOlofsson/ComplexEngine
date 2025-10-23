@@ -1,6 +1,7 @@
 #include "Editor/Precompiled/EditorPch.hpp"
 #include "EntityCompositionPopUp.hpp"
 #include "Editor/Functions/ECSEditorFunctions.hpp"
+#include "Engine/ECS/EntityComposition.hpp"
 #include "Engine/ECSEngine/Utility/ECSEntityCompositionUtility.hpp"
 #include "Engine/Utility/BlackboardKeys.hpp"
 #include "Engine/Scene/SceneManager.hpp"
@@ -9,26 +10,35 @@
 #include "Engine/Utility/DebugShapes.hpp"
 #include "Engine/OperatingSystem/OperatingSystem.hpp"
 #include "Engine/ECSEngine/Utility/ECSTransformUtility.hpp"
+#include "Engine/ECSEngine/Components/EntityCompositionComponent.hpp"
+#include "Engine/ECSEngine/Utility/ECSTransformHierarchyUtility.hpp"
 
 namespace Simple
 {
 
 	EntityCompositionPopUp::EntityCompositionPopUp(const std::string&, RenderContext&& renderContext)
 		: PopUp("Entity Composition Viewer")
-		, mEntityComposition(ECSRegistry::Get())
 	{
 		mRenderState.SetRenderContext(std::move(renderContext));
-		mRootEntities = GetRootEntities(mEntityComposition.GetECS());
-		mEntityComposition.GetECS().GetComponent<NameComponent>(mEntityComposition.GetRootEntity())->name = "Root";
 	}
 
 	void EntityCompositionPopUp::UpdateInternal(const Blackboard& blackboard)
 	{
+		if (!mEntityCompositionAsset.IsValid())
+		{
+			std::shared_ptr<EntityComposition> ec = std::make_shared<EntityComposition>(ECSRegistry::Get());
+			const std::filesystem::path defaultPath = std::filesystem::absolute(SIMPLE_DIR_ASSETS) / "EntityCompositions" / "Test.json";
+			blackboard.Get<Key_AssetManager>().AddEntityCompositionAsset(defaultPath, EntityCompositionAsset(ec));
+
+			mEntityCompositionAsset = blackboard.Get<Key_AssetManager>().GetEntityComposition(defaultPath);
+			mRootEntities = GetRootEntities(mEntityCompositionAsset->GetECS());
+			mEntityCompositionAsset->GetECS().GetComponent<NameComponent>(mEntityCompositionAsset->GetRootEntity())->name = "Root";
+		}
 		Blackboard newBlackboard = blackboard;
 		newBlackboard.Insert<Key_CurrentCamera>(mCamera);
 		newBlackboard.Insert<Key_CurrentRenderState>(mRenderState);
 
-		mEntityComposition.GetECS().EditorUpdate(newBlackboard);
+		mEntityCompositionAsset->GetECS().EditorUpdate(newBlackboard);
 
 		mRenderState.GetRenderList().AddSphere(DrawSphere{ Spheref(Point3f(0, 0, 10), 5.f), Colors::Salmon });
 
@@ -69,7 +79,7 @@ namespace Simple
 		ECS& ecsBuffer = blackboard.Get<Key_ECSBuffer>();
 		EditorCommandTracker& commandTracker = blackboard.Get<Key_CommandTracker>();
 		const WindowView windowView = blackboard.Get<Key_WindowView>();
-		SceneManager& sceneManager = blackboard.Get<Key_SceneManager>();
+		//SceneManager& sceneManager = blackboard.Get<Key_SceneManager>();
 		OSView os = blackboard.Get<Key_OSView>();
 		EditorSceneSettings& editorSceneSettings = blackboard.Get<Key_EditorSceneSettings>();
 		const InputState& input = blackboard.Get<Key_InputState>();
@@ -77,23 +87,23 @@ namespace Simple
 		Blackboard newBlackboard = blackboard;
 		newBlackboard.Insert<Key_CurrentCamera>(mCamera);
 		newBlackboard.Insert<Key_CurrentRenderState>(mRenderState);
-		mEntityComposition.GetECS().Render(newBlackboard);
+		mEntityCompositionAsset->GetECS().Render(newBlackboard);
 		blackboard.Get<Key_OperatingSystem>().Render(mRenderState);
 
 		if (ImGui::Begin("Entity Composition Hierarchy"))
 		{
-			if (ImGui::Button("Instantiate"))
-			{
-				MergeEntityComposition(mEntityComposition, sceneManager.GetCurrentScene().GetECS());
-			}
+			//if (ImGui::Button("Instantiate"))
+			//{
+			//	//MergeEntityComposition(mEntityCompositionAsset, sceneManager.GetCurrentScene().GetECS());
+			//}
 			ShowEntityHierarchyWithAddButtons(
-				mEntityComposition.GetECS(), 
-				ecsBuffer, 
-				mRootEntities, 
-				commandTracker, 
-				mImGuiTag, 
+				mEntityCompositionAsset->GetECS(),
+				ecsBuffer,
+				mRootEntities,
+				commandTracker,
+				mImGuiTag,
 				mSelectedEntityID,
-				mEntityComposition.GetRootEntity()
+				mEntityCompositionAsset->GetRootEntity()
 			);
 		}
 
@@ -103,14 +113,14 @@ namespace Simple
 		{
 			if (mSelectedEntityID != InvalidEntityID)
 			{
-				const Transform transform = GetWorldTransform(mEntityComposition.GetECS(), mSelectedEntityID);
+				const Transform transform = GetWorldTransform(mEntityCompositionAsset->GetECS(), mSelectedEntityID);
 				newBlackboard.Insert<Key_ReferenceTransform>(transform);
 			}
 
-			ShowEntityName(mEntityComposition.GetECS(), mSelectedEntityID, input);
+			ShowEntityName(mEntityCompositionAsset->GetECS(), mSelectedEntityID, input);
 
 			ShowEntityInspector(
-				mEntityComposition.GetECS(),
+				mEntityCompositionAsset->GetECS(),
 				mSelectedEntityID,
 				mAnyItemActiveLastFrame,
 				ecsBuffer,
@@ -128,7 +138,7 @@ namespace Simple
 			//mRenderState.SetRenderRect(renderRect);*/
 
 			mTransformEntityTool.ShowEntityImGuizmo(
-				mEntityComposition.GetECS(),
+				mEntityCompositionAsset->GetECS(),
 				mSelectedEntityID,
 				editorSceneSettings.transformMode,
 				renderRect,

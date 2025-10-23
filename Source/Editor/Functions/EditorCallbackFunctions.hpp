@@ -9,11 +9,11 @@ namespace Simple
 	class EditorCallbacks
 	{
 	public:
-		static std::function<void()> SetPopUpActive(std::shared_ptr<PopUp> aPopUp, bool* aBoolean)
+		static std::function<void()> SetPopUpActive(std::shared_ptr<PopUp> popUp, bool* active)
 		{
 			return [=]() -> void
 				{
-					aPopUp->IsActive() = *aBoolean;
+					popUp->IsActive() = *active;
 				};
 		}
 	};

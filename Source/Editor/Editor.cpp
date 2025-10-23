@@ -1,5 +1,7 @@
 #include "Editor/Precompiled/EditorPch.hpp"
-#include "Editor/Editor.hpp"
+#include "Editor.hpp"
+
+#include "Editor/EditorSystem.hpp"
 
 #include "Editor/Core/Tabs/MenuTabWindow.hpp"
 #include "Editor/Core/Tabs/MenuTabDefault.hpp"
@@ -53,7 +55,7 @@ namespace Simple
 		return ref;
 	}
 
-	static void SetUpDefaultLayout(std::vector<std::shared_ptr<PopUp>>& popUpWindows, std::vector<std::unique_ptr<MainMenuTabBase>>& mainMenuTabs, Engine& engine)
+	static void SetUpDefaultLayout(std::vector<std::shared_ptr<PopUp>>& popUpWindows, std::vector<std::unique_ptr<MainMenuTabBase>>& mainMenuTabs, Engine& engine, EntityCompositionPopUp*& p)
 	{
 		MenuTabDefault& sceneTab = AddMenuTab<MenuTabDefault>(mainMenuTabs, "Scene");
 		MenuTabWindow& windowsTab = AddMenuTab<MenuTabWindow>(mainMenuTabs, "Windows");
@@ -93,11 +95,13 @@ namespace Simple
 		std::shared_ptr<CameraControlsGuidePopUp> cameraHelpPopUp = AddPopUpWindow<CameraControlsGuidePopUp>(popUpWindows, "Editor Camera Control");
 		std::shared_ptr<AssetBrowserPopUp> assetBrowserPopUp2 = AddPopUpWindow<AssetBrowserPopUp>(popUpWindows, "Asset Browser", nodeScriptingPopUp.get(), &windowsTab, nodeScriptingPopUpButton);
 		std::shared_ptr<SceneWindowPopUp> sceneWindowPopUp = AddPopUpWindow<SceneWindowPopUp>(popUpWindows, "Scene");
-		std::shared_ptr<EntityCompositionPopUp> entityFormulaPopUp = AddPopUpWindow<EntityCompositionPopUp>(
+		std::shared_ptr<EntityCompositionPopUp> entityCompositionPopUp = AddPopUpWindow<EntityCompositionPopUp>(
 			popUpWindows, 
 			"",
 			engine.GetOperatingSystem().CreateRenderContext(engine.GetMainWindow().GetClientSize())
 		);
+
+		p = entityCompositionPopUp.get();
 
 		{
 			const std::vector<std::filesystem::path> scenePaths = FileUtility::GetFilesFromDirectory(std::filesystem::absolute(SIMPLE_DIR_SCENES));
@@ -120,7 +124,7 @@ namespace Simple
 		
 		editorPopUpButton->AddCallback(EditorCallbacks::SetPopUpActive(assetBrowserPopUp2, &editorPopUpButton->GetIsActiveRef()));
 		editorPopUpButton->AddCallback(EditorCallbacks::SetPopUpActive(sceneWindowPopUp, &editorPopUpButton->GetIsActiveRef()));
-		editorPopUpButton->AddCallback(EditorCallbacks::SetPopUpActive(entityFormulaPopUp, &editorPopUpButton->GetIsActiveRef()));
+		editorPopUpButton->AddCallback(EditorCallbacks::SetPopUpActive(entityCompositionPopUp, &editorPopUpButton->GetIsActiveRef()));
 
 		nodeScriptingPopUpButton->AddCallback(EditorCallbacks::SetPopUpActive(nodeScriptingPopUp, &nodeScriptingPopUpButton->GetIsActiveRef()));
 
@@ -134,11 +138,12 @@ namespace Simple
 		: mECSBuffer(ECSRegistry::Get())
 		, mEngine(engine)
 	{
+		ECSRegistry::Get().RegisterSystem<EditorSystem>();
 	}
 
 	void Editor::Init()
 	{
-		SetUpDefaultLayout(mPopUpWindows, mMainMenuTabs, *mEngine);
+		SetUpDefaultLayout(mPopUpWindows, mMainMenuTabs, *mEngine, mEntityCompositionPopUp);
 
 		for (auto& menuTab : mMainMenuTabs)
 		{
@@ -203,6 +208,7 @@ namespace Simple
 		editorBlackboard.Insert<Key_FreeFlyCameraSettings>(mFreeFlyCameraSettings);
 		editorBlackboard.Insert<Key_EditorSceneSettings>(mEditorSceneSettings);
 		editorBlackboard.Insert<Key_ShowUnitVectorInScene>(mEditorSceneSettings.showUnitVectorInScene);
+		editorBlackboard.Insert<Key_EntityCompositionPopUp>(*mEntityCompositionPopUp);
 
 		for (const std::shared_ptr<PopUp> popUp : mPopUpWindows)
 		{
@@ -231,6 +237,7 @@ namespace Simple
 		editorBlackboard.Insert<Key_EditorSceneSettings>(mEditorSceneSettings);
 		editorBlackboard.Insert<Key_ShowUnitVectorInScene>(mEditorSceneSettings.showUnitVectorInScene);
 		editorBlackboard.Insert<Key_OperatingSystem>(mEngine->GetOperatingSystem());
+		editorBlackboard.Insert<Key_EntityCompositionPopUp>(*mEntityCompositionPopUp);
 
 		for (auto& tab : mMainMenuTabs)
 		{

@@ -18,9 +18,20 @@ namespace Simple
 		}
 		return decltype(it->second)();
 	}
-	
+
+
+
 	class AssetManager final
 	{
+		template<typename HandleType>
+		[[nodiscard]] static constexpr decltype(auto) ValidatedGet(auto& path, auto& map)
+		{
+			if (auto asset = MapFind(map, std::filesystem::absolute(path)))
+			{
+				return HandleType(asset);
+			}
+			return HandleType();
+		}
 	public:
 
 		AssetManager() = default;
@@ -39,79 +50,83 @@ namespace Simple
 
 		[[nodiscard]] TextureAssetHandle GetTexture(const std::filesystem::path& path)
 		{
-			if (TextureAsset textureAsset = MapFind(mTextureAssets, std::filesystem::absolute(path)))
-			{
-				return TextureAssetHandle(textureAsset);
-			}
-			return TextureAssetHandle();
+			return ValidatedGet<TextureAssetHandle>(path, mTextureAssets);
 		}
 
 		[[nodiscard]] MeshAssetHandle GetMesh(const std::filesystem::path& path)
 		{
-			if (MeshAsset asset = MapFind(mMeshAssets, std::filesystem::absolute(path)))
-			{
-				return MeshAssetHandle(asset);
-			}
-			return MeshAssetHandle();
+			return ValidatedGet<MeshAssetHandle>(path, mMeshAssets);
 		}
 
 		[[nodiscard]] AnimationAssetHandle GetAnimation(const std::filesystem::path& path)
 		{
-			if (AnimationAsset asset = MapFind(mAnimationAssets, std::filesystem::absolute(path)))
-			{
-				return AnimationAssetHandle(asset);
-			}
-			return AnimationAssetHandle();
+			return ValidatedGet<AnimationAssetHandle>(path, mAnimationAssets);
 		}
 
 		[[nodiscard]] SkeletonAssetHandle GetSkeleton(const std::filesystem::path& path)
 		{
-			if (SkeletonAsset asset = MapFind(mSkeletonAssets, std::filesystem::absolute(path)))
-			{
-				return SkeletonAssetHandle(asset);
-			}
-			return SkeletonAssetHandle();
+			return ValidatedGet<SkeletonAssetHandle>(path, mSkeletonAssets);
 		}
 
 		[[nodiscard]] PixelShaderAssetHandle GetPixelShader(const std::filesystem::path& path)
 		{
-			if (PixelShaderAsset asset = MapFind(mPixelShaderAssets, std::filesystem::absolute(path)))
-			{
-				return PixelShaderAssetHandle(asset);
-			}
-			return PixelShaderAssetHandle();
+			return ValidatedGet<PixelShaderAssetHandle>(path, mPixelShaderAssets);
 		}
 
 		[[nodiscard]] VertexShaderAssetHandle GetVertexShader(const std::filesystem::path& path)
 		{
-			if (VertexShaderAsset asset = MapFind(mVertexShaderAssets, std::filesystem::absolute(path)))
+			return ValidatedGet<VertexShaderAssetHandle>(path, mVertexShaderAssets);
+		}
+
+		[[nodiscard]] EntityCompositionAssetHandle GetEntityComposition(const std::filesystem::path& path)
+		{
+			return ValidatedGet<EntityCompositionAssetHandle>(path, mEntityCompositionAssets);
+		}
+
+		void AddTexture(const std::filesystem::path& path, TextureAsset asset)
+		{
+			if (!asset)
 			{
-				return VertexShaderAssetHandle(asset);
+				throw std::invalid_argument("Asset is invalid");
 			}
-			return VertexShaderAssetHandle();
+			mTextureAssets[std::filesystem::absolute(path)] = std::move(asset);
 		}
 
-
-		void AddTexture(const std::filesystem::path& path, TextureAsset textureAsset)
+		void AddMesh(const std::filesystem::path& path, MeshAsset asset)
 		{
-			mTextureAssets[std::filesystem::absolute(path)] = std::move(textureAsset);
-		}
-
-		void AddMesh(const std::filesystem::path& path, MeshAsset meshAsset)
-		{
-			mMeshAssets[std::filesystem::absolute(path)] = std::move(meshAsset);
+			if (!asset)
+			{
+				throw std::invalid_argument("Asset is invalid");
+			}
+			mMeshAssets[std::filesystem::absolute(path)] = std::move(asset);
 		}
 
 		void AddPixelShader(const std::filesystem::path& path, PixelShaderAsset asset)
 		{
-			mPixelShaderAssets[std::filesystem::absolute(path)] = asset;
+			if (!asset)
+			{
+				throw std::invalid_argument("Asset is invalid");
+			}
+			mPixelShaderAssets[std::filesystem::absolute(path)] = std::move(asset);
 		}
 
 		void AddVertexShader(const std::filesystem::path& path, VertexShaderAsset asset)
 		{
-			mVertexShaderAssets[std::filesystem::absolute(path)] = asset;
+			if (!asset)
+			{
+				throw std::invalid_argument("Asset is invalid");
+			}
+			mVertexShaderAssets[std::filesystem::absolute(path)] = std::move(asset);
 		}
 
+		void AddEntityCompositionAsset(const std::filesystem::path& path, EntityCompositionAsset asset)
+		{
+			if (!asset)
+			{
+				throw std::invalid_argument("Asset is invalid");
+			}
+			mEntityCompositionAssets[std::filesystem::absolute(path)] = std::move(asset);
+		}
 
 	private:
 
@@ -121,6 +136,7 @@ namespace Simple
 		std::unordered_map<std::filesystem::path, SkeletonAsset> mSkeletonAssets;
 		std::unordered_map<std::filesystem::path, PixelShaderAsset> mPixelShaderAssets;
 		std::unordered_map<std::filesystem::path, VertexShaderAsset> mVertexShaderAssets;
+		std::unordered_map<std::filesystem::path, EntityCompositionAsset> mEntityCompositionAssets;
 
 		std::function<void(AssetManager&)> mDefaultLoader;
 

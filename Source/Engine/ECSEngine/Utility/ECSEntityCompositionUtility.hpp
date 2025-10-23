@@ -1,7 +1,9 @@
 #pragma once
-
+#include "Utility/Asset/EntityCompositionAsset.hpp"
+#include "Engine/ECS/ECS.hpp"
 
 namespace Simple
 {
-	void MergeEntityComposition(const class EntityComposition& entityComposition, class ECS& ecs);
+
+	void UpdateEntityIDs(const ECS& previousECS, ECS& ecs, const EntityIDConverter& entityIDConverter);
 }

@@ -96,18 +96,6 @@ namespace Simple
 		}
 	}
 
-	EntityIDConverter ECS::MergeEntities(const ECS& otherECS)
-	{
-		auto entityCollectionView = otherECS.ViewEntities();
-		std::vector<EntityID> entityConverter(entityCollectionView.GetCount());
-		for (auto entity : entityCollectionView)
-		{
-			const EntityID createdEntityID = otherECS.CopyEntity(entity.GetEntityID(), *this);
-			entityConverter[entity.GetEntityID().id] = createdEntityID;
-		}
-		return EntityIDConverter(std::move(entityConverter));
-	}
-
 	void ECS::RemoveComponent(const EntityID entityID, const std::type_index& typeIndex)
 	{
 		const std::size_t index = mRegistry.GetComponentTypeIndex(typeIndex);

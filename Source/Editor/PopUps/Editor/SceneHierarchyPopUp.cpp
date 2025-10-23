@@ -7,6 +7,8 @@
 #include "Editor/Functions/ECSEditorFunctions.hpp"
 #include "Engine/Scene/SceneManager.hpp"
 #include "Engine/Utility/BlackboardKeys.hpp"
+#include "Engine/ECSEngine/Utility/ECSTransformHierarchyUtility.hpp"
+#include "Editor/PopUps/Editor/EntityCompositionPopUp.hpp"
 
 namespace Simple
 {
@@ -106,8 +108,14 @@ namespace Simple
 				commandTracker, 
 				mImGuiTag, 
 				mSelectedEntityID, 
-				std::nullopt
+				InvalidEntityID
 			);
+
+			if (ImGui::Button("Instantiate"))
+			{
+				EntityCompositionPopUp& popup = blackboard.Get<Key_EntityCompositionPopUp>();
+				InstantiateEntityComposition(sceneManager.GetCurrentScene().GetECS(), popup.GetCompositionAsset(), mRootEntities, commandTracker);
+			}
 		}
 
 		ImGui::End();

@@ -3,10 +3,10 @@
 #include "Engine/ECS/ECS.hpp"
 #include "Editor/PopUps/Editor/SceneHierarchyPopUp.hpp"
 #include "Editor/PopUps/Editor/SceneInspectorPopUp.hpp"
-#include "Engine/ECS/EntityComposition.hpp"
 #include "Utility/Camera.hpp"
 #include "Graphics/RenderState.hpp"
 #include "Editor/Tools/TransformEntityTool.hpp"
+#include "Utility/Asset/EntityCompositionAsset.hpp"
 
 namespace Simple
 {
@@ -19,9 +19,14 @@ namespace Simple
 		void UpdateInternal(const Blackboard& blackboard) override;
 		void Render(const Blackboard& blackboard) override;
 
+		EntityCompositionAssetHandle GetCompositionAsset()
+		{
+			return mEntityCompositionAsset;
+		}
+
 	private:
 
-		EntityComposition mEntityComposition;
+		EntityCompositionAssetHandle mEntityCompositionAsset;
 		EntityID mSelectedEntityID;
 		bool mAnyItemActiveLastFrame = false;
 		EntityID mCopyEntityID;

@@ -2,6 +2,7 @@
 #include "Engine/ECSEngine/Components/NameComponent.hpp"
 #include "Engine/ECSEngine/Components/TransformComponent.hpp"
 #include "Engine/ECSEngine/Components/TransformHierarchyComponent.hpp"
+#include "Engine/ECSEngine/Components/EntityCompositionComponent.hpp"
 #include "Engine/ECSEngine/Components/MeshComponent.hpp"
 #include "Engine/ECSEngine/Components/AnimationComponent.hpp"
 #include "Engine/ECSEngine/Components/SkyBoxComponent.hpp"
@@ -24,6 +25,7 @@ namespace Simple
 		RegisterNameComponent();
 		RegisterTransformComponent();
 		RegisterTransformHierarchyComponent();
+		RegisterEntityCompositionComponent();
 		RegisterMeshComponent();
 		RegisterAnimationComponent();
 		RegisterSkyBoxComponent();

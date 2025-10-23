@@ -28,9 +28,19 @@ namespace Simple
 			return mAsset.lock();
 		}
 
-		[[nodiscard]] constexpr operator bool() const noexcept
+		[[nodiscard]] std::shared_ptr<const T> Get() const noexcept
+		{
+			return mAsset.lock();
+		}
+
+		[[nodiscard]] constexpr bool IsValid() const noexcept
 		{
 			return !mAsset.expired();
+		}
+
+		[[nodiscard]] constexpr operator bool() const noexcept
+		{
+			return IsValid();
 		}
 
 		[[nodiscard]] T* operator->() const

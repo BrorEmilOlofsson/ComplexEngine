@@ -14,4 +14,9 @@ namespace Simple
 	{
 		return mRootEntityID;
 	}
+
+	const std::filesystem::path& EntityComposition::GetPath() const noexcept
+	{
+		return mPath;
+	}
 }

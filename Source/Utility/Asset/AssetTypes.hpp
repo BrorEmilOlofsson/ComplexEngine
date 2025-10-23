@@ -5,3 +5,4 @@
 #include "Utility/Asset/SkeletonAsset.hpp"
 #include "Utility/Asset/PixelShaderAsset.hpp"
 #include "Utility/Asset/VertexShaderAsset.hpp"
+#include "Utility/Asset/EntityCompositionAsset.hpp"

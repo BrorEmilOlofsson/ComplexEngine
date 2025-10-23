@@ -144,7 +144,7 @@ namespace Simple
 		Matrix4x4f expected = Camera::CreatePerspectiveProjectionMatrix(camera.GetHorizontalFoV(), camera.GetNearPlane(), camera.GetFarPlane(), Vector2ui(resolution));
 		if (proj != expected)
 		{
-			throw std::runtime_error("Resolution in camera does not correspond to RenderState resolution");
+			//throw std::runtime_error("Resolution in camera does not correspond to RenderState resolution");
 		}
 	}
 

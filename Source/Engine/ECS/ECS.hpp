@@ -758,7 +758,6 @@ namespace Simple
 		EntityID CopyEntity(const EntityID entityID, ECS& targetECS) const;
 		EntityID DuplicateEntity(const EntityID entityID);
 		void ReplaceEntity(const EntityID replaceEntityID, const ECS& sourceECS, const EntityID sourceEntityID);
-		EntityIDConverter MergeEntities(const ECS& otherECS);
 
 		template<typename T>
 		T& AddComponent(const EntityID entityID);
