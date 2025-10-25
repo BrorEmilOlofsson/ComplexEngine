@@ -35,29 +35,30 @@ namespace Simple
 		return (ImGui::GetContentRegionAvail().x - labelWidth) / itemCount;
 	}
 
-	static ViewAndEditResult CustomDragFloat1(std::string_view str, float& value, const float width, const std::string& imguiTag, Color color)
+	static ViewAndEditResult CustomDragFloat1(std::string_view str, float& value, const float width, const std::string& imguiTag, Color color, float speed, float min, float max)
 	{
 		ViewAndEditResult viewAndEditResult;
 		ImGui::PushStyleColor(ImGuiCol_Button, ToImVec4(color));
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ToImVec4(color));
 		const std::string xStr = std::string(str) + "##" + imguiTag;
-		const char* xx = xStr.c_str();
-		ImGui::Button(xx);
+		ImGui::Button(xStr.c_str());
 		ImGui::PopStyleColor();
 		ImGui::PopStyleColor();
 
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(width);
 		const std::string floatX = "##" + std::string(str) + imguiTag;
-		if (ImGui::DragFloat(floatX.c_str(), &value, 0.1f))
+		ImGui::PushID(&value);
+		if (ImGui::DragFloat(floatX.c_str(), &value, speed, min, max))
 		{
 			viewAndEditResult.isEdited = true;
 		}
+		ImGui::PopID();
 		viewAndEditResult.isActive = ImGui::IsItemActive();
 		return viewAndEditResult;
 	}
 
-	static ViewAndEditResult CustomDragFloat3(const char* label, float& x, float& y, float& z)
+	static ViewAndEditResult CustomDragFloat3(const char* label, float& x, float& y, float& z, float speed = 0.01f, float min = 0, float max = 0)
 	{
 		ViewAndEditResult viewAndEditResult;
 
@@ -65,11 +66,11 @@ namespace Simple
 
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, (ImVec2(0, 0)));
 
-		viewAndEditResult |= CustomDragFloat1("X", x, width, label, Colors::Red);
+		viewAndEditResult |= CustomDragFloat1("X", x, width, label, Colors::Red, speed, min, max);
 		ImGui::SameLine();
-		viewAndEditResult |= CustomDragFloat1("Y", y, width, label, Color(0, 0.7f, 0));
+		viewAndEditResult |= CustomDragFloat1("Y", y, width, label, Color(0, 0.7f, 0), speed, min, max);
 		ImGui::SameLine();
-		viewAndEditResult |= CustomDragFloat1("Z", z, width, label, Colors::Blue);
+		viewAndEditResult |= CustomDragFloat1("Z", z, width, label, Colors::Blue, speed, min, max);
 
 		ImGui::PopStyleVar();
 
@@ -82,9 +83,9 @@ namespace Simple
 		return viewAndEditResult;
 	}
 
-	static ViewAndEditResult CustomDragFloat3(const char* label, Vector3f& vector)
+	static ViewAndEditResult CustomDragFloat3(const char* label, Vector3f& vector, float speed = 0.01f, float min = 0, float max = 0)
 	{
-		return CustomDragFloat3(label, vector.x, vector.y, vector.z);
+		return CustomDragFloat3(label, vector.x, vector.y, vector.z, speed, min, max);
 	}
 
 	static ViewAndEditResult CustomDragFloat3(const char* label, Point3f& point)
@@ -409,7 +410,7 @@ namespace Simple
 		{
 			Vector3f scale = value.GetScale();
 
-			const ViewAndEditResult viewAndEditScale = CustomDragFloat3("Scale", scale);
+			const ViewAndEditResult viewAndEditScale = CustomDragFloat3("Scale", scale, 0.01f, 0.1f, 0.f);
 			viewAndEditResult |= viewAndEditScale;
 
 			if (viewAndEditScale.isEdited)
@@ -784,8 +785,8 @@ namespace Simple
 
 		if (const ImGuiPayload* currentPayload = ImGui::GetDragDropPayload())
 		{
-			const std::filesystem::path payloadData = std::filesystem::path(reinterpret_cast<const char*>(currentPayload->Data));
-			const std::filesystem::path extension = payloadData.extension();
+			const std::filesystem::path path = std::filesystem::path(reinterpret_cast<const char*>(currentPayload->Data));
+			const std::filesystem::path extension = path.extension();
 
 			if (extension == ".dds")
 			{
@@ -793,8 +794,7 @@ namespace Simple
 				{
 					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Assets_Browser"))
 					{
-						const std::filesystem::path fileName = ConvertAbsolutePathToRelativePath(payloadData);
-						textureAsset = assetManager.GetTexture(fileName);
+						textureAsset = assetManager.GetTexture(path);
 						viewAndEditResult.isEdited = true;
 						viewAndEditResult.isActive = true;
 					}
@@ -827,7 +827,7 @@ namespace Simple
 
 		std::filesystem::path currentPath;
 
-		std::vector<std::filesystem::path> shaderFilePaths = FileUtility::GetFilesFromDirectory(std::filesystem::absolute(SIMPLE_DIR_SHADERS));
+		std::vector<std::filesystem::path> shaderFilePaths = FileUtility::GetPathsFromDirectory(std::filesystem::absolute(SIMPLE_DIR_SHADERS));
 		auto pixelShaderFilePaths = shaderFilePaths | std::views::filter(IsPixelShader);
 
 		if (shader)
@@ -888,7 +888,7 @@ namespace Simple
 
 		std::filesystem::path currentPath;
 
-		std::vector<std::filesystem::path> shaderFilePaths = FileUtility::GetFilesFromDirectory(std::filesystem::absolute(SIMPLE_DIR_SHADERS));
+		std::vector<std::filesystem::path> shaderFilePaths = FileUtility::GetPathsFromDirectory(std::filesystem::absolute(SIMPLE_DIR_SHADERS));
 		auto vertexShaderFilePaths = shaderFilePaths | std::views::filter(IsVertexShader);
 
 		if (shaderAsset)
@@ -963,8 +963,8 @@ namespace Simple
 
 		if (const ImGuiPayload* currentPayload = ImGui::GetDragDropPayload())
 		{
-			const std::filesystem::path payloadData = std::filesystem::path(reinterpret_cast<const char*>(currentPayload->Data));
-			const std::filesystem::path extension = payloadData.extension();
+			const std::filesystem::path path = std::filesystem::path(reinterpret_cast<const char*>(currentPayload->Data));
+			const std::filesystem::path extension = path.extension();
 
 			if (extension.string() == ".fbx")
 			{
@@ -972,8 +972,7 @@ namespace Simple
 				{
 					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Assets_Browser"))
 					{
-						const std::filesystem::path relativePath = ConvertAbsolutePathToRelativePath(payloadData);
-						skeletonAsset = modelFactory.GetSkeleton(relativePath);
+						skeletonAsset = modelFactory.GetSkeleton(path);
 						viewAndEditResult.isEdited = true;
 						viewAndEditResult.isActive = true;
 					}
@@ -1010,8 +1009,8 @@ namespace Simple
 
 		if (const ImGuiPayload* currentPayload = ImGui::GetDragDropPayload())
 		{
-			const std::filesystem::path payloadData = std::filesystem::path(reinterpret_cast<const char*>(currentPayload->Data));
-			const std::filesystem::path extension = payloadData.extension();
+			const std::filesystem::path path = std::filesystem::path(reinterpret_cast<const char*>(currentPayload->Data));
+			const std::filesystem::path extension = path.extension();
 
 			if (extension.string() == ".fbx")
 			{
@@ -1019,8 +1018,7 @@ namespace Simple
 				{
 					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Assets_Browser"))
 					{
-						const std::filesystem::path relativePath = ConvertAbsolutePathToRelativePath(payloadData);
-						animationAsset = assetManager.GetAnimation(relativePath);
+						animationAsset = assetManager.GetAnimation(path);
 						viewAndEditResult.isEdited = true;
 						viewAndEditResult.isActive = true;
 					}

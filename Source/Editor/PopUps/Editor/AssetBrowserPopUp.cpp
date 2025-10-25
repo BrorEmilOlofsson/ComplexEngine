@@ -10,6 +10,9 @@
 #include "Engine/Utility/BlackboardKeys.hpp"
 #include "Graphics/Texture/Texture.hpp"
 #include "Utility/Algorithm.hpp"
+#include "Editor/PopUps/Editor/EntityCompositionPopUp.hpp"
+#include "Engine/ECS/EntityComposition.hpp"
+#include "Engine/ECS/ECSSerializer.hpp"
 
 namespace Simple
 {
@@ -21,7 +24,7 @@ namespace Simple
 		return handle->GetShaderResourceView();
 	}
 
-	static void* GetSRVFromFileExtension(const std::filesystem::path& extension, const std::filesystem::path& directory, const std::filesystem::path& fileName, AssetManager& assetManager)
+	static void* GetSRVFromFileExtension(const std::filesystem::path& extension, const std::filesystem::path& path, AssetManager& assetManager)
 	{
 		const std::optional<eIconType> iconType = ToIconType(extension.string());
 
@@ -32,8 +35,7 @@ namespace Simple
 
 		if (extension == ".dds")
 		{
-			const std::filesystem::path texturePath = ConvertAbsolutePathToRelativePath(directory) / fileName;
-			TextureAssetHandle texture = assetManager.GetTexture(texturePath);
+			TextureAssetHandle texture = assetManager.GetTexture(path);
 
 			if (texture->GetSlot() != TextureSlots::CubeMap)
 			{
@@ -48,23 +50,140 @@ namespace Simple
 		return GetSRVFromIconType(eIconType::Unknown, assetManager);
 	}
 
+	static void OnAssetClicked(const std::filesystem::path& path, std::filesystem::path& currentDirectory, 
+		NodeScriptingWindow& nodeScriptingWindow, MenuTabWindow& nodeScriptParentTab, MenuItemPopUp& nodeScriptButton,
+		SceneManager& sceneManager, AssetManager& assetManager, EntityCompositionPopUp& entityCompositionPopUp, const ImTextureID textureID)
+	{
+		const std::string& extension = path.extension().string();
+		if (std::filesystem::is_directory(path))
+		{
+			currentDirectory = path;
+			return;
+		}
+		else if (textureID == GetSRVFromIconType(eIconType::Scene, assetManager))
+		{
+			const std::filesystem::path scenePath = std::filesystem::path("Assets/Scenes/") / path;
+			sceneManager.ChangeScene(scenePath);
+		}
+		else if (extension == ".fly")
+		{
+			if (nodeScriptingWindow.OpenClassByName(path.stem().string()))
+			{
+				nodeScriptParentTab.ActivateWindow(&nodeScriptButton, true);
+			}
+		}
+		else if (extension == ".ecomp")
+		{
+			EntityCompositionAssetHandle entityCompositionAsset = assetManager.GetEntityComposition(path);
+			if (entityCompositionAsset.IsValid())
+			{
+				entityCompositionPopUp.SetCompositionAsset(entityCompositionAsset);
+			}
+		}
+	}
+
+	static void DeleteAsset(const std::filesystem::path& path, AssetManager& assetManager)
+	{
+		assetManager;
+		if (std::filesystem::remove(path))
+		{
+			Console::Print("Removed ", ConsoleTextColor::White, false);
+			Console::Print(path.string(), ConsoleTextColor::Green, true);
+		}
+	}
+
+	static void ShowAssetCreationPopUp(const std::filesystem::path& directoryPath, bool& canOpenPopUp, AssetManager& assetManager, const DataTypeRegistry& dataTypeRegistry)
+	{
+		static constexpr const char* CreateAssetMenuPopupName = "CreateAssetMenu";
+		static constexpr const char* CreateEntityCompositionAssetName = "CreateEntityCompositionAsset";
+
+		if (ImGui::IsMouseClicked(ImGuiMouseButton_Right) && ImGui::IsWindowHovered() && canOpenPopUp)
+		{
+			ImGui::OpenPopup(CreateAssetMenuPopupName);
+		}
+
+		bool hasOpened = false;
+
+		if (ImGui::BeginPopup(CreateAssetMenuPopupName))
+		{
+
+			if (ImGui::BeginMainMenuBar())
+			{
+				ImGui::Text("Create Asset");
+				ImGui::EndMainMenuBar();
+			}
+			if (ImGui::BeginMenu("Fly##Create"))
+			{
+				if (ImGui::MenuItem("Struct##CreateFlyStruct"))
+				{
+					Fly::CreateStruct("TestStruct", directoryPath);
+				}
+
+				ImGui::EndMenu();
+			}
+
+			if (ImGui::MenuItem("Entity Composition"))
+			{
+				hasOpened = true;
+			}
+
+			canOpenPopUp = false;
+
+			ImGui::EndPopup();
+		}
+		else
+		{
+			canOpenPopUp = true;
+		}
+
+		if (hasOpened)
+		{
+			ImGui::OpenPopup(CreateEntityCompositionAssetName);
+		}
+
+		if (ImGui::BeginPopup(CreateEntityCompositionAssetName))
+		{
+			if (ImGui::BeginMainMenuBar())
+			{
+				ImGui::Text("Create Entity Composition");
+				ImGui::EndMainMenuBar();
+			}
+
+			static char name[32]{};
+			ImGui::InputTextWithHint("##", "Name", name, 32);
+
+			if (ImGui::Button("Create"))
+			{
+				EntityCompositionAsset asset(std::make_shared<EntityComposition>(ECSRegistry::Get()));
+				const std::filesystem::path path = directoryPath / (std::string(name) + ".ecomp");
+				asset->SetPath(path);
+				auto assetHandle = assetManager.AddEntityCompositionAsset(path, asset);
+				SaveEntityCompositionAsset(assetHandle, dataTypeRegistry);
+			}
+
+			ImGui::EndPopup();
+		}
+	}
+
 	struct DrawFilesInFolderData
 	{
-		SceneManager& mSceneManager;
-		AssetManager& mAssetManager;
-		NodeScriptingWindow& mNodeScriptingWindow;
-		MenuTabWindow& mNodeScriptParentTab;
-		MenuItemPopUp& mNodeScriptButton;
-		bool& mCanOpenPopup;
-		std::string& mFilePopUpID;
-		std::filesystem::path& mFileToRemove;
-		std::filesystem::path& mCurrentDirectory;
+		SceneManager& sceneManager;
+		AssetManager& assetManager;
+		DataTypeRegistry& dataTypeRegistry;
+		NodeScriptingWindow& nodeScriptingWindow;
+		MenuTabWindow& nodeScriptParentTab;
+		MenuItemPopUp& nodeScriptButton;
+		EntityCompositionPopUp& entityCompositionPopUp;
+		bool& canOpenPopup;
+		std::string& filePopUpID;
+		std::filesystem::path& fileToRemove;
+		std::filesystem::path& currentDirectory;
 	};
 
 	static void DrawFilesInFolder(const std::filesystem::path& directory, const DrawFilesInFolderData& data)
 	{
 		PROFILER_FUNCTION(profiler::colors::Blue300);
-		const std::vector<std::filesystem::path> fileNames = FileUtility::GetFilesFromDirectory(directory, true);
+		const std::vector<std::filesystem::path> paths = FileUtility::GetPathsFromDirectory(directory, true);
 
 		static constexpr float padding = 16.0f;
 		static constexpr float thumbnailSize = 64.0f;
@@ -82,30 +201,28 @@ namespace Simple
 
 		ImGui::PushStyleColor(ImGuiCol_Button, ImColor(0.12f, 0.12f, 0.12f, 0.0f).Value);
 
-		for (size_t i = 0; i < fileNames.size(); ++i)
+		for (const std::filesystem::path& path : paths)
 		{
-			const std::filesystem::path extension = fileNames[i].extension();
+			const std::filesystem::path extension = path.extension();
 
-			const ImTextureID textureID = GetSRVFromFileExtension(extension, directory, fileNames[i], data.mAssetManager);
+			const ImTextureID textureID = GetSRVFromFileExtension(extension, path, data.assetManager);
 
-			const std::string n = fileNames[i].stem().string();
-			ImGui::ImageButton(n.c_str(), textureID, { thumbnailSize, thumbnailSize });
+			const std::string stem = path.stem().string();
+			ImGui::ImageButton(stem.c_str(), textureID, { thumbnailSize, thumbnailSize });
 			if (extension == ".obj")
 			{
 				static AssetPath_OBJ obj;
-				std::string pathStr = fileNames[i].string();
-				std::string a(pathStr.begin(), pathStr.end());
+				std::string pathStr = path.string();
 				obj = AssetPath_OBJ(FixedString<256>(pathStr.begin(), pathStr.end()));
 				ObjectSource(obj, "OBJ");
 			}
 			else if (ImGui::BeginDragDropSource())
 			{
-				if (extension.string()[0] == '.')
+				if (!std::filesystem::is_directory(path))
 				{
-					std::filesystem::path filePath = directory / fileNames[i];
 
 					char buffer[256]{};
-					strcpy_s(buffer, filePath.string().c_str());
+					strcpy_s(buffer, path.string().c_str());
 
 					ImGui::SetDragDropPayload("Assets_Browser", buffer, sizeof(buffer));
 
@@ -125,33 +242,27 @@ namespace Simple
 			{
 				if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
 				{
-					if (extension.string()[0] != '.')
-					{
-						data.mCurrentDirectory = directory / fileNames[i];
-						break;
-					}
-					else if (textureID == GetSRVFromIconType(eIconType::Scene, data.mAssetManager))
-					{
-						const std::filesystem::path scenePath = std::filesystem::path("Assets/Scenes/") / fileNames[i]; //TO-DO(v11.2.3): Fix so it doesnt become hardcoded
-						data.mSceneManager.ChangeScene(scenePath);
-					}
-					else if (extension == ".fly")
-					{
-						if (data.mNodeScriptingWindow.OpenClassByName(fileNames[i].stem().string()))
-						{
-							data.mNodeScriptParentTab.ActivateWindow(&data.mNodeScriptButton, true);
-						}
-					}
+					OnAssetClicked(
+						path,
+						data.currentDirectory,
+						data.nodeScriptingWindow,
+						data.nodeScriptParentTab,
+						data.nodeScriptButton,
+						data.sceneManager,
+						data.assetManager,
+						data.entityCompositionPopUp,
+						textureID
+					);
 				}
-				else if (ImGui::IsMouseClicked(ImGuiMouseButton_Right) && extension.string()[0] == '.')
+				else if (ImGui::IsMouseClicked(ImGuiMouseButton_Right) && !std::filesystem::is_directory(path))
 				{
-					data.mFilePopUpID = "Delete##" + fileNames[i].string();
-					data.mFileToRemove = directory / fileNames[i];
-					ImGui::OpenPopup(data.mFilePopUpID.c_str());
+					data.filePopUpID = "Delete##" + path.string();
+					data.fileToRemove = directory / path;
+					ImGui::OpenPopup(data.filePopUpID.c_str());
 				}
 			}
 
-			ImGui::TextWrapped(fileNames[i].stem().string().c_str());
+			ImGui::TextWrapped(path.stem().string().c_str());
 			ImGui::NextColumn();
 		}
 
@@ -160,59 +271,23 @@ namespace Simple
 		ImGui::PopStyleColor();
 
 
-		if (ImGui::BeginPopup(data.mFilePopUpID.c_str()))
+		if (ImGui::BeginPopup(data.filePopUpID.c_str()))
 		{
 			if (ImGui::MenuItem("Delete##FileUtilityPopUp"))
 			{
-				if (std::filesystem::remove(data.mFileToRemove))
-				{
-					Console::Print("Removed ", ConsoleTextColor::White, false);
-					Console::Print(data.mFileToRemove.string().c_str(), ConsoleTextColor::Green, true);
-				}
+				DeleteAsset(data.fileToRemove, data.assetManager);
 			}
 
-			data.mCanOpenPopup = false;
+			data.canOpenPopup = false;
 
 			ImGui::EndPopup();
 		}
 		else
 		{
-			data.mCanOpenPopup = true;
+			data.canOpenPopup = true;
 		}
 
-		static constexpr const char* CreateAssetMenuPopupName = "CreateAssetMenu";
-
-		if (ImGui::IsMouseClicked(ImGuiMouseButton_Right) && ImGui::IsWindowHovered() && data.mCanOpenPopup)
-		{
-			ImGui::OpenPopup(CreateAssetMenuPopupName);
-		}
-
-		if (ImGui::BeginPopup(CreateAssetMenuPopupName))
-		{
-
-			if (ImGui::BeginMainMenuBar())
-			{
-				ImGui::Text("Create Asset");
-				ImGui::EndMainMenuBar();
-			}
-			if (ImGui::BeginMenu("Fly##Create"))
-			{
-				if (ImGui::MenuItem("Struct##CreateFlyStruct"))
-				{
-					Fly::CreateStruct("TestStruct", directory.string());
-				}
-
-				ImGui::EndMenu();
-			}
-
-			data.mCanOpenPopup = false;
-
-			ImGui::EndPopup();
-		}
-		else
-		{
-			data.mCanOpenPopup = true;
-		}
+		ShowAssetCreationPopUp(directory, data.canOpenPopup, data.assetManager, data.dataTypeRegistry);
 	}
 
 
@@ -222,7 +297,7 @@ namespace Simple
 
 		if (ImGui::TreeNode(treeNodeName.c_str()))
 		{
-			const std::vector<std::filesystem::path> fileNames = FileUtility::GetFilesFromDirectory(directory, true);
+			const std::vector<std::filesystem::path> fileNames = FileUtility::GetPathsFromDirectory(directory, true);
 
 			for (const auto& name : fileNames)
 			{
@@ -259,7 +334,7 @@ namespace Simple
 			if (ImGui::BeginChild("AssetPaths#", parentSize, ImGuiChildFlags_Border | ImGuiChildFlags_AutoResizeX))
 			{
 				ImGui::SetNextItemOpen(true);
-				ViewFolders(std::filesystem::absolute(SIMPLE_DIR_ASSETS), SIMPLE_DIR_ASSETS, data.mCurrentDirectory);
+				ViewFolders(std::filesystem::absolute(SIMPLE_DIR_ASSETS), SIMPLE_DIR_ASSETS, data.currentDirectory);
 				ImGui::EndChild();
 			}
 
@@ -273,7 +348,7 @@ namespace Simple
 
 				if (ImGui::ArrowButton("##Arrow_back", ImGuiDir_Left))
 				{
-					const std::string currentDirectoryStr = data.mCurrentDirectory.string();
+					const std::string currentDirectoryStr = data.currentDirectory.string();
 					const size_t lastBackSlashPos = currentDirectoryStr.find_last_of('\\');
 
 					if (lastBackSlashPos != std::string::npos)
@@ -282,17 +357,17 @@ namespace Simple
 
 						if (previousDirectory.find("Assets") != std::string::npos)
 						{
-							data.mCurrentDirectory = previousDirectory;
+							data.currentDirectory = previousDirectory;
 						}
 					}
 				}
 
 				ImGui::SameLine();
-				ImGui::Text(data.mCurrentDirectory.string().c_str());
+				ImGui::Text(data.currentDirectory.string().c_str());
 				ImGui::Separator();
 
-				
-				DrawFilesInFolder(data.mCurrentDirectory, data);
+
+				DrawFilesInFolder(data.currentDirectory, data);
 
 				ImGui::EndChild();
 			}
@@ -314,13 +389,17 @@ namespace Simple
 	{
 		SceneManager& sceneManager = blackboard.Get<Key_SceneManager>();
 		AssetManager& assetManager = blackboard.Get<Key_AssetManager>();
+		DataTypeRegistry& dataTypeRegistry = blackboard.Get<Key_DataTypeRegistry>();
+		EntityCompositionPopUp& entityCompositionPopUp = blackboard.Get<Key_EntityCompositionPopUp>();
 		const DrawFilesInFolderData data
 		{
 			sceneManager,
 			assetManager,
+			dataTypeRegistry,
 			*mNodeScriptingWindow,
 			*mNodeScriptParentTab,
 			*mNodeScriptButton,
+			entityCompositionPopUp,
 			mCanOpenPopup,
 			mFilePopUpID,
 			mFileToRemove,

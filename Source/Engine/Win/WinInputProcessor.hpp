@@ -3,8 +3,12 @@
 #include "Engine/Win/WinMouseInput.hpp"
 #include "Utility/Input/InputState.hpp"
 #include <bitset>
-#include <Windows.h>
 #include <string>
+
+#ifdef _WIN32
+
+#include "Engine/Win/WinDefines.hpp"
+#include <Windows.h>
 
 namespace Simple
 {
@@ -31,3 +35,5 @@ namespace Simple
 		InputState mInputState;
 	};
 }
+
+#endif

@@ -12,6 +12,7 @@
 #include "Graphics/GraphicsSettings.hpp"
 
 #ifdef _WIN32
+
 #include <d3d11.h>
 #include <wrl/client.h>
 
@@ -47,14 +48,14 @@ namespace Simple
 
 		void Render(RenderState& renderState);
 
-		[[nodiscard]] AssetLoader GetAssetLoader() const;
+		[[nodiscard]] void SetAssetLoaders(AssetLoader& assetLoader) const;
 
 		[[nodiscard]] std::function<void(AssetManager&)> GetDefaultAssetLoader();
 
 		void SetAssetManager(std::shared_ptr<AssetManager> assetManager)
 		{
 			mAssetManager = std::move(assetManager);
-			mAssetManager->SetAssetLoader(GetAssetLoader());
+			SetAssetLoaders(mAssetManager->GetAssetLoader());
 			mAssetManager->SetDefaultLoader(GetDefaultAssetLoader());
 		}
 

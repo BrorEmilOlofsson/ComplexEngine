@@ -11,13 +11,13 @@ namespace Simple
 		{
 			rootEntities.push_back(entityView.GetEntityID());
 		}
-		for (auto [entityID, hierarchyComponent] : ecs.ViewUsingEntityID<TransformHierarchyComponent>())
-		{
-			if (hierarchyComponent.parent != InvalidEntityID)
+		ecs.ForEach([&rootEntities](const EntityID entityID, const TransformHierarchyComponent& hierarchyComponent)
 			{
-				std::erase(rootEntities, entityID);
-			}
-		}
+				if (hierarchyComponent.parent != InvalidEntityID)
+				{
+					std::erase(rootEntities, entityID);
+				}
+			});
 		return rootEntities;
 	}
 }

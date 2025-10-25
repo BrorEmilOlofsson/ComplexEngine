@@ -39,9 +39,6 @@ namespace Simple
 
 		constexpr void Reset();
 
-		Point2i mCursorScreenPos;
-		uint32_t mSelectedObjectID = std::numeric_limits<uint32_t>::max();
-
 	private:
 
 		RenderList mRenderList;

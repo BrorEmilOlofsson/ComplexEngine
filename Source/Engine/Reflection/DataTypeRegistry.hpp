@@ -136,12 +136,7 @@ namespace Simple
 
 	public:
 		DataTypeRegistry();
-		~DataTypeRegistry();
 
-		DataTypeRegistry(const DataTypeRegistry&) = delete;
-		DataTypeRegistry(DataTypeRegistry&&) = delete;
-		DataTypeRegistry& operator=(const DataTypeRegistry&) = delete;
-		DataTypeRegistry& operator=(DataTypeRegistry&&) = delete;
 	private:
 		inline static DataTypeRegistry* sInstance = nullptr;
 	private:

@@ -11,7 +11,6 @@
 #include "Graphics/DX11/RenderTarget/DX11RenderTarget.hpp"
 #include "Graphics/DX11/DX11GBuffer.hpp"
 #include "Graphics/DX11/RenderTarget/DX11RenderTargetManager.hpp"
-#include "Utility/ShapeMath.hpp"
 #include "Graphics/DX11/DX11RenderContext.hpp"
 #include <fstream>
 #include <cassert>
@@ -65,22 +64,6 @@ namespace Simple
 		return std::filesystem::path(SIMPLE_DIR_SHADERS) / (std::string(name) + ".cso");
 	}
 
-
-	static constexpr Point2i MapToRenderRect(const Point2i mouseScreenPos, const AABB2i& renderRect)
-	{
-		const AABB2f windowRect = AABB2f::CreateFromMinAndExtent(Point2f::Zero(), Vector2f(renderRect.GetExtent()));
-		const Point2i mappedPos = Point2i(Remap(Point2f(mouseScreenPos), ToAABB<float>(renderRect), windowRect));
-		return mappedPos;
-	}
-
-	bool IsInsideRenderRect(const Point2i& mouseScreenPos, const AABB2i& renderRect)
-	{
-		const AABB2f windowRect = AABB2f::CreateFromMinAndExtent(Point2f::Zero(), Vector2f(renderRect.GetExtent()));
-		const Point2i mappedPos = MapToRenderRect(mouseScreenPos, renderRect);
-
-		return IsInside(mappedPos, ToAABB<int>(windowRect));
-	}
-
 	void DX11Renderer::Render(RenderState& renderState, AssetManager& assetManager,
 		PixelShaderAssetHandle, VertexShaderAssetHandle vertexShader,
 		DX11ConstantBuffer<ColorBufferData>& colorCB, DX11ConstantBuffer<TransformBufferData>& transformCB, DX11ConstantBuffer<ObjectIDBufferData>& objectIDCB, DX11SamplerState& samplerState)
@@ -102,8 +85,6 @@ namespace Simple
 
 		renderContext.ClearBuffers();
 
-		
-
 		renderContext.SetGBufferRenderTargets();
 
 		Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilState = DX11Factory::CreateDepthBuffer(*mDevice.Get());
@@ -124,20 +105,6 @@ namespace Simple
 		// (Optional safety) Unbind MRTs before using them as SRVs
 		ID3D11RenderTargetView* nullRTVs[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT] = {};
 		mDeviceContext->OMSetRenderTargets(_countof(nullRTVs), nullRTVs, nullptr);
-
-		Point2i mouseScreenPos = renderState.mCursorScreenPos;
-
-		if (IsInsideRenderRect(mouseScreenPos, renderState.GetRenderRect().value()))
-		{
-			const Point2i mappedPos = MapToRenderRect(mouseScreenPos, renderState.GetRenderRect().value());
-
-			uint32_t id = renderContext.GetObjectIDAt(mappedPos);
-			const_cast<RenderState&>(renderState).mSelectedObjectID = id;
-		}
-		else
-		{
-			const_cast<RenderState&>(renderState).mSelectedObjectID = std::numeric_limits<uint32_t>::max();
-		}
 
 		renderContext.SetOutputRenderTarget();
 		ID3D11ShaderResourceView* dummy[5] = {};
@@ -171,7 +138,7 @@ namespace Simple
 
 		RenderDebugLines(renderState.GetRenderList(), assetManager, vertexShader, colorCB);
 
-		//mTextRenderer.Render(renderState.GetRenderList().GetText3Ds(), *renderState.GetCamera(), size);
+		mTextRenderer.Render(renderState.GetRenderList().GetText3Ds(), *renderState.GetCamera(), size);
 
 	}
 

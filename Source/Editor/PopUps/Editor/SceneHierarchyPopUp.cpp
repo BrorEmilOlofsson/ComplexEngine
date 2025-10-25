@@ -108,7 +108,8 @@ namespace Simple
 				commandTracker, 
 				mImGuiTag, 
 				mSelectedEntityID, 
-				InvalidEntityID
+				InvalidEntityID,
+				{}
 			);
 
 			if (ImGui::Button("Instantiate"))

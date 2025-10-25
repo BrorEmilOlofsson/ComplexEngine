@@ -15,7 +15,7 @@
 namespace Simple
 {
 
-	AssetLoader CreateAssetLoader(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
+	void CreateLoaders(AssetLoader& assetLoader, Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
 	{
 
 		auto textureLoader = [context, device](const std::filesystem::path& path) -> TextureAsset
@@ -47,12 +47,10 @@ namespace Simple
 				return VertexShaderAsset(std::make_shared<VertexShader>(DX11VertexShader(device, context, dx11Vs, inputLayout)));
 			};
 
-		return AssetLoader(
-			textureLoader,
-			meshLoader,
-			pixelShaderLoader,
-			vertexShaderLoader
-		);
+		assetLoader.SetTextureLoader(std::move(textureLoader));
+		assetLoader.SetMeshLoader(std::move(meshLoader));
+		assetLoader.SetPixelShaderLoader(std::move(pixelShaderLoader));
+		assetLoader.SetVertexShaderLoader(std::move(vertexShaderLoader));
 	}
 
 	static std::pair<Microsoft::WRL::ComPtr<ID3D11Device>, Microsoft::WRL::ComPtr<ID3D11DeviceContext>> CreateDeviceAndContext()
@@ -233,9 +231,9 @@ namespace Simple
 		);
 	}
 
-	AssetLoader DX11Foundation::GetAssetLoader() const
+	void DX11Foundation::SetAssetLoaders(AssetLoader& assetLoader) const
 	{
-		return CreateAssetLoader(mDeviceAndContext.first, mDeviceAndContext.second);
+		CreateLoaders(assetLoader, mDeviceAndContext.first, mDeviceAndContext.second);
 	}
 
 	static void AddMesh(AssetManager& assetManager, MeshData<Vertex>&& meshData, const std::string_view meshName, ID3D11Device& device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)

@@ -36,14 +36,19 @@ namespace Simple
 
 		AssetManager() = default;
 
-		void SetAssetLoader(AssetLoader assetLoader)
-		{
-			mAssetLoader = std::move(assetLoader);
-		}
-
 		void SetDefaultLoader(std::function<void(AssetManager&)> defaultLoader)
 		{
 			mDefaultLoader = std::move(defaultLoader);
+		}
+
+		[[nodiscard]] AssetLoader& GetAssetLoader()
+		{
+			return mAssetLoader;
+		}
+
+		[[nodiscard]] const AssetLoader& GetAssetLoader() const
+		{
+			return mAssetLoader;
 		}
 
 		void LoadAssets();
@@ -119,13 +124,14 @@ namespace Simple
 			mVertexShaderAssets[std::filesystem::absolute(path)] = std::move(asset);
 		}
 
-		void AddEntityCompositionAsset(const std::filesystem::path& path, EntityCompositionAsset asset)
+		EntityCompositionAssetHandle AddEntityCompositionAsset(const std::filesystem::path& path, EntityCompositionAsset asset)
 		{
 			if (!asset)
 			{
 				throw std::invalid_argument("Asset is invalid");
 			}
 			mEntityCompositionAssets[std::filesystem::absolute(path)] = std::move(asset);
+			return GetEntityComposition(path);
 		}
 
 	private:

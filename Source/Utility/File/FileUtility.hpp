@@ -10,7 +10,8 @@ namespace Simple
 	public:
 		static void CopyFiles(std::span<const std::filesystem::path> paths, const std::filesystem::path& dropPath);
 
-		static std::vector<std::filesystem::path> GetFilesFromDirectory(const std::filesystem::path& absolutePath, const bool includeFolders = false);
+		// Returns absolute paths
+		static std::vector<std::filesystem::path> GetPathsFromDirectory(const std::filesystem::path& absolutePath, const bool includeFolders = false);
 		static std::optional<nlohmann::json> GetDataAsJson(const std::filesystem::path& absolutePath);
 	};
 }

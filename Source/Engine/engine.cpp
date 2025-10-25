@@ -11,6 +11,8 @@
 #include "Engine/Reflection/EngineRegistration.hpp"
 #include "Utility/GraphicsBufferData.hpp"
 #include "Utility/EngineDirectories.hpp"
+#include "Engine/ECS/EntityComposition.hpp"
+#include "Engine/ECS/ECSSerializer.hpp"
 #include <External/nlohmann/json.hpp>
 #include <fstream>
 #include <dwmapi.h>
@@ -35,6 +37,15 @@ namespace Simple
 		mGraphicsSettings = std::make_shared<GraphicsSettings>();
 		mOperatingSystem.SetAssetManager(mAssetManager);
 		mOperatingSystem.SetGraphicsSettings(mGraphicsSettings);
+
+		std::shared_ptr<Blackboard> blackboard = mBlackboard;
+		auto a = [blackboard](const std::filesystem::path& path)
+			{
+				std::shared_ptr<EntityComposition> entityComposition = std::make_shared<EntityComposition>(ECSRegistry::Get());
+				LoadEntityComposition(path, *entityComposition, *blackboard);
+				return EntityCompositionAsset(std::move(entityComposition));
+			};
+		mAssetManager->GetAssetLoader().SetEntityCompositionLoader(a);
 	}
 
 	Engine::~Engine()
@@ -46,6 +57,13 @@ namespace Simple
 	void Engine::Init()
 	{
 		ECSRegistry::Get().SetBlackboard(mBlackboard);
+
+		mBlackboard->Insert<Key_GraphicsSettings>(*mGraphicsSettings);
+		mBlackboard->Insert<Key_AssetManager>(*mAssetManager);
+		mBlackboard->Insert<Key_SceneManager>(mSceneManager);
+		mBlackboard->Insert<Key_DataTypeRegistry>(DataTypeRegistry::GetInstance());
+		mBlackboard->Insert<Key_InputState>(mInputState);
+
 		mAssetManager->LoadAssets();
 		mOperatingSystem.Init();
 		mMainWindow = mOperatingSystem.MakeWindow(Vector2ui(1600, 900), L"SimpleEngine");
@@ -61,12 +79,6 @@ namespace Simple
 		mOperatingSystem.LoadCursors(std::string(Directory::Assets) + std::string("Cursors"));
 
 		mOperatingSystem.GetWindow(mMainWindow).Show();
-
-		mBlackboard->Insert<Key_GraphicsSettings>(*mGraphicsSettings);
-		mBlackboard->Insert<Key_AssetManager>(*mAssetManager);
-		mBlackboard->Insert<Key_SceneManager>(mSceneManager);
-		mBlackboard->Insert<Key_DataTypeRegistry>(DataTypeRegistry::GetInstance());
-		mBlackboard->Insert<Key_InputState>(mInputState);
 	}
 
 	void Engine::LateInit()

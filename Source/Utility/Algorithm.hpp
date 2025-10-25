@@ -130,37 +130,9 @@ namespace Simple
 		return filePath;
 	}
 
-	constexpr std::string ConvertFilePathToPrettyName(const std::filesystem::path& filePath, const bool aWithExtension = true)
+	constexpr std::string ConvertFilePathToPrettyName(const std::filesystem::path& filePath, const bool withExtension = true)
 	{
-		return ConvertFilePathToPrettyName(filePath.string(), aWithExtension);
-	}
-
-	constexpr std::string ConvertAbsolutePathToRelativePath(const std::string& filePath)
-	{
-		const size_t pos = filePath.rfind("Assets");
-
-		if (pos != std::string::npos)
-		{
-			return filePath.substr(pos);
-		}
-		else
-		{
-			return "";
-		}
-	}
-
-	inline std::filesystem::path ConvertAbsolutePathToRelativePath(const std::filesystem::path& filePath)
-	{
-		const size_t pos = filePath.string().rfind("Assets");
-
-		if (pos != std::string::npos)
-		{
-			return filePath.string().substr(pos);
-		}
-		else
-		{
-			return "";
-		}
+		return ConvertFilePathToPrettyName(filePath.string(), withExtension);
 	}
 
 	inline std::filesystem::path CheckAndReturnAsAbsolutePath(const std::filesystem::path& filePath)
@@ -193,7 +165,7 @@ namespace Simple
 		return result;
 	}
 
-	//NOTE(v10.0.1): Case insensitive (doesn't matter upper or lower-case
+	// Case insensitive (doesn't matter upper or lower-case
 	constexpr bool FindSuffix(const std::string& name, const std::string& suffixToSearch)
 	{
 		for (size_t i = name.length(); i > 0; i--)

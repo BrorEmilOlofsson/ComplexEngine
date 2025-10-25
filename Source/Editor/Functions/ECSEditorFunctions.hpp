@@ -9,6 +9,7 @@ namespace Simple
 {
 	class Camera;
 	class ECS;
+	class InputState;
 	class EditorCommandTracker;
 
 	EntityID CreateEntity(ECS& ecs, std::vector<EntityID>& rootEntities, const EntityID parentID, EditorCommandTracker& commandTracker);
@@ -19,9 +20,9 @@ namespace Simple
 
 	void ShowEntityAddButtons(ECS& ecs, EntityID& selectedEntityID, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker, const std::string& imGuiTag, EntityID defaultParentID);
 	void ShowEntityHierarchy(ECS& ecs, ECS& ecsBuffer, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker, const std::string& imGuiTag,
-		EntityID& selectedEntityID);
+		EntityID& selectedEntityID, const std::set<EntityID>& uneditableEntities);
 	void ShowEntityHierarchyWithAddButtons(ECS& ecs, ECS& ecsBuffer, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker,
-		const std::string& imGuiTag, EntityID& selectedEntityID, EntityID defaultParentID);
+		const std::string& imGuiTag, EntityID& selectedEntityID, EntityID defaultParentID, const std::set<EntityID>& uneditableEntities);
 	
 	void ShowEntityName(ECS& ecs, const EntityID selectedEntityID, const InputState& input);
 	void ShowEntityComponents(ECS& ecs, EntityID entityID, bool& anyItemActiveLastFrame,

@@ -4,6 +4,7 @@
 
 #ifdef _WIN32
 
+#include "Engine/Win/WinDefines.hpp"
 #include <Windows.h>
 #include "Utility/Win/WinUtility.hpp"
 

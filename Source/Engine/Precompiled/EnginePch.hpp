@@ -4,14 +4,6 @@
 #include "Engine/Debugger/MemoryTracker/MemoryTracker.h"
 #endif
 
-#if !defined(WIN32_LEAN_AND_MEAN)
-#define WIN32_LEAN_AND_MEAN
-#endif
-
-#define NOMINMAX
-//#undef min
-//#undef max
-
 #include <array>
 #include <cassert>
 #include <iostream>
@@ -19,6 +11,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <print>
 
 #include <External/profiler.h>
 

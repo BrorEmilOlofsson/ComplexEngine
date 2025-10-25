@@ -2,6 +2,10 @@
 #include "Utility/Math/Point2.hpp"
 #include "Utility/Math/Vector2.hpp"
 #include "Utility/Input/InputMouseState.hpp"
+
+#ifdef _WIN32
+
+#include "Engine/Win/WinDefines.hpp"
 #include <Windows.h>
 
 namespace Simple
@@ -21,3 +25,5 @@ namespace Simple
 		int mTentativeWheelDelta = 0;
 	};
 }
+
+#endif

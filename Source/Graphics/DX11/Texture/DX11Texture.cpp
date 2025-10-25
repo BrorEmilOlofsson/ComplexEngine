@@ -16,6 +16,7 @@ namespace Simple
 		: mShaderResourceView(srv)
 		, mDeviceContext(deviceContext)
 		, mRelativePath(relativePath)
+		, mName(relativePath.stem().string())
 	{
 	}
 

@@ -1,26 +1,70 @@
 #include "Utility/Precompiled/UtilityPch.hpp"
 #include "AssetManager.hpp"
+#include <queue>
 
 namespace Simple
 {
 
-	using LoadFunction = std::function<void(const std::filesystem::path&, AssetManager&, const AssetLoader&)>;
+	using LoadFunction = std::function<void(const std::filesystem::path&, AssetManager&)>;
 
-	static void LoadAssets(AssetManager& assetManager, const AssetLoader& assetLoader, const std::filesystem::path& assetsPath, const std::unordered_map<std::wstring_view, LoadFunction>& loaderMap)
+
+	struct AssetLoadSorter
+	{
+
+		static std::size_t GetLoadIndex(const std::filesystem::path& path)
+		{
+			const std::string extension = path.extension().string();
+			if (extension == ".fbx" || extension == ".cso" || extension == ".dds")
+			{
+				return 1;
+			}
+			else
+			{
+				return 0;
+			}
+		}
+
+		bool operator()(const std::filesystem::path& path1, const std::filesystem::path& path2)
+		{
+			return GetLoadIndex(path1) < GetLoadIndex(path2);
+		}
+	};
+
+	std::priority_queue<std::filesystem::path, std::vector<std::filesystem::path>, AssetLoadSorter> GetLoadOrder(const std::filesystem::path& assetsPath, const std::unordered_map<std::wstring_view, LoadFunction>& loaderMap)
+	{
+		PROFILER_FUNCTION();
+		
+		std::priority_queue<std::filesystem::path, std::vector<std::filesystem::path>, AssetLoadSorter> paths;
+		for (const auto& dirEntry : std::filesystem::recursive_directory_iterator(assetsPath))
+		{
+			if (!loaderMap.contains(dirEntry.path().extension().native()))
+			{
+				continue;
+			}
+			paths.push(dirEntry.path());
+		}
+		return paths;
+	}
+
+	static void LoadAsset(const std::filesystem::path& path, const std::unordered_map<std::wstring_view, LoadFunction>& loaderMap, AssetManager& assetManager)
+	{
+		PROFILER_FUNCTION();
+		const auto extension = path.extension();
+		auto it = loaderMap.find(extension.native());
+		if (it == loaderMap.end())
+		{
+			return; // Skip if no loader is registered for this extension
+		}
+		it->second(std::filesystem::absolute(path), assetManager);
+
+	}
+
+	void LoadAssets(AssetManager& assetManager, const std::filesystem::path& assetsPath, const std::unordered_map<std::wstring_view, LoadFunction>& loaderMap)
 	{
 		PROFILER_FUNCTION(profiler::colors::Teal300);
 		for (const auto& dirEntry : std::filesystem::recursive_directory_iterator(assetsPath))
 		{
-			PROFILER_BEGIN("Load Asset");
-			const auto& path = dirEntry.path();
-			const auto extension = path.extension();
-			auto it = loaderMap.find(extension.native());
-			if (it == loaderMap.end())
-			{
-				continue; // Skip if no loader is registered for this extension
-			}
-			it->second(std::filesystem::absolute(path), assetManager, assetLoader);
-			PROFILER_END();
+			LoadAsset(dirEntry.path(), loaderMap, assetManager);
 		}
 	}
 
@@ -57,10 +101,10 @@ namespace Simple
 	{
 		std::unordered_map<std::wstring_view, LoadFunction> loaderMap;
 
-		loaderMap[L".dds"] = [](const std::filesystem::path& path, AssetManager& assetManager, const AssetLoader& assetLoader)
+		loaderMap[L".dds"] = [](const std::filesystem::path& path, AssetManager& assetManager)
 			{
 				PROFILER_BEGIN("Load DDS");
-				TextureAsset asset = assetLoader.LoadTexture(path);
+				TextureAsset asset = assetManager.GetAssetLoader().LoadTexture(path);
 				if (asset)
 				{
 					assetManager.AddTexture(path, asset);
@@ -68,10 +112,10 @@ namespace Simple
 				PROFILER_END();
 			};
 
-		loaderMap[L".fbx"] = [](const std::filesystem::path& path, AssetManager& assetManager, const AssetLoader& assetLoader)
+		loaderMap[L".fbx"] = [](const std::filesystem::path& path, AssetManager& assetManager)
 			{
 				PROFILER_BEGIN("Load FBX");
-				MeshAsset asset = assetLoader.LoadMesh(path);
+				MeshAsset asset = assetManager.GetAssetLoader().LoadMesh(path);
 				if (asset)
 				{
 					assetManager.AddMesh(path, asset);
@@ -79,7 +123,7 @@ namespace Simple
 				PROFILER_END();
 			};
 
-		loaderMap[L".cso"] = [](const std::filesystem::path& path, AssetManager& assetManager, const AssetLoader& assetLoader)
+		loaderMap[L".cso"] = [](const std::filesystem::path& path, AssetManager& assetManager)
 			{
 				const std::string s = "Load CSO: " + path.string();
 				PROFILER_BEGIN(s.c_str());
@@ -95,7 +139,7 @@ namespace Simple
 				{
 				case eShaderT::Pixel:
 				{
-					auto asset = assetLoader.LoadPixelShader(path);
+					auto asset = assetManager.GetAssetLoader().LoadPixelShader(path);
 					if (asset)
 					{
 						assetManager.AddPixelShader(path, asset);
@@ -105,7 +149,7 @@ namespace Simple
 				case eShaderT::Vertex:
 				{
 					PROFILER_BEGIN("Load vertex shader");
-					auto asset = assetLoader.LoadVertexShader(path);
+					auto asset = assetManager.GetAssetLoader().LoadVertexShader(path);
 					PROFILER_END();
 					if (asset)
 					{
@@ -123,18 +167,41 @@ namespace Simple
 				PROFILER_END();
 			};
 
+		loaderMap[L".ecomp"] = [](const std::filesystem::path& path, AssetManager& assetManager)
+			{
+				EntityCompositionAsset asset = assetManager.GetAssetLoader().LoadEntityComposition(path);
+				assetManager.AddEntityCompositionAsset(path, std::move(asset));
+			};
+
 		return loaderMap;
+	}
+
+	void LoadAssetsNew(const std::filesystem::path& path, AssetManager& assetManager)
+	{
+		auto loaderMap = CreateLoaderMap();
+		auto loadOrder = GetLoadOrder(path, loaderMap);
+
+		while (!loadOrder.empty())
+		{
+			LoadAsset(loadOrder.top(), loaderMap, assetManager);
+			loadOrder.pop();
+		}
 	}
 
 	void AssetManager::LoadAssets()
 	{
 		PROFILER_FUNCTION(profiler::colors::TealA200);
-		::Simple::LoadAssets(*this, mAssetLoader, SIMPLE_DIR_ASSETS, CreateLoaderMap());
-		::Simple::LoadAssets(*this, mAssetLoader, SIMPLE_DIR_SHADERS, CreateLoaderMap());
 
 		if (mDefaultLoader)
 		{
 			mDefaultLoader(*this);
 		}
+
+		LoadAssetsNew(std::filesystem::path(SIMPLE_DIR_SHADERS), *this);
+		LoadAssetsNew(std::filesystem::path(SIMPLE_DIR_ASSETS), *this);
+		//::Simple::LoadAssets(*this, std::filesystem::path(SIMPLE_DIR_ASSETS), CreateLoaderMap());
+		//::Simple::LoadAssets(*this, std::filesystem::path(SIMPLE_DIR_SHADERS), CreateLoaderMap());
+
+		
 	}
 }

@@ -24,6 +24,8 @@ namespace Simple
 			return mEntityCompositionAsset;
 		}
 
+		void SetCompositionAsset(EntityCompositionAssetHandle asset);
+
 	private:
 
 		EntityCompositionAssetHandle mEntityCompositionAsset;

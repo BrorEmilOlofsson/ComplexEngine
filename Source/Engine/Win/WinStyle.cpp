@@ -13,7 +13,7 @@ namespace Simple
 		mCursors.emplace("DefaultCursor", LoadCursorW(nullptr, IDC_ARROW));
 		assert(mCursors["DefaultCursor"] && "Failed to load Custom Cursor");
 
-		const std::vector<std::filesystem::path> absolutePaths = FileUtility::GetFilesFromDirectory(std::filesystem::absolute(path));
+		const std::vector<std::filesystem::path> absolutePaths = FileUtility::GetPathsFromDirectory(std::filesystem::absolute(path));
 
 		for (const std::filesystem::path& cursorPath : absolutePaths)
 		{

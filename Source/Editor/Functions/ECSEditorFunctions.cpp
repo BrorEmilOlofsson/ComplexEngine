@@ -445,7 +445,7 @@ namespace Simple
 
 	static void ShowEntityChildren(ECS& ecs, const EntityID entityID, EntityID& selectedEntityID, ECS& ecsBuffer,
 		std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker,
-		const std::span<const EntityID> parentEntities, const std::string& imGuiTag)
+		const std::span<const EntityID> parentEntities, const std::string& imGuiTag, const std::set<EntityID>& uneditableEntities)
 	{
 		const bool isSelected = selectedEntityID == entityID;
 		const NameComponent* nameComponent = ecs.GetComponent<NameComponent>(entityID);
@@ -463,6 +463,7 @@ namespace Simple
 		const bool isLeaf = hierarchyComponent->children.empty();
 		const bool shouldBeDefaultOpen = std::ranges::find(parentEntities, entityID) != end(parentEntities);
 
+		const bool isUneditable = uneditableEntities.contains(entityID);
 		ImGui::PushID(entityID.id);
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
 		ImGui::InvisibleButton(std::to_string(entityID.id).c_str(), ImVec2{ ImGui::GetContentRegionAvail().x, 3 });
@@ -478,6 +479,25 @@ namespace Simple
 		ImGui::PopStyleVar();
 		ImGui::PopID();
 
+		const bool isRightClicked = ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right);
+		if (isRightClicked)
+		{
+			selectedEntityID = entityID;
+		}
+
+		if (selectedEntityID == entityID)
+		{
+			ImGui::SetItemDefaultFocus();
+
+			const std::string entityOptionsPopUpName = "Entity Settings" + imGuiTag;
+			if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right) && !isUneditable)
+			{
+				ImGui::OpenPopup(entityOptionsPopUpName.c_str());
+			}
+
+			ShowEntityOptionsPopUp(entityOptionsPopUpName, ecs, selectedEntityID, rootEntities, commandTracker, imGuiTag);
+		}
+
 		ShowEntityPayload(ecs, entityID, rootEntities, commandTracker);
 		SelectEntityIfClicked(entityID, selectedEntityID, commandTracker);
 		if (isOpen)
@@ -488,29 +508,15 @@ namespace Simple
 				{
 					continue;
 				}
-				ShowEntityChildren(ecs, childEntityID, selectedEntityID, ecsBuffer, rootEntities, commandTracker, parentEntities, imGuiTag);
+				ShowEntityChildren(ecs, childEntityID, selectedEntityID, ecsBuffer, rootEntities, commandTracker, parentEntities, imGuiTag, uneditableEntities);
 			}
 
-			if (isSelected)
-			{
-
-				ImGui::SetItemDefaultFocus();
-
-				const std::string entityOptionsPopUpName = "Entity Settings" + imGuiTag;
-				if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right))
-				{
-					ImGui::OpenPopup(entityOptionsPopUpName.c_str());
-				}
-
-				ShowEntityOptionsPopUp(entityOptionsPopUpName, ecs, selectedEntityID, rootEntities, commandTracker, imGuiTag);
-
-			}
 			ImGui::TreePop();
 		}
 	}
 
 	void ShowEntityHierarchy(ECS& ecs, ECS& ecsBuffer, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker,
-		const std::string& imGuiTag, EntityID& selectedEntityID)
+		const std::string& imGuiTag, EntityID& selectedEntityID, const std::set<EntityID>& uneditableEntities)
 	{
 		ImGui::PushStyleColor(ImGuiCol_ChildBg, ImColor(0.18f, 0.18f, 0.18f, 0.80f).Value);
 		ImGui::PushStyleColor(ImGuiCol_FrameBg, ImColor(0.12f, 0.12f, 0.12f, 0.0f).Value);
@@ -532,7 +538,16 @@ namespace Simple
 			}
 			for (const EntityID rootEntityID : rootEntities)
 			{
-				ShowEntityChildren(ecs, rootEntityID, selectedEntityID, ecsBuffer, rootEntities, commandTracker, parentEntites, imGuiTag);
+				ShowEntityChildren(
+					ecs, 
+					rootEntityID, 
+					selectedEntityID, 
+					ecsBuffer, 
+					rootEntities, 
+					commandTracker, 
+					parentEntites, 
+					imGuiTag, 
+					uneditableEntities);
 			}
 
 			ImGui::EndListBox();
@@ -545,11 +560,11 @@ namespace Simple
 	}
 
 	void ShowEntityHierarchyWithAddButtons(ECS& ecs, ECS& ecsBuffer, std::vector<EntityID>& rootEntities,
-		EditorCommandTracker& commandTracker, const std::string& imGuiTag, EntityID& selectedEntityID, const EntityID defaultParent)
+		EditorCommandTracker& commandTracker, const std::string& imGuiTag, EntityID& selectedEntityID, const EntityID defaultParent, const std::set<EntityID>& uneditableEntities)
 	{
 		ShowEntityAddButtons(ecs, selectedEntityID, rootEntities, commandTracker, imGuiTag, defaultParent);
 		ImGui::Separator();
-		ShowEntityHierarchy(ecs, ecsBuffer, rootEntities, commandTracker, imGuiTag, selectedEntityID);
+		ShowEntityHierarchy(ecs, ecsBuffer, rootEntities, commandTracker, imGuiTag, selectedEntityID, uneditableEntities);
 	}
 
 	static void ShowComponentData(ECS& ecs, const EntityID entityID, const std::type_info& typeInfo, void* componentPtr, bool& anyActiveItem, ECS& ecsBuffer, const DataTypeRegistry& dataTypeRegistry, EditorCommandTracker& commandTracker, const Blackboard& blackboard)

@@ -57,8 +57,6 @@ namespace Simple
 	{
 		mAssetManager = std::move(assetManager);
 		mGraphicsFoundation.SetAssetManager(mAssetManager);
-		mAssetManager->SetAssetLoader(mGraphicsFoundation.GetAssetLoader());
-		mAssetManager->SetDefaultLoader(mGraphicsFoundation.GetDefaultAssetLoader());
 	}
 
 	void Win_OperatingSystem::SetGraphicsSettings(std::shared_ptr<GraphicsSettings> graphicsSettings)

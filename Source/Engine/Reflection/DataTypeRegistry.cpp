@@ -8,10 +8,6 @@ namespace Simple
 	{
 	}
 
-	DataTypeRegistry::~DataTypeRegistry()
-	{
-	}
-
 	class DataTypeRegistryProxy final
 	{
 	public:

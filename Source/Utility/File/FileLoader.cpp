@@ -8,18 +8,23 @@ namespace Simple
 	{
 		PROFILER_FUNCTION(profiler::colors::RichBlue);
 		MeshData<Vertex> meshData;
-		std::fstream meshLoader(std::filesystem::absolute(path), std::ios_base::in);
-		assert(meshLoader.is_open() && !meshLoader.fail() && "Error! Couldn't open file!");
-		while (!meshLoader.eof())
+		std::ifstream meshFile(std::filesystem::absolute(path), std::ios_base::in);
+
+		if (!meshFile.is_open() || meshFile.fail())
+		{
+			return MeshData<Vertex>();
+		}
+
+		while (!meshFile.eof())
 		{
 			std::string reader;
-			meshLoader >> reader;
+			meshFile >> reader;
 			if (reader == "v")
 			{
 				float x, y, z;
-				meshLoader >> x;
-				meshLoader >> y;
-				meshLoader >> z;
+				meshFile >> x;
+				meshFile >> y;
+				meshFile >> z;
 
 				Vertex& vertex = meshData.vertices.emplace_back();
 				vertex.position = Point3f(x, y, z);
@@ -29,11 +34,11 @@ namespace Simple
 			{
 				int index1, index2, index3;
 
-				meshLoader >> index1;
+				meshFile >> index1;
 
-				meshLoader >> index2;
+				meshFile >> index2;
 
-				meshLoader >> index3;
+				meshFile >> index3;
 
 				meshData.indices.push_back(index1 - 1);
 				meshData.indices.push_back(index2 - 1);

@@ -38,7 +38,7 @@ namespace Simple
 			return !mAsset.expired();
 		}
 
-		[[nodiscard]] constexpr operator bool() const noexcept
+		[[nodiscard]] constexpr explicit operator bool() const noexcept
 		{
 			return IsValid();
 		}
@@ -52,5 +52,16 @@ namespace Simple
 
 		std::weak_ptr<T> mAsset;
 	};
+
+	template<typename T>
+	[[nodiscard]] constexpr bool operator==(const AssetHandle<T>& a, const AssetHandle<T>& b) noexcept
+	{
+		if (!a.IsValid() || !b.IsValid())
+		{
+			return false;
+		}
+
+		return a.Get().get() == b.Get().get();
+	}
 
 }

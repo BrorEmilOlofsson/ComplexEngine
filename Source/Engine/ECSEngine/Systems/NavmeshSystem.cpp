@@ -24,9 +24,9 @@ namespace Simple
 				const unsigned int index0 = navmeshData.mIndices[i];
 				const unsigned int index1 = navmeshData.mIndices[i + 1];
 				const unsigned int index2 = navmeshData.mIndices[i + 2];
-				renderList.AddLine(DrawLine{ navmeshData.m3DVertices[index0], navmeshData.m3DVertices[index1], Colors::Black });
-				renderList.AddLine(DrawLine{ navmeshData.m3DVertices[index1], navmeshData.m3DVertices[index2], Colors::Black });
-				renderList.AddLine(DrawLine{ navmeshData.m3DVertices[index2], navmeshData.m3DVertices[index0], Colors::Black });
+				renderList.AddLine(DrawLine{ navmeshData.m3DVertices[index0], navmeshData.m3DVertices[index1], Colors::Red });
+				renderList.AddLine(DrawLine{ navmeshData.m3DVertices[index1], navmeshData.m3DVertices[index2], Colors::Blue });
+				renderList.AddLine(DrawLine{ navmeshData.m3DVertices[index2], navmeshData.m3DVertices[index0], Colors::LightGreen });
 			}
 			PROFILER_END();
 		}

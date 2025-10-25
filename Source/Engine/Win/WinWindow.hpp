@@ -10,6 +10,8 @@
 
 #ifdef _WIN32
 
+#include "Engine/Win/WinDefines.hpp"
+#include <Windows.h>
 #include <WinUser.h>
 
 namespace Simple

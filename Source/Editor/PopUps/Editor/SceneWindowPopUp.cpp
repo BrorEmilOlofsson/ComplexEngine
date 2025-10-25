@@ -11,6 +11,7 @@
 #include "Engine/OperatingSystem/OSView.hpp"
 #include "Editor/EditorSceneSettings.hpp"
 #include "Engine/Utility/DebugShapes.hpp"
+#include "Utility/ShapeMath.hpp"
 #include <External/AwsomeFontIcons/IconFontDefines.h>
 
 namespace Simple
@@ -167,18 +168,23 @@ namespace Simple
 			AABB2i renderRect = GetImGuiRenderRect();
 			sceneRenderState.SetRenderRect(renderRect);
 			mCamera.SetResolution(Vector2ui(renderRect.GetExtent()));
-			
-			sceneRenderState.mCursorScreenPos = os.GetCursorScreenPosition();
 
 			if (input.IsKeyPressed(eInputKey::LMB))
 			{
-				const EntityID entityID{ sceneRenderState.mSelectedObjectID };
-				if (entityID != InvalidEntityID)
+				const Point2i mouseScreenPos = os.GetCursorScreenPosition();
+				if (IsInsideRenderRect(mouseScreenPos, sceneRenderState.GetRenderRect().value()))
 				{
-					SelectEntity(entityID, mHierarchyPopUp.GetSelectedEntityID(), commandTracker);
+					const Point2i mappedPos = MapToRenderRect(mouseScreenPos, sceneRenderState.GetRenderRect().value());
+
+					const uint32_t id = sceneRenderState.GetRenderContext()->GetObjectIDAt(mappedPos);
+
+					const EntityID entityID{ id };
+					if (entityID != InvalidEntityID)
+					{
+						SelectEntity(entityID, mHierarchyPopUp.GetSelectedEntityID(), commandTracker);
+					}
 				}
 			}
-
 		}
 		ImGui::End();
 

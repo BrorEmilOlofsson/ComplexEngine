@@ -28,6 +28,11 @@ namespace Simple
 			mHasChanged = hasChanged;
 		}
 
+		void SetPath(const std::filesystem::path& path)
+		{
+			mPath = path;
+		}
+
 	private:
 
 		ECS mECS;

@@ -12,6 +12,7 @@
 #include "Engine/ECSEngine/Utility/ECSTransformUtility.hpp"
 #include "Engine/ECSEngine/Components/EntityCompositionComponent.hpp"
 #include "Engine/ECSEngine/Utility/ECSTransformHierarchyUtility.hpp"
+#include "Engine/ECS/ECSSerializer.hpp"
 
 namespace Simple
 {
@@ -37,7 +38,9 @@ namespace Simple
 		Blackboard newBlackboard = blackboard;
 		newBlackboard.Insert<Key_CurrentCamera>(mCamera);
 		newBlackboard.Insert<Key_CurrentRenderState>(mRenderState);
-
+		const InputState& input = blackboard.Get<Key_InputState>();
+		EditorCommandTracker& commandTracker = blackboard.Get<Key_CommandTracker>();
+		const OSView os = blackboard.Get<Key_OSView>();
 		mEntityCompositionAsset->GetECS().EditorUpdate(newBlackboard);
 
 		mRenderState.GetRenderList().AddSphere(DrawSphere{ Spheref(Point3f(0, 0, 10), 5.f), Colors::Salmon });
@@ -47,8 +50,6 @@ namespace Simple
 			FreeFlyCameraSettings& cameraSettings = blackboard.Get<Key_FreeFlyCameraSettings>();
 			const float deltaTime = blackboard.Get<Key_DeltaTime>();
 			WindowView window = blackboard.Get<Key_WindowView>();
-			const InputState& input = blackboard.Get<Key_InputState>();
-			const OSView os = blackboard.Get<Key_OSView>();
 			UpdateEditorCamera(mCamera, cameraSettings, deltaTime, window, input, os);
 		}
 
@@ -69,6 +70,26 @@ namespace Simple
 			const AABB2i renderRect = GetImGuiRenderRect();
 			mRenderState.SetRenderRect(renderRect);
 			mCamera.SetResolution(Vector2ui(renderRect.GetExtent()));
+
+
+			if (input.IsKeyPressed(eInputKey::LMB))
+			{
+				const Point2i mouseScreenPosition = os.GetCursorScreenPosition();
+
+				if (IsInsideRenderRect(mouseScreenPosition, renderRect))
+				{
+					const Point2i mappedPos = MapToRenderRect(mouseScreenPosition, renderRect);
+
+					const uint32_t id = mRenderState.GetRenderContext()->GetObjectIDAt(mappedPos);
+
+					const EntityID entityID{ id };
+					if (entityID != InvalidEntityID)
+					{
+						SelectEntity(entityID, mSelectedEntityID, commandTracker);
+					}
+				}
+			}
+
 		}
 		ImGui::End();
 		mRenderState.SetCamera(mCamera);
@@ -92,10 +113,11 @@ namespace Simple
 
 		if (ImGui::Begin("Entity Composition Hierarchy"))
 		{
-			//if (ImGui::Button("Instantiate"))
-			//{
-			//	//MergeEntityComposition(mEntityCompositionAsset, sceneManager.GetCurrentScene().GetECS());
-			//}
+			if (ImGui::Button("Save"))
+			{
+				mEntityCompositionAsset->SetPath(std::filesystem::path(SIMPLE_DIR_ASSETS) / "EntityCompositions/Test.json");
+				SaveEntityCompositionAsset(mEntityCompositionAsset, blackboard.Get<Key_DataTypeRegistry>());
+			}
 			ShowEntityHierarchyWithAddButtons(
 				mEntityCompositionAsset->GetECS(),
 				ecsBuffer,
@@ -103,7 +125,8 @@ namespace Simple
 				commandTracker,
 				mImGuiTag,
 				mSelectedEntityID,
-				mEntityCompositionAsset->GetRootEntity()
+				mEntityCompositionAsset->GetRootEntity(),
+				{ mEntityCompositionAsset->GetRootEntity() }
 			);
 		}
 
@@ -157,6 +180,22 @@ namespace Simple
 
 
 		mRenderState.Reset();
+	}
+
+
+	void EntityCompositionPopUp::SetCompositionAsset(EntityCompositionAssetHandle asset)
+	{
+		if (!asset)
+		{
+			return;
+		}
+		if (asset == mEntityCompositionAsset)
+		{
+			return;
+		}
+		mEntityCompositionAsset = asset;
+		mRootEntities = GetRootEntities(mEntityCompositionAsset->GetECS());
+		mSelectedEntityID = mRootEntities.front();
 	}
 
 }

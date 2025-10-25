@@ -104,7 +104,7 @@ namespace Simple
 		p = entityCompositionPopUp.get();
 
 		{
-			const std::vector<std::filesystem::path> scenePaths = FileUtility::GetFilesFromDirectory(std::filesystem::absolute(SIMPLE_DIR_SCENES));
+			const std::vector<std::filesystem::path> scenePaths = FileUtility::GetPathsFromDirectory(std::filesystem::absolute(SIMPLE_DIR_SCENES));
 			std::vector<std::string> sceneNames;
 			std::ranges::transform(scenePaths, std::back_inserter(sceneNames), [](const auto& path) { return path.string(); });
 			sceneLoadSelectable->SetStrings(sceneNames);
@@ -238,6 +238,7 @@ namespace Simple
 		editorBlackboard.Insert<Key_ShowUnitVectorInScene>(mEditorSceneSettings.showUnitVectorInScene);
 		editorBlackboard.Insert<Key_OperatingSystem>(mEngine->GetOperatingSystem());
 		editorBlackboard.Insert<Key_EntityCompositionPopUp>(*mEntityCompositionPopUp);
+		editorBlackboard.Insert<Key_FreeFlyCameraSettings>(mFreeFlyCameraSettings);
 
 		for (auto& tab : mMainMenuTabs)
 		{

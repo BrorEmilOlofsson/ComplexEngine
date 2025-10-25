@@ -43,7 +43,7 @@ namespace Simple
 
 	}
 
-	std::vector<std::filesystem::path> FileUtility::GetFilesFromDirectory(const std::filesystem::path& absolutePath, const bool includeFolders)
+	std::vector<std::filesystem::path> FileUtility::GetPathsFromDirectory(const std::filesystem::path& absolutePath, const bool includeFolders)
 	{
 		PROFILER_FUNCTION(profiler::colors::Brown);
 		std::vector<std::filesystem::path> files;

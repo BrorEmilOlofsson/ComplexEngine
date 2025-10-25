@@ -13,17 +13,6 @@ namespace Simple
 
 		AssetLoader() = default;
 
-		explicit AssetLoader(std::function<TextureAsset(const std::filesystem::path&)> textureLoader, 
-			std::function<MeshAsset(const std::filesystem::path&)> meshLoader, 
-			std::function<PixelShaderAsset(const std::filesystem::path&)> pixelShaderLoader,
-			std::function<VertexShaderAsset(const std::filesystem::path&)> vertexShaderLoader)
-			: mTextureLoader(std::move(textureLoader))
-			, mMeshLoader(std::move(meshLoader))
-			, mPixelShaderLoader(std::move(pixelShaderLoader))
-			, mVertexShaderLoader(std::move(vertexShaderLoader))
-		{
-		}
-
 		[[nodiscard]] TextureAsset LoadTexture(const std::filesystem::path& path) const
 		{
 			return mTextureLoader(path);
@@ -44,11 +33,41 @@ namespace Simple
 			return mVertexShaderLoader(path);
 		}
 
+		[[nodiscard]] EntityCompositionAsset LoadEntityComposition(const std::filesystem::path& path) const
+		{
+			return mEntityCompositionLoader(path);
+		}
+
+		void SetTextureLoader(std::function<TextureAsset(const std::filesystem::path&)> loader)
+		{
+			mTextureLoader = std::move(loader);
+		}
+
+		void SetMeshLoader(std::function<MeshAsset(const std::filesystem::path&)> loader)
+		{
+			mMeshLoader = std::move(loader);
+		}
+
+		void SetPixelShaderLoader(std::function<PixelShaderAsset(const std::filesystem::path&)> loader)
+		{
+			mPixelShaderLoader = std::move(loader);
+		}
+
+		void SetVertexShaderLoader(std::function<VertexShaderAsset(const std::filesystem::path&)> loader)
+		{
+			mVertexShaderLoader = std::move(loader);
+		}
+		void SetEntityCompositionLoader(std::function<EntityCompositionAsset(const std::filesystem::path&)> loader)
+		{
+			mEntityCompositionLoader = std::move(loader);
+		}
+
 	private:
 
 		std::function<TextureAsset(const std::filesystem::path&)> mTextureLoader;
 		std::function<MeshAsset(const std::filesystem::path&)> mMeshLoader;
 		std::function<PixelShaderAsset(const std::filesystem::path&)> mPixelShaderLoader;
 		std::function<VertexShaderAsset(const std::filesystem::path&)> mVertexShaderLoader;
+		std::function<EntityCompositionAsset(const std::filesystem::path&)> mEntityCompositionLoader;
 	};
 }

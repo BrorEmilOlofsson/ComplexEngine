@@ -11,14 +11,34 @@ namespace Simple
 
 		constexpr Asset() = default;
 
-		constexpr explicit Asset(std::shared_ptr<T> asset)
+		constexpr explicit Asset(const std::shared_ptr<T>& asset)
+			: mAsset(asset)
+		{
+		}
+
+		constexpr explicit Asset(std::shared_ptr<T>&& asset)
 			: mAsset(std::move(asset))
 		{
 		}
 
-		[[nodiscard]] std::shared_ptr<T> Get() const
+		[[nodiscard]] constexpr std::shared_ptr<T> Get()
 		{
 			return mAsset;
+		}
+
+		[[nodiscard]] constexpr std::shared_ptr<const T> Get() const
+		{
+			return mAsset;
+		}
+
+		[[nodiscard]] constexpr T* operator->() noexcept
+		{
+			return mAsset.get();
+		}
+
+		[[nodiscard]] constexpr const T* operator->() const noexcept
+		{
+			return mAsset.get();
 		}
 
 		[[nodiscard]] constexpr operator bool() const

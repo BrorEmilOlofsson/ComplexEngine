@@ -9,6 +9,6 @@ namespace Simple
 	{
 	public:
 
-		static NavmeshData LoadMesh(const std::filesystem::path& aObjFilePath);
+		static NavmeshData LoadMesh(const std::filesystem::path& objFilePath);
 	};
 }

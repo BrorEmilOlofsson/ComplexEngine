@@ -43,10 +43,9 @@ namespace Simple
 			return [sceneManager]() -> void
 				{
 					const std::filesystem::path absolutePath = std::filesystem::absolute(AppendCounterIfAlreadyExist(std::string(SIMPLE_DIR_SCENES) + "\\" + std::string(SIMPLE_FILENAME_NEWSCENE)));
-					const std::filesystem::path relativePath = ConvertAbsolutePathToRelativePath(absolutePath);
-
+					
 					sceneManager->CreateNewScene(absolutePath);
-					sceneManager->ChangeScene(relativePath);
+					sceneManager->ChangeScene(absolutePath);
 
 					Console::Print("New scene ", ConsoleTextColor::White, false);
 					Console::Print(sceneManager->GetCurrentSceneInfo()->name.c_str(), ConsoleTextColor::Green, false);
@@ -61,10 +60,9 @@ namespace Simple
 					const std::filesystem::path absolutePath = sceneManager->GetCurrentSceneInfo()->absolutePath;
 					const std::filesystem::path newCopyName = absolutePath.parent_path() / std::filesystem::path(absolutePath.stem().string() + "_Copy" + absolutePath.extension().string());
 					const std::filesystem::path newFileName = AppendCounterIfAlreadyExist(newCopyName);
-					const std::filesystem::path relativePath = ConvertAbsolutePathToRelativePath(newFileName);
 
 					std::filesystem::copy_file(absolutePath, newFileName, std::filesystem::copy_options::overwrite_existing);
-					sceneManager->ChangeScene(relativePath);
+					sceneManager->ChangeScene(newFileName);
 
 					Console::Print("New scene ", ConsoleTextColor::White, false);
 					Console::Print(sceneManager->GetCurrentSceneInfo()->name, ConsoleTextColor::Green, false);
