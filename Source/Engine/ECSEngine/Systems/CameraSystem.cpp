@@ -49,25 +49,15 @@ namespace Simple
 			frustrum.mFarPlaneV = camera.GetFarPlane();
 			frustrum.mNearPlaneV = camera.GetNearPlane();
 			frustrum.mTransform = camera.GetTransform();
-			frustrum.mVerticalAngle = ToRadians(Degreesf(30.f));
+			frustrum.mVerticalAngle = camera.GetVerticalFOV();
 			frustrum.mHorizontalAngle = camera.GetHorizontalFOV();
 			RenderFrustrum(frustrum, Colors::Lime, renderList);
-			DrawLine line;
-			line.color = Colors::Red;
-			line.startPosition = transformComponent.transform.GetPosition();
-			line.endPosition = line.startPosition + forward;
 
 			DrawSphere sphere;
-			sphere.sphere = Spheref(line.endPosition, 0.1f);
-			sphere.color = Colors::Red;
-
-			DrawSphere sphere2;
-			sphere2.sphere = Spheref(line.startPosition, 0.25f);
-			sphere2.color = Colors::Gray;
+			sphere.sphere = Spheref(camera.GetPosition(), 0.1f);
+			sphere.color = Colors::Gray;
 
 			renderList.AddSphere(sphere, false);
-			renderList.AddSphere(sphere2, false);
-			renderList.AddLine(line);
 		}
 	}
 

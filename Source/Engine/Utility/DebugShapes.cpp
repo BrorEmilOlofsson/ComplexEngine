@@ -208,7 +208,7 @@ namespace Simple
 		RenderGrid3(grid.minPos, grid.gridSize, grid.cellSize, grid.offset, color, renderList);
 	}
 
-	void RenderFrustrum(const Frustrumf& frustrum, const Color& color, RenderList& renderList)
+	void RenderFrustrum(const Frustrumf& frustrum, const Color& color, RenderList& renderList, const bool renderFull)
 	{
 		Point3f pos = frustrum.mTransform.GetPosition();
 		UnitVector3f forwardDir = frustrum.mTransform.GetForwardVector();
@@ -219,20 +219,14 @@ namespace Simple
 		UnitVector3f leftDir = RotateVectorAroundAxis(forwardDir, upDir, -halfHorizontalAngle);
 		float nearPlane = frustrum.mNearPlaneV;
 		float farPlane = frustrum.mFarPlaneV;
+		const float scale = renderFull ? farPlane : Max(nearPlane + 0.1f, 3.f);
 
-		auto createDrawLine = [color, nearPlane, farPlane, pos](const UnitVector3f& dir) -> DrawLine
+		auto createDrawLine = [color, nearPlane, scale, pos](const UnitVector3f& dir) -> DrawLine
 			{
 				Point3f start = pos + dir * nearPlane;
-				Point3f end = start + dir * farPlane;
+				Point3f end = pos + dir * scale;
 				return DrawLine{ .startPosition = start, .endPosition = end, .color = color };
 			};
-
-		{
-			renderList.AddLine(createDrawLine(leftDir));
-		}
-		{
-			renderList.AddLine(createDrawLine(rightDir));
-		}
 
 		const UnitVector3f t1 = GetPerpendicularVector(leftDir, upDir);
 		const UnitVector3f downLeft = RotateVectorAroundAxis(leftDir, t1, -halfVerticalAngle);
@@ -252,10 +246,10 @@ namespace Simple
 
 
 		{
-			Point3f downLeftPos = pos + downLeft * farPlane;
-			Point3f downRightPos = pos + downRight * farPlane;
-			Point3f upLeftPos = pos + upLeft * farPlane;
-			Point3f upRightPos = pos + upRight * farPlane;
+			Point3f downLeftPos = pos + downLeft * scale;
+			Point3f downRightPos = pos + downRight * scale;
+			Point3f upLeftPos = pos + upLeft * scale;
+			Point3f upRightPos = pos + upRight * scale;
 			renderList.AddLine(DrawLine{ downLeftPos, upLeftPos, color });
 			renderList.AddLine(DrawLine{ upLeftPos, upRightPos, color });
 			renderList.AddLine(DrawLine{ upRightPos, downRightPos, color });

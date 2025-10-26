@@ -28,5 +28,5 @@ namespace Simple
 	void RenderGrid2(const Point2f& min, const Vector2ui& gridSize, const Vector2f& cellSize, const Vector2f& offset, const float yPos, const Color& color, RenderList& renderList);
 	void RenderGrid3(const Point3f& min, const Vector3ui& gridSize, const Vector3f& cellSize, const Vector3f& offset, const Color& color, RenderList& renderList);
 	void RenderGrid3(const PrimitiveGrid3& grid, const Color& color, RenderList& renderList);
-	void RenderFrustrum(const Frustrumf& frustrum, const Color& color, RenderList& renderList);
+	void RenderFrustrum(const Frustrumf& frustrum, const Color& color, RenderList& renderList, const bool renderFull = false);
 }
