@@ -8,6 +8,7 @@
 #include "Engine/ECSEngine/Utility/ECSTransformUtility.hpp"
 #include "Utility/Input/InputState.hpp"
 #include "Graphics/RenderState.hpp"
+#include "Engine/Utility/DebugShapes.hpp"
 
 namespace Simple
 {
@@ -41,7 +42,16 @@ namespace Simple
 			auto [cameraComponent, transformComponent] = *cameraComponentView.begin();
 
 			const UnitVector3f forward = cameraComponent.camera.GetForward();
+			
+			const Camera& camera = cameraComponent.camera;
 
+			Frustrumf frustrum;
+			frustrum.mFarPlaneV = camera.GetFarPlane();
+			frustrum.mNearPlaneV = camera.GetNearPlane();
+			frustrum.mTransform = camera.GetTransform();
+			frustrum.mVerticalAngle = ToRadians(Degreesf(30.f));
+			frustrum.mHorizontalAngle = camera.GetHorizontalFOV();
+			RenderFrustrum(frustrum, Colors::Lime, renderList);
 			DrawLine line;
 			line.color = Colors::Red;
 			line.startPosition = transformComponent.transform.GetPosition();

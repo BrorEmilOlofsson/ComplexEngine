@@ -709,4 +709,10 @@ namespace Simple
 		result.z /= count;
 		return result;
 	}
+
+	template<typename Ret = float, typename T>
+	constexpr float ToAspectRatio(const Vector2<T>& resolution)
+	{
+		return static_cast<float>(resolution.x) / static_cast<float>(resolution.y);
+	}
 }

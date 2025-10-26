@@ -118,7 +118,7 @@ namespace Simple
 			FileUtility::CopyFiles(windowFrameBuffer.droppedFiles, mCurrentDropPath);
 		}
 
-		mSceneManager.GetCurrentScene().BeginFrame(mOperatingSystem.GetWindow(mMainWindow).GetClientSize(), mInputState.GetMousePosition());
+		mSceneManager.GetCurrentScene().BeginFrame(mOperatingSystem.GetWindow(mMainWindow).GetClientSize(), mOperatingSystem.GetOS().GetCursorScreenPosition());
 
 		return !mShouldExit.load();
 	}

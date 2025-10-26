@@ -71,7 +71,7 @@ namespace Simple
 		static std::optional<NavmeshPositionData> startHit;
 		static std::optional<NavmeshPositionData> endHit;
 		static std::vector<Point3f> path;
-		if (input.IsKeyPressed(eInputKey::D1))
+		if (input.IsKeyPressed(eInputKey::LMB))
 		{
 			startRay = mouseRay;
 			startHit = navmesh.Raycast(startRay);
@@ -80,7 +80,7 @@ namespace Simple
 				path = navmesh.FindPath(startHit->m3DPosition, endHit->m3DPosition);
 			}
 		}
-		if (input.IsKeyPressed(eInputKey::D2))
+		if (input.IsKeyPressed(eInputKey::RMB))
 		{
 			endRay = mouseRay;
 			endHit = navmesh.Raycast(endRay);
@@ -116,7 +116,7 @@ namespace Simple
 
 	void NavmeshSystem::Render(const ECS&, [[maybe_unused]] const Blackboard& blackboard)
 	{
-#ifdef _DEBUG
+#ifdef _EDITOR
 		if (auto navmeshRef = blackboard.TryGet<Key_Navmesh>())
 		{
 			const Navmesh& navmesh = *navmeshRef;

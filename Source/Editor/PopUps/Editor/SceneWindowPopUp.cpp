@@ -221,12 +221,6 @@ namespace Simple
 
 	}
 
-	template<typename T>
-	static float ToAspectRatio(Vector2<T> size)
-	{
-		return static_cast<float>(size.x) / static_cast<float>(size.y);
-	}
-
 	void SceneWindowPopUp::Render(const Blackboard& blackboard)
 	{
 		PROFILER_FUNCTION(profiler::colors::Yellow900);

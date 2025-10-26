@@ -110,6 +110,7 @@ namespace Simple
 			return mKeyState.IsKeyReleased(key);
 		}
 
+		// Window coordinates
 		[[nodiscard]] constexpr Point2i GetMousePosition() const noexcept
 		{
 			return mMouseState.GetPosition();

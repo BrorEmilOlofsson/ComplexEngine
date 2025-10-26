@@ -210,8 +210,56 @@ namespace Simple
 
 	void RenderFrustrum(const Frustrumf& frustrum, const Color& color, RenderList& renderList)
 	{
-		frustrum;
-		color;
-		renderList;
+		Point3f pos = frustrum.mTransform.GetPosition();
+		UnitVector3f forwardDir = frustrum.mTransform.GetForwardVector();
+		UnitVector3f upDir = frustrum.mTransform.GetUpVector();
+		const Radiansf halfVerticalAngle = frustrum.mVerticalAngle / 2.f;
+		const Radiansf halfHorizontalAngle = frustrum.mHorizontalAngle / 2.f;
+		UnitVector3f rightDir = RotateVectorAroundAxis(forwardDir, upDir, halfHorizontalAngle);
+		UnitVector3f leftDir = RotateVectorAroundAxis(forwardDir, upDir, -halfHorizontalAngle);
+		float nearPlane = frustrum.mNearPlaneV;
+		float farPlane = frustrum.mFarPlaneV;
+
+		auto createDrawLine = [color, nearPlane, farPlane, pos](const UnitVector3f& dir) -> DrawLine
+			{
+				Point3f start = pos + dir * nearPlane;
+				Point3f end = start + dir * farPlane;
+				return DrawLine{ .startPosition = start, .endPosition = end, .color = color };
+			};
+
+		{
+			renderList.AddLine(createDrawLine(leftDir));
+		}
+		{
+			renderList.AddLine(createDrawLine(rightDir));
+		}
+
+		const UnitVector3f t1 = GetPerpendicularVector(leftDir, upDir);
+		const UnitVector3f downLeft = RotateVectorAroundAxis(leftDir, t1, -halfVerticalAngle);
+		const UnitVector3f upLeft = RotateVectorAroundAxis(leftDir, t1, halfVerticalAngle);
+
+		renderList.AddLine(createDrawLine(downLeft));
+		renderList.AddLine(createDrawLine(upLeft));
+
+
+		const UnitVector3f t2 = GetPerpendicularVector(rightDir, upDir);
+		const UnitVector3f downRight = RotateVectorAroundAxis(rightDir, t2, -halfVerticalAngle);
+		const UnitVector3f upRight = RotateVectorAroundAxis(rightDir, t2, halfVerticalAngle);
+		
+
+		renderList.AddLine(createDrawLine(downRight));
+		renderList.AddLine(createDrawLine(upRight));
+
+
+		{
+			Point3f downLeftPos = pos + downLeft * farPlane;
+			Point3f downRightPos = pos + downRight * farPlane;
+			Point3f upLeftPos = pos + upLeft * farPlane;
+			Point3f upRightPos = pos + upRight * farPlane;
+			renderList.AddLine(DrawLine{ downLeftPos, upLeftPos, color });
+			renderList.AddLine(DrawLine{ upLeftPos, upRightPos, color });
+			renderList.AddLine(DrawLine{ upRightPos, downRightPos, color });
+			renderList.AddLine(DrawLine{ downRightPos, downLeftPos, color });
+		}
 	}
 }

@@ -169,6 +169,12 @@ namespace Simple
 		}
 	}
 
+	template<typename T, typename U> requires ST_Multiplicable<T, U>
+	constexpr auto operator*(const U& a, const T& b)
+	{
+		return b * a;
+	}
+
 	template<typename T, typename U> requires ST_Scalable<T> && std::is_arithmetic_v<U>
 	constexpr T operator/(const T& a, const U& b)
 	{

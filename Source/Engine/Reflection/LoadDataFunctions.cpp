@@ -124,7 +124,7 @@ namespace Simple
 		position.z = json["Position"]["z"];
 
 		camera.SetPosition(position);
-		camera.SetHorizontalFoV(Radiansf(json["HorizontalFoV"]), resolution);
+		camera.SetHorizontalFOV(Radiansf(json["HorizontalFoV"]), resolution);
 		camera.SetNearPlane(json["NearPlane"], resolution);
 		camera.SetFarPlane(json["FarPlane"], resolution);
 	}

@@ -16,7 +16,7 @@ namespace Simple
 		void BeginPlay();
 		void EndPlay();
 		
-		void BeginFrame(Vector2ui clientSize, Point2i cursorPos);
+		void BeginFrame(Vector2ui clientSize, Point2i mouseScreenPos);
 		void Update(const float deltaTime);
 		void EditorUpdate();
 		void Render();

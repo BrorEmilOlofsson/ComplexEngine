@@ -480,13 +480,13 @@ namespace Simple
 	{
 		ViewAndEditResult viewAndEditResult;
 
-		Radiansf horizontalFoV = camera.GetHorizontalFoV();
+		Radiansf horizontalFoV = camera.GetHorizontalFOV();
 		float nearPlane = camera.GetNearPlane();
 		float farPlane = camera.GetFarPlane();
 
 		if (ImGui::DragFloat("HorizontalFoV", &horizontalFoV.Value()))
 		{
-			camera.SetHorizontalFoV(horizontalFoV, resolution);
+			camera.SetHorizontalFOV(horizontalFoV, resolution);
 			viewAndEditResult.isEdited = true;
 			viewAndEditResult.isActive = ImGui::IsItemActive();
 		}

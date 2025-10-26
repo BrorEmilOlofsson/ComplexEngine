@@ -42,16 +42,16 @@ namespace Simple
 		return Point2<T>(point.x, y - point.y);
 	}
 
-	static Ray3f CalculateMouseRay(const Camera& camera, const AABB2i& renderAABB, const Vector2ui windowSize, const Point2i& cursorPos)
+	static Ray3f CalculateMouseRay(const Camera& camera, const AABB2i& renderAABB, const Vector2ui windowSize, const Point2i& mouseScreenPos)
 	{
 		const AABB2f renderAABBf = ToAABB<float>(renderAABB);
 
-		const Point2f mousePos = Remap(Point2f(cursorPos), renderAABBf, AABB2f::CreateFromMinAndExtent(Point2f::Zero(), Vector2f(windowSize)));
+		const Point2f mousePos = Remap(Point2f(mouseScreenPos), renderAABBf, AABB2f::CreateFromDefaultAndExtent(Vector2f(windowSize)));
 		const Point2f correctedMousePos = InvertY(mousePos, static_cast<float>(windowSize.y));
 		return CalculateMouseRay(camera, Point2i(correctedMousePos), windowSize);
 	}
 
-	void Scene::BeginFrame(Vector2ui clientSize, Point2i cursorPos)
+	void Scene::BeginFrame(Vector2ui clientSize, Point2i mouseScreenPos)
 	{
 		if (mRenderState.GetCamera())
 		{
@@ -59,7 +59,7 @@ namespace Simple
 				*mRenderState.GetCamera(),
 				 mRenderState.GetRenderRect().value_or(AABB2i::CreateFromMinAndExtent(Point2i::Zero(), Vector2i(clientSize))),
 				clientSize,
-				cursorPos
+				mouseScreenPos
 			);
 		}
 		mRenderState.Reset();

@@ -24,8 +24,15 @@ namespace Simple
 		[[nodiscard]] constexpr Plane<T>& operator[](const eFrustrumSide side) noexcept;
 		[[nodiscard]] constexpr const Plane<T>& operator[](const eFrustrumSide side) const noexcept;
 
-	private:
+	public:
 
+		Transform mTransform;
+		Radiansf mVerticalAngle = ToRadians(Degreesf(45.f));
+		Radiansf mHorizontalAngle = ToRadians(Degreesf(45.f));
+		float mNearPlaneV = 0.1f;
+		float mFarPlaneV = 1000.f;
+
+	private:
 		Plane<T> mLeftPlane;
 		Plane<T> mRightPlane;
 		Plane<T> mBottomPlane;

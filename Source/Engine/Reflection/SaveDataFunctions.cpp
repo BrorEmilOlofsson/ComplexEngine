@@ -205,7 +205,7 @@ namespace Simple
 
 		json["Position"] = ToJSON(camera.GetPosition());
 
-		json["HorizontalFoV"] = camera.GetHorizontalFoV().Value();
+		json["HorizontalFoV"] = camera.GetHorizontalFOV().Value();
 		json["NearPlane"] = camera.GetNearPlane();
 		json["FarPlane"] = camera.GetFarPlane();
 

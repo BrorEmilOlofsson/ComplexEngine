@@ -13,19 +13,27 @@ namespace Simple
 		Orthographic
 	};
 
+	constexpr Radiansf CalculateHorizontalFOV(Radiansf verticalFOV, float aspectRatio)
+	{
+		return 2.0f * ATan(Tan(verticalFOV * 0.5f) * aspectRatio);
+	}
+
+	constexpr Radiansf CalculateVerticalFOV(Radiansf horizontalFOV, float aspectRatio)
+	{
+		return 2.0f * ATan(Tan(horizontalFOV / 2.0f) / aspectRatio);
+	}
+
+
 	class Camera final
 	{
 	public:
 
 		constexpr Camera();
-		constexpr Camera(const Radiansf horizontalFoVRad, const float nearPlane, const float farPlane);
-
+		
 		constexpr void UpdateProjection(const Vector2ui& resolution);
 		constexpr void UpdateProjection(const float aspectRatio);
 
-	public:
-
-		constexpr void SetOrtographicProjection(const float halfSize, const float nearPlane, const float farPlane);
+		constexpr void SetOrthographicProjection(const float halfSize, const float nearPlane, const float farPlane);
 
 		constexpr void SetCameraType(const eCameraType cameraType, const Vector2ui& resolution);
 
@@ -34,7 +42,8 @@ namespace Simple
 		constexpr void SetRotation(const Matrix4x4f& rotationMatrix);
 		constexpr void SetNearPlane(const float nearPlane, const Vector2ui& resolution);
 		constexpr void SetFarPlane(const float farPlane, const Vector2ui& resolution);
-		constexpr void SetHorizontalFoV(const Radiansf horizontalFoVRad, const Vector2ui& resolution);
+		constexpr void SetHorizontalFOV(const Radiansf horizontalFoVRad, const Vector2ui& resolution);
+		constexpr void SetVerticalFOV(const Radiansf verticalFOV, const Vector2ui& resolution);
 		constexpr void SetResolution(const Vector2ui& resolution);
 
 	public:
@@ -54,15 +63,18 @@ namespace Simple
 
 		[[nodiscard]] constexpr float GetNearPlane() const noexcept;
 		[[nodiscard]] constexpr float GetFarPlane() const noexcept;
-		[[nodiscard]] constexpr Radiansf GetHorizontalFoV() const noexcept;
+		[[nodiscard]] constexpr Radiansf GetHorizontalFOV() const noexcept;
+		[[nodiscard]] constexpr Radiansf GetVerticalFOV() const noexcept;
+		[[nodiscard]] constexpr float GetAspectRatio() const noexcept;
 
-		[[nodiscard]] constexpr static Matrix4x4f CreatePerspectiveProjectionMatrix(const Radiansf horizontalFoV, const float nearPlane, const float farPlane, const float aspectRatio);
-		[[nodiscard]] constexpr static Matrix4x4f CreatePerspectiveProjectionMatrix(const Radiansf horizontalFoV, const float nearPlane, const float farPlane, const Vector2ui resolution);
+		[[nodiscard]] constexpr static Matrix4x4f CreatePerspectiveProjectionMatrix(const Radiansf verticalFOV, const float nearPlane, const float farPlane, const float aspectRatio);
+		[[nodiscard]] constexpr static Matrix4x4f CreatePerspectiveProjectionMatrix(const Radiansf verticalFOV, const float nearPlane, const float farPlane, const Vector2ui resolution);
 		[[nodiscard]] constexpr static Matrix4x4f CreateOrthographicProjectionMatrix(const float halfSize, const float nearPlane, const float farPlane);
 
 	private:
 
-		Radiansf mHorizontalFoVRad = ToRadians(Degreesf(90.f));
+		Radiansf mVerticalFOV = DefaultVerticalFoV;
+		float mAspectRatio = DefaultAspectRatio;
 		float mNearPlane = 0.1f;
 		float mFarPlane = 30000.f;
 
@@ -71,20 +83,13 @@ namespace Simple
 		Matrix4x4f mProjectionMatrix;
 
 		static constexpr float DefaultAspectRatio = 16.f / 9.f;
+		static constexpr Radiansf DefaultVerticalFoV = ToRadians(Degreesf(58.7f));
 	};
 
 	constexpr Camera::Camera()
-		: mProjectionMatrix(CreatePerspectiveProjectionMatrix(mHorizontalFoVRad, mNearPlane, mFarPlane, DefaultAspectRatio))
+		: mProjectionMatrix(CreatePerspectiveProjectionMatrix(mVerticalFOV, mNearPlane, mFarPlane, DefaultAspectRatio))
 		, mCameraType(eCameraType::Perspective)
-	{
-	}
-
-	constexpr Camera::Camera(const Radiansf horizontalFoVRad, const float nearPlane, const float farPlane)
-		: mHorizontalFoVRad(horizontalFoVRad)
-		, mFarPlane(farPlane)
-		, mNearPlane(nearPlane)
-		, mProjectionMatrix(CreatePerspectiveProjectionMatrix(mHorizontalFoVRad, mNearPlane, mFarPlane, DefaultAspectRatio))
-		, mCameraType(eCameraType::Perspective)
+		, mAspectRatio(DefaultAspectRatio)
 	{
 	}
 
@@ -133,9 +138,19 @@ namespace Simple
 		return mFarPlane;
 	}
 
-	constexpr Radiansf Camera::GetHorizontalFoV() const noexcept
+	constexpr Radiansf Camera::GetHorizontalFOV() const noexcept
 	{
-		return mHorizontalFoVRad;
+		return CalculateHorizontalFOV(mVerticalFOV, mAspectRatio);
+	}
+
+	constexpr Radiansf Camera::GetVerticalFOV() const noexcept
+	{
+		return mVerticalFOV;
+	}
+
+	constexpr float Camera::GetAspectRatio() const noexcept
+	{
+		return mAspectRatio;
 	}
 
 	constexpr UnitVector3f Camera::GetForward() const noexcept
@@ -153,12 +168,16 @@ namespace Simple
 		return mTransform.GetMatrix().GetRight();
 	}
 
-	constexpr Matrix4x4f Camera::CreatePerspectiveProjectionMatrix(const Radiansf horizontalFoV, const float nearPlane, const float farPlane, const float aspectRatio)
+	constexpr Matrix4x4f Camera::CreatePerspectiveProjectionMatrix(const Radiansf verticalFOV, const float nearPlane, const float farPlane, const float aspectRatio)
 	{
 		const float Q = farPlane / (farPlane - nearPlane);
-		const Radiansf verticalFoVRad = ATan(Tan(horizontalFoV / 2.f) * (1.f / aspectRatio)) * 2.f;
-		const float scaleX = 1.0f / Tan(horizontalFoV / 2.0f);
-		const float scaleY = 1.0f / Tan(verticalFoVRad * 0.5f);
+		//const Radiansf horizontalFOV = CalculateHorizontalFOV(verticalFOV, aspectRatio);
+		//const float scaleX = 1.0f / Tan(horizontalFOV / 2.0f);
+		//const float scaleY = 1.0f / Tan(verticalFOV * 0.5f);
+
+		float scaleY = 1.0f / Tan(verticalFOV * 0.5f);
+		float scaleX = scaleY / aspectRatio;
+
 
 		Matrix4x4f matrix;
 		// One based indexing
@@ -172,9 +191,9 @@ namespace Simple
 		return matrix;
 	}
 
-	constexpr Matrix4x4f Camera::CreatePerspectiveProjectionMatrix(const Radiansf horizontalFoV, const float nearPlane, const float farPlane, const Vector2ui resolution)
+	constexpr Matrix4x4f Camera::CreatePerspectiveProjectionMatrix(const Radiansf verticalFOV, const float nearPlane, const float farPlane, const Vector2ui resolution)
 	{
-		return CreatePerspectiveProjectionMatrix(horizontalFoV, nearPlane, farPlane, static_cast<float>(resolution.x) / static_cast<float>(resolution.y));
+		return CreatePerspectiveProjectionMatrix(verticalFOV, nearPlane, farPlane, ToAspectRatio(resolution));
 	}
 
 	constexpr Matrix4x4f Camera::CreateOrthographicProjectionMatrix(const float halfSize, const float nearPlane, const float farPlane)
@@ -197,7 +216,7 @@ namespace Simple
 		return matrix;
 	}
 
-	constexpr void Camera::SetOrtographicProjection(const float halfSize, const float nearPlane, const float farPlane)
+	constexpr void Camera::SetOrthographicProjection(const float halfSize, const float nearPlane, const float farPlane)
 	{
 		mProjectionMatrix = CreateOrthographicProjectionMatrix(halfSize, nearPlane, farPlane);
 	}
@@ -219,10 +238,12 @@ namespace Simple
 
 	constexpr void Camera::UpdateProjection(const Vector2ui& resolution)
 	{
+		const float aspectRatio = ToAspectRatio(resolution);
+		mAspectRatio = aspectRatio;
 		switch (mCameraType)
 		{
 		case eCameraType::Perspective:
-			UpdateProjection(static_cast<float>(resolution.x) / static_cast<float>(resolution.y));
+			UpdateProjection(aspectRatio);
 			break;
 		case eCameraType::Orthographic:
 			break;
@@ -231,7 +252,8 @@ namespace Simple
 
 	constexpr void Camera::UpdateProjection(const float aspectRatio)
 	{
-		mProjectionMatrix = CreatePerspectiveProjectionMatrix(mHorizontalFoVRad, mNearPlane, mFarPlane, aspectRatio);
+		mProjectionMatrix = CreatePerspectiveProjectionMatrix(mVerticalFOV, mNearPlane, mFarPlane, aspectRatio);
+		mAspectRatio = aspectRatio;
 	}
 
 	constexpr void Camera::SetCameraType(const eCameraType cameraType, const Vector2ui& resolution)
@@ -260,9 +282,9 @@ namespace Simple
 		}
 	}
 
-	constexpr void Camera::SetHorizontalFoV(const Radiansf horizontalFoVRad, const Vector2ui& resolution)
+	constexpr void Camera::SetHorizontalFOV(const Radiansf horizontalFoVRad, const Vector2ui& resolution)
 	{
-		mHorizontalFoVRad = horizontalFoVRad;
+		mVerticalFOV = CalculateVerticalFOV(horizontalFoVRad, ToAspectRatio(resolution));
 
 		if (mCameraType == eCameraType::Perspective)
 		{
