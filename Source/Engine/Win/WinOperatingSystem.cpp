@@ -117,6 +117,7 @@ namespace Simple
 				mAssetManager,
 				mGraphicsSettings,
 				mGraphicsFoundation.GetDepthStencilViewManager(),
+				mGraphicsFoundation.GetSamplerState(),
 				size,
 				title,
 				*mWindowClass,

@@ -748,7 +748,7 @@ namespace Simple
 			{
 				if (ImGui::BeginDragDropTarget())
 				{
-					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Assets_Browser"))
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Asset"))
 					{
 						meshAsset = assetManager.GetMesh(path);
 						viewAndEditResult.isEdited = true;
@@ -792,7 +792,7 @@ namespace Simple
 			{
 				if (ImGui::BeginDragDropTarget())
 				{
-					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Assets_Browser"))
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Asset"))
 					{
 						textureAsset = assetManager.GetTexture(path);
 						viewAndEditResult.isEdited = true;
@@ -970,7 +970,7 @@ namespace Simple
 			{
 				if (ImGui::BeginDragDropTarget())
 				{
-					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Assets_Browser"))
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Asset"))
 					{
 						skeletonAsset = modelFactory.GetSkeleton(path);
 						viewAndEditResult.isEdited = true;
@@ -1016,7 +1016,7 @@ namespace Simple
 			{
 				if (ImGui::BeginDragDropTarget())
 				{
-					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Assets_Browser"))
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Asset"))
 					{
 						animationAsset = assetManager.GetAnimation(path);
 						viewAndEditResult.isEdited = true;
@@ -1171,7 +1171,7 @@ namespace Simple
 				{
 					if (ImGui::BeginDragDropTarget())
 					{
-						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Assets_Browser"))
+						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Asset"))
 						{
 							TextureAssetHandle textureAsset = assetManager.GetTexture(path);
 

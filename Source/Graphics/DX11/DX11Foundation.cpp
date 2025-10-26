@@ -68,7 +68,7 @@ namespace Simple
 		, mRenderer(GetDevice(), GetContext())
 		, mRenderTargetManager(GetDevice(), GetContext())
 		, mDepthStencilViewManager(std::make_shared<DX11DepthStencilViewManager>(GetDevice()))
-		, mSamplerState(*GetDevice().Get())
+		, mSamplerState(std::make_shared<DX11SamplerState>(*GetDevice().Get()))
 	{
 	}
 
@@ -200,7 +200,6 @@ namespace Simple
 		}
 		if (renderState.GetRenderContext()->GetBufferSize() != renderSize)
 		{
-
 			renderState.GetRenderContext()->ResizeBuffers(renderSize);
 
 			RenderState& r = const_cast<RenderState&>(renderState);
@@ -227,7 +226,7 @@ namespace Simple
 			mConstantBufferManager.mColorBuffer,
 			mConstantBufferManager.mTransformBuffer,
 			mConstantBufferManager.mObjectIDBuffer,
-			mSamplerState
+			*mSamplerState
 		);
 	}
 

@@ -22,7 +22,7 @@ namespace Simple
 	public:
 
 		Win_Window(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, std::shared_ptr<AssetManager> assetManager,
-			std::shared_ptr<GraphicsSettings> graphicsSettings, std::weak_ptr<DX11DepthStencilViewManager> dsvManager, const Vector2ui& windowSize, const std::wstring& name, const Win_WindowClass& windowClass, void* operatingSystem, bool instantiateImGui);
+			std::shared_ptr<GraphicsSettings> graphicsSettings, std::weak_ptr<DX11DepthStencilViewManager> dsvManager, std::weak_ptr<DX11SamplerState> samplerState, const Vector2ui& windowSize, const std::wstring& name, const Win_WindowClass& windowClass, void* operatingSystem, bool instantiateImGui);
 		~Win_Window();
 
 		Win_Window(const Win_Window&) = delete;

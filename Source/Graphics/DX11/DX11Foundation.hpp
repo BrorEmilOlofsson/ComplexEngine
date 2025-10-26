@@ -81,6 +81,11 @@ namespace Simple
 			return mDepthStencilViewManager;
 		}
 
+		[[nodiscard]] std::shared_ptr<DX11SamplerState> GetSamplerState()
+		{
+			return mSamplerState;
+		}
+
 	private:
 
 		std::pair<Microsoft::WRL::ComPtr<ID3D11Device>, Microsoft::WRL::ComPtr<ID3D11DeviceContext>> mDeviceAndContext;
@@ -90,7 +95,7 @@ namespace Simple
 		DX11Renderer mRenderer;
 		DX11RenderTargetManager mRenderTargetManager;
 		std::shared_ptr<DX11DepthStencilViewManager> mDepthStencilViewManager;
-		DX11SamplerState mSamplerState;
+		std::shared_ptr<DX11SamplerState> mSamplerState;
 		std::shared_ptr<AssetManager> mAssetManager;
 		std::shared_ptr<GraphicsSettings> mGraphicsSettings;
 

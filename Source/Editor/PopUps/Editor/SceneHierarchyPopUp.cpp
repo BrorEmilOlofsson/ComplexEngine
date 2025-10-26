@@ -126,7 +126,7 @@ namespace Simple
 
 	void SceneHierarchyPopUp::OnSceneLoaded(Scene& scene)
 	{
-		mRootEntities = GetRootEntities(scene.GetECS());
+		mRootEntities = ::Simple::GetRootEntities(scene.GetECS());
 		mSelectedEntityID = InvalidEntityID;
 	}
 
@@ -149,5 +149,15 @@ namespace Simple
 	EntityID SceneHierarchyPopUp::GetSelectedEntityID() const
 	{
 		return mSelectedEntityID;
+	}
+
+	std::vector<EntityID>& SceneHierarchyPopUp::GetRootEntities()
+	{
+		return mRootEntities;
+	}
+
+	const std::vector<EntityID>& SceneHierarchyPopUp::GetRootEntities() const 
+	{
+		return mRootEntities;
 	}
 }

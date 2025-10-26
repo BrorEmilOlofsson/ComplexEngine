@@ -84,7 +84,8 @@ namespace Simple
 
 	static void DeleteAsset(const std::filesystem::path& path, AssetManager& assetManager)
 	{
-		assetManager;
+		assetManager.Remove(path);
+		
 		if (std::filesystem::remove(path))
 		{
 			Console::Print("Removed ", ConsoleTextColor::White, false);
@@ -159,6 +160,8 @@ namespace Simple
 				asset->SetPath(path);
 				auto assetHandle = assetManager.AddEntityCompositionAsset(path, asset);
 				SaveEntityCompositionAsset(assetHandle, dataTypeRegistry);
+
+				ImGui::CloseCurrentPopup();
 			}
 
 			ImGui::EndPopup();
@@ -224,7 +227,7 @@ namespace Simple
 					char buffer[256]{};
 					strcpy_s(buffer, path.string().c_str());
 
-					ImGui::SetDragDropPayload("Assets_Browser", buffer, sizeof(buffer));
+					ImGui::SetDragDropPayload("Asset", buffer, sizeof(buffer));
 
 					ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 

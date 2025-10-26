@@ -22,6 +22,9 @@ namespace Simple
 		EntityID& GetSelectedEntityID();
 		EntityID GetSelectedEntityID() const;
 
+		std::vector<EntityID>& GetRootEntities();
+		const std::vector<EntityID>& GetRootEntities() const;
+
 	private:
 
 		EntityID mSelectedEntityID;

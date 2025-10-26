@@ -443,6 +443,14 @@ workspace "FootballGame" -- Workspace, is not same as Project. Anything configur
 				"{COPY} %{wks.location}Dependencies/DLL/Release/*.dll %{cfg.targetdir}"
 			}
 
+		filter "configurations:*Game"
+			postbuildcommands {
+				'xcopy /E /Q /Y /I "%{wks.location}Assets" "%{cfg.targetdir}\\Assets" > nul'
+			}
+			--postbuildcommands {
+			--	"{COPY} %{wks.location}Assets %{cfg.targetdir}"
+			--}
+
 ------------------------------------------------------------------------------------------------------------------------------------------
 
 	group "Testing"

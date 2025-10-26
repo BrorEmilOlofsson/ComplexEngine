@@ -50,7 +50,7 @@ namespace Simple
 
 	DX11Window::DX11Window(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context,
 		Win_Window* window, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<GraphicsSettings> graphicsSettings,
-		std::weak_ptr<DX11DepthStencilViewManager> dsvManager, bool instantiateImGui)
+		std::weak_ptr<DX11DepthStencilViewManager> dsvManager, std::weak_ptr<DX11SamplerState> samplerState, bool instantiateImGui)
 		: mDevice(device)
 		, mContext(context)
 		, mSwapChain(DX11Factory::CreateSwapChain(window->GetHandle(), window->GetClientSize(), device))
@@ -60,6 +60,7 @@ namespace Simple
 		, mBackBuffer(context, device, *DX11Factory::GetBackBuffer(*mSwapChain.Get()).Get(), window->GetClientSize(), false)
 		, mImGuiWindow(CreateImGuiWindow(instantiateImGui, window->GetHandle()))
 		, mDepthStencilViewManager(dsvManager)
+		, mSamplerState(std::move(samplerState))
 	{
 	}
 
@@ -74,31 +75,6 @@ namespace Simple
 
 			mContext->RSSetViewports(1, &viewport);
 
-			{
-				//auto backBuffer = ;
-
-				//mBackBuffer.InitRenderTargetView(*backBuffer.Get(), windowSize);
-
-				/*{
-					mIDTexture = DX11Factory::CreateRenderTargetTexture(*mDevice.Get(), DX11Factory::CreateObjectSelectionTextureDesc(windowSize));
-					mObjectIDRenderTarget.Init(*mDevice.Get(), *mIDTexture.Get(), windowSize);
-				}*/
-				/*{
-
-					D3D11_TEXTURE2D_DESC desc = {};
-					mIDTexture->GetDesc(&desc);
-
-					desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
-					desc.Usage = D3D11_USAGE_STAGING;
-					desc.BindFlags = 0;
-					desc.MiscFlags = 0;
-
-					HRESULT hr = mDevice->CreateTexture2D(&desc, nullptr, &mStagingTexture);
-					WIN_CHECK_HRESULT(hr);
-				}*/
-			}
-
-			
 			mRasterizerState = DX11Factory::CreateRasterizerState_BackfaceCulling(*mDevice.Get());
 		}
 

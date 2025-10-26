@@ -779,7 +779,7 @@ namespace Simple
 		return EntityIDConverter(std::move(entityConverter));
 	}
 
-	void InstantiateEntityComposition(ECS& targetECS, const EntityCompositionAssetHandle& compositionAsset, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker)
+	EntityID InstantiateEntityComposition(ECS& targetECS, const EntityCompositionAssetHandle& compositionAsset, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker)
 	{
 		commandTracker;
 		const EntityComposition& entityComposition = *compositionAsset.Get();
@@ -788,6 +788,7 @@ namespace Simple
 		const EntityID instantiatedRootEntity = entityConverter[entityComposition.GetRootEntity()];
 		targetECS.AddComponent<EntityCompositionComponent>(instantiatedRootEntity).asset = compositionAsset;
 		rootEntities = GetRootEntities(targetECS);
+		return instantiatedRootEntity;
 	}
 
 	void TeleportCameraToEntity(const ECS& ecs, const EntityID entityID, Camera& camera, const bool changeRotation, const float offsetDistance)

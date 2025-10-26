@@ -11,6 +11,7 @@
 #include "Engine/OperatingSystem/OSView.hpp"
 #include "Editor/EditorSceneSettings.hpp"
 #include "Engine/Utility/DebugShapes.hpp"
+#include "Utility/Asset/AssetManager.hpp"
 #include "Utility/ShapeMath.hpp"
 #include <External/AwsomeFontIcons/IconFontDefines.h>
 
@@ -121,6 +122,34 @@ namespace Simple
 	}
 
 
+	static void CheckForEntityCompositionDrops(ECS& ecs, AssetManager& assetManager, std::vector<EntityID>& rootEntities, EntityID& selectedEntity, EditorCommandTracker& commandTracker)
+	{
+		if (ImGui::BeginDragDropTarget())
+		{
+			if (const ImGuiPayload* data = ImGui::AcceptDragDropPayload("Asset"))
+			{
+				const std::filesystem::path path = std::filesystem::path(reinterpret_cast<const char*>(data->Data));
+				if (path.extension() == ".ecomp")
+				{
+					commandTracker.BeginComposite("Instantiate Entity Composition + Select Root");
+
+					const EntityID rootEntity = InstantiateEntityComposition(
+						ecs,
+						assetManager.GetEntityComposition(path),
+						rootEntities,
+						commandTracker
+					);
+
+					SelectEntity(rootEntity, selectedEntity, commandTracker);
+
+					commandTracker.EndComposite();
+				}
+			}
+			ImGui::EndDragDropTarget();
+		}
+	}
+
+
 	SceneWindowPopUp::SceneWindowPopUp(const std::string& name)
 		: PopUp(name)
 		, mHierarchyPopUp("Hierarchy")
@@ -191,7 +220,7 @@ namespace Simple
 		sceneRenderState.SetCamera(mCamera);
 
 	}
-	
+
 	template<typename T>
 	static float ToAspectRatio(Vector2<T> size)
 	{
@@ -201,15 +230,16 @@ namespace Simple
 	void SceneWindowPopUp::Render(const Blackboard& blackboard)
 	{
 		PROFILER_FUNCTION(profiler::colors::Yellow900);
-		
+
 		SceneManager& sceneManager = blackboard.Get<Key_SceneManager>();
 		Blackboard newBlackboard = blackboard;
 		newBlackboard.Insert<Key_CurrentRenderState>(sceneManager.GetCurrentScene().GetRenderState());
 		EditorCommandTracker& commandTracker = blackboard.Get<Key_CommandTracker>();
 		const InputState& input = blackboard.Get<Key_InputState>();
 		const OSView os = blackboard.Get<Key_OSView>();
+		AssetManager& assetManager = blackboard.Get<Key_AssetManager>();
 		EditorSceneSettings& editorSceneSettings = blackboard.Get<Key_EditorSceneSettings>();
-		
+
 		const WindowView windowView = blackboard.Get<Key_WindowView>();
 		void* sceneTextureID = sceneManager.GetCurrentScene().GetRenderState().GetRenderContext()->GetOutputSRV();
 		RenderState& sceneRenderState = sceneManager.GetCurrentScene().GetRenderState();
@@ -226,12 +256,20 @@ namespace Simple
 
 		if (ImGui::Begin(mImGuiName.c_str(), &mIsActive, ImGuiWindowFlags_NoScrollbar))
 		{
+
+
 			RenderOrientationCube(mCamera);
 
 			const AABB2i renderRect = RenderImage(sceneTextureID);
 			//assert(renderRect == sceneRenderState.GetRenderRect().value());
 
-			
+			CheckForEntityCompositionDrops(
+				sceneManager.GetCurrentScene().GetECS(),
+				assetManager,
+				mHierarchyPopUp.GetRootEntities(),
+				mHierarchyPopUp.GetSelectedEntityID(),
+				commandTracker
+			);
 
 			mTransformEntityTool.ShowEntityImGuizmo(
 				sceneManager.GetCurrentScene().GetECS(),

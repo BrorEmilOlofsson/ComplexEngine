@@ -81,11 +81,11 @@ namespace Simple
 	}
 
 	Win_Window::Win_Window(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, std::shared_ptr<AssetManager> assetManager,
-		std::shared_ptr<GraphicsSettings> graphicsSettings, std::weak_ptr<DX11DepthStencilViewManager> dsvManager,
+		std::shared_ptr<GraphicsSettings> graphicsSettings, std::weak_ptr<DX11DepthStencilViewManager> dsvManager, std::weak_ptr<DX11SamplerState> samplerState,
 		const Vector2ui& windowSize, const std::wstring& name, const Win_WindowClass& windowClass, void* operatingSystem, bool instantiateImGui)
 		: mHandle(CreateWindowImpl(GetAdjustedWindowRect(GetDefaultClientRect(windowSize), DEFAULT_WINDOW_STYLE),
 			windowClass.GetInstance(), name, std::wstring(windowClass.GetName()), DEFAULT_WINDOW_STYLE, operatingSystem))
-		, mGraphicsWindow(device, context, this, assetManager, graphicsSettings, dsvManager, instantiateImGui)
+		, mGraphicsWindow(device, context, this, assetManager, graphicsSettings, dsvManager, samplerState, instantiateImGui)
 	{
 		RegisterMouse(mHandle);
 

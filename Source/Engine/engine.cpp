@@ -169,6 +169,10 @@ namespace Simple
 		PROFILER_FUNCTION(profiler::colors::Cyan700);
 
 		mSceneManager.Render();
+
+#ifndef _EDITOR
+		mSceneManager.GetCurrentScene().GetRenderState().SetRenderRect(AABB2i::CreateFromDefaultAndExtent(Vector2i(mOperatingSystem.GetWindow(mMainWindow).GetClientSize())));
+#endif
 		mOperatingSystem.Render(mSceneManager.GetCurrentScene().GetRenderState());
 	}
 

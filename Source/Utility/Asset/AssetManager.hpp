@@ -134,6 +134,34 @@ namespace Simple
 			return GetEntityComposition(path);
 		}
 
+		void Remove(const std::filesystem::path& path)
+		{
+			const auto extension = path.extension();
+
+			auto remove = [](auto& map, const std::filesystem::path& path)
+				{
+					map.erase(path);
+				};
+
+			if (extension == ".dds")
+			{
+				remove(mTextureAssets, path);
+			}
+			else if (extension == ".fbx")
+			{
+				remove(mMeshAssets, path);
+			}
+			else if (extension == ".cso")
+			{
+				remove(mPixelShaderAssets, path);
+				remove(mVertexShaderAssets, path);
+			}
+			else if (extension == ".ecomp")
+			{
+				remove(mEntityCompositionAssets, path);
+			}
+		}
+
 	private:
 
 		std::unordered_map<std::filesystem::path, TextureAsset> mTextureAssets;

@@ -28,7 +28,7 @@ namespace Simple
 	public:
 
 		Navmesh();
-		Navmesh(const NavmeshData& aNavmeshData);
+		Navmesh(const NavmeshData& navmeshData);
 
 		[[nodiscard]] std::vector<Point3f> FindPath(const Point3f& startPosition, const NavmeshPositionData& endData) const;
 		[[nodiscard]] std::vector<Point3f> FindPath(const Point3f& startPosition, const Point3f& endPosition) const;
@@ -67,9 +67,9 @@ namespace Simple
 		NavmeshNodeIndex GetNodeIndexFromPosition(const Point3f& position) const;
 		bool IsInsideNode(const NavmeshNode& node, const Point2f& position) const;
 		bool IsVertexConnectedToNode(const NavmeshVertexIndex aVertexIndex, const NavmeshNodeIndex nodeIndex) const;
-		bool AreNodesConnected(const NavmeshNodeIndex aNode1, const NavmeshNodeIndex aNode2) const;
-		bool AreAllVerticesConnectedToNode(const NavmeshNodeIndex aNodeIndex, const NavmeshVertexIndex vertexIndex1, const NavmeshVertexIndex vertexIndex2, const NavmeshVertexIndex aVertexIndex3) const;
-		std::optional<NavmeshEdge> GetEdgeBetweenNodes(const NavmeshNodeIndex nodeIndex1, const NavmeshNodeIndex aNodeIndex2) const;
+		bool AreNodesConnected(const NavmeshNodeIndex node1, const NavmeshNodeIndex node2) const;
+		bool AreAllVerticesConnectedToNode(const NavmeshNodeIndex nodeIndex, const NavmeshVertexIndex vertexIndex1, const NavmeshVertexIndex vertexIndex2, const NavmeshVertexIndex aVertexIndex3) const;
+		std::optional<NavmeshEdge> GetEdgeBetweenNodes(const NavmeshNodeIndex nodeIndex1, const NavmeshNodeIndex nodeIndex2) const;
 		std::optional<LineSegment2f> GetEdgeLineSegment2DFromNodes(const NavmeshNodeIndex nodeIndex1, const NavmeshNodeIndex nodeIndex2) const;
 		LineSegment2f GetLineSegment2DFromEdge(const NavmeshEdge& edge) const;
 

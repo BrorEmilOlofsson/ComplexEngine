@@ -66,7 +66,7 @@ namespace Simple
 				{
 					if (ImGui::BeginDragDropTarget())
 					{
-						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Assets_Browser"))
+						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Asset"))
 						{
 							const std::string newMusicName = payloadData.filename().string();
 							audioManager.SetMainMusic(newMusicName);

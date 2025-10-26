@@ -33,7 +33,7 @@ namespace Simple
 
 		DX11Window(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context,
 			Win_Window* window, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<GraphicsSettings> graphicsSettings, 
-			std::weak_ptr<DX11DepthStencilViewManager> dsvManager, bool instantiateImGui);
+			std::weak_ptr<DX11DepthStencilViewManager> dsvManager, std::weak_ptr<DX11SamplerState> samplerState, bool instantiateImGui);
 
 		void Init();
 

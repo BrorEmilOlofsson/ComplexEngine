@@ -401,13 +401,14 @@ namespace Simple
 
 	std::optional<NavmeshEdge> Navmesh::GetEdgeBetweenNodes(const NavmeshNodeIndex nodeIndex1, const NavmeshNodeIndex nodeIndex2) const
 	{
-		NavmeshEdge edge;
-		edge.first = GetInvalidIndex<NavmeshVertexIndex>();
-		edge.second = GetInvalidIndex<NavmeshVertexIndex>();
 		if (nodeIndex1 == nodeIndex2)
 		{
 			return std::nullopt;
 		}
+		NavmeshEdge edge;
+		edge.first = GetInvalidIndex<NavmeshVertexIndex>();
+		edge.second = GetInvalidIndex<NavmeshVertexIndex>();
+		
 		for (const NavmeshVertexIndex vertexIndex1 : mNodes[nodeIndex1].mVertexIndices)
 		{
 			for (const NavmeshVertexIndex vertexIndex2 : mNodes[nodeIndex2].mVertexIndices)

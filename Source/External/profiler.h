@@ -1,17 +1,8 @@
 #pragma once
 
-#ifndef _Simple //SimpleEngine Makes It Lazy
-#define BUILD_WITH_EASY_PROFILER
-#endif
-
 #include <easy/profiler.h>
 
-#ifdef _DEBUG
-
-#define PROFILER_ENABLED 1
-#else
-#define PROFILER_ENABLED 1
-#endif
+#define PROFILER_ENABLED 0
 
 #if PROFILER_ENABLED
 #define PROFILER_ENABLE() EASY_PROFILER_ENABLE
