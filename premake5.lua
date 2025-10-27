@@ -157,7 +157,8 @@ workspace "FootballGame" -- Workspace, is not same as Project. Anything configur
 		}
 
 		links {
-			"Lib/Common/easy_profiler"
+			"Lib/Common/easy_profiler",
+			"Lib/Common/assimp-vc143-mt"
 		}
 
 		filter "configurations:Debug*" 

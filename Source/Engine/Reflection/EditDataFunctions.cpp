@@ -491,14 +491,14 @@ namespace Simple
 			viewAndEditResult.isActive = ImGui::IsItemActive();
 		}
 
-		if (ImGui::DragFloat("NearPlane", &nearPlane))
+		if (ImGui::DragFloat("NearPlane", &nearPlane, 0.1f, 0.f, 10.f))
 		{
 			camera.SetNearPlane(nearPlane, resolution);
 			viewAndEditResult.isEdited = true;
 			viewAndEditResult.isActive = ImGui::IsItemActive();
 		}
 
-		if (ImGui::DragFloat("FarPlane", &farPlane))
+		if (ImGui::DragFloat("FarPlane", &farPlane, 0.1f, 0.5f, 30000.f))
 		{
 			camera.SetFarPlane(farPlane, resolution);
 			viewAndEditResult.isEdited = true;

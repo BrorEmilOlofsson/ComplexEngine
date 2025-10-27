@@ -1,7 +1,6 @@
 #include "Graphics/Precompiled/GraphicsPch.hpp"
 #include "DX11Texture.hpp"
 #include "Utility/Algorithm.hpp"
-#include "External/DDSTextureLoader/DDSTextureLoader11.h"
 #include "Graphics/DX11/DX11Factory.hpp"
 #include "Utility/Win/WinException.hpp"
 #include <d3d11.h>

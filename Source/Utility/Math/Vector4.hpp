@@ -14,9 +14,13 @@ namespace Simple
 
 		constexpr Vector4() = default;
 		constexpr Vector4(const T& x, const T& y, const T& z, const T& w) noexcept;
+
+
+		[[nodiscard]] static constexpr Vector4 Zero() noexcept;
 	};
 
-	using Vector4i = Vector4<int>;
+	using Vector4i = Vector4<int32_t>;
+	using Vector4ui = Vector4<uint32_t>;
 	using Vector4f = Vector4<float>;
 	using Vector4d = Vector4<double>;
 
@@ -27,6 +31,12 @@ namespace Simple
 		, z(z)
 		, w(w)
 	{
+	}
+
+	template<typename T>
+	[[nodiscard]] constexpr Vector4<T> Vector4<T>::Zero() noexcept
+	{
+		return Vector4<T>(0, 0, 0, 0);
 	}
 
 	template<typename T>

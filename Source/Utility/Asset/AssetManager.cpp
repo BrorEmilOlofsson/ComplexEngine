@@ -5,6 +5,55 @@
 namespace Simple
 {
 
+	/*Skeleton ToSkeleton(const TGA::FBX::Mesh& tgaMesh)
+	{
+		Skeleton skeleton;
+		skeleton.mName = ConvertFilePathToPrettyName(tgaMesh.Name);
+
+		if (tgaMesh.Skeleton.GetRoot())
+		{
+			skeleton.mJoints.resize(tgaMesh.Skeleton.Bones.size());
+			skeleton.mJointNames.resize(skeleton.mJoints.size());
+
+			for (size_t i = 0; i < tgaMesh.Skeleton.Bones.size(); ++i)
+			{
+				Matrix4x4f bindPoseInverse;
+
+				bindPoseInverse(1, 1) = tgaMesh.Skeleton.Bones[i].BindPoseInverse.m11;
+				bindPoseInverse(1, 2) = tgaMesh.Skeleton.Bones[i].BindPoseInverse.m12;
+				bindPoseInverse(1, 3) = tgaMesh.Skeleton.Bones[i].BindPoseInverse.m13;
+				bindPoseInverse(1, 4) = tgaMesh.Skeleton.Bones[i].BindPoseInverse.m14;
+
+				bindPoseInverse(2, 1) = tgaMesh.Skeleton.Bones[i].BindPoseInverse.m21;
+				bindPoseInverse(2, 2) = tgaMesh.Skeleton.Bones[i].BindPoseInverse.m22;
+				bindPoseInverse(2, 3) = tgaMesh.Skeleton.Bones[i].BindPoseInverse.m23;
+				bindPoseInverse(2, 4) = tgaMesh.Skeleton.Bones[i].BindPoseInverse.m24;
+
+				bindPoseInverse(3, 1) = tgaMesh.Skeleton.Bones[i].BindPoseInverse.m31;
+				bindPoseInverse(3, 2) = tgaMesh.Skeleton.Bones[i].BindPoseInverse.m32;
+				bindPoseInverse(3, 3) = tgaMesh.Skeleton.Bones[i].BindPoseInverse.m33;
+				bindPoseInverse(3, 4) = tgaMesh.Skeleton.Bones[i].BindPoseInverse.m34;
+
+				bindPoseInverse(4, 1) = tgaMesh.Skeleton.Bones[i].BindPoseInverse.m41;
+				bindPoseInverse(4, 2) = tgaMesh.Skeleton.Bones[i].BindPoseInverse.m42;
+				bindPoseInverse(4, 3) = tgaMesh.Skeleton.Bones[i].BindPoseInverse.m43;
+				bindPoseInverse(4, 4) = tgaMesh.Skeleton.Bones[i].BindPoseInverse.m44;
+
+				Joint joint;
+
+				joint.mBindPoseInverse = bindPoseInverse;
+				joint.mName = tgaMesh.Skeleton.Bones[i].Name;
+				joint.mParent = tgaMesh.Skeleton.Bones[i].ParentIdx;
+				joint.mChildren = tgaMesh.Skeleton.Bones[i].Children;
+
+				skeleton.mJointNameToIndex.insert({ joint.mName, i });
+				skeleton.mJointNames[i] = joint.mName;
+				skeleton.mJoints[i] = joint;
+			}
+		}
+		return skeleton;
+	}*/
+
 	using LoadFunction = std::function<void(const std::filesystem::path&, AssetManager&)>;
 
 

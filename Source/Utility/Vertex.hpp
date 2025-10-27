@@ -12,8 +12,8 @@ namespace Simple
 		Point3f position;
 		float w = 1.f;
 		Color color = Colors::White;
-		Vector4f bones = { 0, 0, 0, 0 };
-		Vector4f weights = { 0, 0, 0, 0 };
+		Vector4f bones = Vector4f::Zero();
+		Vector4f weights = Vector4f::Zero();
 		UnitVector3f normal = UnitVector3f::Up();
 		UnitVector3f tangent = UnitVector3f::Right();
 		UnitVector3f bitangent = UnitVector3f::Forward();
