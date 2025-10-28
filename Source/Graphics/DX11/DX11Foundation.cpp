@@ -4,6 +4,7 @@
 #include "Graphics/DX11/Texture/DX11Texture.hpp"
 #include "Graphics/Texture/Texture.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
+#include "Graphics/Model/Model.hpp"
 #include "Graphics/DX11/DX11LoadFunctions.hpp"
 #include "Graphics/Model/Factory/ShapeCreator3000.hpp"
 #include "Graphics/DX11/Shader/DX11PixelShader.hpp"
@@ -34,6 +35,16 @@ namespace Simple
 				return MeshAsset::Empty();
 			};
 
+		auto modelLoader = [device, context](const std::filesystem::path& path) -> ModelAsset
+			{
+				std::expected<DX11Model, std::string> meshResult = LoadDX11Model(path, *device.Get(), context);
+				if (meshResult.has_value())
+				{
+					return ModelAsset(std::make_shared<Model>(std::move(meshResult.value())));
+				}
+				return ModelAsset::Empty();
+			};
+
 		auto pixelShaderLoader = [device, context](const std::filesystem::path& path) -> PixelShaderAsset
 			{
 				auto ps = DX11Factory::CreatePixelShader(path, *device.Get());
@@ -49,6 +60,7 @@ namespace Simple
 
 		assetLoader.SetTextureLoader(std::move(textureLoader));
 		assetLoader.SetMeshLoader(std::move(meshLoader));
+		assetLoader.SetModelLoader(std::move(modelLoader));
 		assetLoader.SetPixelShaderLoader(std::move(pixelShaderLoader));
 		assetLoader.SetVertexShaderLoader(std::move(vertexShaderLoader));
 	}
@@ -241,6 +253,14 @@ namespace Simple
 		assetManager.AddMesh(meshName, MeshAsset(mesh));
 	}
 
+	static void AddModel(AssetManager& assetManager, MeshData<Vertex>&& meshData, const std::string_view meshName, ID3D11Device& device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
+	{
+		std::vector<DX11Mesh> v;
+		v.push_back(DX11Mesh(std::move(meshData), meshName, meshName, device, context));
+		std::shared_ptr<Model> model = std::make_shared<Model>(DX11Model(std::move(v), std::string(meshName), meshName, device, context));
+		assetManager.AddModel(meshName, ModelAsset(model));
+	}
+
 	std::function<void(AssetManager&)> DX11Foundation::GetDefaultAssetLoader()
 	{
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext> context = GetContext();
@@ -253,6 +273,12 @@ namespace Simple
 				AddMesh(assetManager, ShapeCreator3000::CreatePlane(), EnumToString(ePrimitiveShape::Plane), *device.Get(), context);
 				AddMesh(assetManager, ShapeCreator3000::CreateSkyBox(Vector3f(100, 100, 100)), EnumToString(ePrimitiveShape::SkyBox), *device.Get(), context);
 				AddMesh(assetManager, ShapeCreator3000::CreateSphere(), EnumToString(ePrimitiveShape::Sphere), *device.Get(), context);
+
+				AddModel(assetManager, ShapeCreator3000::CreateCube(), EnumToString(ePrimitiveShape::Cube), *device.Get(), context);
+				AddModel(assetManager, ShapeCreator3000::CreatePyramid(), EnumToString(ePrimitiveShape::Pyramid), *device.Get(), context);
+				AddModel(assetManager, ShapeCreator3000::CreatePlane(), EnumToString(ePrimitiveShape::Plane), *device.Get(), context);
+				AddModel(assetManager, ShapeCreator3000::CreateSkyBox(Vector3f(100, 100, 100)), EnumToString(ePrimitiveShape::SkyBox), *device.Get(), context);
+				AddModel(assetManager, ShapeCreator3000::CreateSphere(), EnumToString(ePrimitiveShape::Sphere), *device.Get(), context);
 			};
 	}
 

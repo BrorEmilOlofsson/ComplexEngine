@@ -8,6 +8,7 @@
 #include "Utility/Camera.hpp"
 #include "Graphics/Texture/Texture.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
+#include "Graphics/Model/Model.hpp"
 #include "Engine/Reflection/DataTypeRegistry.hpp"
 
 namespace Simple
@@ -220,6 +221,20 @@ namespace Simple
 		if (meshAsset)
 		{
 			meshPath = meshAsset->GetPath();
+		}
+
+		json = meshPath;
+		return json;
+	}
+
+	nlohmann::json ToJSON(const ModelAssetHandle& modelAsset)
+	{
+		nlohmann::json json;
+		std::filesystem::path meshPath;
+
+		if (modelAsset)
+		{
+			meshPath = modelAsset->GetPath();
 		}
 
 		json = meshPath;

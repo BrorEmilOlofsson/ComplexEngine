@@ -1,7 +1,14 @@
 #include "Engine/Precompiled/EnginePch.hpp"
 #include "RenderSystem.hpp"
 #include "Engine/ECS/ECS.hpp"
-#include "Engine/ECSEngine/Components/AllEngineComponents.hpp"
+#include "Engine/ECSEngine/Components/AnimationComponent.hpp"
+#include "Engine/ECSEngine/Components/Sprite3DComponent.hpp"
+#include "Engine/ECSEngine/Components/Sprite2DComponent.hpp"
+#include "Engine/ECSEngine/Components/DirectionalLightComponent.hpp"
+#include "Engine/ECSEngine/Components/MeshComponent.hpp"
+#include "Engine/ECSEngine/Components/ModelComponent.hpp"
+#include "Engine/ECSEngine/Components/SkyBoxComponent.hpp"
+#include "Engine/ECSEngine/Components/ArrowComponent.hpp"
 #include "Engine/ECSEngine/Utility/ECSTransformUtility.hpp"
 #include "Graphics/RenderList.hpp"
 #include "Graphics/GraphicsSettings.hpp"
@@ -9,6 +16,7 @@
 #include "Graphics/RenderState.hpp"
 #include "Utility/Asset/MeshAsset.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
+#include "Graphics/Model/Model.hpp"
 
 namespace Simple
 {
@@ -21,11 +29,11 @@ namespace Simple
 		std::vector<DrawLine> staticSkeletonLines(joints.size());
 
 		DrawLine line;
-		line.color = { 0.0f, 1.0f, 0.0f, 1.0f };
+		line.color = Colors::Black;
 
 		DrawSphere drawSphere;
 		drawSphere.sphere.SetRadius(0.05f);
-		drawSphere.color = { 0.0f, 1.0f, 0.0f, 1.0f };
+		drawSphere.color = Colors::Black;
 
 		for (size_t index = 0; index < joints.size(); ++index)
 		{
@@ -163,9 +171,38 @@ namespace Simple
 				renderList.AddModelInstance(ModelInstance(
 					worldTransform,
 					meshComponent.mesh,
+					ModelAssetHandle(),
 					meshComponent.textures[TextureSlots::Albedo],
 					meshComponent.textures[TextureSlots::Normal],
 					meshComponent.textures[TextureSlots::Material],
+					entityID.id
+				));
+			});
+
+		ecs.ForEach([&](const EntityID entityID, const ModelComponent& modelComponent)
+			{
+				if (!modelComponent.model)
+				{
+					return;
+				}
+				const Transform worldTransform = GetWorldTransform(ecs, entityID);
+				if (shouldRenderBoundingBox)
+				{
+					renderList.AddBoundingBox(DrawBoundingBox(worldTransform, modelComponent.model->GetBoundingBox(), Colors::LightGreen));
+				}
+
+				if (!shouldRenderMesh)
+				{
+					return;
+				}
+
+				renderList.AddModelInstance(ModelInstance(
+					worldTransform,
+					MeshAssetHandle(),
+					modelComponent.model,
+					modelComponent.textures[TextureSlots::Albedo],
+					modelComponent.textures[TextureSlots::Normal],
+					modelComponent.textures[TextureSlots::Material],
 					entityID.id
 				));
 			});
@@ -206,7 +243,7 @@ namespace Simple
 					return;
 				}
 
-				renderList.AddAnimatedModelInstance(AnimatedModelInstance(worldTransform, Model(meshComponent.textures, meshComponent.mesh, meshComponent.pixelShader, meshComponent.vertexShader), animationComponent.jointMatrices, animationComponent.pixelShader, animationComponent.vertexShader));
+				//renderList.AddAnimatedModelInstance(AnimatedModelInstance(worldTransform, Model(meshComponent.textures, meshComponent.mesh, meshComponent.pixelShader, meshComponent.vertexShader), animationComponent.jointMatrices, animationComponent.pixelShader, animationComponent.vertexShader));
 			});
 	}
 

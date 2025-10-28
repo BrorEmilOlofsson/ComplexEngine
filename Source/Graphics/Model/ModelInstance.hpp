@@ -2,6 +2,7 @@
 #include "Utility/Math/Transform3.hpp"
 #include "Utility/Asset/TextureAsset.hpp"
 #include "Utility/Asset/MeshAsset.hpp"
+#include "Utility/Asset/ModelAsset.hpp"
 #include <limits>
 
 namespace Simple
@@ -11,6 +12,7 @@ namespace Simple
 	{
 		Transform transform;
 		MeshAssetHandle mesh;
+		ModelAssetHandle model;
 		TextureAssetHandle albedoTexture;
 		TextureAssetHandle normalTexture;
 		TextureAssetHandle materialTexture;

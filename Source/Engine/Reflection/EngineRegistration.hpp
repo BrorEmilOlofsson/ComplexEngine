@@ -60,6 +60,7 @@ namespace Simple
 	REGISTER_DATATYPE(Sprite2D);
 
 	REGISTER_DATATYPE(MeshAssetHandle);
+	REGISTER_DATATYPE(ModelAssetHandle);
 	REGISTER_DATATYPE(TextureAssetHandle);
 	REGISTER_DATATYPE(AnimationAssetHandle);
 	REGISTER_DATATYPE(SkeletonAssetHandle);

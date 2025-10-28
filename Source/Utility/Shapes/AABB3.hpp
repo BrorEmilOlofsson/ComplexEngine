@@ -61,6 +61,12 @@ namespace Simple
 	}
 
 	template<typename T>
+	[[nodiscard]] constexpr AABB3<T> MinMax(const AABB3<T>& a, const AABB3<T>& b)
+	{
+		return AABB3<T>::CreateFromMinAndMax(Min(a.GetMin(), b.GetMin()), Max(a.GetMax(), b.GetMax()));
+	}
+
+	template<typename T>
 	[[nodiscard]] constexpr bool IsInside(const Point3<T>& point, const Point3<T>& min, const Point3<T>& max) noexcept
 	{
 		return !(point.x < min.x || point.y < min.y || point.z < min.z

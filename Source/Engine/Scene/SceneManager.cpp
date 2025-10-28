@@ -55,15 +55,15 @@ namespace Simple
 		mIsPlaying = false;
 	}
 
-	void SceneManager::ChangeScene(const std::filesystem::path& sceneName)
+	void SceneManager::ChangeScene(const std::filesystem::path& scenePath)
 	{
-		if (!mSceneInfos.contains(sceneName))
+		if (!mSceneInfos.contains(scenePath))
 		{
-			AddScene(sceneName);
+			AddScene(scenePath);
 		}
 
 		mOnScenePreLoad();
-		mCurrentSceneInfo = &mSceneInfos.at(sceneName);
+		mCurrentSceneInfo = &mSceneInfos.at(scenePath);
 		mOnScenePostLoad(GetCurrentScene());
 	}
 
@@ -73,15 +73,14 @@ namespace Simple
 
 		newSceneInfo.id = mCurrentSceneInfo->id;
 		newSceneInfo.name = newSceneName;
-		newSceneInfo.relativePath = std::string(SIMPLE_DIR_SCENES) + "\\" + std::string(newSceneInfo.name).c_str() + std::string(".scene").c_str();
-		newSceneInfo.absolutePath = std::filesystem::absolute(newSceneInfo.relativePath);
+		newSceneInfo.absolutePath = std::filesystem::path(SIMPLE_DIR_SCENES) / (newSceneName + ".scene");
 
 		std::filesystem::rename(mCurrentSceneInfo->absolutePath, newSceneInfo.absolutePath);
 
-		mSceneInfos.erase(mCurrentSceneInfo->relativePath);
-		mSceneInfos.emplace(newSceneInfo.relativePath, newSceneInfo);
+		mSceneInfos.erase(mCurrentSceneInfo->absolutePath);
+		mSceneInfos.emplace(newSceneInfo.absolutePath, newSceneInfo);
 
-		mCurrentSceneInfo = &mSceneInfos.at(newSceneInfo.relativePath);
+		mCurrentSceneInfo = &mSceneInfos.at(newSceneInfo.absolutePath);
 	}
 
 	void SceneManager::CreateNewScene(const std::filesystem::path& filePath)
@@ -99,12 +98,12 @@ namespace Simple
 		mOnScenePostLoad.Add(std::move(function));
 	}
 
-	void SceneManager::ReloadSceneFromFile(const std::filesystem::path& sceneName)
+	void SceneManager::ReloadSceneFromFile(const std::filesystem::path& scenePath)
 	{
-		if (mSceneInfos.contains(sceneName))
+		if (mSceneInfos.contains(scenePath))
 		{
-			mScenes.erase(mSceneInfos.at(sceneName).id);
-			LoadAndInitScene(sceneName);
+			mScenes.erase(mSceneInfos.at(scenePath).id);
+			LoadAndInitScene(scenePath);
 		}
 	}
 
@@ -146,7 +145,8 @@ namespace Simple
 			writeFile << emptyJson.dump(-1);
 		}
 
-		LoadDefaultScene(gameSettings["Start_Scene_RelativePath"]);
+		
+		LoadDefaultScene(sceneFilePath);
 	}
 
 	void SceneManager::LoadDefaultScene(const std::filesystem::path& defaultScenePath)
@@ -154,9 +154,9 @@ namespace Simple
 		ChangeScene(defaultScenePath);
 	}
 
-	bool SceneManager::LoadAndInitScene(const std::filesystem::path& sceneName)
+	bool SceneManager::LoadAndInitScene(const std::filesystem::path& scenePath)
 	{
-		const bool success = mScenes.try_emplace(mSceneInfos.at(sceneName).id, mBlackboard).second;
+		const bool success = mScenes.try_emplace(mSceneInfos.at(scenePath).id, mBlackboard).second;
 
 		if (!success)
 		{
@@ -164,9 +164,9 @@ namespace Simple
 			return false;
 		}
 
-		Scene& scene = mScenes.at(mSceneInfos.at(sceneName).id);
+		Scene& scene = mScenes.at(mSceneInfos.at(scenePath).id);
 
-		SceneLoader::LoadScene(scene, std::filesystem::path(SIMPLE_DIR_SCENES) / sceneName, *mBlackboard.lock());
+		SceneLoader::LoadScene(scene, scenePath, *mBlackboard.lock());
 
 		return true;
 	}
@@ -177,12 +177,11 @@ namespace Simple
 
 		sceneInfo.id = mNextSceneID++;
 		sceneInfo.name = ConvertFilePathToPrettyName(sceneName, false);
-		sceneInfo.relativePath = sceneName;
-		sceneInfo.absolutePath = std::filesystem::absolute(sceneName);
+		sceneInfo.absolutePath = std::filesystem::absolute(std::filesystem::path(SIMPLE_DIR_SCENES)) / (sceneName);
 
-		mSceneInfos[sceneName] = sceneInfo;
+		mSceneInfos[sceneInfo.absolutePath] = sceneInfo;
 
-		return LoadAndInitScene(sceneName);
+		return LoadAndInitScene(sceneInfo.absolutePath);
 	}
 
 	bool SceneManager::IsPlaying() const

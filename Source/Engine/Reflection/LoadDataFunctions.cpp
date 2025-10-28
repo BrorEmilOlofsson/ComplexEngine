@@ -159,6 +159,36 @@ namespace Simple
 		FromJSON(mesh, json, blackboard.Get<Key_AssetManager>());
 	}
 
+	static void FromJSON(ModelAssetHandle& modelAsset, const nlohmann::json& json, AssetManager& assetManager)
+	{
+		const std::filesystem::path filePath = json;
+
+		if (filePath.empty())
+		{
+			return;
+		}
+		const std::filesystem::path absolutePath = std::filesystem::absolute(SIMPLE_DIR_ASSETS / filePath);
+
+		if (std::filesystem::exists(absolutePath) || absolutePath.string().find("Primitive") != std::string::npos)
+		{
+			modelAsset = assetManager.GetModel(absolutePath);
+			if (!modelAsset)
+			{
+				Console::Print("Mesh Error: Could not find mesh: " + absolutePath.string(), ConsoleTextColor::Red);
+			}
+		}
+		else
+		{
+			const std::string text = "Mesh Error: Could not find file at " + absolutePath.string() + ". Primitive Mesh has replaced.";
+			Console::Print(text, ConsoleTextColor::Red);
+		}
+	}
+
+	void FromJSON(ModelAssetHandle& modelAsset, const nlohmann::json& json, const Blackboard& blackboard)
+	{
+		FromJSON(modelAsset, json, blackboard.Get<Key_AssetManager>());
+	}
+
 	static void FromJSON(TextureAssetHandle& texture, const nlohmann::json& json, AssetManager& assetManager)
 	{
 		const std::filesystem::path filePath = json;

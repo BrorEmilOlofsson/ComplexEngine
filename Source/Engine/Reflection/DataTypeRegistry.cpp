@@ -55,7 +55,7 @@ namespace Simple
 
 			if (n != 0 && n != 3)
 			{
-				assert(false && "Data Type is incomplete!");
+				throw std::runtime_error("DataType '" + dataType.name + "' must have either all or none of the edit, save, and load functions defined.");
 			}
 		}
 	}

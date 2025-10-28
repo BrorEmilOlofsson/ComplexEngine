@@ -18,12 +18,10 @@ namespace Simple
 		SceneID id = static_cast<size_t>(-1);
 		std::string name;
 		std::filesystem::path absolutePath;
-		std::filesystem::path relativePath;
 	};
 
 	class SceneManager final
 	{
-		using SceneRelativePath = std::filesystem::path;
 	public:
 
 		SceneManager() = default;
@@ -67,7 +65,7 @@ namespace Simple
 
 	private:
 
-		std::unordered_map<SceneRelativePath, SceneInfo> mSceneInfos;
+		std::unordered_map<std::filesystem::path, SceneInfo> mSceneInfos;
 		std::unordered_map<SceneID, Scene> mScenes;
 		SceneInfo* mCurrentSceneInfo = nullptr;
 		size_t mNextSceneID = std::numeric_limits<size_t>::max();

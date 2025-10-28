@@ -4,6 +4,7 @@
 #include "Utility/TGA/TGAAdapterFunctions.hpp"
 #include "Utility/Algorithm.hpp"
 #include "Graphics/Model/Skeleton.hpp"
+#include "Graphics/DX11/Model/DX11Model.hpp"
 #include <External/assimp/Importer.hpp>
 #include <External/assimp/scene.h>
 #include <External/assimp/postprocess.h>
@@ -76,8 +77,28 @@ namespace Simple
 		return MeshData<Vertex>
 		{
 			.vertices = ToVertices(inMesh),
-			.indices = ToIndices(inMesh)
+				.indices = ToIndices(inMesh)
 		};
+	}
+
+	void TraverseNodes(std::vector<DX11Mesh>& meshes, const aiNode* node, const aiScene* scene, const std::filesystem::path& path,
+		ID3D11Device& device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
+	{
+		// Process mesh data
+		for (unsigned int i = 0; i < node->mNumMeshes; i++)
+		{
+			const aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+
+			MeshData meshData = ToMeshData(*mesh);
+			const std::string name = mesh->mName.C_Str();
+			meshes.push_back(DX11Mesh(meshData, name, path, device, context));
+		}
+
+		// Process child nodes recursively
+		for (unsigned int i = 0; i < node->mNumChildren; i++)
+		{
+			TraverseNodes(meshes, node->mChildren[i], scene, path, device, context);
+		}
 	}
 
 	std::vector<MeshData<Vertex>> ToMeshDatas(const aiScene& scene)
@@ -108,19 +129,6 @@ namespace Simple
 		PROFILER_END();
 
 
-		//Assimp::Importer importer;
-
-		//const aiScene* scene = importer.ReadFile(
-		//	path.string().c_str(),  // path to your .fbx
-		//	aiProcess_Triangulate            // Convert everything to triangles
-		//	| aiProcess_JoinIdenticalVertices // Merge duplicate vertices
-		//	| aiProcess_CalcTangentSpace      // Generate tangents/bitangents
-		//	| aiProcess_GenSmoothNormals      // Generate normals if missing
-		//	| aiProcess_FlipUVs               // If your engine's UV origin differs
-		//	| aiProcess_LimitBoneWeights      // (Optional, for animation)
-		//);
-
-		//std::vector<MeshData<Vertex>> meshDatas = ToMeshDatas(*scene);
 
 
 
@@ -131,6 +139,34 @@ namespace Simple
 
 		MeshData<Vertex> meshData = LoadMeshData(tgaMesh);
 		return meshData;
+	}
+
+	std::expected<DX11Model, std::string> LoadDX11Model(const std::filesystem::path& path, ID3D11Device& device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
+	{
+		PROFILER_FUNCTION();
+		Assimp::Importer importer;
+
+		const aiScene* scene = importer.ReadFile(
+			path.string().c_str(),  // path to your .fbx
+			aiProcess_Triangulate            // Convert everything to triangles
+			| aiProcess_JoinIdenticalVertices // Merge duplicate vertices
+			| aiProcess_CalcTangentSpace      // Generate tangents/bitangents
+			//| aiProcess_GenSmoothNormals      // Generate normals if missing
+			//| aiProcess_FlipUVs               // If your engine's UV origin differs
+			| aiProcess_LimitBoneWeights      // (Optional, for animation)
+		);
+		
+		if (scene == nullptr)
+		{
+			return std::unexpected("Failed to load model: " + path.string() + " with error: " + importer.GetErrorString());
+		}
+
+
+
+		std::vector<DX11Mesh> meshes;
+		TraverseNodes(meshes, scene->mRootNode, scene, path, device, context);
+
+		return DX11Model(std::move(meshes), std::string(scene->mName.C_Str()), path, device, context);
 	}
 
 	std::expected<DX11Mesh, std::string> LoadDX11Mesh(const std::filesystem::path& path, ID3D11Device& device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
@@ -144,6 +180,9 @@ namespace Simple
 		{
 			return std::unexpected(meshData.error());
 		}
+
+		auto dx11Model = LoadDX11Model(path, device, context);
+
 
 		const std::filesystem::path fileName = ConvertFilePathToPrettyName(path);
 		return DX11Mesh(meshData.value(), fileName, path, device, context);

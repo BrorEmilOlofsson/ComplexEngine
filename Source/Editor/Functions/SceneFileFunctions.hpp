@@ -18,7 +18,7 @@ namespace Simple
 			return [sceneManager, dataTypeRegistry]() -> void
 				{
 					const SceneInfo* sceneInfo = sceneManager->GetCurrentSceneInfo();
-					SceneLoader::SaveScene(sceneManager->GetCurrentScene(), sceneInfo->relativePath, *dataTypeRegistry);
+					SceneLoader::SaveScene(sceneManager->GetCurrentScene(), sceneInfo->absolutePath, *dataTypeRegistry);
 
 					Console::Print("Scene ", ConsoleTextColor::White, false);
 					Console::Print(sceneInfo->name.c_str(), ConsoleTextColor::Green, false);
@@ -74,7 +74,7 @@ namespace Simple
 		{
 			return [sceneManager]() -> void
 				{
-					sceneManager->ReloadSceneFromFile(sceneManager->GetCurrentSceneInfo()->relativePath);
+					sceneManager->ReloadSceneFromFile(sceneManager->GetCurrentSceneInfo()->name);
 
 					Console::Print("Scene ", ConsoleTextColor::White, false);
 					Console::Print(sceneManager->GetCurrentSceneInfo()->name, ConsoleTextColor::Green, false);
@@ -94,7 +94,7 @@ namespace Simple
 						return;
 					}
 
-					jsonData.value()["Game_Settings"]["Start_Scene_RelativePath"] = sceneInfo->relativePath;
+					jsonData.value()["Game_Settings"]["Start_Scene_RelativePath"] = std::filesystem::relative(sceneInfo->absolutePath);
 
 					std::ofstream writeFile(std::filesystem::absolute(SIMPLE_SETTINGS_GAME));
 					assert(writeFile.is_open() && "Failed to open the file");

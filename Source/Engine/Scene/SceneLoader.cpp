@@ -17,7 +17,7 @@ namespace Simple
 		PROFILER_FUNCTION(profiler::colors::TealA400);
 		nlohmann::ordered_json sceneJson;
 		SaveECS(scene.GetECS(), sceneJson, dataTypeRegistry);
-		sceneJson["NavmeshPath"] = scene.GetNavmeshPath();
+		sceneJson["NavmeshPath"] = std::filesystem::relative(scene.GetNavmeshPath(), std::filesystem::path(SIMPLE_DIR_ASSETS));
 
 		std::ofstream writeFile(std::filesystem::absolute(filePath));
 		assert(writeFile.is_open() && "Failed to open the file");
@@ -31,10 +31,13 @@ namespace Simple
 
 		if (jsonData.contains("NavmeshPath"))
 		{
-			const std::filesystem::path navmeshPath = std::filesystem::path(SIMPLE_DIR_ASSETS) / jsonData.at("NavmeshPath");
-			if (!navmeshPath.empty())
+			const std::filesystem::path navmeshRelativePath = jsonData.at("NavmeshPath");
+			if (!navmeshRelativePath.empty())
 			{
+				const std::filesystem::path navmeshPath = std::filesystem::path(SIMPLE_DIR_ASSETS) / navmeshRelativePath;
 				scene.GetNavmesh() = Navmesh(NavmeshLoader::LoadMesh(navmeshPath));
+
+				scene.SetNavmeshPath(navmeshPath);
 			}
 		}
 		return shouldSave;

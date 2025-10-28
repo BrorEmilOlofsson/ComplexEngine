@@ -16,8 +16,8 @@ namespace Simple
 		NavmeshCreator::CreateNavmesh(*this);
 	}
 
-	Navmesh::Navmesh(const NavmeshData& aNavmeshData)
-		: mNavmeshData(aNavmeshData)
+	Navmesh::Navmesh(const NavmeshData& navmeshData)
+		: mNavmeshData(navmeshData)
 	{
 		if (mNavmeshData.mVertices.empty())
 		{

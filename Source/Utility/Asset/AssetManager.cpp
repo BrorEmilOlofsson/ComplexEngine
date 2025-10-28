@@ -164,6 +164,14 @@ namespace Simple
 		loaderMap[L".fbx"] = [](const std::filesystem::path& path, AssetManager& assetManager)
 			{
 				PROFILER_BEGIN("Load FBX");
+				ModelAsset modelAsset = assetManager.GetAssetLoader().LoadModel(path);
+
+				if (modelAsset)
+				{
+					assetManager.AddModel(path, modelAsset);
+				}
+
+
 				MeshAsset asset = assetManager.GetAssetLoader().LoadMesh(path);
 				if (asset)
 				{

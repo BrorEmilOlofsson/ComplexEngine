@@ -63,6 +63,11 @@ namespace Simple
 			return ValidatedGet<MeshAssetHandle>(path, mMeshAssets);
 		}
 
+		[[nodiscard]] ModelAssetHandle GetModel(const std::filesystem::path& path)
+		{
+			return ValidatedGet<ModelAssetHandle>(path, mModelAssets);
+		}
+
 		[[nodiscard]] AnimationAssetHandle GetAnimation(const std::filesystem::path& path)
 		{
 			return ValidatedGet<AnimationAssetHandle>(path, mAnimationAssets);
@@ -95,6 +100,15 @@ namespace Simple
 				throw std::invalid_argument("Asset is invalid");
 			}
 			mTextureAssets[std::filesystem::absolute(path)] = std::move(asset);
+		}
+
+		void AddModel(const std::filesystem::path& path, ModelAsset asset)
+		{
+			if (!asset)
+			{
+				throw std::invalid_argument("Asset is invalid");
+			}
+			mModelAssets[std::filesystem::absolute(path)] = std::move(asset);
 		}
 
 		void AddMesh(const std::filesystem::path& path, MeshAsset asset)
@@ -150,6 +164,7 @@ namespace Simple
 			else if (extension == ".fbx")
 			{
 				remove(mMeshAssets, path);
+				remove(mModelAssets, path);
 			}
 			else if (extension == ".cso")
 			{
@@ -166,6 +181,7 @@ namespace Simple
 
 		std::unordered_map<std::filesystem::path, TextureAsset> mTextureAssets;
 		std::unordered_map<std::filesystem::path, MeshAsset> mMeshAssets;
+		std::unordered_map<std::filesystem::path, ModelAsset> mModelAssets;
 		std::unordered_map<std::filesystem::path, AnimationAsset> mAnimationAssets;
 		std::unordered_map<std::filesystem::path, SkeletonAsset> mSkeletonAssets;
 		std::unordered_map<std::filesystem::path, PixelShaderAsset> mPixelShaderAssets;

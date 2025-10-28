@@ -3,7 +3,6 @@
 #include <span>
 #include "Utility/DrawPrimitives/DrawPrimitives.hpp"
 #include "Graphics/Model/ModelInstance.hpp"
-#include "Graphics/Model/AnimatedModelInstance.hpp"
 #include "Graphics/Light/PointLight.hpp"
 #include "Graphics/Sprite/Sprite2D.hpp"
 #include "Graphics/Sprite/Sprite3D.hpp"
@@ -46,7 +45,6 @@ namespace Simple
 		constexpr void AddText(const Text3D& text);
 		constexpr void AddTexts(std::span<const Text3D> texts);
 		constexpr void AddModelInstance(const ModelInstance& modelInstance);
-		constexpr void AddAnimatedModelInstance(const AnimatedModelInstance& animatedModelInstance);
 		constexpr void AddPointLight(const PointLight& pointLight);
 
 		constexpr void Clear() noexcept;
@@ -54,7 +52,6 @@ namespace Simple
 	private:
 
 		std::vector<ModelInstance> mStaticModelsToRender;
-		std::vector<AnimatedModelInstance> mAnimatedModelsToRender;
 		std::vector<DrawLine> mDebugLines;
 		std::vector<DrawSphere> mWireSpheres;
 		std::vector<DrawBoundingBox> mWireBoundingBoxes;
@@ -219,11 +216,6 @@ namespace Simple
 		mStaticModelsToRender.push_back(meshInstance);
 	}
 
-	constexpr void RenderList::AddAnimatedModelInstance(const AnimatedModelInstance& animatedMeshInstance)
-	{
-		mAnimatedModelsToRender.push_back(animatedMeshInstance);
-	}
-
 	constexpr void RenderList::AddPointLight(const PointLight& pointLight)
 	{
 		mPointLights.push_back(pointLight);
@@ -232,7 +224,6 @@ namespace Simple
 	constexpr void RenderList::Clear() noexcept
 	{
 		mStaticModelsToRender.clear();
-		mAnimatedModelsToRender.clear();
 		mDebugLines.clear();
 		mWireSpheres.clear();
 		mWireBoundingBoxes.clear();

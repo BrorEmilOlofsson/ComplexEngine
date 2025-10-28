@@ -23,6 +23,11 @@ namespace Simple
 			return mMeshLoader(path);
 		}
 
+		[[nodiscard]] ModelAsset LoadModel(const std::filesystem::path& path) const
+		{
+			return mModelLoader(path);
+		}
+
 		[[nodiscard]] PixelShaderAsset LoadPixelShader(const std::filesystem::path& path) const
 		{
 			return mPixelShaderLoader(path);
@@ -48,6 +53,11 @@ namespace Simple
 			mMeshLoader = std::move(loader);
 		}
 
+		void SetModelLoader(std::function<ModelAsset(const std::filesystem::path&)> loader)
+		{
+			mModelLoader = std::move(loader);
+		}
+
 		void SetPixelShaderLoader(std::function<PixelShaderAsset(const std::filesystem::path&)> loader)
 		{
 			mPixelShaderLoader = std::move(loader);
@@ -57,6 +67,7 @@ namespace Simple
 		{
 			mVertexShaderLoader = std::move(loader);
 		}
+
 		void SetEntityCompositionLoader(std::function<EntityCompositionAsset(const std::filesystem::path&)> loader)
 		{
 			mEntityCompositionLoader = std::move(loader);
@@ -66,6 +77,7 @@ namespace Simple
 
 		std::function<TextureAsset(const std::filesystem::path&)> mTextureLoader;
 		std::function<MeshAsset(const std::filesystem::path&)> mMeshLoader;
+		std::function<ModelAsset(const std::filesystem::path&)> mModelLoader;
 		std::function<PixelShaderAsset(const std::filesystem::path&)> mPixelShaderLoader;
 		std::function<VertexShaderAsset(const std::filesystem::path&)> mVertexShaderLoader;
 		std::function<EntityCompositionAsset(const std::filesystem::path&)> mEntityCompositionLoader;

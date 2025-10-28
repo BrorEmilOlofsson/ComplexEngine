@@ -3,6 +3,7 @@
 #include "Utility/Asset/MeshAsset.hpp"
 #include "Utility/Asset/PixelShaderAsset.hpp"
 #include "Utility/Asset/VertexShaderAsset.hpp"
+#include "Utility/Blackboard.hpp"
 #include <array>
 
 namespace Simple

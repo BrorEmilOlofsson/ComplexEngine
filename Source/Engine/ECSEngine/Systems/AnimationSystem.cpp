@@ -1,7 +1,7 @@
 #include "Engine/Precompiled/EnginePch.hpp"
 #include "AnimationSystem.hpp"
 #include "Engine/ECS/ECS.hpp"
-#include "Engine/ECSEngine/Components/AllEngineComponents.hpp"
+#include "Engine/ECSEngine/Components/AnimationComponent.hpp"
 
 namespace Simple
 {

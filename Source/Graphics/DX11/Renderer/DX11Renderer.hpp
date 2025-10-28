@@ -8,10 +8,6 @@
 #include "Graphics/DX11/Text/DX11TextRenderer.hpp"
 #include "Graphics/ConstantBufferData.hpp"
 #include "Graphics/SkyBox/SkyBox.hpp"
-#include "Graphics/Light/DirectionalLight.hpp"
-#include "Graphics/Model/ModelInstance.hpp"
-#include "Graphics/Model/AnimatedModelInstance.hpp"
-#include "Graphics/Model/Model.hpp"
 #include "Graphics/RenderState.hpp"
 #include <memory>
 #include <vector>

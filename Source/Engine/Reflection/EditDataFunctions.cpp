@@ -11,6 +11,7 @@
 #include "Engine/OperatingSystem/WindowView.hpp"
 #include "Utility/Algorithm.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
+#include "Graphics/Model/Model.hpp"
 #include "Graphics/Texture/Texture.hpp"
 #include "Graphics/Animation/Animation.hpp"
 #include "Graphics/Model/Skeleton.hpp"
@@ -767,6 +768,51 @@ namespace Simple
 		return ViewAndEditValue(mesh, blackboard.Get<Key_AssetManager>());
 	}
 
+	static ViewAndEditResult ViewAndEditValue(ModelAssetHandle& modelAsset, AssetManager& assetManager)
+	{
+		ViewAndEditResult viewAndEditResult;
+		std::filesystem::path path;
+
+		if (modelAsset)
+		{
+			path = modelAsset->GetPath();
+		}
+
+		ImGui::AlignTextToFramePadding();
+
+		ImGui::Text("Model:");
+		ImGui::SameLine();
+		ImGui::BeginDisabled();
+		ImGui::InputText("", path.string().data(), path.string().size());
+		ImGui::EndDisabled();
+
+		if (const ImGuiPayload* currentPayload = ImGui::GetDragDropPayload())
+		{
+			const std::filesystem::path droppedPath = std::filesystem::path(reinterpret_cast<const char*>(currentPayload->Data));
+			const std::filesystem::path extension = droppedPath.extension();
+
+			if (extension.string() == ".fbx")
+			{
+				if (ImGui::BeginDragDropTarget())
+				{
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Asset"))
+					{
+						modelAsset = assetManager.GetModel(droppedPath);
+						viewAndEditResult.isEdited = true;
+						viewAndEditResult.isActive = true;
+					}
+					ImGui::EndDragDropTarget();
+				}
+			}
+		}
+
+		return viewAndEditResult;
+	}
+
+	ViewAndEditResult ViewAndEditValue(ModelAssetHandle& model, const Blackboard& blackboard)
+	{
+		return ViewAndEditValue(model, blackboard.Get<Key_AssetManager>());
+	}
 
 	static ViewAndEditResult ViewAndEditValue(TextureAssetHandle& textureAsset, AssetManager& assetManager)
 	{

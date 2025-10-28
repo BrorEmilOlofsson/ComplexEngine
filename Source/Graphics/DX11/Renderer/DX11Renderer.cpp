@@ -6,6 +6,7 @@
 #include "Graphics/Model/Factory/ShapeCreator3000.hpp"
 #include "Utility/Asset/AssetManager.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
+#include "Graphics/Model/Model.hpp"
 #include "Graphics/Texture/Texture.hpp"
 #include "Utility/EngineDirectories.hpp"
 #include "Graphics/DX11/RenderTarget/DX11RenderTarget.hpp"
@@ -24,6 +25,22 @@ namespace Simple
 		{
 			if (!modelInstance.mesh)
 			{
+
+				if (!modelInstance.model)
+				{
+					continue;
+				}
+
+				if (modelInstance.albedoTexture)
+				{
+					modelInstance.albedoTexture->Bind();
+				}
+
+				transformCB.UpdateAndBind(TransformBufferData{ modelInstance.transform.GetMatrix() }, context);
+				objectIDCB.UpdateAndBind(ObjectIDBufferData{ modelInstance.objectID }, context);
+
+				modelInstance.model->Render();
+
 				continue;
 			}
 			if (modelInstance.albedoTexture)
