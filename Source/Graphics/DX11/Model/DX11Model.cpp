@@ -1,6 +1,5 @@
 #include "Graphics/Precompiled/GraphicsPch.hpp"
 #include "DX11Model.hpp"
-#include "Graphics/DX11/DX11Factory.hpp"
 
 #undef min
 #undef max
@@ -8,22 +7,11 @@
 namespace Simple
 {
 
-	[[nodiscard]] constexpr AABB3f CreateBoundingBox(const auto& meshDatas)
-	{
-		AABB3f boundingBox;
-		for (const auto& meshData : meshDatas)
-		{
-			const auto meshBoundingBox = CreateAABB3FromPoints(meshData.vertices, [](const Vertex& vertex) { return vertex.position; });
-			boundingBox = MinMax(boundingBox, meshBoundingBox);
-		}
-		return boundingBox;
-	}
-
 	DX11Model::DX11Model(std::vector<DX11Mesh>&& meshData, const std::string& name, const std::filesystem::path& path,
 		ID3D11Device& device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
 		: mContext(context)
 		, mName(name)
-		, mRelativePath(path)
+		, mPath(path)
 		, mMeshes(std::move(meshData))
 	{
 		device;
@@ -42,7 +30,7 @@ namespace Simple
 
 	const std::filesystem::path& DX11Model::GetPath() const
 	{
-		return mRelativePath;
+		return mPath;
 	}
 
 	static void RenderMesh(ID3D11DeviceContext& context, Microsoft::WRL::ComPtr<ID3D11Buffer> vertexBuffer,

@@ -12,6 +12,18 @@
 namespace Simple
 {
 
+
+	[[nodiscard]] constexpr AABB3f CreateBoundingBox(const auto& meshDatas)
+	{
+		AABB3f boundingBox;
+		for (const auto& meshData : meshDatas)
+		{
+			const auto meshBoundingBox = CreateAABB3FromPoints(meshData.vertices, [](const Vertex& vertex) { return vertex.position; });
+			boundingBox = MinMax(boundingBox, meshBoundingBox);
+		}
+		return boundingBox;
+	}
+
 	class DX11Mesh final
 	{
 	public:

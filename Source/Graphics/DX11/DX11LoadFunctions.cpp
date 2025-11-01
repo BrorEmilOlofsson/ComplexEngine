@@ -22,6 +22,11 @@ namespace Simple
 		return UnitVector3f(vec.x, vec.y, vec.z);
 	}
 
+	[[nodiscard]] constexpr Color ToColor(const aiColor4D& color)
+	{
+		return Color(color.r, color.g, color.b, color.a);
+	}
+
 	std::vector<Vertex> ToVertices(const aiMesh& inMesh)
 	{
 		std::vector<Vertex> vertices(inMesh.mNumVertices);
@@ -43,15 +48,14 @@ namespace Simple
 				vertex.bitangent = ToUnitVector3(inMesh.mBitangents[i]);
 			}
 
-			if (inMesh.HasVertexColors(i))
+			if (inMesh.HasVertexColors(0))
 			{
-				const aiColor4D& color = inMesh.mColors[0][i];
-				vertex.color = Color(color.r, color.g, color.b, color.a);
+				vertex.color = ToColor(inMesh.mColors[0][i]);
 			}
 
-			if (inMesh.HasTextureCoords(i))
+			if (inMesh.HasTextureCoords(0))
 			{
-				vertex.uv = Vector2f(inMesh.mTextureCoords[i]->x, inMesh.mTextureCoords[i]->y);
+				vertex.uv = Vector2f(inMesh.mTextureCoords[0][i].x, 1 - inMesh.mTextureCoords[0][i].y);
 			}
 
 		}
@@ -77,7 +81,7 @@ namespace Simple
 		return MeshData<Vertex>
 		{
 			.vertices = ToVertices(inMesh),
-				.indices = ToIndices(inMesh)
+			.indices = ToIndices(inMesh)
 		};
 	}
 
@@ -149,13 +153,13 @@ namespace Simple
 		const aiScene* scene = importer.ReadFile(
 			path.string().c_str(),  // path to your .fbx
 			aiProcess_Triangulate            // Convert everything to triangles
-			| aiProcess_JoinIdenticalVertices // Merge duplicate vertices
-			| aiProcess_CalcTangentSpace      // Generate tangents/bitangents
+			//| aiProcess_JoinIdenticalVertices // Merge duplicate vertices
+			//| aiProcess_CalcTangentSpace      // Generate tangents/bitangents
 			//| aiProcess_GenSmoothNormals      // Generate normals if missing
 			//| aiProcess_FlipUVs               // If your engine's UV origin differs
-			| aiProcess_LimitBoneWeights      // (Optional, for animation)
+			//| aiProcess_LimitBoneWeights      // (Optional, for animation)
 		);
-		
+
 		if (scene == nullptr)
 		{
 			return std::unexpected("Failed to load model: " + path.string() + " with error: " + importer.GetErrorString());
@@ -164,6 +168,11 @@ namespace Simple
 
 
 		std::vector<DX11Mesh> meshes;
+		const bool h = scene->HasSkeletons();
+		h;
+
+		std::println("{}", path.string());
+
 		TraverseNodes(meshes, scene->mRootNode, scene, path, device, context);
 
 		return DX11Model(std::move(meshes), std::string(scene->mName.C_Str()), path, device, context);
@@ -180,9 +189,6 @@ namespace Simple
 		{
 			return std::unexpected(meshData.error());
 		}
-
-		auto dx11Model = LoadDX11Model(path, device, context);
-
 
 		const std::filesystem::path fileName = ConvertFilePathToPrettyName(path);
 		return DX11Mesh(meshData.value(), fileName, path, device, context);

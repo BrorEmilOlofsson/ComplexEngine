@@ -1,29 +1,28 @@
 #pragma once
-#include "Utility/Shapes/AABB3.hpp"
-#include "Utility/MeshData.hpp"
-#include <string>
+#include <vector>
 #include <filesystem>
+#include <string>
+#include "Utility/Shapes/AABB3.hpp"
 
 #ifdef _WIN32
 
+#include "Graphics/DX11/Mesh/DX11Mesh.hpp"
 #include <d3d11.h>
 #include <wrl/client.h>
-#include "Graphics/DX11/Mesh/DX11Mesh.hpp"
 
 namespace Simple
 {
-
-	class DX11Model final
+	class DX11AnimatedModel final
 	{
 	public:
 
-		DX11Model(std::vector<DX11Mesh>&& meshData, const std::string& modelName, const std::filesystem::path& path,
+		DX11AnimatedModel(std::vector<DX11Mesh>&& meshData, const std::string& modelName, const std::filesystem::path& path,
 			ID3D11Device& device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext);
 
-		DX11Model(DX11Model&&) noexcept = default;
-		DX11Model(const DX11Model&) = delete;
-		DX11Model& operator=(DX11Model&&) noexcept = default;
-		DX11Model& operator=(const DX11Model&) = delete;
+		DX11AnimatedModel(DX11AnimatedModel&&) noexcept = default;
+		DX11AnimatedModel(const DX11AnimatedModel&) = delete;
+		DX11AnimatedModel& operator=(DX11AnimatedModel&&) noexcept = default;
+		DX11AnimatedModel& operator=(const DX11AnimatedModel&) = delete;
 
 		[[nodiscard]] const AABB3f& GetBoundingBox() const;
 		[[nodiscard]] const std::string& GetName() const;
@@ -39,6 +38,8 @@ namespace Simple
 		std::filesystem::path mPath;
 
 		AABB3f mBoundingBox;
+
+		std::vector<Bone> mBones;
 
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext> mContext;
 	};

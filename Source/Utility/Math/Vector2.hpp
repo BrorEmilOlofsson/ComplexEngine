@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <format>
 
 namespace Simple
 {
@@ -147,3 +148,13 @@ namespace Simple
 		return os << "{ X: " << vector.x << " Y: " << vector.y << " }";
 	}
 }
+
+template<typename T>
+struct std::formatter<Simple::Vector2<T>, char> : std::formatter<std::string, char>
+{
+	template<typename FormatContext>
+	auto format(const Simple::Vector2<T>& vector, FormatContext& ctx) const
+	{
+		return std::format_to(ctx.out(), "{{ X: {} Y: {} }}", vector.x, vector.y);
+	}
+};

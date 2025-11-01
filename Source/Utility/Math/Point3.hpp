@@ -2,6 +2,7 @@
 #include "Utility/Math/Vector3.hpp"
 #include "Utility/Math/UnitVector3.hpp"
 #include <iostream>
+#include <format>
 
 namespace Simple
 {
@@ -111,3 +112,13 @@ namespace Simple
 		return (Abs(a.x - b.x) < tolerance) && (Abs(a.y - b.y) < tolerance) && (Abs(a.z - b.z) < tolerance);
 	}
 }
+
+template<typename T>
+struct std::formatter<Simple::Point3<T>, char> : std::formatter<std::string, char>
+{
+	template<typename FormatContext>
+	auto format(const Simple::Point3<T>& point, FormatContext& ctx) const
+	{
+		return std::format_to(ctx.out(), "{{ X: {} Y: {} Z: {} }}", point.x, point.y, point.z);
+	}
+};
