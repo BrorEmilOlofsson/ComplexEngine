@@ -31,6 +31,11 @@ namespace Simple
 
 		void Resize(ID3D11Resource& resource, Vector2ui size);
 
+		void Reset()
+		{
+			mRenderTargetView.Reset();
+		}
+
 		[[nodiscard]] ID3D11RenderTargetView* GetRenderTargetView();
 		[[nodiscard]] ID3D11ShaderResourceView* GetShaderResourceView();
 		[[nodiscard]] Vector2ui GetSize() const { return mSize; }

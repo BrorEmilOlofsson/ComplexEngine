@@ -121,22 +121,29 @@ namespace Simple
 	{
 		const Vector2ui windowSize = mWindow->GetClientSize();
 
-		mBackBuffer.GetRenderTargetView()->Release();
+		mContext->OMSetRenderTargets(0, nullptr, nullptr);
 
-		const HRESULT result = mSwapChain->ResizeBuffers(0, windowSize.x, windowSize.y, DXGI_FORMAT_UNKNOWN, 0);
-		WIN_CHECK_HRESULT(result);
+		// Release old references safely
+		mBackBuffer.Reset();
+		mDepthStencilViewManager.lock()->Get(mDepthStencilViewHandle).Reset();
 
+		// Resize swap chain buffers
+		HRESULT hr = mSwapChain->ResizeBuffers(0, windowSize.x, windowSize.y, DXGI_FORMAT_UNKNOWN, 0);
+		WIN_CHECK_HRESULT(hr);
+
+		// Create RTV
 		auto backBuffer = DX11Factory::GetBackBuffer(*mSwapChain.Get());
 		mBackBuffer.InitRenderTargetView(*backBuffer.Get(), windowSize);
 
-		{
-			//auto viewport = DX11Factory::CreateViewport(windowSize);
-			//mContext->RSSetViewports(1, &viewport);
-		}
+		mDepthStencilViewManager.lock()->Initialize(mDepthStencilViewHandle, windowSize);
 	}
 
 	void DX11Window::BindBackBuffer()
 	{
 		mBackBuffer.Set(mDepthStencilViewManager.lock()->Get(mDepthStencilViewHandle).Get());
+
+		auto viewport = DX11Factory::CreateViewport(mWindow->GetClientSize());
+
+		mContext->RSSetViewports(1, &viewport);
 	}
 }

@@ -27,8 +27,8 @@ namespace Simple
 		{
 			return;
 		}
-
-		dsv = DX11Factory::CreateDepthStencilView(*mDevice.Get(), windowSize);
+		
+		mDepthStencilViews[handle.GetID()] = DX11Factory::CreateDepthStencilView(*mDevice.Get(), windowSize);
 	}
 
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> DX11DepthStencilViewManager::Get(DepthStencilViewHandle handle)
