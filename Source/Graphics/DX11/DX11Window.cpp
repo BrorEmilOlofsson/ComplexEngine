@@ -121,6 +121,11 @@ namespace Simple
 	{
 		const Vector2ui windowSize = mWindow->GetClientSize();
 
+		if (windowSize.x == 0 || windowSize.y == 0)
+		{
+			return;
+		}
+
 		mContext->OMSetRenderTargets(0, nullptr, nullptr);
 
 		// Release old references safely

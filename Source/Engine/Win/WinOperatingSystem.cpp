@@ -152,7 +152,10 @@ namespace Simple
 			if (LOWORD(lParam) == HTCLIENT)
 			{
 				SetCursor(LoadCursor(nullptr, IDC_ARROW));
+				return TRUE;
 			}
+
+			return DefWindowProc(hwnd, msg, wParam, lParam);
 
 			break;
 		case WM_DESTROY:

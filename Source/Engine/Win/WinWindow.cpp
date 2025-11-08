@@ -19,7 +19,7 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 namespace Simple
 {
 
-	constexpr DWORD DEFAULT_WINDOW_STYLE = WS_OVERLAPPED | WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU | WS_THICKFRAME;
+	constexpr DWORD DEFAULT_WINDOW_STYLE = WS_OVERLAPPEDWINDOW;
 
 	static HWND CreateWindowImpl(AABB2i rect, HINSTANCE hInstance, const std::wstring& name, const std::wstring& windowClassName, DWORD windowStyle, void* window)
 	{
