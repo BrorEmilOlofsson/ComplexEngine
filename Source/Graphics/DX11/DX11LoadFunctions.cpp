@@ -27,6 +27,16 @@ namespace Simple
 		return Color(color.r, color.g, color.b, color.a);
 	}
 
+	[[nodiscard]] constexpr Matrix4x4f ToMatrix(const aiMatrix4x4& mat)
+	{
+		return Matrix4x4f({
+			mat.a1, mat.b1, mat.c1, mat.d1,
+			mat.a2, mat.b2, mat.c2, mat.d2,
+			mat.a3, mat.b3, mat.c3, mat.d3,
+			mat.a4, mat.b4, mat.c4, mat.d4
+			});
+	}
+
 	std::vector<Vertex> ToVertices(const aiMesh& inMesh)
 	{
 		std::vector<Vertex> vertices(inMesh.mNumVertices);
@@ -81,27 +91,71 @@ namespace Simple
 		return MeshData<Vertex>
 		{
 			.vertices = ToVertices(inMesh),
-			.indices = ToIndices(inMesh)
+				.indices = ToIndices(inMesh)
 		};
 	}
 
-	void TraverseNodes(std::vector<DX11Mesh>& meshes, const aiNode* node, const aiScene* scene, const std::filesystem::path& path,
+	void TraverseNodes(std::vector<DX11Mesh>& meshes, std::vector<Bone>& bones, std::unordered_map<std::string, uint32_t>& boneIndexMap, const aiNode* node, const aiScene* scene, const std::filesystem::path& path,
 		ID3D11Device& device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
 	{
 		// Process mesh data
 		for (unsigned int i = 0; i < node->mNumMeshes; i++)
 		{
-			const aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+			const aiMesh& mesh = *scene->mMeshes[node->mMeshes[i]];
 
-			MeshData meshData = ToMeshData(*mesh);
-			const std::string name = mesh->mName.C_Str();
-			meshes.push_back(DX11Mesh(meshData, name, path, device, context));
+			MeshData meshData = ToMeshData(mesh);
+			const std::string meshName = mesh.mName.C_Str();
+			meshes.push_back(DX11Mesh(meshData, meshName, path, device, context));
+
+			for (unsigned int b = 0; b < mesh.mNumBones; b++)
+			{
+				const aiBone& aiBone = *mesh.mBones[b];
+				uint32_t boneIndex = 0;
+				std::string boneName = aiBone.mName.C_Str();
+				if (!boneIndexMap.contains(boneName))
+				{
+					boneIndex = static_cast<uint32_t>(bones.size());
+					boneIndexMap[boneName] = boneIndex;
+
+					Bone& bone = bones.emplace_back();
+					bone.name = boneName;
+					bone.inverseModelMatrix = ToMatrix(aiBone.mOffsetMatrix);
+					bone.parentIndex = std::numeric_limits<uint32_t>::max();
+				}
+				else
+				{
+					boneIndex = boneIndexMap[boneName];
+				}
+
+				auto addWeight = [&](Vertex& vertex, const uint32_t boneIndex, const float weight)
+					{
+						auto it = std::ranges::find_if(vertex.weights,
+							[](float w) { return w == 0.f; });
+
+						if (it == vertex.weights.end())
+						{
+							// No empty weight slot found
+							return;
+						}
+
+						auto index = std::distance(vertex.weights.begin(), it);
+
+						vertex.bones[index] = boneIndex;
+						vertex.weights[index] = weight;
+					};
+
+				for (unsigned int w = 0; w < aiBone.mNumWeights; w++)
+				{
+					auto& weight = aiBone.mWeights[w];
+					addWeight(meshData.vertices[weight.mVertexId], b, weight.mWeight);
+				}
+			}
 		}
 
 		// Process child nodes recursively
 		for (unsigned int i = 0; i < node->mNumChildren; i++)
 		{
-			TraverseNodes(meshes, node->mChildren[i], scene, path, device, context);
+			TraverseNodes(meshes, bones, boneIndexMap, node->mChildren[i], scene, path, device, context);
 		}
 	}
 
@@ -112,7 +166,7 @@ namespace Simple
 			return {};
 		}
 		unsigned int num = scene.mNumMeshes;
-
+	
 		std::vector<MeshData<Vertex>> meshDatas;
 		meshDatas.reserve(num);
 
@@ -132,10 +186,6 @@ namespace Simple
 		TGA::FBX::FbxImportStatus status = TGA::FBX::Importer::LoadMeshA(path.string(), tgaMesh);
 		PROFILER_END();
 
-
-
-
-
 		if (!status)
 		{
 			return std::unexpected("Failed to load mesh: " + path.string() + " with error code: " + std::to_string(static_cast<int>(status.Result)));
@@ -145,7 +195,7 @@ namespace Simple
 		return meshData;
 	}
 
-	std::expected<DX11Model, std::string> LoadDX11Model(const std::filesystem::path& path, ID3D11Device& device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
+	std::expected<std::variant<DX11Model, DX11AnimatedModel>, std::string> LoadDX11Model(const std::filesystem::path& path, ID3D11Device& device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
 	{
 		PROFILER_FUNCTION();
 		Assimp::Importer importer;
@@ -168,12 +218,24 @@ namespace Simple
 
 
 		std::vector<DX11Mesh> meshes;
-		const bool h = scene->HasSkeletons();
-		h;
 
-		std::println("{}", path.string());
+		std::vector<Bone> bones;
+		std::unordered_map<std::string, uint32_t> boneIndexMap;
 
-		TraverseNodes(meshes, scene->mRootNode, scene, path, device, context);
+
+		TraverseNodes(meshes, bones, boneIndexMap, scene->mRootNode, scene, path, device, context);
+
+		bool hasBones = !bones.empty();
+
+		if (hasBones)
+		{
+			std::println("Loading skeleton: {}", path.string());
+			return DX11AnimatedModel(std::move(meshes), Skeleton(bones), std::string(scene->mName.C_Str()), path, device, context);
+		}
+		else
+		{
+			std::println("Loading non-skeleton: {}", path.string());
+		}
 
 		return DX11Model(std::move(meshes), std::string(scene->mName.C_Str()), path, device, context);
 	}

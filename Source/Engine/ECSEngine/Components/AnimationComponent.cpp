@@ -12,5 +12,4 @@ namespace Simple
 	COMPONENT(AnimationComponent);
 
 	REGISTER_MEMBER(AnimationComponent::animation);
-	REGISTER_MEMBER(AnimationComponent::skeleton);
 }

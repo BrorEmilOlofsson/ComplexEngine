@@ -1,14 +1,17 @@
 #include "Graphics/Precompiled/GraphicsPch.hpp"
 #include "DX11AnimatedModel.hpp"
 
+#ifdef _WIN32
+
 namespace Simple
 {
 	
-	DX11AnimatedModel::DX11AnimatedModel(std::vector<DX11Mesh>&& meshData, const std::string& name, const std::filesystem::path& path,
+	DX11AnimatedModel::DX11AnimatedModel(std::vector<DX11Mesh>&& meshData, const Skeleton& skeleton, const std::string& name, const std::filesystem::path& path,
 		ID3D11Device& device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
 		: mContext(context)
 		, mName(name)
 		, mPath(path)
+		, mSkeleton(skeleton)
 		, mMeshes(std::move(meshData))
 	{
 		device;
@@ -29,4 +32,11 @@ namespace Simple
 	{
 		return mPath;
 	}
+
+	const Skeleton& DX11AnimatedModel::GetSkeleton() const
+	{
+		return mSkeleton;
+	}
 }
+
+#endif

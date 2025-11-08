@@ -12,7 +12,6 @@
 #include "Utility/Asset/TextureAsset.hpp"
 #include "Utility/Asset/MeshAsset.hpp"
 #include "Utility/Asset/AnimationAsset.hpp"
-#include "Utility/Asset/SkeletonAsset.hpp"
 
 #include <string>
 #include <array>
@@ -63,7 +62,6 @@ namespace Simple
 	REGISTER_DATATYPE(ModelAssetHandle);
 	REGISTER_DATATYPE(TextureAssetHandle);
 	REGISTER_DATATYPE(AnimationAssetHandle);
-	REGISTER_DATATYPE(SkeletonAssetHandle);
 	REGISTER_DATATYPE_POINTER(PixelShader);
 	REGISTER_DATATYPE_POINTER(VertexShader);
 }

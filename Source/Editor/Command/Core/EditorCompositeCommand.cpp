@@ -4,25 +4,25 @@
 namespace Simple
 {
 
-	EditorCompositeCommand::EditorCompositeCommand(std::string aName, std::vector<EditorCommand> aCommands)
-		: myName(std::move(aName))
-		, myCommands(std::move(aCommands))
+	EditorCompositeCommand::EditorCompositeCommand(std::string name, std::vector<EditorCommand> commands)
+		: mName(std::move(name))
+		, mCommands(std::move(commands))
 	{
 	}
 
-	void EditorCompositeCommand::Execute(const bool aDebugPrint) const
+	void EditorCompositeCommand::Execute(const bool debugPrint) const
 	{
-		for (const EditorCommand& command : myCommands)
+		for (const EditorCommand& command : mCommands)
 		{
-			command.ExecuteCommand(aDebugPrint);
+			command.ExecuteCommand(debugPrint);
 		}
 	}
 
-	void EditorCompositeCommand::Undo(const bool aDebugPrint) const
+	void EditorCompositeCommand::Undo(const bool debugPrint) const
 	{
-		for (int i = static_cast<int>(myCommands.size()) - 1; i >= 0; --i)
+		for (auto& command : std::views::reverse(mCommands))
 		{
-			myCommands[i].UndoCommand(aDebugPrint);
+			command.UndoCommand(debugPrint);
 		}
 	}
 }

@@ -9,6 +9,7 @@
 #include "Graphics/Texture/Texture.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
 #include "Graphics/Model/Model.hpp"
+#include "Graphics/GraphicsConstants.hpp"
 #include "Engine/Reflection/DataTypeRegistry.hpp"
 
 namespace Simple
@@ -301,22 +302,6 @@ namespace Simple
 		}
 
 		json = animationRelativePath;
-
-		return json;
-	}
-
-	nlohmann::json ToJSON(const SkeletonAssetHandle& skeletonAsset)
-	{
-		nlohmann::json json;
-
-		std::filesystem::path skeletonRelativePath;
-
-		if (skeletonAsset)
-		{
-			skeletonRelativePath = skeletonAsset->GetRelativePath();
-		}
-
-		json = skeletonRelativePath;
 
 		return json;
 	}

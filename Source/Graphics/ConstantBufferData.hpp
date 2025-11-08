@@ -4,7 +4,7 @@
 #include "Utility/Math/Vector4.hpp"
 #include "Utility/Math/Matrix4x4.hpp"
 #include "Utility/Color.hpp"
-#include "Graphics/GraphicsDefines.hpp"
+#include "Graphics/GraphicsConstants.hpp"
 #include <array>
 
 #undef max

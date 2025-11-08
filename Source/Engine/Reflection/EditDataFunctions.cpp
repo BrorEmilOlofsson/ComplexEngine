@@ -989,52 +989,6 @@ namespace Simple
 		return ViewAndEditValue(shaderAsset, blackboard.Get<Key_AssetManager>());
 	}
 
-	static ViewAndEditResult ViewAndEditValue(SkeletonAssetHandle& skeletonAsset, AssetManager& modelFactory)
-	{
-		ViewAndEditResult viewAndEditResult;
-		std::string name;
-
-		if (skeletonAsset)
-		{
-			name = skeletonAsset->mName;
-		}
-
-		ImGui::AlignTextToFramePadding();
-
-		ImGui::Text("Skeleton:");
-		ImGui::SameLine();
-		ImGui::BeginDisabled();
-		ImGui::InputText("", name.data(), name.size());
-		ImGui::EndDisabled();
-
-		if (const ImGuiPayload* currentPayload = ImGui::GetDragDropPayload())
-		{
-			const std::filesystem::path path = std::filesystem::path(reinterpret_cast<const char*>(currentPayload->Data));
-			const std::filesystem::path extension = path.extension();
-
-			if (extension.string() == ".fbx")
-			{
-				if (ImGui::BeginDragDropTarget())
-				{
-					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Asset"))
-					{
-						skeletonAsset = modelFactory.GetSkeleton(path);
-						viewAndEditResult.isEdited = true;
-						viewAndEditResult.isActive = true;
-					}
-					ImGui::EndDragDropTarget();
-				}
-			}
-		}
-
-		return viewAndEditResult;
-	}
-
-	ViewAndEditResult ViewAndEditValue(SkeletonAssetHandle& skeletonAsset, const Blackboard& blackboard)
-	{
-		return ViewAndEditValue(skeletonAsset, blackboard.Get<Key_AssetManager>());
-	}
-
 	static ViewAndEditResult ViewAndEditValue(AnimationAssetHandle& animationAsset, AssetManager& assetManager)
 	{
 		ViewAndEditResult viewAndEditResult;

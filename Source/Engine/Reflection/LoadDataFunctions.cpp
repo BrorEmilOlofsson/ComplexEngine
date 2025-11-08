@@ -9,6 +9,7 @@
 #include "Utility/Camera.hpp"
 #include "Utility/Asset/AssetManager.hpp"
 #include "Engine/Reflection/DataTypeRegistry.hpp"
+#include "Graphics/GraphicsDefines.hpp"
 #include <filesystem>
 
 namespace Simple
@@ -218,25 +219,6 @@ namespace Simple
 	void FromJSON(TextureAssetHandle& textureAsset, const nlohmann::json& json, const Blackboard& blackboard)
 	{
 		FromJSON(textureAsset, json, blackboard.Get<Key_AssetManager>());
-	}
-
-	static void FromJSON(SkeletonAssetHandle& skeletonAsset, const nlohmann::json& json, AssetManager& assetManager)
-	{
-		const std::string skeletonRelativeFilePath = json;
-
-		if (skeletonRelativeFilePath.empty())
-		{
-			return;
-		}
-
-		std::filesystem::path skeletonPath = std::filesystem::absolute(skeletonRelativeFilePath);
-
-		skeletonAsset = assetManager.GetSkeleton(skeletonPath);
-	}
-
-	void FromJSON(SkeletonAssetHandle& skeletonAsset, const nlohmann::json& json, const Blackboard& blackboard)
-	{
-		FromJSON(skeletonAsset, json, blackboard.Get<Key_AssetManager>());
 	}
 
 	static void FromJSON(AnimationAssetHandle& animationAsset, const nlohmann::json& json, AssetManager& assetManager)

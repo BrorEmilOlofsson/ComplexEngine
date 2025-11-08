@@ -19,14 +19,14 @@ namespace Simple
 
 		EditorCompositeCommandBuilder() = default;
 
-		void AddCommand(EditorCommand&& aCommand);
+		void AddCommand(EditorCommand&& command);
 
-		void Begin(std::string_view aName);
+		void Begin(std::string_view name);
 		[[nodiscard]] std::optional<EditorCompositeCommand> End();
 
 		[[nodiscard]] bool IsActive() const
 		{
-			return myCurrentCompositeCommand.operator bool();
+			return mCurrentCompositeCommand.operator bool();
 		}
 
 	private:
@@ -36,26 +36,26 @@ namespace Simple
 			friend class CompositeCommandBuilder;
 		public:
 
-			CompositeCommandInternal(std::string aName = std::string())
-				: myName(aName)
+			CompositeCommandInternal(std::string name = std::string())
+				: mName(std::move(name))
 			{
 
 			}
 
-			void AddCommand(EditorCommand&& aCommand);
+			void AddCommand(EditorCommand&& command);
 
-			void Begin(std::string_view aName);
+			void Begin(std::string_view name);
 			[[nodiscard]] eEndCode End();
 
 			[[nodiscard]] EditorCompositeCommand Build() const;
 
 		private:
 
-			std::unique_ptr<CompositeCommandInternal> myCurrentChild;
-			std::vector<EditorCommand> myCommands;
-			std::string myName;
+			std::unique_ptr<CompositeCommandInternal> mCurrentChild;
+			std::vector<EditorCommand> mCommands;
+			std::string mName;
 		};
 
-		std::unique_ptr<CompositeCommandInternal> myCurrentCompositeCommand;
+		std::unique_ptr<CompositeCommandInternal> mCurrentCompositeCommand;
 	};
 }

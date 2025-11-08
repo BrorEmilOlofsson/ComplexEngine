@@ -1,6 +1,7 @@
 #pragma once
 #include <functional>
 #include <filesystem>
+#include <variant>
 #include "Asset.hpp"
 #include "Utility/Asset/AssetTypes.hpp"
 
@@ -23,7 +24,7 @@ namespace Simple
 			return mMeshLoader(path);
 		}
 
-		[[nodiscard]] ModelAsset LoadModel(const std::filesystem::path& path) const
+		[[nodiscard]] std::variant<std::monostate, ModelAsset, AnimatedModelAsset> LoadModel(const std::filesystem::path& path) const
 		{
 			return mModelLoader(path);
 		}
@@ -53,7 +54,7 @@ namespace Simple
 			mMeshLoader = std::move(loader);
 		}
 
-		void SetModelLoader(std::function<ModelAsset(const std::filesystem::path&)> loader)
+		void SetModelLoader(std::function<std::variant<std::monostate, ModelAsset, AnimatedModelAsset>(const std::filesystem::path&)> loader)
 		{
 			mModelLoader = std::move(loader);
 		}
@@ -77,7 +78,7 @@ namespace Simple
 
 		std::function<TextureAsset(const std::filesystem::path&)> mTextureLoader;
 		std::function<MeshAsset(const std::filesystem::path&)> mMeshLoader;
-		std::function<ModelAsset(const std::filesystem::path&)> mModelLoader;
+		std::function<std::variant<std::monostate, ModelAsset, AnimatedModelAsset>(const std::filesystem::path&)> mModelLoader;
 		std::function<PixelShaderAsset(const std::filesystem::path&)> mPixelShaderLoader;
 		std::function<VertexShaderAsset(const std::filesystem::path&)> mVertexShaderLoader;
 		std::function<EntityCompositionAsset(const std::filesystem::path&)> mEntityCompositionLoader;

@@ -8,6 +8,7 @@
 
 #include <d3d11.h>
 #include <wrl/client.h>
+#include "Graphics/DX11/DX11VertexBuffer.hpp"
 
 namespace Simple
 {
@@ -40,7 +41,7 @@ namespace Simple
 		[[nodiscard]] const std::filesystem::path& GetName() const;
 		[[nodiscard]] const std::filesystem::path& GetPath() const;
 
-		[[nodiscard]] Microsoft::WRL::ComPtr<ID3D11Buffer> GetVertexBuffer() const
+		[[nodiscard]] const DX11VertexBuffer& GetVertexBuffer() const
 		{
 			return mVertexBuffer;
 		}
@@ -59,16 +60,17 @@ namespace Simple
 
 	private:
 
+		Microsoft::WRL::ComPtr<ID3D11DeviceContext> mDeviceContext;
 		MeshData<Vertex> mMeshData;
+
+		DX11VertexBuffer mVertexBuffer;
+		Microsoft::WRL::ComPtr<ID3D11Buffer> mIndexBuffer;
 
 		std::filesystem::path mName;
 		std::filesystem::path mRelativePath;
 
 		AABB3f mBoundingBox;
 
-		Microsoft::WRL::ComPtr<ID3D11Buffer> mVertexBuffer;
-		Microsoft::WRL::ComPtr<ID3D11Buffer> mIndexBuffer;
-		Microsoft::WRL::ComPtr<ID3D11DeviceContext> mDeviceContext;
 	};
 }
 

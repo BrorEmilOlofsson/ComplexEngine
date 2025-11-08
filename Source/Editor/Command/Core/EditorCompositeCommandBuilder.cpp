@@ -4,41 +4,36 @@
 namespace Simple
 {
 
-	void EditorCompositeCommandBuilder::AddCommand(EditorCommand&& aCommand)
+	void EditorCompositeCommandBuilder::AddCommand(EditorCommand&& command)
 	{
-		myCurrentCompositeCommand->AddCommand(std::move(aCommand));
+		mCurrentCompositeCommand->AddCommand(std::move(command));
 	}
 
-	void EditorCompositeCommandBuilder::Begin(std::string_view aName)
+	void EditorCompositeCommandBuilder::Begin(std::string_view name)
 	{
-		if (myCurrentCompositeCommand)
+		if (mCurrentCompositeCommand)
 		{
-			myCurrentCompositeCommand->Begin(aName);
+			mCurrentCompositeCommand->Begin(name);
 		}
 		else
 		{
-			myCurrentCompositeCommand = std::make_unique<CompositeCommandInternal>(std::string(aName));
+			mCurrentCompositeCommand = std::make_unique<CompositeCommandInternal>(std::string(name));
 		}
 	}
 
 	std::optional<EditorCompositeCommand> EditorCompositeCommandBuilder::End()
 	{
-		if (!myCurrentCompositeCommand)
+		if (!mCurrentCompositeCommand)
 		{
 			return std::nullopt;
 		}
 
-		/*if (myCurrentCompositeCommand->myCommands.empty())
-		{
-			return std::nullopt;
-		}*/
-
-		eEndCode endCode = myCurrentCompositeCommand->End();
+		eEndCode endCode = mCurrentCompositeCommand->End();
 
 		if (endCode == eEndCode::Ended)
 		{
-			std::unique_ptr<CompositeCommandInternal> internalComposite = std::move(myCurrentCompositeCommand);
-			myCurrentCompositeCommand.reset();
+			std::unique_ptr<CompositeCommandInternal> internalComposite = std::move(mCurrentCompositeCommand);
+			mCurrentCompositeCommand.reset();
 			return internalComposite->Build();
 		}
 
@@ -48,52 +43,52 @@ namespace Simple
 
 	EditorCompositeCommand EditorCompositeCommandBuilder::CompositeCommandInternal::Build() const
 	{
-		return EditorCompositeCommand(myName, myCommands);
+		return EditorCompositeCommand(mName, mCommands);
 	}
 
-	void EditorCompositeCommandBuilder::CompositeCommandInternal::AddCommand(EditorCommand&& aCommand)
+	void EditorCompositeCommandBuilder::CompositeCommandInternal::AddCommand(EditorCommand&& command)
 	{
-		if (myCurrentChild)
+		if (mCurrentChild)
 		{
-			myCurrentChild->AddCommand(std::move(aCommand));
+			mCurrentChild->AddCommand(std::move(command));
 		}
 		else
 		{
-			myCommands.emplace_back(std::move(aCommand));
+			mCommands.emplace_back(std::move(command));
 		}
 	}
 
 
-	void EditorCompositeCommandBuilder::CompositeCommandInternal::Begin(std::string_view aName)
+	void EditorCompositeCommandBuilder::CompositeCommandInternal::Begin(std::string_view name)
 	{
-		if (myCurrentChild)
+		if (mCurrentChild)
 		{
-			myCurrentChild->Begin(aName);
+			mCurrentChild->Begin(name);
 		}
 		else
 		{
-			myCurrentChild = std::make_unique<CompositeCommandInternal>(std::string(aName));
+			mCurrentChild = std::make_unique<CompositeCommandInternal>(std::string(name));
 		}
 	}
 
 	EditorCompositeCommandBuilder::eEndCode EditorCompositeCommandBuilder::CompositeCommandInternal::End()
 	{
-		if (myCurrentChild)
+		if (mCurrentChild)
 		{
-			const eEndCode endCode = myCurrentChild->End();
+			const eEndCode endCode = mCurrentChild->End();
 			if (endCode == eEndCode::Ended)
 			{
-				const std::string compositeName = myCurrentChild->myName;
-				myCommands.push_back(EditorCommand(myCurrentChild->Build(), compositeName));
-				myCurrentChild.reset();
+				const std::string compositeName = mCurrentChild->mName;
+				mCommands.push_back(EditorCommand(mCurrentChild->Build(), compositeName));
+				mCurrentChild.reset();
 			}
 			else if (endCode == eEndCode::Ended_Empty) // If the child's commands are empty we don't want to add the child to our commands
 			{
-				myCurrentChild.reset();
+				mCurrentChild.reset();
 			}
 			return eEndCode::InProgress;
 		}
-		else if (myCommands.empty())
+		else if (mCommands.empty())
 		{
 			return eEndCode::Ended_Empty;
 		}

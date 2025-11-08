@@ -144,7 +144,6 @@ namespace Simple
 	ViewAndEditResult ViewAndEditValue(TextureAssetHandle& textureAsset, const Blackboard& blackboard);
 	ViewAndEditResult ViewAndEditValue(PixelShaderAssetHandle& shaderAsset, const Blackboard& blackboard);
 	ViewAndEditResult ViewAndEditValue(VertexShaderAssetHandle& shaderAsset, const Blackboard& blackboard);
-	ViewAndEditResult ViewAndEditValue(SkeletonAssetHandle& skeletonAsset, const Blackboard& blackboard);
 	ViewAndEditResult ViewAndEditValue(AnimationAssetHandle& animationAsset, const Blackboard& blackboard);
 
 	ViewAndEditResult ViewAndEditValue(std::array<TextureAssetHandle, 3>& textureAssets, const Blackboard& blackboard);

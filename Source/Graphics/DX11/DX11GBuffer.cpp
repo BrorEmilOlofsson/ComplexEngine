@@ -1,7 +1,7 @@
 #include "Graphics/Precompiled/GraphicsPch.hpp"
 #include "DX11GBuffer.hpp"
 #include "Graphics/DX11/DX11Factory.hpp"
-#include "Graphics/GraphicsDefines.hpp"
+#include "Graphics/GraphicsConstants.hpp"
 
 namespace Simple
 {

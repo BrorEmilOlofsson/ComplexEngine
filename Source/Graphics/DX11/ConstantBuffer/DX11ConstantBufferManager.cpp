@@ -2,7 +2,7 @@
 #include "DX11ConstantBufferManager.hpp"
 #include "Utility/Camera.hpp"
 #include "Graphics/ConstantBufferData.hpp"
-#include "Graphics/GraphicsDefines.hpp"
+#include "Graphics/GraphicsConstants.hpp"
 #include <cassert>
 
 namespace Simple

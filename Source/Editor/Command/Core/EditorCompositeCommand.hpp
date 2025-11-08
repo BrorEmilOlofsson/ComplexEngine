@@ -8,30 +8,30 @@ namespace Simple
 	{
 	public:
 
-		EditorCompositeCommand(std::string aName, std::vector<EditorCommand> aCommands);
+		EditorCompositeCommand(std::string name, std::vector<EditorCommand> commands);
 
 
-		void Execute(bool aDebugPrint) const;
-		void Undo(bool aDebugPrint) const;
+		void Execute(bool debugPrint) const;
+		void Undo(bool debugPrint) const;
 
 		const std::string& GetName() const
 		{
-			return myName;
+			return mName;
 		}
 
-		void AddCommand(EditorCommand&& aCommand)
+		void AddCommand(EditorCommand&& command)
 		{
-			myCommands.push_back(std::move(aCommand));
+			mCommands.push_back(std::move(command));
 		}
 
-		void AddCommand(const EditorCommand& aCommand)
+		void AddCommand(const EditorCommand& command)
 		{
-			myCommands.push_back(aCommand);
+			mCommands.push_back(command);
 		}
 
 	private:
 
-		std::vector<EditorCommand> myCommands;
-		std::string myName;
+		std::vector<EditorCommand> mCommands;
+		std::string mName;
 	};
 }

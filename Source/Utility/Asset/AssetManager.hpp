@@ -68,14 +68,14 @@ namespace Simple
 			return ValidatedGet<ModelAssetHandle>(path, mModelAssets);
 		}
 
+		[[nodiscard]] AnimatedModelAssetHandle GetAnimatedModel(const std::filesystem::path& path)
+		{
+			return ValidatedGet<AnimatedModelAssetHandle>(path, mAnimatedModelAssets);
+		}
+
 		[[nodiscard]] AnimationAssetHandle GetAnimation(const std::filesystem::path& path)
 		{
 			return ValidatedGet<AnimationAssetHandle>(path, mAnimationAssets);
-		}
-
-		[[nodiscard]] SkeletonAssetHandle GetSkeleton(const std::filesystem::path& path)
-		{
-			return ValidatedGet<SkeletonAssetHandle>(path, mSkeletonAssets);
 		}
 
 		[[nodiscard]] PixelShaderAssetHandle GetPixelShader(const std::filesystem::path& path)
@@ -109,6 +109,15 @@ namespace Simple
 				throw std::invalid_argument("Asset is invalid");
 			}
 			mModelAssets[std::filesystem::absolute(path)] = std::move(asset);
+		}
+
+		void AddAnimatedModel(const std::filesystem::path& path, AnimatedModelAsset asset)
+		{
+			if (!asset)
+			{
+				throw std::invalid_argument("Asset is invalid");
+			}
+			mAnimatedModelAssets[std::filesystem::absolute(path)] = std::move(asset);
 		}
 
 		void AddMesh(const std::filesystem::path& path, MeshAsset asset)
@@ -182,8 +191,8 @@ namespace Simple
 		std::unordered_map<std::filesystem::path, TextureAsset> mTextureAssets;
 		std::unordered_map<std::filesystem::path, MeshAsset> mMeshAssets;
 		std::unordered_map<std::filesystem::path, ModelAsset> mModelAssets;
+		std::unordered_map<std::filesystem::path, AnimatedModelAsset> mAnimatedModelAssets;
 		std::unordered_map<std::filesystem::path, AnimationAsset> mAnimationAssets;
-		std::unordered_map<std::filesystem::path, SkeletonAsset> mSkeletonAssets;
 		std::unordered_map<std::filesystem::path, PixelShaderAsset> mPixelShaderAssets;
 		std::unordered_map<std::filesystem::path, VertexShaderAsset> mVertexShaderAssets;
 		std::unordered_map<std::filesystem::path, EntityCompositionAsset> mEntityCompositionAssets;

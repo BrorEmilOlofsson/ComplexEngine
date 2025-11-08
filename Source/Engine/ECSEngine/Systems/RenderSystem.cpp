@@ -20,7 +20,7 @@
 
 namespace Simple
 {
-	static void PushStaticAnimationLines(const Transform& transform, const AnimationComponent& animationPlayerComponent, RenderList& renderList)
+	/*static void PushStaticAnimationLines(const Transform& transform, const AnimationComponent& animationPlayerComponent, RenderList& renderList)
 	{
 		const std::vector<Joint>& joints = animationPlayerComponent.skeleton->mJoints;
 		const Point3f position = transform.GetPosition();
@@ -61,9 +61,9 @@ namespace Simple
 		}
 
 		renderList.AddLines(staticSkeletonLines);
-	}
+	}*/
 
-	static void PushAnimatedSkeletonLines(const Transform& transform, const AnimationComponent& animationPlayerComponent, RenderList& renderList)
+	/*static void PushAnimatedSkeletonLines(const Transform& transform, const AnimationComponent& animationPlayerComponent, RenderList& renderList)
 	{
 		const SkeletonAssetHandle skeleton = animationPlayerComponent.skeleton;
 		const ModelSpacePose& modelSpacePose = animationPlayerComponent.animationPlayer.mModelSpacePose;
@@ -72,7 +72,7 @@ namespace Simple
 		const Vector3f scale = transform.GetScale();
 		const size_t jointSize = animationPlayerComponent.skeleton->mJoints.size();
 
-		std::vector<DrawLine> animatedkeletonLines(jointSize);
+		std::vector<DrawLine> animatedSkeletonLines(jointSize);
 		LocalSpacePose pose;
 
 		skeleton->ConvertModelSpacePoseToLocalSpacePose(modelSpacePose, pose);
@@ -104,11 +104,11 @@ namespace Simple
 			line.startPosition = boneWorldTransform.GetTranslation();
 			line.endPosition = boneWorldTransformNext.GetTranslation();
 
-			animatedkeletonLines[index] = line;
+			animatedSkeletonLines[index] = line;
 		}
 
-		renderList.AddLines(animatedkeletonLines);
-	}
+		renderList.AddLines(animatedSkeletonLines);
+	}*/
 
 	static void UpdateSpriteTransforms(ECS& ecs)
 	{
@@ -208,44 +208,44 @@ namespace Simple
 			});
 	}
 
-	static void ProcessAnimatedModels(const ECS& ecs, RenderList& renderList, const GraphicsSettings& graphicsSettings)
-	{
-		const bool shouldRenderMesh = graphicsSettings.mShouldRenderMesh;
-		const bool shouldRenderBoundingBox = graphicsSettings.mShouldRenderBoundingBox;
+	//static void ProcessAnimatedModels(const ECS& ecs, RenderList& renderList, const GraphicsSettings& graphicsSettings)
+	//{
+	//	const bool shouldRenderMesh = graphicsSettings.mShouldRenderMesh;
+	//	const bool shouldRenderBoundingBox = graphicsSettings.mShouldRenderBoundingBox;
 
-		ecs.ForEach([&](const EntityID entityID, const MeshComponent& meshComponent, const AnimationComponent& animationComponent)
-			{
-				const Transform worldTransform = GetWorldTransform(ecs, entityID);
-				if (shouldRenderBoundingBox == true)
-				{
-					renderList.AddBoundingBox(DrawBoundingBox(worldTransform, meshComponent.mesh->GetBoundingBox()));
-				}
+	//	ecs.ForEach([&](const EntityID entityID, const MeshComponent& meshComponent, const AnimationComponent& animationComponent)
+	//		{
+	//			const Transform worldTransform = GetWorldTransform(ecs, entityID);
+	//			if (shouldRenderBoundingBox == true)
+	//			{
+	//				renderList.AddBoundingBox(DrawBoundingBox(worldTransform, meshComponent.mesh->GetBoundingBox()));
+	//			}
 
-				if (!animationComponent.skeleton || !animationComponent.pixelShader || !animationComponent.vertexShader)
-				{
-					return;
-				}
+	//			if (!animationComponent.skeleton || !animationComponent.pixelShader || !animationComponent.vertexShader)
+	//			{
+	//				return;
+	//			}
 
-				if (graphicsSettings.mShouldRenderSkeletonLines)
-				{
-					if (animationComponent.animationPlayer.mModelSpacePose.count > 0)
-					{
-						PushAnimatedSkeletonLines(worldTransform, animationComponent, renderList);
-					}
-					else
-					{
-						PushStaticAnimationLines(worldTransform, animationComponent, renderList);
-					}
-				}
+	//			if (graphicsSettings.mShouldRenderSkeletonLines)
+	//			{
+	//				if (animationComponent.animationPlayer.mModelSpacePose.count > 0)
+	//				{
+	//					PushAnimatedSkeletonLines(worldTransform, animationComponent, renderList);
+	//				}
+	//				else
+	//				{
+	//					PushStaticAnimationLines(worldTransform, animationComponent, renderList);
+	//				}
+	//			}
 
-				if (!shouldRenderMesh)
-				{
-					return;
-				}
+	//			if (!shouldRenderMesh)
+	//			{
+	//				return;
+	//			}
 
-				//renderList.AddAnimatedModelInstance(AnimatedModelInstance(worldTransform, Model(meshComponent.textures, meshComponent.mesh, meshComponent.pixelShader, meshComponent.vertexShader), animationComponent.jointMatrices, animationComponent.pixelShader, animationComponent.vertexShader));
-			});
-	}
+	//			//renderList.AddAnimatedModelInstance(AnimatedModelInstance(worldTransform, Model(meshComponent.textures, meshComponent.mesh, meshComponent.pixelShader, meshComponent.vertexShader), animationComponent.jointMatrices, animationComponent.pixelShader, animationComponent.vertexShader));
+	//		});
+	//}
 
 	static void ProcessSkyBox(const ECS& ecs, RenderState& renderState)
 	{
@@ -282,7 +282,7 @@ namespace Simple
 		ProcessSkyBox(ecs, renderState);
 		ProcessDirectionalLight(ecs, renderState);
 		ProcessStaticModels(ecs, renderState.GetRenderList(), graphicsSettings);
-		ProcessAnimatedModels(ecs, renderState.GetRenderList(), graphicsSettings);
+		//ProcessAnimatedModels(ecs, renderState.GetRenderList(), graphicsSettings);
 	}
 
 	static void ProcessArrows(const ECS& ecs, RenderList& renderList)

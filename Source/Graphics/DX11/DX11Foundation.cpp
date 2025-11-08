@@ -5,6 +5,7 @@
 #include "Graphics/Texture/Texture.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
 #include "Graphics/Model/Model.hpp"
+#include "Graphics/Model/AnimatedModel.hpp"
 #include "Graphics/DX11/DX11LoadFunctions.hpp"
 #include "Graphics/Model/Factory/ShapeCreator3000.hpp"
 #include "Graphics/DX11/Shader/DX11PixelShader.hpp"
@@ -35,14 +36,21 @@ namespace Simple
 				return MeshAsset::Empty();
 			};
 
-		auto modelLoader = [device, context](const std::filesystem::path& path) -> ModelAsset
+		auto modelLoader = [device, context](const std::filesystem::path& path) -> std::variant<std::monostate, ModelAsset, AnimatedModelAsset>
 			{
-				std::expected<DX11Model, std::string> meshResult = LoadDX11Model(path, *device.Get(), context);
+				std::expected<std::variant<DX11Model, DX11AnimatedModel>, std::string> meshResult = LoadDX11Model(path, *device.Get(), context);
 				if (meshResult.has_value())
 				{
-					return ModelAsset(std::make_shared<Model>(std::move(meshResult.value())));
+					if (DX11Model* model = std::get_if<DX11Model>(&meshResult.value()))
+					{
+						return ModelAsset(std::make_shared<Model>(std::move(*model)));
+					}
+					else if (DX11AnimatedModel* animatedModel = std::get_if<DX11AnimatedModel>(&meshResult.value()))
+					{
+						return AnimatedModelAsset(std::make_shared<AnimatedModel>(std::move(*animatedModel)));
+					}
 				}
-				return ModelAsset::Empty();
+				return std::monostate{};
 			};
 
 		auto pixelShaderLoader = [device, context](const std::filesystem::path& path) -> PixelShaderAsset
