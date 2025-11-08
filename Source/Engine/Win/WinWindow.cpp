@@ -97,7 +97,7 @@ namespace Simple
 			DWMWCP_ROUNDSMALL = 3
 		};
 
-		DWM_WINDOW_CORNER_PREFERENCE preference = DWM_WINDOW_CORNER_PREFERENCE::DWMWCP_DONOTROUND;
+		DWM_WINDOW_CORNER_PREFERENCE preference = DWM_WINDOW_CORNER_PREFERENCE::DWMWCP_ROUND;
 		DwmSetWindowAttribute(mHandle, DWMWA_WINDOW_CORNER_PREFERENCE, &preference, sizeof(preference));
 
 		DragAcceptFiles(mHandle, true);

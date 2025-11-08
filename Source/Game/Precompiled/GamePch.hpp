@@ -26,7 +26,6 @@
 #include "Utility/Math/Math.hpp"
 #include "Utility/Math/VectorMath.hpp"
 
-#include "Utility/HashStuff.hpp"
 #include "Utility/Shapes/Ray3.hpp"
 #include "Utility/Shapes/Plane.hpp"
 #include "Utility/Bounds.hpp"

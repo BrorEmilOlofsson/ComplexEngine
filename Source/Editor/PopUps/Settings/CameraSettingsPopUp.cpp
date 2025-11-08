@@ -20,7 +20,8 @@ namespace Simple
 		FreeFlyCameraSettings& cameraSettings = blackboard.Get<Key_FreeFlyCameraSettings>();
 		if (ImGui::Begin(mImGuiName.c_str(), &mIsActive))
 		{
-			Degreesf fov = ToDegrees(blackboard.Get<Key_CurrentCamera>().GetHorizontalFOV());
+			Camera& camera = blackboard.Get<Key_CurrentCamera>();
+			Degreesf fov = ToDegrees(camera.GetHorizontalFOV());
 
 			if (ImGui::DragFloat("Camera Move Speed", &cameraSettings.moveSpeed, 0.1f, 0.0f, 100.0f))
 			{
@@ -32,10 +33,8 @@ namespace Simple
 
 			if (ImGui::SliderFloat("FoV", &fov.Value(), 0.01f, 179.00f, "%0.2f"))
 			{
-				blackboard.Get<Key_CurrentCamera>().SetHorizontalFOV(ToRadians(fov), windowView.GetClientSize());
+				camera.SetHorizontalFOV(ToRadians(fov), windowView.GetClientSize());
 			}
-
-			const Camera& camera = blackboard.Get<Key_CurrentCamera>();
 
 			Transform transform = camera.GetTransform();
 			transform.SetPosition(Point3f(-5, 2, 0));
