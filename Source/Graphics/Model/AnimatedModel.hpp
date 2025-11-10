@@ -43,10 +43,10 @@ namespace Simple
 			return mConcept->GetSkeleton();
 		}
 
-		/*void Render()
+		void Render()
 		{
 			mConcept->Render();
-		}*/
+		}
 
 	private:
 
@@ -61,7 +61,7 @@ namespace Simple
 			virtual const std::filesystem::path& GetPath() const = 0;
 			virtual AABB3f GetBoundingBox() const = 0;
 			virtual const Skeleton& GetSkeleton() const = 0;
-			//virtual void Render() = 0;
+			virtual void Render() = 0;
 		};
 
 		template<typename T>
@@ -94,10 +94,10 @@ namespace Simple
 				return mModel.GetSkeleton();
 			}
 
-			/*void Render() override
+			void Render() override
 			{
 				mModel.Render();
-			}*/
+			}
 
 		private:
 

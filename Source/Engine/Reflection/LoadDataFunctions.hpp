@@ -136,6 +136,7 @@ namespace Simple
 
 	void FromJSON(MeshAssetHandle& meshAsset, const nlohmann::json& json, const Blackboard& blackboard);
 	void FromJSON(ModelAssetHandle& modelAsset, const nlohmann::json& json, const Blackboard& blackboard);
+	void FromJSON(AnimatedModelAssetHandle& animatedModelAsset, const nlohmann::json& json, const Blackboard& blackboard);
 	void FromJSON(TextureAssetHandle& textureAsset, const nlohmann::json& json, const Blackboard& blackboard);
 	void FromJSON(AnimationAssetHandle& animationAsset, const nlohmann::json& json, const Blackboard& blackboard);
 	void FromJSON(PixelShaderAssetHandle& shader, const nlohmann::json& json, const Blackboard& blackboard);

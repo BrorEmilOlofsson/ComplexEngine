@@ -11,6 +11,7 @@ namespace Simple
 	using Key_SceneSettings = BlackboardKey<struct SceneSettings&, "SceneSettings">;
 	using Key_VariableName = BlackboardKey<std::string, "VariableName">;
 	using Key_CurrentCamera = BlackboardKey<class Camera&, "CurrentCamera">;
+	using Key_DeltaTime = BlackboardKey<float, "DeltaTime">;
 	using Key_ReferenceTransform = BlackboardKey<Transform, "ReferenceTransform">;
 	using Key_ShowUnitVectorInScene = BlackboardKey<bool&, "ShowUnitVectorInScene">;
 	using Key_IsPlaying = BlackboardKey<bool, "IsPlaying">;

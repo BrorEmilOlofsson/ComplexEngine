@@ -7,6 +7,7 @@
 #include "Utility/Asset/AssetManager.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
 #include "Graphics/Model/Model.hpp"
+#include "Graphics/Model/AnimatedModel.hpp"
 #include "Graphics/Texture/Texture.hpp"
 #include "Utility/EngineDirectories.hpp"
 #include "Graphics/DX11/RenderTarget/DX11RenderTarget.hpp"
@@ -19,9 +20,9 @@
 namespace Simple
 {
 
-	static void RenderModels(std::span<const ModelInstance> models, DX11ConstantBuffer<TransformBufferData>& transformCB, DX11ConstantBuffer<ObjectIDBufferData>& objectIDCB, ID3D11DeviceContext& context)
+	static void RenderModels(std::span<const ModelInstance> modelInstances, DX11ConstantBuffer<TransformBufferData>& transformCB, DX11ConstantBuffer<ObjectIDBufferData>& objectIDCB, ID3D11DeviceContext& context)
 	{
-		for (auto& modelInstance : models)
+		for (auto& modelInstance : modelInstances)
 		{
 			if (!modelInstance.mesh)
 			{
@@ -54,6 +55,30 @@ namespace Simple
 		}
 	}
 
+	static void RenderAnimatedModels(std::span<const AnimatedModelInstance> modelInstances, DX11ConstantBuffer<TransformBufferData>& transformCB, DX11ConstantBuffer<ObjectIDBufferData>& objectIDCB, DX11ConstantBuffer<BoneBufferData>& boneCB, ID3D11DeviceContext& context)
+	{
+		for (auto& modelInstance : modelInstances)
+		{
+
+			if (!modelInstance.animatedModel)
+			{
+				continue;
+			}
+
+			if (modelInstance.albedoTexture)
+			{
+				modelInstance.albedoTexture->Bind();
+			}
+
+			transformCB.UpdateAndBind(TransformBufferData{ modelInstance.transform.GetMatrix() }, context);
+			objectIDCB.UpdateAndBind(ObjectIDBufferData{ modelInstance.objectID }, context);
+			boneCB.UpdateAndBind(BoneBufferData{ modelInstance.boneMatrices }, context);
+
+			modelInstance.animatedModel->Render();
+
+		}
+	}
+
 	DX11Renderer::DX11Renderer(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
 		: mDevice(device)
 		, mDeviceContext(context)
@@ -81,16 +106,22 @@ namespace Simple
 		return std::filesystem::path(SIMPLE_DIR_SHADERS) / (std::string(name) + ".cso");
 	}
 
-	void DX11Renderer::Render(RenderState& renderState, AssetManager& assetManager,
-		PixelShaderAssetHandle, VertexShaderAssetHandle vertexShader,
-		DX11ConstantBuffer<ColorBufferData>& colorCB, DX11ConstantBuffer<TransformBufferData>& transformCB, DX11ConstantBuffer<ObjectIDBufferData>& objectIDCB, DX11SamplerState& samplerState)
+	void DX11Renderer::Render(RenderState& renderState,
+		AssetManager& assetManager,
+		PixelShaderAssetHandle, 
+		VertexShaderAssetHandle vertexShader,
+		DX11ConstantBuffer<ColorBufferData>& colorCB,
+		DX11ConstantBuffer<TransformBufferData>& transformCB,
+		DX11ConstantBuffer<ObjectIDBufferData>& objectIDCB, 
+		DX11ConstantBuffer<BoneBufferData>& boneBuffer,
+		DX11SamplerState& samplerState)
 	{
 		PROFILER_FUNCTION(profiler::colors::Red);
 
 		DX11RenderContext* r = renderState.GetRenderContext()->GetUnderlying<DX11RenderContext>();
 
 		const Vector2ui size = Vector2ui(renderState.GetRenderRect()->GetExtent());
-		
+
 		auto viewport = DX11Factory::CreateViewport(size);
 		mDeviceContext->RSSetViewports(1, &viewport);
 
@@ -115,10 +146,12 @@ namespace Simple
 		assetManager.GetVertexShader(GetPath(eVertexShaderType::Default))->Bind();
 
 		RenderModels(renderState.GetRenderList().GetModelInstances(), transformCB, objectIDCB, *mDeviceContext.Get());
+		assetManager.GetVertexShader(GetShaderPath("AnimatedVS"))->Bind();
+		RenderAnimatedModels(renderState.GetRenderList().GetAnimatedModelInstances(), transformCB, objectIDCB, boneBuffer, *mDeviceContext.Get());
 
 		objectIDCB.Update(ObjectIDBufferData{}, *mDeviceContext.Get());
 
-		
+
 		// (Optional safety) Unbind MRTs before using them as SRVs
 		ID3D11RenderTargetView* nullRTVs[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT] = {};
 		mDeviceContext->OMSetRenderTargets(_countof(nullRTVs), nullRTVs, nullptr);
@@ -131,12 +164,12 @@ namespace Simple
 
 		RenderFullScreen(
 			*mDeviceContext.Get(),
-		r->GetOutputRenderTarget().GetShaderResourceView(),
+			r->GetOutputRenderTarget().GetShaderResourceView(),
 			samplerState,
 			assetManager.GetVertexShader(GetShaderPath("FullScreenQuadVS")),
 			assetManager.GetPixelShader(GetShaderPath("DeferredLightingPS"))
 		);
-		
+
 
 		// Render debug lines
 

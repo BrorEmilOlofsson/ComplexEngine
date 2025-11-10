@@ -13,7 +13,7 @@
 #include "Editor/PopUps/Editor/EntityCompositionPopUp.hpp"
 #include "Engine/ECS/EntityComposition.hpp"
 #include "Engine/ECS/ECSSerializer.hpp"
-#include "Graphics/GraphicsDefines.hpp"
+#include "Graphics/GraphicsConstants.hpp"
 
 namespace Simple
 {

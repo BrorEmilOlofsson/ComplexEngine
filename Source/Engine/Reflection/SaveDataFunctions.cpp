@@ -9,6 +9,7 @@
 #include "Graphics/Texture/Texture.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
 #include "Graphics/Model/Model.hpp"
+#include "Graphics/Model/AnimatedModel.hpp"
 #include "Graphics/GraphicsConstants.hpp"
 #include "Engine/Reflection/DataTypeRegistry.hpp"
 
@@ -242,6 +243,20 @@ namespace Simple
 		return json;
 	}
 
+	nlohmann::json ToJSON(const AnimatedModelAssetHandle& asset)
+	{
+		nlohmann::json json;
+		std::filesystem::path meshPath;
+
+		if (asset)
+		{
+			meshPath = asset->GetPath();
+		}
+
+		json = meshPath;
+		return json;
+	}
+
 	nlohmann::json ToJSON(const TextureAssetHandle& textureAsset)
 	{
 		nlohmann::json json;
@@ -298,7 +313,7 @@ namespace Simple
 
 		if (animationAsset)
 		{
-			animationRelativePath = animationAsset->relativePath;
+			animationRelativePath = animationAsset->path;
 		}
 
 		json = animationRelativePath;

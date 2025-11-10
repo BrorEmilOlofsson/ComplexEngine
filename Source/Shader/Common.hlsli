@@ -1,5 +1,5 @@
 
-#define SIMPLE_MAX_JOINTS 64
+#define SIMPLE_MAX_BONES 64
 #define SIMPLE_MAX_POINTLIGHTS 100
 
 SamplerState GlobalDefaultSampler : register(s0);
@@ -19,8 +19,8 @@ Texture2D GBufferObjectIDTexture : register(t9);
 
 cbuffer CameraBuffer : register(b0)
 {
-    row_major float4x4 CameraViewMatrix;
-    row_major float4x4 CameraProjectionMatrix;
+    float4x4 CameraViewMatrix;
+    float4x4 CameraProjectionMatrix;
     float3 CameraPosition;
     float paddingCameraBuffer;
     
@@ -30,7 +30,7 @@ cbuffer CameraBuffer : register(b0)
 
 cbuffer TransformBuffer : register(b1)
 {
-    row_major float4x4 ModelToWorldMatrix;
+    float4x4 ModelToWorldMatrix;
 }
 
 cbuffer TimeBuffer : register(b2)
@@ -53,7 +53,7 @@ cbuffer LightBuffer : register(b3)
 
 cbuffer JointBuffer : register(b4)
 {
-    float4x4 bones[SIMPLE_MAX_JOINTS];
+    float4x4 BoneMatrices[SIMPLE_MAX_BONES];
 }
 
 cbuffer PostProcessingBuffer : register(b5)
@@ -131,13 +131,12 @@ struct VertexInputType
 {
     float4 Position : POSITION0;
     float4 Color : COLOR0;
-    float4 Bones : BONES0;
+    uint4 Bones : BONES0;
     float4 Weights : WEIGHTS0;
     float3 Normal : NORMAL0;
     float3 Tangent : TANGENT0;
     float3 Bitangent : BITANGENT0;
     float2 UV : TEXCOORD0;
-    //float4x4 instanceTransform : INSTANCE_TRANSFORM;
 };
 
 struct PixelInputType

@@ -9,4 +9,5 @@ namespace Simple
 
 	COMPONENT(AnimatedModelComponent);
 	REGISTER_MEMBER(AnimatedModelComponent::modelHandle);
+	REGISTER_MEMBER(AnimatedModelComponent::textures);
 }

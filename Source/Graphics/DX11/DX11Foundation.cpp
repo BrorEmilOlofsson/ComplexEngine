@@ -36,21 +36,35 @@ namespace Simple
 				return MeshAsset::Empty();
 			};
 
-		auto modelLoader = [device, context](const std::filesystem::path& path) -> std::variant<std::monostate, ModelAsset, AnimatedModelAsset>
+		auto fbxLoader = [device, context](const std::filesystem::path& path) -> FBXParseResult
 			{
-				std::expected<std::variant<DX11Model, DX11AnimatedModel>, std::string> meshResult = LoadDX11Model(path, *device.Get(), context);
+				FBXParseResult result;
+				std::expected<FBXResult, std::string> meshResult = LoadDX11FBX(path, *device.Get(), context);
 				if (meshResult.has_value())
 				{
-					if (DX11Model* model = std::get_if<DX11Model>(&meshResult.value()))
+					if (DX11Model* model = std::get_if<DX11Model>(&meshResult.value().model))
 					{
-						return ModelAsset(std::make_shared<Model>(std::move(*model)));
+						result.model = ModelAsset(std::make_shared<Model>(std::move(*model)));
 					}
-					else if (DX11AnimatedModel* animatedModel = std::get_if<DX11AnimatedModel>(&meshResult.value()))
+					else if (DX11AnimatedModel* animatedModel = std::get_if<DX11AnimatedModel>(&meshResult.value().model))
 					{
-						return AnimatedModelAsset(std::make_shared<AnimatedModel>(std::move(*animatedModel)));
+						result.model = AnimatedModelAsset(std::make_shared<AnimatedModel>(std::move(*animatedModel)));
+					}
+					else
+					{
+						result.model = std::monostate{};
+					}
+
+					if (!meshResult.value().animations.empty())
+					{
+						for (auto& animation : meshResult.value().animations)
+						{
+							result.animations.emplace_back(std::make_shared<Animation>(std::move(animation)));
+						}
 					}
 				}
-				return std::monostate{};
+
+				return result;
 			};
 
 		auto pixelShaderLoader = [device, context](const std::filesystem::path& path) -> PixelShaderAsset
@@ -68,7 +82,7 @@ namespace Simple
 
 		assetLoader.SetTextureLoader(std::move(textureLoader));
 		assetLoader.SetMeshLoader(std::move(meshLoader));
-		assetLoader.SetModelLoader(std::move(modelLoader));
+		assetLoader.SetFBXLoader(std::move(fbxLoader));
 		assetLoader.SetPixelShaderLoader(std::move(pixelShaderLoader));
 		assetLoader.SetVertexShaderLoader(std::move(vertexShaderLoader));
 	}
@@ -246,6 +260,7 @@ namespace Simple
 			mConstantBufferManager.mColorBuffer,
 			mConstantBufferManager.mTransformBuffer,
 			mConstantBufferManager.mObjectIDBuffer,
+			mConstantBufferManager.mBoneBuffer,
 			*mSamplerState
 		);
 	}

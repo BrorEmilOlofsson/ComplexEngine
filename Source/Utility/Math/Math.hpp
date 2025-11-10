@@ -260,6 +260,18 @@ namespace Simple
 	}
 
 	template<typename T>
+	[[nodiscard]] constexpr T LengthSquared(const T& x, const T& y, const T& z, const T& w) noexcept
+	{
+		return Square(x) + Square(y) + Square(z) + Square(w);
+	}
+
+	template<typename T>
+	[[nodiscard]] constexpr T Length(const T& x, const T& y, const T& z, const T& w) noexcept
+	{
+		return Sqrt(LengthSquared(x, y, z, w));
+	}
+
+	template<typename T>
 	[[nodiscard]] constexpr bool IsNormalized(const T& x, const T& y) noexcept
 	{
 		return LengthSquared(x, y) == static_cast<T>(1.0);
@@ -286,6 +298,35 @@ namespace Simple
 		if (!IsNormalized(x, y, z))
 		{
 			throw std::runtime_error("Vector is not normalized");
+		}
+	}
+
+	template<bool ThrowError = true, typename T>
+	constexpr void Normalize(T& x, T& y, T& z, T& w) noexcept(!ThrowError)
+	{
+		const T lengthSquared = LengthSquared(x, y, z, w);
+		if (lengthSquared == T{ 0 })
+		{
+			if constexpr (ThrowError)
+			{
+				throw std::runtime_error("Cannot normalize zero vector");
+			}
+			else
+			{
+				return;
+			}
+		}
+		else if (lengthSquared == static_cast<T>(1.0))
+		{
+			return;
+		}
+		else
+		{
+			const T length = Sqrt(lengthSquared);
+			x /= length;
+			y /= length;
+			z /= length;
+			w /= length;
 		}
 	}
 

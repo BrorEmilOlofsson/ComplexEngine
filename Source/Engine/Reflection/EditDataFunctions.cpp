@@ -1,7 +1,7 @@
 #include "Engine/Precompiled/EnginePch.hpp"
 #include "Engine/Reflection/EditDataFunctions.hpp"
 
-#include "Graphics/GraphicsDefines.hpp"
+#include "Graphics/GraphicsConstants.hpp"
 #include "Utility/Camera.hpp"
 #include "Engine/Collision/CollisionShape.hpp"
 #include "Graphics/RenderState.hpp"
@@ -12,6 +12,7 @@
 #include "Utility/Algorithm.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
 #include "Graphics/Model/Model.hpp"
+#include "Graphics/Model/AnimatedModel.hpp"
 #include "Graphics/Texture/Texture.hpp"
 #include "Graphics/Animation/Animation.hpp"
 #include "Graphics/Model/Skeleton.hpp"
@@ -814,6 +815,52 @@ namespace Simple
 		return ViewAndEditValue(model, blackboard.Get<Key_AssetManager>());
 	}
 
+	static ViewAndEditResult ViewAndEditValue(AnimatedModelAssetHandle& animatedModelAsset, AssetManager& assetManager)
+	{
+		ViewAndEditResult viewAndEditResult;
+		std::filesystem::path path;
+
+		if (animatedModelAsset)
+		{
+			path = animatedModelAsset->GetPath();
+		}
+
+		ImGui::AlignTextToFramePadding();
+
+		ImGui::Text("Model:");
+		ImGui::SameLine();
+		ImGui::BeginDisabled();
+		ImGui::InputText("", path.string().data(), path.string().size());
+		ImGui::EndDisabled();
+
+		if (const ImGuiPayload* currentPayload = ImGui::GetDragDropPayload())
+		{
+			const std::filesystem::path droppedPath = std::filesystem::path(reinterpret_cast<const char*>(currentPayload->Data));
+			const std::filesystem::path extension = droppedPath.extension();
+
+			if (extension.string() == ".fbx")
+			{
+				if (ImGui::BeginDragDropTarget())
+				{
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Asset"))
+					{
+						animatedModelAsset = assetManager.GetAnimatedModel(droppedPath);
+						viewAndEditResult.isEdited = true;
+						viewAndEditResult.isActive = true;
+					}
+					ImGui::EndDragDropTarget();
+				}
+			}
+		}
+
+		return viewAndEditResult;
+	}
+
+	ViewAndEditResult ViewAndEditValue(AnimatedModelAssetHandle& model, const Blackboard& blackboard)
+	{
+		return ViewAndEditValue(model, blackboard.Get<Key_AssetManager>());
+	}
+
 	static ViewAndEditResult ViewAndEditValue(TextureAssetHandle& textureAsset, AssetManager& assetManager)
 	{
 		ViewAndEditResult viewAndEditResult;
@@ -996,7 +1043,7 @@ namespace Simple
 
 		if (animationAsset)
 		{
-			name = animationAsset->relativePath;
+			name = animationAsset->path;
 		}
 
 		ImGui::AlignTextToFramePadding();

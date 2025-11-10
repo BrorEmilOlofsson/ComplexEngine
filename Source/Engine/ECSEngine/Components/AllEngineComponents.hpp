@@ -6,7 +6,6 @@
 #include "Engine/ECSEngine/Components/MeshComponent.hpp"
 #include "Engine/ECSEngine/Components/ModelComponent.hpp"
 #include "Engine/ECSEngine/Components/AnimatedModelComponent.hpp"
-#include "Engine/ECSEngine/Components/AnimationComponent.hpp"
 #include "Engine/ECSEngine/Components/SkyBoxComponent.hpp"
 #include "Engine/ECSEngine/Components/DirectionalLightComponent.hpp"
 #include "Engine/ECSEngine/Components/PointLightComponent.hpp"
@@ -31,7 +30,6 @@ namespace Simple
 		RegisterMeshComponent();
 		RegisterModelComponent();
 		RegisterAnimatedModelComponent();
-		RegisterAnimationComponent();
 		RegisterSkyBoxComponent();
 		RegisterDirectionalLightComponent();
 		RegisterPointLightComponent();

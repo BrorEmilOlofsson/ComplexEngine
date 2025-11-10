@@ -16,7 +16,7 @@ namespace Simple
 		mLightBuffer.Init(device, ConstantBufferSlots::Light);
 		mPointLightBuffer.Init(device, ConstantBufferSlots::Pointlight);
 		mPostProcessBuffer.Init(device, ConstantBufferSlots::PostProcess);
-		mJointsBuffer.Init(device, ConstantBufferSlots::Joints);
+		mBoneBuffer.Init(device, ConstantBufferSlots::Bone);
 		mSkyBoxBuffer.Init(device, ConstantBufferSlots::SkyBox);
 		mColorBuffer.Init(device, ConstantBufferSlots::Color);
 		mObjectIDBuffer.Init(device, ConstantBufferSlots::ObjectID);

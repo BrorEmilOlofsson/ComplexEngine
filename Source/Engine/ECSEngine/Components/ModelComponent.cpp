@@ -2,7 +2,7 @@
 #include "ModelComponent.hpp"
 #include "Engine/Reflection/Reflection.hpp"
 #include "Utility/Asset/AssetManager.hpp"
-#include "Graphics/GraphicsDefines.hpp"
+#include "Graphics/GraphicsConstants.hpp"
 
 namespace Simple
 {

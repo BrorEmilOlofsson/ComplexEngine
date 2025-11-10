@@ -8,6 +8,12 @@
 namespace Simple
 {
 
+	struct FBXParseResult
+	{
+		std::variant<std::monostate, ModelAsset, AnimatedModelAsset> model;
+		std::vector<AnimationAsset> animations;
+	};
+
 	class AssetLoader final
 	{
 	public:
@@ -24,9 +30,9 @@ namespace Simple
 			return mMeshLoader(path);
 		}
 
-		[[nodiscard]] std::variant<std::monostate, ModelAsset, AnimatedModelAsset> LoadModel(const std::filesystem::path& path) const
+		[[nodiscard]] FBXParseResult LoadFBX(const std::filesystem::path& path) const
 		{
-			return mModelLoader(path);
+			return mFBXLoader(path);
 		}
 
 		[[nodiscard]] PixelShaderAsset LoadPixelShader(const std::filesystem::path& path) const
@@ -54,9 +60,9 @@ namespace Simple
 			mMeshLoader = std::move(loader);
 		}
 
-		void SetModelLoader(std::function<std::variant<std::monostate, ModelAsset, AnimatedModelAsset>(const std::filesystem::path&)> loader)
+		void SetFBXLoader(std::function<FBXParseResult(const std::filesystem::path&)> loader)
 		{
-			mModelLoader = std::move(loader);
+			mFBXLoader = std::move(loader);
 		}
 
 		void SetPixelShaderLoader(std::function<PixelShaderAsset(const std::filesystem::path&)> loader)
@@ -78,7 +84,7 @@ namespace Simple
 
 		std::function<TextureAsset(const std::filesystem::path&)> mTextureLoader;
 		std::function<MeshAsset(const std::filesystem::path&)> mMeshLoader;
-		std::function<std::variant<std::monostate, ModelAsset, AnimatedModelAsset>(const std::filesystem::path&)> mModelLoader;
+		std::function<FBXParseResult(const std::filesystem::path&)> mFBXLoader;
 		std::function<PixelShaderAsset(const std::filesystem::path&)> mPixelShaderLoader;
 		std::function<VertexShaderAsset(const std::filesystem::path&)> mVertexShaderLoader;
 		std::function<EntityCompositionAsset(const std::filesystem::path&)> mEntityCompositionLoader;

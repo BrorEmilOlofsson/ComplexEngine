@@ -120,6 +120,15 @@ namespace Simple
 			mAnimatedModelAssets[std::filesystem::absolute(path)] = std::move(asset);
 		}
 
+		void AddAnimation(const std::filesystem::path& path, AnimationAsset asset)
+		{
+			if (!asset)
+			{
+				throw std::invalid_argument("Asset is invalid");
+			}
+			mAnimationAssets[std::filesystem::absolute(path)] = std::move(asset);
+		}
+
 		void AddMesh(const std::filesystem::path& path, MeshAsset asset)
 		{
 			if (!asset)

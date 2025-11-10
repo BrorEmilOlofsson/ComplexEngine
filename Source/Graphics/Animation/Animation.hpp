@@ -7,23 +7,26 @@
 
 namespace Simple
 {
+	struct BoneKeyFrames
+	{
+		std::vector<Point3f> positions;
+		std::vector<Quaternionf> rotations;
+		std::vector<Vector3f> scales;
+		std::vector<float> positionTimestamps;
+		std::vector<float> rotationTimestamps;
+		std::vector<float> scaleTimestamps;
+	};
+
 	class Animation final
 	{
 	public:
-		struct Frame
-		{
-			std::unordered_map<std::string, Matrix4x4f> jointNameToModelSpaceMatrix;
-		private:
-			const char padding[48] = {};
-		};
+		
 
-		std::vector<Frame> frames;
-		std::string animationName;
-		std::filesystem::path relativePath;
+		std::vector<BoneKeyFrames> boneKeyFrames;
+		std::string name;
+		std::filesystem::path path;
 
 		float duration = 0.0f;
 		float framesPerSecond = 0.0f;
-
-		unsigned int length = 0;
 	};
 }

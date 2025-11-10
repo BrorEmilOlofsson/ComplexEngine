@@ -161,6 +161,7 @@ namespace Simple
 
 	[[nodiscard]] nlohmann::json ToJSON(const MeshAssetHandle& meshAsset);
 	[[nodiscard]] nlohmann::json ToJSON(const ModelAssetHandle& modelAsset);
+	[[nodiscard]] nlohmann::json ToJSON(const AnimatedModelAssetHandle& animatedModelAsset);
 	[[nodiscard]] nlohmann::json ToJSON(const PixelShaderAssetHandle& shaderAsset);
 	[[nodiscard]] nlohmann::json ToJSON(const VertexShaderAssetHandle& shaderAsset);
 	[[nodiscard]] nlohmann::json ToJSON(const TextureAssetHandle& textureAsset);

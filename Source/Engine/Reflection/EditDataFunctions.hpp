@@ -141,6 +141,7 @@ namespace Simple
 
 	ViewAndEditResult ViewAndEditValue(MeshAssetHandle& meshAsset, const Blackboard& blackboard);
 	ViewAndEditResult ViewAndEditValue(ModelAssetHandle& modelAsset, const Blackboard& blackboard);
+	ViewAndEditResult ViewAndEditValue(AnimatedModelAssetHandle& animatedModelAsset, const Blackboard& blackboard);
 	ViewAndEditResult ViewAndEditValue(TextureAssetHandle& textureAsset, const Blackboard& blackboard);
 	ViewAndEditResult ViewAndEditValue(PixelShaderAssetHandle& shaderAsset, const Blackboard& blackboard);
 	ViewAndEditResult ViewAndEditValue(VertexShaderAssetHandle& shaderAsset, const Blackboard& blackboard);

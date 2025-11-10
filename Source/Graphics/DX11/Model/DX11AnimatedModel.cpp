@@ -10,7 +10,7 @@ namespace Simple
 		ID3D11Device& device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
 		: mContext(context)
 		, mName(name)
-		, mPath(path)
+		, mPath(std::filesystem::relative(path))
 		, mSkeleton(skeleton)
 		, mMeshes(std::move(meshData))
 	{
@@ -36,6 +36,14 @@ namespace Simple
 	const Skeleton& DX11AnimatedModel::GetSkeleton() const
 	{
 		return mSkeleton;
+	}
+
+	void DX11AnimatedModel::Render()
+	{
+		for (auto& mesh : mMeshes)
+		{
+			mesh.Render();
+		}
 	}
 }
 

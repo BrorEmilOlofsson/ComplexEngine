@@ -42,8 +42,6 @@ namespace Simple
 		constexpr Rotator<T> GetRotator() const;
 
 		constexpr static Vector3<T> RotateVectorByQuaternion(const Quaternion<T>& aQuaternion, const Vector3<T>& aVectorToRotate);
-		constexpr static Quaternion<T> Lerp(const Quaternion<T>& aQuaternionA, const Quaternion<T>& aQuaternionB, const T& aDelta);
-		constexpr static Quaternion<T> Slerp(const Quaternion<T>& aQuaternionA, const Quaternion<T>& aQuaternionB, const T& aDelta);
 	};
 
 	typedef Quaternion<float> Quaternionf;
@@ -318,47 +316,5 @@ namespace Simple
 			+ 2.0f * aQuaternion.w * vector.Cross(aVectorToRotate);
 
 		return result;
-	}
-
-	template<typename T>
-	constexpr Quaternion<T> Quaternion<T>::Lerp(const Quaternion<T>& aQuaternionA, const Quaternion<T>& aQuaternionB, const T& aDelta)
-	{
-		Quaternion<T> result;
-
-		const float deltaInverse = 1 - aDelta;
-
-		result.w = deltaInverse * aQuaternionA.w + aDelta * aQuaternionB.w;
-
-		result.x = deltaInverse * aQuaternionA.x + aDelta * aQuaternionB.x;
-		result.y = deltaInverse * aQuaternionA.y + aDelta * aQuaternionB.y;
-		result.z = deltaInverse * aQuaternionA.z + aDelta * aQuaternionB.z;
-
-		result.Normalize();
-
-		return result;
-	}
-
-	template<typename T>
-	constexpr Quaternion<T> Quaternion<T>::Slerp(const Quaternion<T>& aQuaternionA, const Quaternion<T>& aQuaternionB, const T& aDelta)
-	{
-		Quaternion<T> qz = aQuaternionB;
-
-		T cosTheta = aQuaternionA.Dot(aQuaternionB);
-
-		if (cosTheta < T(0))
-		{
-			qz = -qz;
-			cosTheta = -cosTheta;
-		}
-
-		const T dotThreshold = static_cast<T>(0.9995);
-
-		if (cosTheta > T(1) - dotThreshold)
-		{
-			return Lerp(aQuaternionA, qz, aDelta);
-		}
-
-		const T angle = acos(cosTheta);
-		return (std::sin((T(1) - aDelta) * angle) * aQuaternionA + std::sin(aDelta * angle) * qz) / std::sin(angle);
 	}
 }

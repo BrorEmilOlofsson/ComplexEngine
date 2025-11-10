@@ -29,9 +29,15 @@ namespace Simple
 		DX11Renderer(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context);
 
 		void Init(AssetManager& assetManager);
-		void Render(RenderState& renderState, AssetManager& assetManager, 
-			PixelShaderAssetHandle pixelShader, VertexShaderAssetHandle vertexShader,
-			DX11ConstantBuffer<ColorBufferData>& colorCB, DX11ConstantBuffer<TransformBufferData>& transformCB, DX11ConstantBuffer<ObjectIDBufferData>& objectIDCB,
+
+		void Render(RenderState& renderState, 
+			AssetManager& assetManager, 
+			PixelShaderAssetHandle pixelShader,
+			VertexShaderAssetHandle vertexShader,
+			DX11ConstantBuffer<ColorBufferData>& colorCB, 
+			DX11ConstantBuffer<TransformBufferData>& transformCB,
+			DX11ConstantBuffer<ObjectIDBufferData>& objectIDCB,
+			DX11ConstantBuffer<BoneBufferData>& boneBuffer,
 			DX11SamplerState& samplerState);
 
 	private:

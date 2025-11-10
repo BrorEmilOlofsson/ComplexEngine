@@ -283,4 +283,46 @@ namespace Simple
 		normalizedRotator.Normalize180();
 		return normalizedRotator;
 	}
+
+	template<typename T>
+	constexpr Quaternion<T> Lerp(const Quaternion<T>& from, const Quaternion<T>& to, const T& delta)
+	{
+		Quaternion<T> result;
+
+		const float deltaInverse = 1 - delta;
+
+		result.w = deltaInverse * from.w + delta * to.w;
+
+		result.x = deltaInverse * from.x + delta * to.x;
+		result.y = deltaInverse * from.y + delta * to.y;
+		result.z = deltaInverse * from.z + delta * to.z;
+
+		result.Normalize();
+
+		return result;
+	}
+
+	template<typename T>
+	constexpr Quaternion<T> Slerp(const Quaternion<T>& from, const Quaternion<T>& to, const T& delta)
+	{
+		Quaternion<T> qz = to;
+
+		T cosTheta = from.Dot(to);
+
+		if (cosTheta < T(0))
+		{
+			qz = -qz;
+			cosTheta = -cosTheta;
+		}
+
+		const T dotThreshold = static_cast<T>(0.9995);
+
+		if (cosTheta > T(1) - dotThreshold)
+		{
+			return Lerp(from, qz, delta);
+		}
+
+		const auto angle = ACos(cosTheta);
+		return (Sin((T(1) - delta) * angle) * from + Sin(delta * angle) * qz) / Sin(angle);
+	}
 }

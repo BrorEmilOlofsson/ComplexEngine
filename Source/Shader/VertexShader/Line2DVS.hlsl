@@ -4,11 +4,11 @@ PixelInputType main(VertexInputType input)
 {
     PixelInputType output;
     
-    float4 vertexWorldPos = mul(input.Position, ModelToWorldMatrix);
-    float4 vertexViewPos = mul(vertexWorldPos, CameraViewMatrix);
+    float4 vertexWorldPos = mul(ModelToWorldMatrix, input.Position);
+    float4 vertexViewPos = mul(CameraViewMatrix, vertexWorldPos);
     
     output.WorldPosition = vertexWorldPos;
-    output.Position = mul(vertexViewPos, CameraProjectionMatrix);
+    output.Position = mul(CameraProjectionMatrix, vertexViewPos);
     
     output.UV = float2(input.UV.x, 1.0 - input.UV.y);
     

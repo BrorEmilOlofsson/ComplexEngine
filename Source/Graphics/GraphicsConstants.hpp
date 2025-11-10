@@ -2,7 +2,7 @@
 
 namespace Simple
 {
-	constexpr std::size_t Global_Max_Joints = 64;
+	constexpr std::size_t GlobalMaxBones = 64;
 	constexpr std::size_t Global_Max_PointLights = 100;
 
 	namespace ConstantBufferSlots
@@ -11,7 +11,7 @@ namespace Simple
 		constexpr unsigned int Transform = 1;
 		constexpr unsigned int Time = 2;
 		constexpr unsigned int Light = 3;
-		constexpr unsigned int Joints = 4;
+		constexpr unsigned int Bone = 4;
 		constexpr unsigned int PostProcess = 5;
 		constexpr unsigned int Pointlight = 6;
 		constexpr unsigned int SkyBox = 7;

@@ -13,6 +13,7 @@ namespace Simple
 		AnimationSystem() = delete;
 
 		static void Update(ECS& ecs, const float deltaTime, const Blackboard& blackboard);
+		static void EditorUpdate(ECS& ecs, const Blackboard& blackboard);
 
 	};
 }

@@ -8,6 +8,7 @@
 #include "Utility/Math/Angle.hpp"
 #include "Utility/Math/Matrix3x3.hpp"
 #include "Utility/Math/RotationMatrix3.hpp"
+#include "Utility/Math/Quaternion.hpp"
 #include <string>
 #include <cassert>
 #include <iomanip>
@@ -52,6 +53,7 @@ namespace Simple
 		[[nodiscard]] constexpr Vector3<T> GetUpScaled() const;
 		[[nodiscard]] constexpr Vector3<T> GetForwardScaled() const;
 		[[nodiscard]] constexpr RotationMatrix3<T> GetRotationMatrix() const;
+		[[nodiscard]] constexpr Quaternion<T> GetQuaternion() const;
 
 		[[nodiscard]] static constexpr Matrix4x4<T> Identity();
 		[[nodiscard]] static constexpr Matrix4x4<T> Zero();
@@ -287,6 +289,12 @@ namespace Simple
 				mValues[8], mValues[9], mValues[10]
 			}
 		);
+	}
+
+	template<typename T>
+	constexpr Quaternion<T> Matrix4x4<T>::GetQuaternion() const
+	{
+		return Quaternion<T>(*this);
 	}
 
 	template<typename T>
@@ -598,16 +606,16 @@ namespace Simple
 	[[nodiscard]] constexpr Matrix4x4<T> operator*(const Matrix4x4<T>& a, const Matrix4x4<T>& b) noexcept
 	{
 		Matrix4x4<T> result = Matrix4x4<T>::Zero();
-		for (int i = 0; i < 4; ++i)
+		for (int row = 0; row < 4; ++row)
 		{
-			for (int j = 0; j < 4; ++j)
+			for (int col = 0; col < 4; ++col)
 			{
 				T sum = 0;
 				for (int k = 0; k < 4; ++k)
 				{
-					sum += a(i + 1, k + 1) * b(k + 1, j + 1);
+					sum += a(row + 1, k + 1) * b(k + 1, col + 1);
 				}
-				result(i + 1, j + 1) = sum;
+				result(row + 1, col + 1) = sum;
 			}
 		}
 		return result;

@@ -9,7 +9,7 @@
 #include "Utility/Camera.hpp"
 #include "Utility/Asset/AssetManager.hpp"
 #include "Engine/Reflection/DataTypeRegistry.hpp"
-#include "Graphics/GraphicsDefines.hpp"
+#include "Graphics/GraphicsConstants.hpp"
 #include <filesystem>
 
 namespace Simple
@@ -186,6 +186,36 @@ namespace Simple
 	}
 
 	void FromJSON(ModelAssetHandle& modelAsset, const nlohmann::json& json, const Blackboard& blackboard)
+	{
+		FromJSON(modelAsset, json, blackboard.Get<Key_AssetManager>());
+	}
+
+	static void FromJSON(AnimatedModelAssetHandle& animatedModelAsset, const nlohmann::json& json, AssetManager& assetManager)
+	{
+		const std::filesystem::path filePath = json;
+
+		if (filePath.empty())
+		{
+			return;
+		}
+		const std::filesystem::path absolutePath = std::filesystem::absolute(SIMPLE_DIR_ASSETS / filePath);
+
+		if (std::filesystem::exists(absolutePath) || absolutePath.string().find("Primitive") != std::string::npos)
+		{
+			animatedModelAsset = assetManager.GetAnimatedModel(absolutePath);
+			if (!animatedModelAsset)
+			{
+				Console::Print("Mesh Error: Could not find mesh: " + absolutePath.string(), ConsoleTextColor::Red);
+			}
+		}
+		else
+		{
+			const std::string text = "Mesh Error: Could not find file at " + absolutePath.string() + ". Primitive Mesh has replaced.";
+			Console::Print(text, ConsoleTextColor::Red);
+		}
+	}
+
+	void FromJSON(AnimatedModelAssetHandle& modelAsset, const nlohmann::json& json, const Blackboard& blackboard)
 	{
 		FromJSON(modelAsset, json, blackboard.Get<Key_AssetManager>());
 	}

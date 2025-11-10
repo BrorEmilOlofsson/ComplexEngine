@@ -89,9 +89,9 @@ namespace Simple
 		std::byte padding[8];
 	};
 
-	struct alignas(16) JointsBufferData final
+	struct alignas(16) BoneBufferData final
 	{
-		std::array<Matrix4x4f, Global_Max_Joints> bonesTransform;
+		std::array<Matrix4x4f, GlobalMaxBones> boneTransforms;
 	};
 
 	struct alignas(16) SkyBoxBufferData final

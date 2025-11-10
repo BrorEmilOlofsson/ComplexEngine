@@ -4,7 +4,7 @@
 namespace Simple
 {
 
-	Skeleton::Skeleton(const std::vector<Bone>& bones)
+	Skeleton::Skeleton(const std::array<Bone, GlobalMaxBones>& bones)
 		: mBones(bones)
 	{
 	}

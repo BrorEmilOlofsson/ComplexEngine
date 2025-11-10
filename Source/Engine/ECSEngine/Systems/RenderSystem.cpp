@@ -1,12 +1,12 @@
 #include "Engine/Precompiled/EnginePch.hpp"
 #include "RenderSystem.hpp"
 #include "Engine/ECS/ECS.hpp"
-#include "Engine/ECSEngine/Components/AnimationComponent.hpp"
 #include "Engine/ECSEngine/Components/Sprite3DComponent.hpp"
 #include "Engine/ECSEngine/Components/Sprite2DComponent.hpp"
 #include "Engine/ECSEngine/Components/DirectionalLightComponent.hpp"
 #include "Engine/ECSEngine/Components/MeshComponent.hpp"
 #include "Engine/ECSEngine/Components/ModelComponent.hpp"
+#include "Engine/ECSEngine/Components/AnimatedModelComponent.hpp"
 #include "Engine/ECSEngine/Components/SkyBoxComponent.hpp"
 #include "Engine/ECSEngine/Components/ArrowComponent.hpp"
 #include "Engine/ECSEngine/Utility/ECSTransformUtility.hpp"
@@ -17,6 +17,9 @@
 #include "Utility/Asset/MeshAsset.hpp"
 #include "Graphics/Mesh/Mesh.hpp"
 #include "Graphics/Model/Model.hpp"
+#include "Graphics/GraphicsConstants.hpp"
+#include "Graphics/Model/AnimatedModel.hpp"
+#include "Graphics/Model/AnimatedModelInstance.hpp"
 
 namespace Simple
 {
@@ -208,44 +211,74 @@ namespace Simple
 			});
 	}
 
-	//static void ProcessAnimatedModels(const ECS& ecs, RenderList& renderList, const GraphicsSettings& graphicsSettings)
-	//{
-	//	const bool shouldRenderMesh = graphicsSettings.mShouldRenderMesh;
-	//	const bool shouldRenderBoundingBox = graphicsSettings.mShouldRenderBoundingBox;
+	std::array<Matrix4x4f, GlobalMaxBones> ComputeGlobalTransforms(
+		std::span<const Matrix4x4f> localTransforms, std::span<const Bone> bones)
+	{
+		assert(localTransforms.size() == bones.size());
+		assert(bones.size() <= GlobalMaxBones);
+		std::array<Matrix4x4f, GlobalMaxBones> globalTransforms{};
 
-	//	ecs.ForEach([&](const EntityID entityID, const MeshComponent& meshComponent, const AnimationComponent& animationComponent)
-	//		{
-	//			const Transform worldTransform = GetWorldTransform(ecs, entityID);
-	//			if (shouldRenderBoundingBox == true)
-	//			{
-	//				renderList.AddBoundingBox(DrawBoundingBox(worldTransform, meshComponent.mesh->GetBoundingBox()));
-	//			}
+		for (uint32_t i = 0; i < bones.size(); ++i)
+		{
+			const Bone& bone = bones[i];
 
-	//			if (!animationComponent.skeleton || !animationComponent.pixelShader || !animationComponent.vertexShader)
-	//			{
-	//				return;
-	//			}
+			globalTransforms[i] = localTransforms[i];
 
-	//			if (graphicsSettings.mShouldRenderSkeletonLines)
-	//			{
-	//				if (animationComponent.animationPlayer.mModelSpacePose.count > 0)
-	//				{
-	//					PushAnimatedSkeletonLines(worldTransform, animationComponent, renderList);
-	//				}
-	//				else
-	//				{
-	//					PushStaticAnimationLines(worldTransform, animationComponent, renderList);
-	//				}
-	//			}
+			if (bone.parentIndex != std::numeric_limits<uint32_t>::max())
+				globalTransforms[i] = globalTransforms[i] * globalTransforms[bone.parentIndex];
+		}
 
-	//			if (!shouldRenderMesh)
-	//			{
-	//				return;
-	//			}
+		return globalTransforms;
+	}
 
-	//			//renderList.AddAnimatedModelInstance(AnimatedModelInstance(worldTransform, Model(meshComponent.textures, meshComponent.mesh, meshComponent.pixelShader, meshComponent.vertexShader), animationComponent.jointMatrices, animationComponent.pixelShader, animationComponent.vertexShader));
-	//		});
-	//}
+	std::array<Matrix4x4f, GlobalMaxBones> CalculateFinalBoneMatrices(std::span<const Matrix4x4f> globalMatrices, std::span<const Bone> bones)
+	{
+		std::array<Matrix4x4f, GlobalMaxBones> finalBoneMatrices{};
+
+		for (size_t i = 0; i < bones.size(); i++)
+		{
+			finalBoneMatrices[i] = globalMatrices[i] * bones[i].inverseBindMatrix;
+		}
+
+		return finalBoneMatrices;
+	}
+
+	static void ProcessAnimatedModels(const ECS& ecs, RenderList& renderList, const GraphicsSettings& graphicsSettings)
+	{
+		graphicsSettings;
+		ecs.ForEach([&](const EntityID entityID, const AnimatedModelComponent& animatedModelComponent)
+			{
+				if (!animatedModelComponent.modelHandle || !animatedModelComponent.animationPlayer.mAnimationAsset)
+				{
+					return;
+				}
+
+				const Transform worldTransform = GetWorldTransform(ecs, entityID);
+
+				auto globalBoneMatrices = ComputeGlobalTransforms(
+					animatedModelComponent.animationPlayer.localBoneMatrices,
+					animatedModelComponent.modelHandle->GetSkeleton().GetBones()
+				);
+
+
+				std::array<Matrix4x4f, GlobalMaxBones> finalBoneMatrices = CalculateFinalBoneMatrices(
+					globalBoneMatrices,
+					animatedModelComponent.modelHandle->GetSkeleton().GetBones()
+				);
+
+
+				AnimatedModelInstance instance;
+				instance.albedoTexture = animatedModelComponent.textures[TextureSlots::Albedo];
+				instance.normalTexture = animatedModelComponent.textures[TextureSlots::Normal];
+				instance.materialTexture = animatedModelComponent.textures[TextureSlots::Material];
+				instance.animatedModel = animatedModelComponent.modelHandle;
+				instance.transform = worldTransform;
+				instance.objectID = entityID.id;
+				instance.boneMatrices = finalBoneMatrices;
+
+				renderList.AddAnimatedModelInstance(instance);
+			});
+	}
 
 	static void ProcessSkyBox(const ECS& ecs, RenderState& renderState)
 	{
@@ -282,7 +315,7 @@ namespace Simple
 		ProcessSkyBox(ecs, renderState);
 		ProcessDirectionalLight(ecs, renderState);
 		ProcessStaticModels(ecs, renderState.GetRenderList(), graphicsSettings);
-		//ProcessAnimatedModels(ecs, renderState.GetRenderList(), graphicsSettings);
+		ProcessAnimatedModels(ecs, renderState.GetRenderList(), graphicsSettings);
 	}
 
 	static void ProcessArrows(const ECS& ecs, RenderList& renderList)

@@ -29,7 +29,7 @@ namespace Simple
 		DX11ConstantBuffer<CameraBufferData> mCameraBuffer;
 		DX11ConstantBuffer<TransformBufferData> mTransformBuffer;
 		DX11ConstantBuffer<TimeBufferData> mTimeBuffer;
-		DX11ConstantBuffer<JointsBufferData> mJointsBuffer;
+		DX11ConstantBuffer<BoneBufferData> mBoneBuffer;
 		DX11ConstantBuffer<LightBufferData> mLightBuffer;
 		DX11ConstantBuffer<PointLightBufferData> mPointLightBuffer;
 		DX11ConstantBuffer<PostProcessBufferData> mPostProcessBuffer;

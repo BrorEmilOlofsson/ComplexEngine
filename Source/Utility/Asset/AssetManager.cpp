@@ -164,21 +164,21 @@ namespace Simple
 		loaderMap[L".fbx"] = [](const std::filesystem::path& path, AssetManager& assetManager)
 			{
 				PROFILER_BEGIN("Load FBX");
-				auto modelAssetVariant = assetManager.GetAssetLoader().LoadModel(path);
+				auto fbxResult = assetManager.GetAssetLoader().LoadFBX(path);
 
-				if (auto modelAsset = std::get_if<ModelAsset>(&modelAssetVariant))
+				if (auto modelAsset = std::get_if<ModelAsset>(&fbxResult.model))
 				{
 					assetManager.AddModel(path, *modelAsset);
 				}
-				else if (auto animtedModelAsset = std::get_if<AnimatedModelAsset>(&modelAssetVariant))
+				else if (auto animtedModelAsset = std::get_if<AnimatedModelAsset>(&fbxResult.model))
 				{
 					assetManager.AddAnimatedModel(path, *animtedModelAsset);
 				}
-				/*else
-				if (std::get_if<std::monostate>(&modelAsset))
+
+				for (auto& animationAsset : fbxResult.animations)
 				{
-					assetManager.AddModel(path, modelAsset);
-				}*/
+					assetManager.AddAnimation(path, animationAsset);
+				}
 
 
 				MeshAsset asset = assetManager.GetAssetLoader().LoadMesh(path);

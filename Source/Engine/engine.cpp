@@ -8,7 +8,7 @@
 #include "Engine/ECSEngine/Systems/NavmeshSystem.hpp"
 #include "Engine/ECSEngine/Components/AllEngineComponents.hpp"
 #include "Utility/File/FileUtility.hpp"
-#include "Engine/Reflection/EngineRegistration.hpp"
+#include "Engine/Reflection/EngineReflectionRegistration.hpp"
 #include "Utility/GraphicsBufferData.hpp"
 #include "Utility/EngineDirectories.hpp"
 #include "Engine/ECS/EntityComposition.hpp"
@@ -160,6 +160,7 @@ namespace Simple
 
 		const float deltaTimeCapped = Min(mFrameTimer.GetDeltaTime().count(), 0.1f);
 		mSceneManager.GetCurrentScene().GetRenderState().SetAmbientLight(AmbientLight{});
+		mBlackboard->Insert<Key_DeltaTime>(deltaTimeCapped);
 		mSceneManager.Update(deltaTimeCapped);
 		//mAudioManager.Update();
 	}
