@@ -171,22 +171,19 @@ namespace Simple
 	constexpr Matrix4x4f Camera::CreatePerspectiveProjectionMatrix(const Radiansf verticalFOV, const float nearPlane, const float farPlane, const float aspectRatio)
 	{
 		const float Q = farPlane / (farPlane - nearPlane);
-		//const Radiansf horizontalFOV = CalculateHorizontalFOV(verticalFOV, aspectRatio);
-		//const float scaleX = 1.0f / Tan(horizontalFOV / 2.0f);
-		//const float scaleY = 1.0f / Tan(verticalFOV * 0.5f);
 
 		float scaleY = 1.0f / Tan(verticalFOV * 0.5f);
 		float scaleX = scaleY / aspectRatio;
 
 
 		Matrix4x4f matrix;
-		// One based indexing
-		matrix(1, 1) = scaleX;
-		matrix(2, 2) = scaleY;
-		matrix(3, 3) = Q;
-		matrix(3, 4) = 1.0f / Q;
-		matrix(4, 3) = -Q * nearPlane;
-		matrix(4, 4) = 0.0f;
+
+		matrix(0, 0) = scaleX;
+		matrix(1, 1) = scaleY;
+		matrix(2, 2) = Q;
+		matrix(2, 3) = 1.0f / Q;
+		matrix(3, 2) = -Q * nearPlane;
+		matrix(3, 3) = 0.0f;
 
 		return matrix;
 	}

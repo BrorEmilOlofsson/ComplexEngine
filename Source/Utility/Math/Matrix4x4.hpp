@@ -106,26 +106,24 @@ namespace Simple
 	template<typename T>
 	constexpr T& Matrix4x4<T>::operator()(const unsigned int row, const unsigned int column)
 	{
-		return mValues[GetIndex(row - 1, column - 1)];
+		return mValues[GetIndex(row, column)];
 	}
 
 	template<typename T>
 	constexpr const T& Matrix4x4<T>::operator()(const unsigned int row, const unsigned int column) const
 	{
-		return mValues[GetIndex(row - 1, column - 1)];
+		return mValues[GetIndex(row, column)];
 	}
 
 	template<typename T>
 	constexpr T& Matrix4x4<T>::operator[](const unsigned int index) noexcept
 	{
-		assert(index < 16);
 		return mValues[index];
 	}
 
 	template<typename T>
 	constexpr const T& Matrix4x4<T>::operator[](const unsigned int index) const noexcept
 	{
-		assert(index < 16);
 		return mValues[index];
 	}
 
@@ -202,15 +200,15 @@ namespace Simple
 	template<typename T>
 	constexpr void Matrix4x4<T>::SetRotationMatrix(const Matrix3x3<T>& rotationMatrix)
 	{
-		mValues[0] = rotationMatrix(1, 1);
-		mValues[1] = rotationMatrix(1, 2);
-		mValues[2] = rotationMatrix(1, 3);
-		mValues[4] = rotationMatrix(2, 1);
-		mValues[5] = rotationMatrix(2, 2);
-		mValues[6] = rotationMatrix(2, 3);
-		mValues[8] = rotationMatrix(3, 1);
-		mValues[9] = rotationMatrix(3, 2);
-		mValues[10] = rotationMatrix(3, 3);
+		mValues[0] = rotationMatrix(0, 0);
+		mValues[1] = rotationMatrix(0, 1);
+		mValues[2] = rotationMatrix(0, 2);
+		mValues[4] = rotationMatrix(1, 0);
+		mValues[5] = rotationMatrix(1, 1);
+		mValues[6] = rotationMatrix(1, 2);
+		mValues[8] = rotationMatrix(2, 0);
+		mValues[9] = rotationMatrix(2, 1);
+		mValues[10] = rotationMatrix(2, 2);
 	}
 
 	template<typename T>
@@ -332,10 +330,10 @@ namespace Simple
 		const T cosA = Cos(angle);
 		const T sinA = Sin(angle);
 
+		rotationMatrix(1, 1) = cosA;
+		rotationMatrix(1, 2) = sinA;
+		rotationMatrix(2, 1) = -sinA;
 		rotationMatrix(2, 2) = cosA;
-		rotationMatrix(2, 3) = sinA;
-		rotationMatrix(3, 2) = -sinA;
-		rotationMatrix(3, 3) = cosA;
 
 		return rotationMatrix;
 	}
@@ -347,10 +345,10 @@ namespace Simple
 		const T cosA = Cos(angle);
 		const T sinA = Sin(angle);
 
-		rotationMatrix(1, 1) = cosA;
-		rotationMatrix(1, 3) = -sinA;
-		rotationMatrix(3, 1) = sinA;
-		rotationMatrix(3, 3) = cosA;
+		rotationMatrix(0, 0) = cosA;
+		rotationMatrix(0, 2) = -sinA;
+		rotationMatrix(2, 0) = sinA;
+		rotationMatrix(2, 2) = cosA;
 
 		return rotationMatrix;
 	}
@@ -362,10 +360,10 @@ namespace Simple
 		const T cosA = Cos(angle);
 		const T sinA = Sin(angle);
 
+		rotationMatrix(0, 0) = cosA;
+		rotationMatrix(0, 1) = sinA;
+		rotationMatrix(1, 0) = -sinA;
 		rotationMatrix(1, 1) = cosA;
-		rotationMatrix(1, 2) = sinA;
-		rotationMatrix(2, 1) = -sinA;
-		rotationMatrix(2, 2) = cosA;
 
 		return rotationMatrix;
 	}
@@ -392,11 +390,7 @@ namespace Simple
 	constexpr Matrix4x4<T> Matrix4x4<T>::CreateTranslationMatrix(const Point3<T>& translation)
 	{
 		Matrix4x4<T> result = Matrix4x4<T>::Identity();
-
-		result(4, 1) = translation.x;
-		result(4, 2) = translation.y;
-		result(4, 3) = translation.z;
-
+		result.SetTranslation(translation);
 		return result;
 	}
 
@@ -407,17 +401,17 @@ namespace Simple
 
 		Matrix4x4<T> rotationMatrix = Matrix4x4<T>::Identity();
 
-		rotationMatrix(1, 1) = matrix(1, 1) / scale.x;
-		rotationMatrix(2, 1) = matrix(2, 1) / scale.x;
-		rotationMatrix(3, 1) = matrix(3, 1) / scale.x;
+		rotationMatrix(0, 0) = matrix(0, 0) / scale.x;
+		rotationMatrix(1, 0) = matrix(1, 0) / scale.x;
+		rotationMatrix(2, 0) = matrix(2, 0) / scale.x;
 
-		rotationMatrix(1, 2) = matrix(1, 2) / scale.y;
-		rotationMatrix(2, 2) = matrix(2, 2) / scale.y;
-		rotationMatrix(3, 2) = matrix(3, 2) / scale.y;
+		rotationMatrix(0, 1) = matrix(0, 1) / scale.y;
+		rotationMatrix(1, 2) = matrix(1, 1) / scale.y;
+		rotationMatrix(2, 2) = matrix(1, 1) / scale.y;
 
-		rotationMatrix(1, 3) = matrix(1, 3) / scale.z;
-		rotationMatrix(2, 3) = matrix(2, 3) / scale.z;
-		rotationMatrix(3, 3) = matrix(3, 3) / scale.z;
+		rotationMatrix(0, 2) = matrix(0, 2) / scale.z;
+		rotationMatrix(1, 2) = matrix(1, 2) / scale.z;
+		rotationMatrix(2, 2) = matrix(2, 2) / scale.z;
 
 		return rotationMatrix;
 	}
@@ -427,9 +421,9 @@ namespace Simple
 	{
 		Matrix4x4<T> result = Matrix4x4<T>::Identity();
 
-		result(1, 1) = scale.x;
-		result(2, 2) = scale.y;
-		result(3, 3) = scale.z;
+		result(0, 0) = scale.x;
+		result(1, 1) = scale.y;
+		result(2, 2) = scale.z;
 
 		return result;
 	}
@@ -439,11 +433,11 @@ namespace Simple
 	{
 		Matrix4x4<T> transposed;
 
-		for (int i = 1; i <= 4; i++)
+		for (int row = 0; row < 4; row++)
 		{
-			for (int j = 1; j <= 4; j++)
+			for (int col = 0; col < 4; col++)
 			{
-				transposed(i, j) = matrixToTranspose(j, i);
+				transposed(row, col) = matrixToTranspose(col, row);
 			}
 		}
 
@@ -456,15 +450,15 @@ namespace Simple
 		Matrix4x4<T> inv = Matrix4x4<T>::Identity();
 
 		// Transpose rotation part (since R^-1 = R^T)
-		inv(1, 1) = m(1, 1); inv(1, 2) = m(2, 1); inv(1, 3) = m(3, 1);
-		inv(2, 1) = m(1, 2); inv(2, 2) = m(2, 2); inv(2, 3) = m(3, 2);
-		inv(3, 1) = m(1, 3); inv(3, 2) = m(2, 3); inv(3, 3) = m(3, 3);
+		inv(0, 0) = m(0, 0); inv(0, 1) = m(1, 0); inv(0, 2) = m(2, 0);
+		inv(1, 0) = m(0, 1); inv(1, 1) = m(1, 1); inv(1, 2) = m(2, 1);
+		inv(2, 0) = m(0, 2); inv(2, 1) = m(1, 2); inv(2, 2) = m(2, 2);
 
 		// Compute new translation
-		inv(4, 1) = -(m(4, 1) * inv(1, 1) + m(4, 2) * inv(2, 1) + m(4, 3) * inv(3, 1));
-		inv(4, 2) = -(m(4, 1) * inv(1, 2) + m(4, 2) * inv(2, 2) + m(4, 3) * inv(3, 2));
-		inv(4, 3) = -(m(4, 1) * inv(1, 3) + m(4, 2) * inv(2, 3) + m(4, 3) * inv(3, 3));
-		inv(4, 4) = 1.0f;
+		inv(3, 0) = -(m(3, 0) * inv(0, 0) + m(3, 1) * inv(1, 0) + m(3, 2) * inv(2, 0));
+		inv(3, 1) = -(m(3, 0) * inv(0, 1) + m(3, 1) * inv(1, 1) + m(3, 2) * inv(2, 1));
+		inv(3, 2) = -(m(3, 0) * inv(0, 2) + m(3, 1) * inv(1, 2) + m(3, 2) * inv(2, 2));
+		inv(3, 3) = 1.0f;
 
 		return inv;
 	}
@@ -476,30 +470,30 @@ namespace Simple
 
 		for (int i = 0; i < 4; ++i)
 		{
-			int pivotRow = i + 1;
+			int pivotRow = i;
 
-			while (pivotRow < 4 && matrixToInverse(pivotRow, i + 1) == 0)
+			while (pivotRow < 4 && matrixToInverse(pivotRow, i) == 0)
 			{
 				++pivotRow;
 			}
 
-			if (pivotRow == 4 + 1)
+			if (pivotRow == 4)
 				assert(false && "Matrix is singular, no unique inverse.");
 
-			SwapRows(matrixToInverse, i + 1, pivotRow);
-			SwapRows(inverse, i + 1, pivotRow);
+			SwapRows(matrixToInverse, i, pivotRow);
+			SwapRows(inverse, i, pivotRow);
 
-			float pivotElement = matrixToInverse(i + 1, i + 1);
-			ScaleRow(matrixToInverse, i + 1, 1 / pivotElement);
-			ScaleRow(inverse, i + 1, 1 / pivotElement);
+			float pivotElement = matrixToInverse(i, i);
+			ScaleRow(matrixToInverse, i, 1 / pivotElement);
+			ScaleRow(inverse, i, 1 / pivotElement);
 
 			for (int j = 0; j < 4; ++j)
 			{
 				if (j != i)
 				{
-					float factor = -matrixToInverse(j + 1, i + 1);
-					AddScaledRow(matrixToInverse, j + 1, i + 1, factor);
-					AddScaledRow(inverse, j + 1, i + 1, factor);
+					float factor = -matrixToInverse(j, i);
+					AddScaledRow(matrixToInverse, j, i, factor);
+					AddScaledRow(inverse, j, i, factor);
 				}
 			}
 		}
@@ -524,7 +518,7 @@ namespace Simple
 	{
 		for (int i = 0; i < 4; ++i)
 		{
-			std::swap(matrix(row1, i + 1), matrix(row2, i + 1));
+			std::swap(matrix(row1, i), matrix(row2, i));
 		}
 	}
 
@@ -533,7 +527,7 @@ namespace Simple
 	{
 		for (int i = 0; i < 4; ++i)
 		{
-			matrix(row, i + 1) *= factor;
+			matrix(row, i) *= factor;
 		}
 	}
 
@@ -542,7 +536,7 @@ namespace Simple
 	{
 		for (int i = 0; i < 4; ++i)
 		{
-			matrix(row1, i + 1) += factor * matrix(row2, i + 1);
+			matrix(row1, i) += factor * matrix(row2, i);
 		}
 	}
 
@@ -551,25 +545,25 @@ namespace Simple
 	{
 		Matrix4x4<T> matrix;
 
+		matrix(0, 0) = a(0, 0) + b(0, 0);
+		matrix(0, 1) = a(0, 1) + b(0, 1);
+		matrix(0, 2) = a(0, 2) + b(0, 2);
+		matrix(0, 3) = a(0, 3) + b(0, 3);
+
+		matrix(1, 0) = a(1, 0) + b(1, 0);
 		matrix(1, 1) = a(1, 1) + b(1, 1);
 		matrix(1, 2) = a(1, 2) + b(1, 2);
 		matrix(1, 3) = a(1, 3) + b(1, 3);
-		matrix(1, 4) = a(1, 4) + b(1, 4);
 
+		matrix(2, 0) = a(2, 0) + b(2, 0);
 		matrix(2, 1) = a(2, 1) + b(2, 1);
 		matrix(2, 2) = a(2, 2) + b(2, 2);
 		matrix(2, 3) = a(2, 3) + b(2, 3);
-		matrix(2, 4) = a(2, 4) + b(2, 4);
 
+		matrix(3, 0) = a(3, 0) + b(3, 0);
 		matrix(3, 1) = a(3, 1) + b(3, 1);
 		matrix(3, 2) = a(3, 2) + b(3, 2);
 		matrix(3, 3) = a(3, 3) + b(3, 3);
-		matrix(3, 4) = a(3, 4) + b(3, 4);
-
-		matrix(4, 1) = a(4, 1) + b(4, 1);
-		matrix(4, 2) = a(4, 2) + b(4, 2);
-		matrix(4, 3) = a(4, 3) + b(4, 3);
-		matrix(4, 4) = a(4, 4) + b(4, 4);
 
 		return matrix;
 	}
@@ -579,25 +573,25 @@ namespace Simple
 	{
 		Matrix4x4<T> matrix;
 
+		matrix(0, 0) = a(0, 0) - b(0, 0);
+		matrix(0, 1) = a(0, 1) - b(0, 1);
+		matrix(0, 2) = a(0, 2) - b(0, 2);
+		matrix(0, 3) = a(0, 3) - b(0, 3);
+
+		matrix(1, 0) = a(1, 0) - b(1, 0);
 		matrix(1, 1) = a(1, 1) - b(1, 1);
 		matrix(1, 2) = a(1, 2) - b(1, 2);
 		matrix(1, 3) = a(1, 3) - b(1, 3);
-		matrix(1, 4) = a(1, 4) - b(1, 4);
 
+		matrix(2, 0) = a(2, 0) - b(2, 0);
 		matrix(2, 1) = a(2, 1) - b(2, 1);
 		matrix(2, 2) = a(2, 2) - b(2, 2);
 		matrix(2, 3) = a(2, 3) - b(2, 3);
-		matrix(2, 4) = a(2, 4) - b(2, 4);
 
+		matrix(3, 0) = a(3, 0) - b(3, 0);
 		matrix(3, 1) = a(3, 1) - b(3, 1);
 		matrix(3, 2) = a(3, 2) - b(3, 2);
 		matrix(3, 3) = a(3, 3) - b(3, 3);
-		matrix(3, 4) = a(3, 4) - b(3, 4);
-
-		matrix(4, 1) = a(4, 1) - b(4, 1);
-		matrix(4, 2) = a(4, 2) - b(4, 2);
-		matrix(4, 3) = a(4, 3) - b(4, 3);
-		matrix(4, 4) = a(4, 4) - b(4, 4);
 
 		return matrix;
 	}
@@ -613,9 +607,9 @@ namespace Simple
 				T sum = 0;
 				for (int k = 0; k < 4; ++k)
 				{
-					sum += a(row + 1, k + 1) * b(k + 1, col + 1);
+					sum += a(row, k) * b(k, col);
 				}
-				result(row + 1, col + 1) = sum;
+				result(row, col) = sum;
 			}
 		}
 		return result;
@@ -642,23 +636,44 @@ namespace Simple
 		return a;
 	}
 
-	template<typename T>
+	/*template<typename T>
 	[[nodiscard]] constexpr Vector4<T> operator*(const Matrix4x4<T>& matrix, const Vector4<T>& vector) noexcept
 	{
 		Vector4<T> result;
 
-		result.x = vector.x * matrix(1, 1) + vector.y * matrix(2, 1) + vector.z * matrix(3, 1) + vector.w * matrix(4, 1);
-		result.y = vector.x * matrix(1, 2) + vector.y * matrix(2, 2) + vector.z * matrix(3, 2) + vector.w * matrix(4, 2);
-		result.z = vector.x * matrix(1, 3) + vector.y * matrix(2, 3) + vector.z * matrix(3, 3) + vector.w * matrix(4, 3);
-		result.w = vector.x * matrix(1, 4) + vector.y * matrix(2, 4) + vector.z * matrix(3, 4) + vector.w * matrix(4, 4);
+		result.x = vector.x * matrix[0] + vector.y * matrix[4] + vector.z * matrix[8] + vector.w * matrix[12];
+		result.y = vector.x * matrix[1] + vector.y * matrix[5] + vector.z * matrix[9] + vector.w * matrix[13];
+		result.z = vector.x * matrix[2] + vector.y * matrix[6] + vector.z * matrix[10] + vector.w * matrix[14];
+		result.w = vector.x * matrix[3] + vector.y * matrix[7] + vector.z * matrix[11] + vector.w * matrix[15];
 
 		return result;
-	}
+	}*/
+
+	//// COLUMN VECTOR VERSION
+	//template<typename T>
+	//[[nodiscard]] constexpr Vector4<T> operator*(const Matrix4x4<T>& m, const Vector4<T>& v) noexcept
+	//{
+	//	Vector4<T> result;
+
+	//	result.x = m[0] * v.x + m[1] * v.y + m[2] * v.z + m[3] * v.w;
+	//	result.y = m[4] * v.x + m[5] * v.y + m[6] * v.z + m[7] * v.w;
+	//	result.z = m[8] * v.x + m[9] * v.y + m[10] * v.z + m[11] * v.w;
+	//	result.w = m[12] * v.x + m[13] * v.y + m[14] * v.z + m[15] * v.w;
+
+	//	return result;
+	//}
 
 	template<typename T>
 	[[nodiscard]] constexpr Vector4<T> operator*(const Vector4<T>& vector, const Matrix4x4<T>& matrix) noexcept
 	{
-		return matrix * vector;
+		Vector4<T> result;
+
+		result.x = vector.x * matrix[0] + vector.y * matrix[4] + vector.z * matrix[8] + vector.w * matrix[12];
+		result.y = vector.x * matrix[1] + vector.y * matrix[5] + vector.z * matrix[9] + vector.w * matrix[13];
+		result.z = vector.x * matrix[2] + vector.y * matrix[6] + vector.z * matrix[10] + vector.w * matrix[14];
+		result.w = vector.x * matrix[3] + vector.y * matrix[7] + vector.z * matrix[11] + vector.w * matrix[15];
+
+		return result;
 	}
 
 	template<typename T>
@@ -690,14 +705,11 @@ namespace Simple
 	template<typename T>
 	[[nodiscard]] constexpr bool operator==(const Matrix4x4<T>& a, const Matrix4x4<T>& b) noexcept
 	{
-		for (unsigned int row = 0; row < 4; ++row)
+		for (unsigned int i = 0; i < 16; ++i)
 		{
-			for (unsigned int column = 0; column < 4; ++column)
+			if (a[i] != b[i])
 			{
-				if (a(row + 1, column + 1) != b(row + 1, column + 1))
-				{
-					return false;
-				}
+				return false;
 			}
 		}
 
@@ -709,11 +721,11 @@ namespace Simple
 	{
 		float max = 1;
 
-		for (int row = 1; row <= 4; ++row)
+		for (int row = 0; row < 4; ++row)
 		{
-			for (int column = 1; column <= 4; ++column)
+			for (int column = 0; column < 4; ++column)
 			{
-				max = std::max(max, static_cast<float>(matrix(row, column)));
+				max = Max(max, static_cast<float>(matrix(row, column)));
 			}
 		}
 
@@ -724,10 +736,10 @@ namespace Simple
 		return os
 			<< std::endl
 			<< " " << std::string(totalLength, '-') << std::endl
-			<< "| " << std::setw(characterLength) << matrix(1, 1) << std::setw(characterLength) << matrix(1, 2) << std::setw(characterLength) << matrix(1, 3) << std::setw(characterLength) << matrix(1, 4) << " |" << std::endl
-			<< "| " << std::setw(characterLength) << matrix(2, 1) << std::setw(characterLength) << matrix(2, 2) << std::setw(characterLength) << matrix(2, 3) << std::setw(characterLength) << matrix(2, 4) << " |" << std::endl
-			<< "| " << std::setw(characterLength) << matrix(3, 1) << std::setw(characterLength) << matrix(3, 2) << std::setw(characterLength) << matrix(3, 3) << std::setw(characterLength) << matrix(3, 4) << " |" << std::endl
-			<< "| " << std::setw(characterLength) << matrix(4, 1) << std::setw(characterLength) << matrix(4, 2) << std::setw(characterLength) << matrix(4, 3) << std::setw(characterLength) << matrix(4, 4) << " |" << std::endl
+			<< "| " << std::setw(characterLength) << matrix(0, 0) << std::setw(characterLength) << matrix(0, 1) << std::setw(characterLength) << matrix(0, 2) << std::setw(characterLength) << matrix(0, 3) << " |" << std::endl
+			<< "| " << std::setw(characterLength) << matrix(1, 0) << std::setw(characterLength) << matrix(1, 1) << std::setw(characterLength) << matrix(1, 2) << std::setw(characterLength) << matrix(1, 3) << " |" << std::endl
+			<< "| " << std::setw(characterLength) << matrix(2, 0) << std::setw(characterLength) << matrix(2, 1) << std::setw(characterLength) << matrix(2, 2) << std::setw(characterLength) << matrix(2, 3) << " |" << std::endl
+			<< "| " << std::setw(characterLength) << matrix(3, 0) << std::setw(characterLength) << matrix(3, 1) << std::setw(characterLength) << matrix(3, 2) << std::setw(characterLength) << matrix(3, 3) << " |" << std::endl
 			<< " " << std::string(totalLength, '-') << std::endl;
 	}
 }

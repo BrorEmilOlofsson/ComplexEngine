@@ -195,17 +195,17 @@ namespace Simple
 
 		Matrix4x4<T> result = Matrix4x4<T>::Identity();
 
-		result(1, 1) = t * x * x + c;
-		result(1, 2) = t * x * y - s * z;
-		result(1, 3) = t * x * z + s * y;
+		result(0, 0) = t * x * x + c;
+		result(0, 1) = t * x * y - s * z;
+		result(0, 2) = t * x * z + s * y;
 
-		result(2, 1) = t * x * y + s * z;
-		result(2, 2) = t * y * y + c;
-		result(2, 3) = t * y * z - s * x;
+		result(1, 0) = t * x * y + s * z;
+		result(1, 1) = t * y * y + c;
+		result(1, 2) = t * y * z - s * x;
 
-		result(3, 1) = t * x * z - s * y;
-		result(3, 2) = t * y * z + s * x;
-		result(3, 3) = t * z * z + c;
+		result(2, 0) = t * x * z - s * y;
+		result(2, 1) = t * y * z + s * x;
+		result(2, 2) = t * z * z + c;
 
 		return result;
 	}

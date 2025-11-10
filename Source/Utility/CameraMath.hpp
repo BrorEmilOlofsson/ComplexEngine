@@ -14,12 +14,14 @@ namespace Simple
 		const Vector4f clipCoords(clipCoords2.x, clipCoords2.y, 1.0f, 1.0f);
 
 		const Matrix4x4f invertedProjection = Matrix4x4f::GetInverse(projectionMatrix);
-		Vector4f eyeCoords = invertedProjection * clipCoords;
+
+		// TODO check multiplication order
+		Vector4f eyeCoords = clipCoords * invertedProjection;
 		eyeCoords.z = 1.0f;
 		eyeCoords.w = 0.0f;
 
 		const Matrix4x4f invertedViewMatrix = Matrix4x4f::GetInverse(viewMatrix);
-		const Vector4f rayWorld = invertedViewMatrix * eyeCoords;
+		const Vector4f rayWorld = eyeCoords * invertedViewMatrix;
 
 		const UnitVector3f mouseDir(rayWorld.x, rayWorld.y, rayWorld.z);
 
@@ -39,7 +41,7 @@ namespace Simple
 
 		const Vector4f worldPosH = Vector4f(position.x, position.y, position.z, 1.0f);
 
-		const Vector4f clipSpacePos = viewMatrix * projectionMatrix * worldPosH;
+		const Vector4f clipSpacePos = worldPosH * (viewMatrix * projectionMatrix);
 
 		auto test = [clipSpacePos, windowSize]()
 			{
