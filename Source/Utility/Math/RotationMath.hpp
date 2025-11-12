@@ -27,6 +27,12 @@ namespace Simple
 	}
 
 	template<typename T>
+	[[nodiscard]] constexpr UnitVector3<T> ToWorldSpace(const UnitVector3<T>& local, const Matrix4x4<T>& parent)
+	{
+		return local * parent.GetRotationMatrix();
+	}
+
+	template<typename T>
 	[[nodiscard]] constexpr Matrix4x4<T> CreateRotationMatrix(const Rotator<T>& rotator)
 	{
 		Matrix4x4<T> rotationMatrix = Matrix4x4<T>::Identity();

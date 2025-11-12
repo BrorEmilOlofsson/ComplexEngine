@@ -40,6 +40,7 @@ namespace Simple
 		constexpr void SetUp(const Vector3<T>& up);
 		constexpr void SetForward(const Vector3<T>& forward);
 		constexpr void SetRotationMatrix(const Matrix3x3<T>& rotationMatrix);
+		constexpr void SetRotationMatrix(const RotationMatrix3<T>& rotationMatrix);
 
 		[[nodiscard]] constexpr const T* GetDataPtr() const;
 		[[nodiscard]] constexpr T* GetDataPtr();
@@ -67,10 +68,12 @@ namespace Simple
 		[[nodiscard]] static constexpr Matrix4x4<T> CreateTranslationMatrix(const Point3<T>& translation);
 		[[nodiscard]] static constexpr Matrix4x4<T> CreateScaleMatrix(const Vector3<T>& scale);
 
-		[[nodiscard]] static constexpr Matrix4x4<T> Transpose(const Matrix4x4<T>& matrixToTranspose);
-		[[nodiscard]] static constexpr Matrix4x4<T> GetInverse(Matrix4x4<T> matrixToInverse);
+		[[nodiscard]] static constexpr Matrix4x4<T> CreateRTMatrix(const RotationMatrix3<T>& rotationMatrix, const Point3<T>& translation);
 
-		//GetFastInverse should only be use on Matrices with scale of 1
+		[[nodiscard]] static constexpr Matrix4x4<T> GetTransposed(const Matrix4x4<T>& matrix);
+		[[nodiscard]] static constexpr Matrix4x4<T> GetInverse(Matrix4x4<T> matrix);
+
+		// GetFastInverse should only be use on Matrices with scale of 1
 		[[nodiscard]] static constexpr Matrix4x4<T> GetFastInverse(const Matrix4x4<T>& matrix);
 		[[nodiscard]] constexpr Matrix4x4<T> GetFastInverse() const;
 
@@ -199,6 +202,20 @@ namespace Simple
 
 	template<typename T>
 	constexpr void Matrix4x4<T>::SetRotationMatrix(const Matrix3x3<T>& rotationMatrix)
+	{
+		mValues[0] = rotationMatrix(0, 0);
+		mValues[1] = rotationMatrix(0, 1);
+		mValues[2] = rotationMatrix(0, 2);
+		mValues[4] = rotationMatrix(1, 0);
+		mValues[5] = rotationMatrix(1, 1);
+		mValues[6] = rotationMatrix(1, 2);
+		mValues[8] = rotationMatrix(2, 0);
+		mValues[9] = rotationMatrix(2, 1);
+		mValues[10] = rotationMatrix(2, 2);
+	}
+
+	template<typename T>
+	constexpr void Matrix4x4<T>::SetRotationMatrix(const RotationMatrix3<T>& rotationMatrix)
 	{
 		mValues[0] = rotationMatrix(0, 0);
 		mValues[1] = rotationMatrix(0, 1);
@@ -429,7 +446,16 @@ namespace Simple
 	}
 
 	template<typename T>
-	constexpr Matrix4x4<T> Matrix4x4<T>::Transpose(const Matrix4x4<T>& matrixToTranspose)
+	constexpr Matrix4x4<T> Matrix4x4<T>::CreateRTMatrix(const RotationMatrix3<T>& rotationMatrix, const Point3<T>& translation)
+	{
+		Matrix4x4<T> result = Matrix4x4<T>::Identity();
+		result.SetRotationMatrix(rotationMatrix);
+		result.SetTranslation(translation);
+		return result;
+	}
+
+	template<typename T>
+	constexpr Matrix4x4<T> Matrix4x4<T>::GetTransposed(const Matrix4x4<T>& m)
 	{
 		Matrix4x4<T> transposed;
 
@@ -437,7 +463,7 @@ namespace Simple
 		{
 			for (int col = 0; col < 4; col++)
 			{
-				transposed(row, col) = matrixToTranspose(col, row);
+				transposed(row, col) = m(col, row);
 			}
 		}
 

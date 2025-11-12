@@ -244,6 +244,123 @@ TEST_CASE("Matrix4x4 SetScale")
 	REQUIRE(matrix[10] == 4.f);
 }
 
+TEST_CASE("Matrix4x4 GetTranslation")
+{
+	const Matrix4x4f matrix
+	(
+		{
+			1.f, 0.f, 0.f, 0.f,
+			0.f, 1.f, 0.f, 0.f,
+			0.f, 0.f, 1.f, 0.f,
+			7.f, 8.f, 9.f, 1.f
+		}
+	);
+	const Point3f translation = matrix.GetTranslation();
+	REQUIRE(translation == Point3f(7.f, 8.f, 9.f));
+}
+
+TEST_CASE("Matrix4x4 GetScale")
+{
+	const Matrix4x4f matrix
+	(
+		{
+			2.f, 0.f, 0.f, 0.f,
+			0.f, 3.f, 0.f, 0.f,
+			0.f, 0.f, 4.f, 0.f,
+			0.f, 0.f, 0.f, 1.f
+		}
+	);
+	const Vector3f scale = matrix.GetScale();
+	REQUIRE(scale == Vector3f(2.f, 3.f, 4.f));
+}
+
+TEST_CASE("Matrix4x4 Get Scaled Vectors")
+{
+	const Matrix4x4f matrix
+	(
+		{
+			7.f, 0.f, 0.f, 0.f,
+			0.f, 0.f, -5.f, 0.f,
+			0.f, 2.f, 0.f, 0.f,
+			0.f, 0.f, 0.f, 1.f
+		}
+	);
+
+	Vector3f right = matrix.GetRightScaled();
+	Vector3f up = matrix.GetUpScaled();
+	Vector3f forward = matrix.GetForwardScaled();
+
+	REQUIRE(right == Vector3f(7.f, 0.f, 0.f));
+	REQUIRE(up == Vector3f(0.f, 0.f, -5.f));
+	REQUIRE(forward == Vector3f(0.f, 2.f, 0.f));
+}
+
+TEST_CASE("Matrix4x4 Get Unscaled Vectors")
+{
+	const Matrix4x4f matrix
+	(
+		{
+			0.f, 0.f, -3.f, 0.f,
+			0.f, 4.f, 0.f, 0.f,
+			5.f, 0.f, 0.f, 0.f,
+			0.f, 0.f, 0.f, 1.f
+		}
+	);
+	UnitVector3f right = matrix.GetRight();
+	UnitVector3f up = matrix.GetUp();
+	UnitVector3f forward = matrix.GetForward();
+	REQUIRE(right == UnitVector3f(0.f, 0.f, -1.f));
+	REQUIRE(up == UnitVector3f(0.f, 1.f, 0.f));
+	REQUIRE(forward == UnitVector3f(1.f, 0.f, 0.f));
+}
+
+TEST_CASE("Matrix4x4 GetTransposed")
+{
+	const Matrix4x4f matrix
+	(
+		{
+			1.f, 2.f, 3.f, 4.f,
+			5.f, 6.f, 7.f, 8.f,
+			9.f, 10.f, 11.f, 12.f,
+			13.f, 14.f, 15.f, 16.f
+		}
+	);
+	const Matrix4x4f transposedMatrix = Matrix4x4f::GetTransposed(matrix);
+
+	REQUIRE(matrix[0] == transposedMatrix[0]);
+	REQUIRE(matrix[1] == transposedMatrix[4]);
+	REQUIRE(matrix[2] == transposedMatrix[8]);
+	REQUIRE(matrix[3] == transposedMatrix[12]);
+	REQUIRE(matrix[4] == transposedMatrix[1]);
+	REQUIRE(matrix[5] == transposedMatrix[5]);
+	REQUIRE(matrix[6] == transposedMatrix[9]);
+	REQUIRE(matrix[7] == transposedMatrix[13]);
+	REQUIRE(matrix[8] == transposedMatrix[2]);
+	REQUIRE(matrix[9] == transposedMatrix[6]);
+	REQUIRE(matrix[10] == transposedMatrix[10]);
+	REQUIRE(matrix[11] == transposedMatrix[14]);
+	REQUIRE(matrix[12] == transposedMatrix[3]);
+	REQUIRE(matrix[13] == transposedMatrix[7]);
+	REQUIRE(matrix[14] == transposedMatrix[11]);
+	REQUIRE(matrix[15] == transposedMatrix[15]);
+}
+
+TEST_CASE("Matrix4x4 CreateTranslationMatrix")
+{
+	constexpr Point3f translation(3.f, 4.f, 5.f);
+	constexpr Matrix4x4f translationMatrix = Matrix4x4f::CreateTranslationMatrix(translation);
+	constexpr Matrix4x4f expectedMatrix
+	(
+		{
+			1.f, 0.f, 0.f, 0.f,
+			0.f, 1.f, 0.f, 0.f,
+			0.f, 0.f, 1.f, 0.f,
+			3.f, 4.f, 5.f, 1.f
+		}
+	);
+	REQUIRE(translationMatrix == expectedMatrix);
+}
+
 TEST_CASE("Matrix4x4 rotation axes unchanged")
 {
 	{ // Rotate on X axis
@@ -372,7 +489,7 @@ TEST_CASE("Rotation matrix")
 	}
 }
 
-TEST_CASE("Transform hierarchy")
+TEST_CASE("ToWorldSpace")
 {
 	{
 		Matrix4x4f parentMatrix;
@@ -394,35 +511,64 @@ TEST_CASE("Transform hierarchy")
 	}
 }
 
-TEST_CASE("Transform world to local space")
+TEST_CASE("ToLocalSpace")
 {
 	// No rotation
 	{
-		Matrix4x4f parentMatrix;
-		parentMatrix.SetTranslation(Point3f(10, 10, 10));
+		constexpr Matrix4x4f parentMatrixInWorldSpace = Matrix4x4f::CreateTranslationMatrix(Point3f(10, 10, 10));
+		constexpr Matrix4x4f childMatrixInWorldSpace = Matrix4x4f::CreateTranslationMatrix(Point3f(15, -5, 15));
 
-		Matrix4x4f childMatrix;
-		childMatrix.SetTranslation(Point3f(15, -5, 15));
+		constexpr Matrix4x4f local = ToLocalSpace(childMatrixInWorldSpace, parentMatrixInWorldSpace);
+		constexpr Matrix4x4f world = ToWorldSpace(local, parentMatrixInWorldSpace);
 
-
-		const Matrix4x4f local = ToLocalSpace(childMatrix, parentMatrix);
-		const Matrix4x4f world = ToWorldSpace(local, parentMatrix);
-		REQUIRE(local.GetTranslation() == Point3f(5, -15, 5));
-		REQUIRE(world == childMatrix);
+		constexpr Matrix4x4f expectedLocal = Matrix4x4f::CreateTranslationMatrix(Point3f(5, -15, 5));
+		REQUIRE(local == expectedLocal);
+		REQUIRE(world == childMatrixInWorldSpace);
 	}
 
 	// Rotation
 	{
-		Matrix4x4f parentMatrixInWorldSpace = CreateMatrixFromXY(UnitVector3f::Forward(), UnitVector3f::Up());
-		parentMatrixInWorldSpace.SetTranslation(Point3f(10, 10, 10));
+		constexpr Matrix4x4f parentMatrixInWorldSpace = CreateMatrixFromXY(UnitVector3f::Forward(), UnitVector3f::Up()) * Matrix4x4f::CreateTranslationMatrix(Point3f(10, 10, 10));
 
-		Matrix4x4f childMatrixInWorldSpace;
-		childMatrixInWorldSpace.SetTranslation(Point3f(15, 15, 5));
+		constexpr Matrix4x4f childMatrixInWorldSpace = Matrix4x4f::CreateTranslationMatrix(Point3f(15, 15, 5));
 
+		constexpr Matrix4x4f local = ToLocalSpace(childMatrixInWorldSpace, parentMatrixInWorldSpace);
+		constexpr Matrix4x4f world = ToWorldSpace(local, parentMatrixInWorldSpace);
 
-		const Matrix4x4f local = ToLocalSpace(childMatrixInWorldSpace, parentMatrixInWorldSpace);
+		constexpr Matrix4x4f expectedLocal
+		{
+			{
+				0.f, 0.f, -1.f, 0.f,
+				0.f, 1.f, 0.0f, 0.f,
+				1.f, 0.f, 0.0f, 0.f,
+				-5.f, 5.f, -5.f, 1.f
+			}
+		};
 
-		REQUIRE(local.GetTranslation() == Point3f(-5, 5, -5));
+		REQUIRE(local == expectedLocal);
+		REQUIRE(world == childMatrixInWorldSpace);
+	}
+
+	// Rotation
+	{
+		constexpr Matrix4x4f parentMatrixInWorldSpace = CreateMatrixFromXY(UnitVector3f::Forward(), UnitVector3f::Up()) * Matrix4x4f::CreateTranslationMatrix(Point3f(10, 10, 10));
+		constexpr Matrix4x4f childMatrixInWorldSpace = CreateMatrixFromXY(UnitVector3f::Backward(), UnitVector3f::Down()) * Matrix4x4f::CreateTranslationMatrix(Point3f(15, 15, 5));
+
+		constexpr Matrix4x4f local = ToLocalSpace(childMatrixInWorldSpace, parentMatrixInWorldSpace);
+		constexpr Matrix4x4f world = ToWorldSpace(local, parentMatrixInWorldSpace);
+
+		constexpr Matrix4x4f expectedLocal
+		{
+			{
+				-1.f, 0.f, 0.f, 0.f,
+				0.f, -1.f, 0.0f, 0.f,
+				0.f, 0.f, 1.0f, 0.f,
+				-5.f, 5.f, -5.f, 1.f
+			}
+		};
+
+		REQUIRE(local == expectedLocal);
+		REQUIRE(world == childMatrixInWorldSpace);
 	}
 
 	// Rotation
@@ -442,14 +588,24 @@ TEST_CASE("Transform world to local space")
 
 TEST_CASE("Transform vector local to world space")
 {
-	constexpr Vector3f forward(0, 0, 1);
+	{
+		constexpr UnitVector3f forward = UnitVector3f::Forward();
 
-	Matrix4x4f matrix = CreateMatrixFromYZ(UnitVector3f::Backward(), UnitVector3f::Left());
-	matrix.SetTranslation(Point3f(5, 5, 5));
+		constexpr Matrix4x4f matrix = Matrix4x4f::CreateRTMatrix(RotationMatrix3f::CreateFromXY(UnitVector3f::Backward(), UnitVector3f::Left()), Point3f(5, 5, 5));
 
-	const Vector3f worldVector = ToWorldSpace(forward, matrix);
+		constexpr UnitVector3f worldVector = ToWorldSpace(forward, matrix);
 
-	REQUIRE(worldVector == Vector3f(-1, 0, 0));
+		REQUIRE(worldVector == UnitVector3f::Up());
+	}
+	{
+		constexpr Vector3f forward(0, 0, 1);
+
+		constexpr Matrix4x4f matrix = CreateMatrixFromYZ(UnitVector3f::Backward(), UnitVector3f::Left()) * Matrix4x4f::CreateTranslationMatrix(Point3f(5, 5, 5));
+
+		constexpr Vector3f worldVector = ToWorldSpace(forward, matrix);
+
+		REQUIRE(worldVector == Vector3f(-1, 0, 0));
+	}
 }
 
 TEST_CASE("GetFastInverse")
