@@ -19,8 +19,8 @@ Texture2D GBufferObjectIDTexture : register(t9);
 
 cbuffer CameraBuffer : register(b0)
 {
-    float4x4 CameraViewMatrix;
-    float4x4 CameraProjectionMatrix;
+    row_major float4x4 CameraViewMatrix;
+    row_major float4x4 CameraProjectionMatrix;
     float3 CameraPosition;
     float paddingCameraBuffer;
     
@@ -30,7 +30,7 @@ cbuffer CameraBuffer : register(b0)
 
 cbuffer TransformBuffer : register(b1)
 {
-    float4x4 ModelToWorldMatrix;
+    row_major float4x4 ModelToWorldMatrix;
 }
 
 cbuffer TimeBuffer : register(b2)
@@ -53,7 +53,7 @@ cbuffer LightBuffer : register(b3)
 
 cbuffer JointBuffer : register(b4)
 {
-    float4x4 BoneMatrices[SIMPLE_MAX_BONES];
+    row_major float4x4 BoneMatrices[SIMPLE_MAX_BONES];
 }
 
 cbuffer PostProcessingBuffer : register(b5)

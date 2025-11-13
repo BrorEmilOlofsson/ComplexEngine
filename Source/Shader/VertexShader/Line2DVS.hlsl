@@ -8,7 +8,7 @@ PixelInputType main(VertexInputType input)
     float4 vertexViewPos = mul(CameraViewMatrix, vertexWorldPos);
     
     output.WorldPosition = vertexWorldPos;
-    output.Position = mul(CameraProjectionMatrix, vertexViewPos);
+    output.Position = mul(vertexViewPos, CameraProjectionMatrix);
     
     output.UV = float2(input.UV.x, 1.0 - input.UV.y);
     

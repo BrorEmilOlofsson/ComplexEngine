@@ -20,6 +20,7 @@
 #include "Graphics/GraphicsConstants.hpp"
 #include "Graphics/Model/AnimatedModel.hpp"
 #include "Graphics/Model/AnimatedModelInstance.hpp"
+#include "Graphics/Animation/AnimationUtility.hpp"
 
 namespace Simple
 {
@@ -209,38 +210,6 @@ namespace Simple
 					entityID.id
 				));
 			});
-	}
-
-	std::array<Matrix4x4f, GlobalMaxBones> ComputeGlobalTransforms(
-		std::span<const Matrix4x4f> localTransforms, std::span<const Bone> bones)
-	{
-		assert(localTransforms.size() == bones.size());
-		assert(bones.size() <= GlobalMaxBones);
-		std::array<Matrix4x4f, GlobalMaxBones> globalTransforms{};
-
-		for (uint32_t i = 0; i < bones.size(); ++i)
-		{
-			const Bone& bone = bones[i];
-
-			globalTransforms[i] = localTransforms[i];
-
-			if (bone.parentIndex != std::numeric_limits<uint32_t>::max())
-				globalTransforms[i] = globalTransforms[i] * globalTransforms[bone.parentIndex];
-		}
-
-		return globalTransforms;
-	}
-
-	std::array<Matrix4x4f, GlobalMaxBones> CalculateFinalBoneMatrices(std::span<const Matrix4x4f> globalMatrices, std::span<const Bone> bones)
-	{
-		std::array<Matrix4x4f, GlobalMaxBones> finalBoneMatrices{};
-
-		for (size_t i = 0; i < bones.size(); i++)
-		{
-			finalBoneMatrices[i] = globalMatrices[i] * bones[i].inverseBindMatrix;
-		}
-
-		return finalBoneMatrices;
 	}
 
 	static void ProcessAnimatedModels(const ECS& ecs, RenderList& renderList, const GraphicsSettings& graphicsSettings)

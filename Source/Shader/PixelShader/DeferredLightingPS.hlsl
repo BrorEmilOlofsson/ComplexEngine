@@ -11,7 +11,8 @@ float4 main(TestVSOut input) : SV_TARGET
     float3 lightDir = DirectionalLightDirection;
     float intensity = saturate(dot(normal, -lightDir));
     
-    float3 finalColor = albedo * intensity;
+    float ambient = 0.1f;
+    float3 finalColor = (albedo * intensity) + ambient;
 
     return float4(finalColor, 1.0);
     

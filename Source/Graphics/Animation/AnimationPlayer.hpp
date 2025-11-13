@@ -1,6 +1,8 @@
 #pragma once
 #include "Graphics/GraphicsConstants.hpp"
 #include "Utility/Asset/AnimationAsset.hpp"
+#include "Graphics/Model/Bone.hpp"
+#include <span>
 
 namespace Simple
 {
@@ -9,7 +11,7 @@ namespace Simple
 	{
 	public:
 
-		void Update(const float deltaTime);
+		void Update(const float deltaTime, std::span<const Bone> skeletonBones);
 
 		std::array<Matrix4x4f, GlobalMaxBones> localBoneMatrices;
 
@@ -21,11 +23,11 @@ namespace Simple
 		}
 		
 		AnimationAssetHandle mAnimationAsset;
+		float mCurrentTime = 0.f;
 
 	private:
 
 
-		float mCurrentTime = 0.f;
 
 	};
 }

@@ -361,6 +361,27 @@ TEST_CASE("Matrix4x4 CreateTranslationMatrix")
 	REQUIRE(translationMatrix == expectedMatrix);
 }
 
+TEST_CASE("Matrix4x4 CreateTRS Matrix")
+{
+	constexpr Point3f translation = Point3f(10, 20, 30);
+	const Matrix4x4f rotationMatrix = Matrix4x4f::CreateRotationAroundZ(Degreesf(45.f));
+	constexpr Vector3f scale = Vector3f(2, 3, 4);
+	// rs is correct
+	const Matrix4x4f trs = Matrix4x4f::CreateTRSMatrix(translation, rotationMatrix, scale);
+
+	const Matrix4x4f expectedMatrix
+	(
+		{
+			1.4142135f,  1.4142135f, 0.f, 0.f,
+			-2.1213202f,  2.1213202f, 0.f, 0.f,
+			0.f,         0.f,        4.f, 0.f,
+			10.f,        20.f,       30.f, 1.f
+		}
+	);
+
+	REQUIRE(NearlyEqual(trs, expectedMatrix));
+}
+
 TEST_CASE("Matrix4x4 rotation axes unchanged")
 {
 	{ // Rotate on X axis

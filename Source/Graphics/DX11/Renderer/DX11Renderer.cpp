@@ -72,6 +72,12 @@ namespace Simple
 
 			transformCB.UpdateAndBind(TransformBufferData{ modelInstance.transform.GetMatrix() }, context);
 			objectIDCB.UpdateAndBind(ObjectIDBufferData{ modelInstance.objectID }, context);
+
+			/*for (std::size_t i = 0; i < modelInstance.boneMatrices.size(); i++)
+			{
+				modelInstance.boneMatrices[i] = Matrix4x4f::Identity();
+			}*/
+
 			boneCB.UpdateAndBind(BoneBufferData{ modelInstance.boneMatrices }, context);
 
 			modelInstance.animatedModel->Render();

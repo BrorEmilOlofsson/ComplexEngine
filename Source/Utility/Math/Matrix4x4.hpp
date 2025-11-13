@@ -69,6 +69,8 @@ namespace Simple
 		[[nodiscard]] static constexpr Matrix4x4<T> CreateScaleMatrix(const Vector3<T>& scale);
 
 		[[nodiscard]] static constexpr Matrix4x4<T> CreateRTMatrix(const RotationMatrix3<T>& rotationMatrix, const Point3<T>& translation);
+		[[nodiscard]] static constexpr Matrix4x4<T> CreateTRSMatrix(const Point3<T>& translation, const Matrix4x4<T>& rotationMatrix, const Vector3<T>& scale);
+		[[nodiscard]] static constexpr Matrix4x4<T> CreateTRSMatrix(const Point3<T>& translation, const RotationMatrix3<T>& rotationMatrix, const Vector3<T>& scale);
 
 		[[nodiscard]] static constexpr Matrix4x4<T> GetTransposed(const Matrix4x4<T>& matrix);
 		[[nodiscard]] static constexpr Matrix4x4<T> GetInverse(Matrix4x4<T> matrix);
@@ -455,6 +457,20 @@ namespace Simple
 	}
 
 	template<typename T>
+	constexpr Matrix4x4<T> Matrix4x4<T>::CreateTRSMatrix(const Point3<T>& translation, const Matrix4x4<T>& rotationMatrix, const Vector3<T>& scale)
+	{
+		return CreateScaleMatrix(scale)
+			* rotationMatrix
+			* CreateTranslationMatrix(translation);
+	}
+
+	template<typename T>
+	constexpr Matrix4x4<T> Matrix4x4<T>::CreateTRSMatrix(const Point3<T>& translation, const RotationMatrix3<T>& rotationMatrix, const Vector3<T>& scale)
+	{
+		return CreateTRSMatrix(scale, CreateRotationMatrix(rotationMatrix), translation);
+	}
+
+	template<typename T>
 	constexpr Matrix4x4<T> Matrix4x4<T>::GetTransposed(const Matrix4x4<T>& m)
 	{
 		Matrix4x4<T> transposed;
@@ -739,6 +755,19 @@ namespace Simple
 			}
 		}
 
+		return true;
+	}
+
+	template<typename T>
+	[[nodiscard]] constexpr bool NearlyEqual(const Matrix4x4<T>& a, const Matrix4x4<T>& b, const T epsilon = std::numeric_limits<T>::epsilon()) noexcept
+	{
+		for (unsigned int i = 0; i < 16; ++i)
+		{
+			if (!NearlyEqual(a[i], b[i], epsilon))
+			{
+				return false;
+			}
+		}
 		return true;
 	}
 

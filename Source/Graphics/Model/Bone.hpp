@@ -9,7 +9,8 @@ namespace Simple
 
 	struct Bone final
 	{
-		Matrix4x4f inverseBindMatrix;
+		Matrix4x4f inverseBindPose;
+		Matrix4x4f localBindPose;
 		std::string name;
 		uint32_t parentIndex = std::numeric_limits<uint32_t>::max();
 	};

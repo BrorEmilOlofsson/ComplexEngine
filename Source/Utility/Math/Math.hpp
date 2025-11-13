@@ -9,11 +9,9 @@
 #include "Utility/Math/MathConstants.hpp"
 #include "Utility/Math/Angle.hpp"
 
-#undef max
-#undef min
-
 namespace Simple
 {
+
 	template<typename T>
 	[[nodiscard]] constexpr T Square(const T& value) noexcept
 	{
@@ -90,6 +88,12 @@ namespace Simple
 	[[nodiscard]] constexpr bool IsInRangeExclusive(const T& value, const T& min, const T& max) noexcept
 	{
 		return value > min && value < max;
+	}
+
+	template<typename T>
+	[[nodiscard]] constexpr bool NearlyEqual(const T& a, const T& b, const T& tolerance = static_cast<T>(0.0001)) noexcept
+	{
+		return Abs(a - b) < tolerance;
 	}
 
 	template<typename T>

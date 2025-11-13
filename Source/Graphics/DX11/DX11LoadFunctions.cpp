@@ -40,12 +40,12 @@ namespace Simple
 
 	[[nodiscard]] constexpr Matrix4x4f ToMatrix(const aiMatrix4x4& mat)
 	{
-		return Matrix4x4f({
+		return Matrix4x4f::GetTransposed(Matrix4x4f({
 			mat.a1, mat.a2, mat.a3, mat.a4,
 			mat.b1, mat.b2, mat.b3, mat.b4,
 			mat.c1, mat.c2, mat.c3, mat.c4,
 			mat.d1, mat.d2, mat.d3, mat.d4
-			});
+			}));
 	}
 
 	std::vector<Vertex> ToVertices(const aiMesh& inMesh)
@@ -120,7 +120,7 @@ namespace Simple
 
 				Bone& bone = bones.emplace_back();
 				bone.name = boneName;
-				bone.inverseBindMatrix = ToMatrix(aiBone.mOffsetMatrix);
+				bone.inverseBindPose = Matrix4x4f::GetFastInverse(ToMatrix(aiBone.mOffsetMatrix));
 				bone.parentIndex = std::numeric_limits<uint32_t>::max();
 			}
 			else
