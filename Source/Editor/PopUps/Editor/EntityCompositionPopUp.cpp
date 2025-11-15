@@ -43,7 +43,8 @@ namespace Simple
 		const OSView os = blackboard.Get<Key_OSView>();
 		mEntityCompositionAsset->GetECS().EditorUpdate(newBlackboard);
 
-		mRenderState.GetRenderList().AddSphere(DrawSphere{ Spheref(Point3f(0, 0, 10), 5.f), Colors::Salmon });
+		constexpr Spheref drawSphere(Point3f(0, 0, 10), 5.f);
+		mRenderState.GetRenderList().AddSphere(DrawSphere{ drawSphere, Colors::Salmon }, true);
 
 		if (IsFocused())
 		{

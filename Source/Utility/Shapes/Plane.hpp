@@ -12,13 +12,13 @@ namespace Simple
 
 		constexpr Plane() = default;
 		constexpr Plane(const Point3<T>& point0, const Point3<T>& point1, const Point3<T>& point2);
-		constexpr Plane(const Point3<T>& aPoint, const UnitVector3<T>& aNormal);
+		constexpr Plane(const Point3<T>& point, const UnitVector3<T>& normal);
 
 		[[nodiscard]] constexpr Point3<T> GetPoint() const;
 		[[nodiscard]] constexpr const UnitVector3<T>& GetNormal() const;
 
-		void SetPoint(const Point3<T>& aPoint);
-		void SetNormal(const UnitVector3<T>& aNormal);
+		void SetPoint(const Point3<T>& point);
+		void SetNormal(const UnitVector3<T>& normal);
 
 	private:
 

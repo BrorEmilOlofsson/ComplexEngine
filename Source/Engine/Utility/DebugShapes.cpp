@@ -2,7 +2,6 @@
 #include "DebugShapes.hpp"
 #include "Utility/Shapes/Sphere.hpp"
 #include "Utility/Shapes/Ray3.hpp"
-#include "Engine/Collision/CollisionFunctions.hpp"
 #include "Graphics/RenderList.hpp"
 
 namespace Simple

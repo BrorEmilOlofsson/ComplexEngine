@@ -24,14 +24,14 @@ namespace Simple
 
 	constexpr Point2i MapToRenderRect(const Point2i mouseScreenPos, const AABB2i& renderRect)
 	{
-		const AABB2f windowRect = AABB2f::CreateFromDefaultAndExtent(Vector2f(renderRect.GetExtent()));
+		const AABB2f windowRect = AABB2f::FromDefaultAndExtent(Vector2f(renderRect.GetExtent()));
 		const Point2i mappedPos = Point2i(Remap(Point2f(mouseScreenPos), ToAABB<float>(renderRect), windowRect));
 		return mappedPos;
 	}
 
 	constexpr bool IsInsideRenderRect(const Point2i& mouseScreenPos, const AABB2i& renderRect)
 	{
-		const AABB2f windowRect = AABB2f::CreateFromDefaultAndExtent(Vector2f(renderRect.GetExtent()));
+		const AABB2f windowRect = AABB2f::FromDefaultAndExtent(Vector2f(renderRect.GetExtent()));
 		const Point2i mappedPos = MapToRenderRect(mouseScreenPos, renderRect);
 
 		return IsInside(mappedPos, ToAABB<int>(windowRect));

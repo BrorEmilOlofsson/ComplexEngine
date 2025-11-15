@@ -54,7 +54,8 @@ namespace Simple
 		[[nodiscard]] constexpr Vector3<T> GetUpScaled() const;
 		[[nodiscard]] constexpr Vector3<T> GetForwardScaled() const;
 		[[nodiscard]] constexpr RotationMatrix3<T> GetRotationMatrix() const;
-		[[nodiscard]] constexpr Quaternion<T> GetQuaternion() const;
+
+		[[nodiscard]] constexpr bool IsOrthogonal() const;
 
 		[[nodiscard]] static constexpr Matrix4x4<T> Identity();
 		[[nodiscard]] static constexpr Matrix4x4<T> Zero();
@@ -65,10 +66,11 @@ namespace Simple
 		[[nodiscard]] static constexpr Matrix4x4<T> CreateRotationAroundY(const Degrees<T> angle);
 		[[nodiscard]] static constexpr Matrix4x4<T> CreateRotationAroundZ(const Degrees<T> angle);
 		[[nodiscard]] static constexpr Matrix4x4<T> CreateRotationMatrix(const Matrix4x4<T>& matrix);
+		[[nodiscard]] static constexpr Matrix4x4<T> CreateRotationMatrix(const RotationMatrix3<T>& matrix);
 		[[nodiscard]] static constexpr Matrix4x4<T> CreateTranslationMatrix(const Point3<T>& translation);
 		[[nodiscard]] static constexpr Matrix4x4<T> CreateScaleMatrix(const Vector3<T>& scale);
 
-		[[nodiscard]] static constexpr Matrix4x4<T> CreateRTMatrix(const RotationMatrix3<T>& rotationMatrix, const Point3<T>& translation);
+		[[nodiscard]] static constexpr Matrix4x4<T> CreateTRMatrix(const RotationMatrix3<T>& rotationMatrix, const Point3<T>& translation);
 		[[nodiscard]] static constexpr Matrix4x4<T> CreateTRSMatrix(const Point3<T>& translation, const Matrix4x4<T>& rotationMatrix, const Vector3<T>& scale);
 		[[nodiscard]] static constexpr Matrix4x4<T> CreateTRSMatrix(const Point3<T>& translation, const RotationMatrix3<T>& rotationMatrix, const Vector3<T>& scale);
 
@@ -299,19 +301,30 @@ namespace Simple
 	template<typename T>
 	constexpr RotationMatrix3<T> Matrix4x4<T>::GetRotationMatrix() const
 	{
-		return RotationMatrix3<T>(
-			{
-				mValues[0], mValues[1], mValues[2],
-				mValues[4], mValues[5], mValues[6],
-				mValues[8], mValues[9], mValues[10]
-			}
-		);
+		const Vector3<T> scale = GetScale();
+
+		return RotationMatrix3<T>
+			(
+				{
+					mValues[0] / scale.x, mValues[1] / scale.x, mValues[2] / scale.x,
+					mValues[4] / scale.y, mValues[5] / scale.y, mValues[6] / scale.y,
+					mValues[8] / scale.z, mValues[9] / scale.z, mValues[10] / scale.z
+				}
+			);
+
 	}
 
 	template<typename T>
-	constexpr Quaternion<T> Matrix4x4<T>::GetQuaternion() const
+	constexpr bool Matrix4x4<T>::IsOrthogonal() const
 	{
-		return Quaternion<T>(*this);
+		const Vector3<T> right = GetRightScaled();
+		const Vector3<T> up = GetUpScaled();
+		const Vector3<T> forward = GetForwardScaled();
+		const T dotXY = Dot(right, up);
+		const T dotXZ = Dot(right, forward);
+		const T dotYZ = Dot(up, forward);
+		const T epsilon = static_cast<T>(1e-6);
+		return (Abs(dotXY) < epsilon) && (Abs(dotXZ) < epsilon) && (Abs(dotYZ) < epsilon);
 	}
 
 	template<typename T>
@@ -418,21 +431,41 @@ namespace Simple
 	{
 		const Vector3<T> scale = matrix.GetScale();
 
-		Matrix4x4<T> rotationMatrix = Matrix4x4<T>::Identity();
+		Matrix4x4<T> result = Matrix4x4<T>::Identity();
 
-		rotationMatrix(0, 0) = matrix(0, 0) / scale.x;
-		rotationMatrix(1, 0) = matrix(1, 0) / scale.x;
-		rotationMatrix(2, 0) = matrix(2, 0) / scale.x;
+		result(0, 0) = matrix(0, 0) / scale.x;
+		result(0, 1) = matrix(0, 1) / scale.x;
+		result(0, 2) = matrix(0, 2) / scale.x;
 
-		rotationMatrix(0, 1) = matrix(0, 1) / scale.y;
-		rotationMatrix(1, 2) = matrix(1, 1) / scale.y;
-		rotationMatrix(2, 2) = matrix(1, 1) / scale.y;
+		result(1, 0) = matrix(1, 0) / scale.y;
+		result(1, 1) = matrix(1, 1) / scale.y;
+		result(1, 2) = matrix(1, 2) / scale.y;
 
-		rotationMatrix(0, 2) = matrix(0, 2) / scale.z;
-		rotationMatrix(1, 2) = matrix(1, 2) / scale.z;
-		rotationMatrix(2, 2) = matrix(2, 2) / scale.z;
+		result(2, 0) = matrix(2, 0) / scale.z;
+		result(2, 1) = matrix(2, 1) / scale.z;
+		result(2, 2) = matrix(2, 2) / scale.z;
 
-		return rotationMatrix;
+		return result;
+	}
+
+	template<typename T>
+	constexpr Matrix4x4<T> Matrix4x4<T>::CreateRotationMatrix(const RotationMatrix3<T>& rotationMatrix)
+	{
+		Matrix4x4<T> result = Matrix4x4<T>::Identity();
+
+		result(0, 0) = rotationMatrix(0, 0);
+		result(1, 0) = rotationMatrix(1, 0);
+		result(2, 0) = rotationMatrix(2, 0);
+
+		result(0, 1) = rotationMatrix(0, 1);
+		result(1, 1) = rotationMatrix(1, 1);
+		result(2, 1) = rotationMatrix(2, 1);
+
+		result(0, 2) = rotationMatrix(0, 2);
+		result(1, 2) = rotationMatrix(1, 2);
+		result(2, 2) = rotationMatrix(2, 2);
+
+		return result;
 	}
 
 	template<typename T>
@@ -448,12 +481,10 @@ namespace Simple
 	}
 
 	template<typename T>
-	constexpr Matrix4x4<T> Matrix4x4<T>::CreateRTMatrix(const RotationMatrix3<T>& rotationMatrix, const Point3<T>& translation)
+	constexpr Matrix4x4<T> Matrix4x4<T>::CreateTRMatrix(const RotationMatrix3<T>& rotationMatrix, const Point3<T>& translation)
 	{
-		Matrix4x4<T> result = Matrix4x4<T>::Identity();
-		result.SetRotationMatrix(rotationMatrix);
-		result.SetTranslation(translation);
-		return result;
+		return CreateRotationMatrix(rotationMatrix)
+			* CreateTranslationMatrix(translation);
 	}
 
 	template<typename T>

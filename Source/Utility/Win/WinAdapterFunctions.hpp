@@ -101,7 +101,7 @@ namespace Simple
 	template<typename T = float>
 	inline AABB2<T> ToAABB(RECT rect)
 	{
-		return AABB2<T>::CreateFromMinAndMax
+		return AABB2<T>::FromMinAndMax
 		(
 			Point2<T>(rect.left, rect.top),
 			Point2<T>(rect.right, rect.bottom)

@@ -9,6 +9,170 @@ namespace Simple
 {
 
 	template<typename T>
+	[[nodiscard]] constexpr Matrix4x4<T> ToMatrix(const Quaternion<T>& quaternion)
+	{
+		Matrix4x4<T> result;
+
+		const T w = quaternion.w;
+		const T x = quaternion.x;
+		const T y = quaternion.y;
+		const T z = quaternion.z;
+
+		const T qxx(x * x);
+		const T qyy(y * y);
+		const T qzz(z * z);
+
+		const T qxz(x * z);
+		const T qxy(x * y);
+		const T qyz(y * z);
+
+		const T qwx(w * x);
+		const T qwy(w * y);
+		const T qwz(w * z);
+
+		result(0, 0) = T(1) - T(2) * (qyy + qzz);
+		result(0, 1) = T(2) * (qxy + qwz);
+		result(0, 2) = T(2) * (qxz - qwy);
+
+		result(1, 0) = T(2) * (qxy - qwz);
+		result(1, 1) = T(1) - T(2) * (qxx + qzz);
+		result(1, 2) = T(2) * (qyz + qwx);
+
+		result(2, 0) = T(2) * (qxz + qwy);
+		result(2, 1) = T(2) * (qyz - qwx);
+		result(2, 2) = T(1) - T(2) * (qxx + qyy);
+
+		return result;
+	}
+
+	template<typename T>
+	[[nodiscard]] constexpr RotationMatrix3<T> ToRotationMatrix(const Quaternion<T>& quaternion)
+	{
+
+		const T w = quaternion.w;
+		const T x = quaternion.x;
+		const T y = quaternion.y;
+		const T z = quaternion.z;
+
+		const T qxx(x * x);
+		const T qyy(y * y);
+		const T qzz(z * z);
+
+		const T qxz(x * z);
+		const T qxy(x * y);
+		const T qyz(y * z);
+
+		const T qwx(w * x);
+		const T qwy(w * y);
+		const T qwz(w * z);
+
+		std::array<T, 9> values
+		{
+			T(1) - T(2) * (qyy + qzz),
+			T(2) * (qxy + qwz),
+			T(2) * (qxz - qwy),
+
+			T(2) * (qxy - qwz),
+			T(1) - T(2) * (qxx + qzz),
+			T(2) * (qyz + qwx),
+
+			T(2) * (qxz + qwy),
+			T(2) * (qyz - qwx),
+			T(1) - T(2) * (qxx + qyy)
+		};
+
+		return RotationMatrix3<T>(values);
+	}
+
+	template<typename T>
+	[[nodiscard]] constexpr Quaternion<T> ToQuaternion(const Matrix4x4<T>& matrix)
+	{
+		assert(matrix.IsOrthogonal() && "Matrix must be orthogonal to convert to Quaternion");
+
+		const T m00 = matrix(0, 0);
+		const T m11 = matrix(1, 1);
+		const T m22 = matrix(2, 2);
+
+		Quaternion<T> quaternion;
+
+		quaternion.w = Sqrt(std::max(T(0), T(1) + m00 + m11 + m22)) * T(0.5);
+
+		quaternion.x = Sqrt(std::max(T(0), T(1) + m00 - m11 - m22)) * T(0.5);
+		quaternion.y = Sqrt(std::max(T(0), T(1) - m00 + m11 - m22)) * T(0.5);
+		quaternion.z = Sqrt(std::max(T(0), T(1) - m00 - m11 + m22)) * T(0.5);
+
+		quaternion.x = CopySign(quaternion.x, matrix(2, 1) - matrix(1, 2));
+		quaternion.y = CopySign(quaternion.y, matrix(0, 2) - matrix(2, 0));
+		quaternion.z = CopySign(quaternion.z, matrix(1, 0) - matrix(0, 1));
+
+		return quaternion;
+	}
+
+	template<typename T>
+	[[nodiscard]] constexpr Quaternion<T> ToQuaternion(const RotationMatrix3<T>& matrix)
+	{
+		const T m00 = matrix(0, 0);
+		const T m11 = matrix(1, 1);
+		const T m22 = matrix(2, 2);
+
+		Quaternion<T> quaternion;
+
+		quaternion.w = Sqrt(Max(T(0), T(1) + m00 + m11 + m22)) * T(0.5);
+
+		quaternion.x = Sqrt(Max(T(0), T(1) + m00 - m11 - m22)) * T(0.5);
+		quaternion.y = Sqrt(Max(T(0), T(1) - m00 + m11 - m22)) * T(0.5);
+		quaternion.z = Sqrt(Max(T(0), T(1) - m00 - m11 + m22)) * T(0.5);
+
+		quaternion.x = CopySign(quaternion.x, matrix(2, 1) - matrix(1, 2));
+		quaternion.y = CopySign(quaternion.y, matrix(0, 2) - matrix(2, 0));
+		quaternion.z = CopySign(quaternion.z, matrix(1, 0) - matrix(0, 1));
+
+		return quaternion;
+	}
+
+	template<typename T>
+	constexpr Quaternion<T> ToQuaternion2(const Matrix4x4<T>& matrix)
+	{
+		const T trace = matrix(1, 1) + matrix(2, 2) + matrix(3, 3);
+		Quaternion<T> quaternion;
+		if (trace > T(0))
+		{
+			const T s = Sqrt(trace + T(1)) * T(2);
+			quaternion.w = s * T(0.25);
+			quaternion.x = (matrix(3, 2) - matrix(2, 3)) / s;
+			quaternion.y = (matrix(1, 3) - matrix(3, 1)) / s;
+			quaternion.z = (matrix(2, 1) - matrix(1, 2)) / s;
+		}
+		else if ((matrix(1, 1) > matrix(2, 2)) && (matrix(1, 1) > matrix(3, 3)))
+		{
+			const T s = Sqrt(T(1) + matrix(1, 1) - matrix(2, 2) - matrix(3, 3)) * T(2);
+			quaternion.w = (matrix(3, 2) - matrix(2, 3)) / s;
+			quaternion.x = s * T(0.25);
+			quaternion.y = (matrix(1, 2) + matrix(2, 1)) / s;
+			quaternion.z = (matrix(1, 3) + matrix(3, 1)) / s;
+		}
+		else if (matrix(2, 2) > matrix(3, 3))
+		{
+			const T s = Sqrt(T(1) + matrix(2, 2) - matrix(1, 1) - matrix(3, 3)) * T(2);
+			quaternion.w = (matrix(1, 3) - matrix(3, 1)) / s;
+			quaternion.x = (matrix(1, 2) + matrix(2, 1)) / s;
+			quaternion.y = s * T(0.25);
+			quaternion.z = (matrix(2, 3) + matrix(3, 2)) / s;
+		}
+		else
+		{
+			const T s = Sqrt(T(1) + matrix(3, 3) - matrix(1, 1) - matrix(2, 2)) * T(2);
+			quaternion.w = (matrix(2, 1) - matrix(1, 2)) / s;
+			quaternion.x = (matrix(1, 3) + matrix(3, 1)) / s;
+			quaternion.y = (matrix(2, 3) + matrix(3, 2)) / s;
+			quaternion.z = s * T(0.25);
+		}
+
+		return quaternion;
+	}
+
+
+	template<typename T>
 	[[nodiscard]] constexpr Matrix4x4<T> ToWorldSpace(const Matrix4x4<T>& local, const Matrix4x4<T>& world)
 	{
 		return local * world;

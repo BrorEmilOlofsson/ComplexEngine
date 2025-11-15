@@ -12,36 +12,36 @@ namespace Simple
 {
 
 	template<typename T>
-	constexpr bool DetectCollision(const Point3<T>& aPoint1, const Point3<T>& aPoint2)
+	constexpr bool DetectCollision(const Point3<T>& point1, const Point3<T>& point2)
 	{
-		return aPoint1 == aPoint2;
+		return point1 == point2;
 	}
 
 	template<typename T>
-	constexpr bool DetectCollision(const Point3<T>& aPoint, const Sphere<T>& aSphere)
+	constexpr bool DetectCollision(const Point3<T>& point, const Sphere<T>& sphere)
 	{
-		const T distanceSquared = DistanceSquared(aPoint, aSphere.GetCenter());
-		const T sumRadiiSquared = Square(aSphere.GetRadius());
+		const T distanceSquared = DistanceSquared(point, sphere.GetCenter());
+		const T sumRadiiSquared = Square(sphere.GetRadius());
 		return distanceSquared <= sumRadiiSquared;
 	}
 
 	template<typename T>
-	constexpr bool DetectCollision(const Sphere<T>& aSphere1, const Sphere<T>& aSphere2)
+	constexpr bool DetectCollision(const Sphere<T>& sphere1, const Sphere<T>& sphere2)
 	{
-		const T distanceSquared = DistanceSquared(aSphere1.GetCenter(), aSphere2.GetCenter());
-		const T sumRadiiSquared = Square(aSphere1.GetRadius() + aSphere2.GetRadius());
+		const T distanceSquared = DistanceSquared(sphere1.GetCenter(), sphere2.GetCenter());
+		const T sumRadiiSquared = Square(sphere1.GetRadius() + sphere2.GetRadius());
 		return distanceSquared <= sumRadiiSquared;
 	}
 
-	constexpr bool DetectCollision(const Spheref& aSphere, const AABB3f& aAABB)
+	constexpr bool DetectCollision(const Spheref& sphere, const AABB3f& aabb)
 	{
-		const Point3f sphereCenter = aSphere.GetCenter();
+		const Point3f sphereCenter = sphere.GetCenter();
 		// Find the closest point to the sphere within the AABB
 		Point3f closestPoint
 		{
-			Max(aAABB.GetMin().x, Min(sphereCenter.x, aAABB.GetMax().x)),
-			Max(aAABB.GetMin().y, Min(sphereCenter.y, aAABB.GetMax().y)),
-			Max(aAABB.GetMin().z, Min(sphereCenter.z, aAABB.GetMax().z))
+			Max(aabb.GetMin().x, Min(sphereCenter.x, aabb.GetMax().x)),
+			Max(aabb.GetMin().y, Min(sphereCenter.y, aabb.GetMax().y)),
+			Max(aabb.GetMin().z, Min(sphereCenter.z, aabb.GetMax().z))
 		};
 
 		// Calculate the distance between the closest point and the sphere's center
@@ -50,49 +50,49 @@ namespace Simple
 			(closestPoint.z - sphereCenter.z) * (closestPoint.z - sphereCenter.z);
 
 		// If the distance is less than the radius, they intersect
-		return distanceSquared < (aSphere.GetRadius() * aSphere.GetRadius());
+		return distanceSquared < (sphere.GetRadius() * sphere.GetRadius());
 	}
 
-	constexpr bool DetectCollision(const Spheref& aSphere, const Ray3f& aRay)
+	constexpr bool DetectCollision(const Spheref& sphere, const Ray3f& ray)
 	{
-		const Vector3f rayOriginToSphere = aSphere.GetCenter() - aRay.GetOrigin();
+		const Vector3f rayOriginToSphere = sphere.GetCenter() - ray.GetOrigin();
 
-		const float sphereRadiusSqr = aSphere.GetRadius() * aSphere.GetRadius();
+		const float sphereRadiusSqr = sphere.GetRadius() * sphere.GetRadius();
 		if (LengthSquared(rayOriginToSphere) <= sphereRadiusSqr)
 		{
 			return true;
 		}
 
-		const float projection = Dot(rayOriginToSphere, aRay.GetDirection());
+		const float projection = Dot(rayOriginToSphere, ray.GetDirection());
 
 		if (projection < 0)
 		{
 			return false;
 		}
 
-		const Point3f closestPoint = aRay.GetOrigin() + projection * aRay.GetDirection();
+		const Point3f closestPoint = ray.GetOrigin() + projection * ray.GetDirection();
 
-		const float distanceSqr = DistanceSquared(closestPoint, aSphere.GetCenter());
+		const float distanceSqr = DistanceSquared(closestPoint, sphere.GetCenter());
 
 		return distanceSqr <= sphereRadiusSqr;
 	}
 
-	constexpr bool DetectCollision(const AABB3f& aAABB1, const AABB3f& aAABB2)
+	constexpr bool DetectCollision(const AABB3f& aabb1, const AABB3f& aabb2)
 	{
 		// Check for overlap along the x-axis
-		if (aAABB1.GetMax().x < aAABB2.GetMin().x || aAABB1.GetMin().x > aAABB2.GetMax().x)
+		if (aabb1.GetMax().x < aabb2.GetMin().x || aabb1.GetMin().x > aabb2.GetMax().x)
 		{
 			return false; // No overlap
 		}
 
 		// Check for overlap along the y-axis
-		if (aAABB1.GetMax().y < aAABB2.GetMin().y || aAABB1.GetMin().y > aAABB2.GetMax().y)
+		if (aabb1.GetMax().y < aabb2.GetMin().y || aabb1.GetMin().y > aabb2.GetMax().y)
 		{
 			return false; // No overlap
 		}
 
 		// Check for overlap along the z-axis
-		if (aAABB1.GetMax().z < aAABB2.GetMin().z || aAABB1.GetMin().z > aAABB2.GetMax().z)
+		if (aabb1.GetMax().z < aabb2.GetMin().z || aabb1.GetMin().z > aabb2.GetMax().z)
 		{
 			return false; // No overlap
 		}
@@ -101,22 +101,22 @@ namespace Simple
 		return true;
 	}
 
-	constexpr bool DetectCollision(const AABB3f& aAABB, const Spheref& aSphere)
+	constexpr bool DetectCollision(const AABB3f& aabb, const Spheref& sphere)
 	{
-		return DetectCollision(aSphere, aAABB);
+		return DetectCollision(sphere, aabb);
 	}
 
-	constexpr bool DetectCollision(const AABB3f& aAABB, const Ray3f& aRay)
+	constexpr bool DetectCollision(const AABB3f& aabb, const Ray3f& ray)
 	{
-		const Vector3f invDir = 1.0f / aRay.GetDirection();
+		const Vector3f invDir = 1.0f / ray.GetDirection();
 
-		float tMin = (aAABB.GetMin().x - aRay.GetOrigin().x) * invDir.x;
-		float tMax = (aAABB.GetMax().x - aRay.GetOrigin().x) * invDir.x;
+		float tMin = (aabb.GetMin().x - ray.GetOrigin().x) * invDir.x;
+		float tMax = (aabb.GetMax().x - ray.GetOrigin().x) * invDir.x;
 
 		if (tMin > tMax) std::swap(tMin, tMax);
 
-		float tYMin = (aAABB.GetMin().y - aRay.GetOrigin().y) * invDir.y;
-		float tYMax = (aAABB.GetMax().y - aRay.GetOrigin().y) * invDir.y;
+		float tYMin = (aabb.GetMin().y - ray.GetOrigin().y) * invDir.y;
+		float tYMax = (aabb.GetMax().y - ray.GetOrigin().y) * invDir.y;
 
 		if (tYMin > tYMax) std::swap(tYMin, tYMax);
 
@@ -125,8 +125,8 @@ namespace Simple
 		if (tYMin > tMin) tMin = tYMin;
 		if (tYMax < tMax) tMax = tYMax;
 
-		float tZMin = (aAABB.GetMin().z - aRay.GetOrigin().z) * invDir.z;
-		float tZMax = (aAABB.GetMax().z - aRay.GetOrigin().z) * invDir.z;
+		float tZMin = (aabb.GetMin().z - ray.GetOrigin().z) * invDir.z;
+		float tZMax = (aabb.GetMax().z - ray.GetOrigin().z) * invDir.z;
 
 		if (tZMin > tZMax) std::swap(tZMin, tZMax);
 
@@ -135,24 +135,24 @@ namespace Simple
 		return true;
 	}
 
-	constexpr bool DetectCollision(const Ray3f& aRay, const Spheref& aSphere)
+	constexpr bool DetectCollision(const Ray3f& ray, const Spheref& sphere)
 	{
-		return DetectCollision(aSphere, aRay);
+		return DetectCollision(sphere, ray);
 	}
 
-	constexpr bool DetectCollision(const Ray3f& aRay, const AABB3f& aAABB)
+	constexpr bool DetectCollision(const Ray3f& ray, const AABB3f& aabb)
 	{
-		return DetectCollision(aAABB, aRay);
+		return DetectCollision(aabb, ray);
 	}
 
-	constexpr bool DetectCollision(const Ray3f& aRay1, const Ray3f& aRay2)
+	constexpr bool DetectCollision(const Ray3f& ray1, const Ray3f& ray2)
 	{
 		constexpr float TOLERANCE = 1e-6f;
 
-		const Point3f origin1 = aRay1.GetOrigin();
-		const Point3f origin2 = aRay2.GetOrigin();
-		const UnitVector3f dir1 = aRay1.GetDirection();
-		const UnitVector3f dir2 = aRay2.GetDirection();
+		const Point3f origin1 = ray1.GetOrigin();
+		const Point3f origin2 = ray2.GetOrigin();
+		const UnitVector3f dir1 = ray1.GetDirection();
+		const UnitVector3f dir2 = ray2.GetDirection();
 
 		const Vector3f r = origin2 - origin1;
 		const float a = Dot(dir1, dir1);
@@ -167,7 +167,7 @@ namespace Simple
 		if (Abs(denominator) < TOLERANCE)
 		{
 
-			const Vector3f rayToPoint = aRay1.GetOrigin() - aRay2.GetOrigin();
+			const Vector3f rayToPoint = ray1.GetOrigin() - ray2.GetOrigin();
 
 			if (Abs(dir2.X() * rayToPoint.y - dir2.Y() * rayToPoint.x) < 1e-6 &&
 				Abs(dir2.Y() * rayToPoint.z - dir2.Z() * rayToPoint.y) < 1e-6 &&
@@ -205,25 +205,26 @@ namespace Simple
 
 
 	template<typename T>
-	constexpr bool DetectCollision(const Cylinder<T>& aCylinder1, const Cylinder<T>& aCylinder2)
+	constexpr bool DetectCollision(const Cylinder<T>& cylinder1, const Cylinder<T>& cylinder2)
 	{
-		aCylinder1;
-		aCylinder2;
-		return false;
+		cylinder1;
+		cylinder2;
+		throw std::exception("DetectCollision for Cylinder-Cylinder not implemented yet.");
+		//return false;
 	}
 
 	template<typename T>
-	constexpr bool DetectCollision(const Sphere<T>& aSphere, const Cylinder<T>& aCylinder)
+	constexpr bool DetectCollision(const Sphere<T>& sphere, const Cylinder<T>& cylinder)
 	{
-		const Point3<T>& sphereCenter = aSphere.GetCenter();
-		const T sphereRadius = aSphere.GetRadius();
-		const Point3<T> cylinderP0 = aCylinder.GetLowerPoint();
-		const Point3<T> cylinderP1 = aCylinder.GetUpperPoint();
-		const T cylinderRadius = aCylinder.GetRadius();
+		const Point3<T>& sphereCenter = sphere.GetCenter();
+		const T sphereRadius = sphere.GetRadius();
+		const Point3<T> cylinderP0 = cylinder.GetLowerPoint();
+		const Point3<T> cylinderP1 = cylinder.GetUpperPoint();
+		const T cylinderRadius = cylinder.GetRadius();
 
-		const UnitVector3<T>& cylinderAxis = aCylinder.GetAxis();
+		const UnitVector3<T>& cylinderAxis = cylinder.GetAxis();
 		//const Vector3<T> cylinderAxis = cylinderP1 - cylinderP0;
-		const T cylinderHeightSq = Square(aCylinder.GetHeight()); // Length squared
+		const T cylinderHeightSq = Square(cylinder.GetHeight()); // Length squared
 		if (cylinderHeightSq == T(0))
 		{
 			// Degenerate cylinder -> treat as sphere
@@ -247,9 +248,9 @@ namespace Simple
 	}
 
 	template<typename T>
-	constexpr bool DetectCollision(const Cylinder<T>& aCylinder, const Sphere<T>& aSphere)
+	constexpr bool DetectCollision(const Cylinder<T>& cylinder, const Sphere<T>& sphere)
 	{
-		return DetectCollision(aSphere, aCylinder);
+		return DetectCollision(sphere, cylinder);
 	}
 
 

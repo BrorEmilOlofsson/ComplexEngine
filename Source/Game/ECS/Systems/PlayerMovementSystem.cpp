@@ -4,7 +4,7 @@
 #include "Game/ECS/Components/PlanetComponent.hpp"
 #include "Engine/ECSEngine/Components/CameraComponent.hpp"
 #include "Engine/ECSEngine/Utility/ECSTransformUtility.hpp"
-#include "Engine/Collision/CollisionFunctions.hpp"
+#include "Utility/CollisionFunctions.hpp"
 #include "Utility/ShapeMath.hpp"
 #include "Graphics/RenderState.hpp"
 

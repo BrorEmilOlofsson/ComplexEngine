@@ -9,10 +9,10 @@
 #include "Utility/RGBColor.hpp"
 #include "Utility/Shapes/AABB2.hpp"
 #include "Utility/Shapes/AABB3.hpp"
+#include "Utility/Shapes/Ray3.hpp"
 #include "Engine/ECS/EntityID.hpp"
 #include "Engine/Reflection/DataTypeID.hpp"
 #include "Utility/Blackboard.hpp"
-#include "Engine/Collision/CollisionShape.hpp"
 #include "Utility/EnumUtility.hpp"
 #include "Engine/Reflection/ViewAndEditResult.hpp"
 #include "Utility/Asset/AssetTypes.hpp"
@@ -107,7 +107,6 @@ namespace Simple
 	ViewAndEditResult ViewAndEditValue(DirectionalLight& directionalLight, const Blackboard& blackboard);
 	ViewAndEditResult ViewAndEditValue(Camera& camera, const Blackboard& blackboard);
 
-	ViewAndEditResult ViewAndEditValue(CollisionShape& collisionShape, const Blackboard& blackboard);
 	template<typename T>
 	ViewAndEditResult ViewAndEditValue(AABB3<T>& aabb, const std::string&)
 	{

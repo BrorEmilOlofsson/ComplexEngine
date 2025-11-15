@@ -118,18 +118,18 @@ namespace Simple
 		return mDimensions;
 	}
 
-	std::optional<Point3f> Navmesh::FindClosestPointInNavmesh(const Point3f& position, const Point3f& aReferencePoint) const
+	std::optional<Point3f> Navmesh::FindClosestPointInNavmesh(const Point3f& position, const Point3f& referencePoint) const
 	{
 		const Point2f pos2D = ToPoint2XZ(position);
-		const Point2f referencePoint2D = ToPoint2XZ(aReferencePoint);
+		const Point2f referencePoint2D = ToPoint2XZ(referencePoint);
 		const AABB2f aabb = CreateAABB2FromPoints(std::span<const Point2f>({ pos2D, referencePoint2D }));
 		return FindClosestPointInNavmesh(position, aabb);
 	}
 
-	std::optional<Point3f> Navmesh::FindClosestPointInNavmesh(const Point3f& position, const Vector2f& aSearchExtents) const
+	std::optional<Point3f> Navmesh::FindClosestPointInNavmesh(const Point3f& position, const Vector2f& searchExtent) const
 	{
 		const Point2f pos2D = ToPoint2XZ(position);
-		const AABB2f aabb = AABB2f::CreateFromCenterAndExtent(pos2D, aSearchExtents);
+		const AABB2f aabb = AABB2f::FromCenterAndExtent(pos2D, searchExtent);
 		return FindClosestPointInNavmesh(position, aabb);
 	}
 

@@ -61,10 +61,10 @@ namespace Simple
 
 	public:
 
-		[[nodiscard]] static constexpr Bounds CreateFromMinAndExtent(const T& min, const ExtentType& extent);
-		[[nodiscard]] static constexpr Bounds CreateFromDefaultAndExtent(const ExtentType& extent);
-		[[nodiscard]] static constexpr Bounds CreateFromCenterAndExtent(const T& center, const ExtentType& extent);
-		[[nodiscard]] static constexpr Bounds CreateFromMinAndMax(const T& min, const T& max);
+		[[nodiscard]] static constexpr Bounds FromMinAndExtent(const T& min, const ExtentType& extent);
+		[[nodiscard]] static constexpr Bounds FromDefaultAndExtent(const ExtentType& extent);
+		[[nodiscard]] static constexpr Bounds FromCenterAndExtent(const T& center, const ExtentType& extent);
+		[[nodiscard]] static constexpr Bounds FromMinAndMax(const T& min, const T& max);
 
 	private:
 
@@ -162,27 +162,27 @@ namespace Simple
 	}
 
 	template<typename T, typename BoundsChecker>
-	[[nodiscard]] constexpr Bounds<T, BoundsChecker> Bounds<T, BoundsChecker>::CreateFromMinAndExtent(const T& min, const ExtentType& extent)
+	[[nodiscard]] constexpr Bounds<T, BoundsChecker> Bounds<T, BoundsChecker>::FromMinAndExtent(const T& min, const ExtentType& extent)
 	{
 		return Bounds<T, BoundsChecker>(min, min + extent);
 	}
 
 	template<typename T, typename BoundsChecker>
-	[[nodiscard]] constexpr Bounds<T, BoundsChecker> Bounds<T, BoundsChecker>::CreateFromDefaultAndExtent(const ExtentType& extent)
+	[[nodiscard]] constexpr Bounds<T, BoundsChecker> Bounds<T, BoundsChecker>::FromDefaultAndExtent(const ExtentType& extent)
 	{
 		constexpr T d = T{};
 		return Bounds<T, BoundsChecker>(d, d + extent);
 	}
 
 	template<typename T, typename BoundsChecker>
-	[[nodiscard]] constexpr Bounds<T, BoundsChecker> Bounds<T, BoundsChecker>::CreateFromCenterAndExtent(const T& center, const ExtentType& extent)
+	[[nodiscard]] constexpr Bounds<T, BoundsChecker> Bounds<T, BoundsChecker>::FromCenterAndExtent(const T& center, const ExtentType& extent)
 	{
 		const auto halfExtent = extent / static_cast<ScalarType>(2);
 		return Bounds<T, BoundsChecker>(center - halfExtent, center + halfExtent);
 	}
 
 	template<typename T, typename BoundsChecker>
-	[[nodiscard]] constexpr Bounds<T, BoundsChecker> Bounds<T, BoundsChecker>::CreateFromMinAndMax(const T& min, const T& max)
+	[[nodiscard]] constexpr Bounds<T, BoundsChecker> Bounds<T, BoundsChecker>::FromMinAndMax(const T& min, const T& max)
 	{
 		return Bounds<T, BoundsChecker>(min, max);
 	}

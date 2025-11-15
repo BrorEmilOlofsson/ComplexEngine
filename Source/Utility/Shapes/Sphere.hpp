@@ -18,6 +18,7 @@ namespace Simple
 
 		[[nodiscard]] constexpr const Point3<T>& GetCenter() const;
 		[[nodiscard]] constexpr T GetRadius() const;
+		[[nodiscard]] constexpr T GetDiameter() const;
 
 	public:
 
@@ -62,5 +63,11 @@ namespace Simple
 	constexpr T Sphere<T>::GetRadius() const
 	{
 		return mRadius;
+	}
+
+	template<typename T>
+	constexpr T Sphere<T>::GetDiameter() const
+	{
+		return mRadius * 2;
 	}
 }

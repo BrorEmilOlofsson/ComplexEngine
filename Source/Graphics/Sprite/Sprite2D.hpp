@@ -38,7 +38,7 @@ namespace Simple
 
 		Point2f mPosition;
 		Vector2f mScale = Vector2f::One();
-		AABB2l mUVAABB = AABB2l::CreateFromMinAndMax(Point2l::Zero(), Point2l(512, 512));
+		AABB2l mUVAABB = AABB2l::FromDefaultAndExtent(Vector2l(512, 512));
 		Color mColor = Colors::White;
 		Vector2f mPivot;
 		TextureAssetHandle mTexture;

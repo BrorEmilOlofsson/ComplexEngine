@@ -361,7 +361,48 @@ TEST_CASE("Matrix4x4 CreateTranslationMatrix")
 	REQUIRE(translationMatrix == expectedMatrix);
 }
 
-TEST_CASE("Matrix4x4 CreateTRS Matrix")
+TEST_CASE("Matrix4x4 CreateScaleMatrix")
+{
+	constexpr Vector3f scale(2.f, 3.f, 4.f);
+	constexpr Matrix4x4f scaleMatrix = Matrix4x4f::CreateScaleMatrix(scale);
+	constexpr Matrix4x4f expectedMatrix
+	(
+		{
+			2.f, 0.f, 0.f, 0.f,
+			0.f, 3.f, 0.f, 0.f,
+			0.f, 0.f, 4.f, 0.f,
+			0.f, 0.f, 0.f, 1.f
+		}
+	);
+	REQUIRE(scaleMatrix == expectedMatrix);
+}
+
+TEST_CASE("Matrix4x4 CreateRotationMatrix")
+{
+
+	constexpr RotationMatrix3f rotationMatrix
+	(
+		{
+			0, 1, 0,
+			0, 0, 1,
+			1, 0, 0
+		}
+	);
+	constexpr Matrix4x4f m = Matrix4x4f::CreateRotationMatrix(rotationMatrix);
+
+	constexpr Matrix4x4f expectedMatrix
+	(
+		{
+			0, 1, 0, 0,
+			0, 0, 1, 0,
+			1, 0, 0, 0,
+			0, 0, 0, 1
+		}
+	);
+	REQUIRE(m == expectedMatrix);
+}
+
+TEST_CASE("Matrix4x4 CreateTRSMatrix")
 {
 	constexpr Point3f translation = Point3f(10, 20, 30);
 	const Matrix4x4f rotationMatrix = Matrix4x4f::CreateRotationAroundZ(Degreesf(45.f));
@@ -380,6 +421,19 @@ TEST_CASE("Matrix4x4 CreateTRS Matrix")
 	);
 
 	REQUIRE(NearlyEqual(trs, expectedMatrix));
+}
+
+
+TEST_CASE("GetFastInverse")
+{
+
+	Matrix4x4f world = CreateMatrixFromXY(UnitVector3f::Forward(), UnitVector3f::Up());
+	world.SetTranslation(Point3f(10.f, 5.f, -3.f));
+
+	Matrix4x4f view = Matrix4x4f::GetFastInverse(world);
+	Matrix4x4f test = view * world;
+
+	REQUIRE(test == Matrix4x4f::Identity());
 }
 
 TEST_CASE("Matrix4x4 rotation axes unchanged")
@@ -612,9 +666,9 @@ TEST_CASE("Transform vector local to world space")
 	{
 		constexpr UnitVector3f forward = UnitVector3f::Forward();
 
-		constexpr Matrix4x4f matrix = Matrix4x4f::CreateRTMatrix(RotationMatrix3f::CreateFromXY(UnitVector3f::Backward(), UnitVector3f::Left()), Point3f(5, 5, 5));
+		const Matrix4x4f matrix = Matrix4x4f::CreateTRMatrix(RotationMatrix3f::FromXY(UnitVector3f::Backward(), UnitVector3f::Left()), Point3f(5, 5, 5));
 
-		constexpr UnitVector3f worldVector = ToWorldSpace(forward, matrix);
+		const UnitVector3f worldVector = ToWorldSpace(forward, matrix);
 
 		REQUIRE(worldVector == UnitVector3f::Up());
 	}
@@ -623,20 +677,8 @@ TEST_CASE("Transform vector local to world space")
 
 		constexpr Matrix4x4f matrix = CreateMatrixFromYZ(UnitVector3f::Backward(), UnitVector3f::Left()) * Matrix4x4f::CreateTranslationMatrix(Point3f(5, 5, 5));
 
-		constexpr Vector3f worldVector = ToWorldSpace(forward, matrix);
+		const Vector3f worldVector = ToWorldSpace(forward, matrix);
 
 		REQUIRE(worldVector == Vector3f(-1, 0, 0));
 	}
-}
-
-TEST_CASE("GetFastInverse")
-{
-
-	Matrix4x4f world = CreateMatrixFromXY(UnitVector3f::Forward(), UnitVector3f::Up());
-	world.SetTranslation(Point3f(10.f, 5.f, -3.f));
-
-	Matrix4x4f view = Matrix4x4f::GetFastInverse(world);
-	Matrix4x4f test = view * world;
-
-	REQUIRE(test == Matrix4x4f::Identity());
 }

@@ -115,7 +115,7 @@ namespace Simple
 		Point2<T> max;
 		FromJSON(min, json.at("Min"));
 		FromJSON(max, json.at("Max"));
-		aabb = AABB2<T>::CreateFromMinAndMax(min, max);
+		aabb = AABB2<T>::FromMinAndMax(min, max);
 	}
 
 	template<typename T>

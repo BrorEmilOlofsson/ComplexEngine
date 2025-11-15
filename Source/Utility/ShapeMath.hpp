@@ -1,6 +1,7 @@
 #pragma once
 #include "Utility/Shapes/AABB2.hpp"
 #include "Utility/Shapes/AABB3.hpp"
+#include "Utility/Shapes/Sphere.hpp"
 #include "Utility/Shapes/LineSegment2.hpp"
 #include "Utility/Shapes/LineSegment3.hpp"
 #include "Utility/Shapes/Line2.hpp"
@@ -10,9 +11,12 @@
 #include "Utility/Shapes/Plane.hpp"
 #include "Utility/Shapes/Triangle2.hpp"
 #include "Utility/Shapes/Triangle3.hpp"
+#include "Utility/Shapes/Disk.hpp"
+#include "Utility/Shapes/SphericalCap.hpp"
 #include "Utility/Math/Math.hpp"
 #include "Utility/Math/VectorMath.hpp"
 #include "Utility/Percent.hpp"
+#include <expected>
 
 namespace Simple
 {
@@ -235,9 +239,15 @@ namespace Simple
 	}
 
 	template<typename T>
+	[[nodiscard]] constexpr T GetDistance(const Plane<T>& plane, const Point3<T>& point) noexcept
+	{
+		return Dot(plane.GetNormal(), point - plane.GetPoint());
+	}
+
+	template<typename T>
 	[[nodiscard]] constexpr Point3<T> GetProjectedPoint(const Plane<T>& plane, const Point3<T>& point) noexcept
 	{
-		const T t = Dot(plane.GetNormal(), point - plane.GetPoint());
+		const T t = GetDistance(plane, point);
 		return point - plane.GetNormal() * t;
 	}
 
@@ -309,15 +319,29 @@ namespace Simple
 	}
 
 	template<typename T>
+	[[nodiscard]] constexpr bool IsOverlapping(const AABB2<T>& a, const AABB2<T>& b)
+	{
+		return !(a.GetMax().x < b.GetMin().x || a.GetMin().x > b.GetMax().x ||
+			a.GetMax().y < b.GetMin().y || a.GetMin().y > b.GetMax().y);
+	}
+
+	template<typename T>
+	[[nodiscard]] constexpr bool IsOverlapping(const AABB3<T>& a, const AABB3<T>& b)
+	{
+		return !(a.GetMax().x < b.GetMin().x || a.GetMin().x > b.GetMax().x ||
+			a.GetMax().y < b.GetMin().y || a.GetMin().y > b.GetMax().y ||
+			a.GetMax().z < b.GetMin().z || a.GetMin().z > b.GetMax().z);
+	}
+
+	template<typename T>
 	[[nodiscard]] constexpr std::optional<AABB2<T>> GetOverlap(const AABB2<T>& a, const AABB2<T>& b) noexcept
 	{
-		if (a.GetMax().x < b.GetMin().x || a.GetMin().x > b.GetMax().x ||
-			a.GetMax().y < b.GetMin().y || a.GetMin().y > b.GetMax().y)
+		if (!IsOverlapping(a, b))
 		{
 			return std::nullopt; // No overlap
 		}
 
-		return AABB2<T>::CreateFromMinAndMax(
+		return AABB2<T>::FromMinAndMax(
 			Max(a.GetMin(), b.GetMin()),
 			Min(a.GetMax(), b.GetMax())
 		);
@@ -326,17 +350,16 @@ namespace Simple
 	template<typename T>
 	[[nodiscard]] constexpr std::optional<AABB3<T>> GetOverlap(const AABB3<T>& a, const AABB3<T>& b) noexcept
 	{
-		if (a.GetMax().x < b.GetMin().x || a.GetMin().x > b.GetMax().x ||
-			a.GetMax().y < b.GetMin().y || a.GetMin().y > b.GetMax().y ||
-			a.GetMax().z < b.GetMin().z || a.GetMin().z > b.GetMax().z)
+		if (!IsOverlapping(a, b))
 		{
 			return std::nullopt; // No overlap
 		}
-		return AABB3<T>::CreateFromMinAndMax(
+		return AABB3<T>::FromMinAndMax(
 			Max(a.GetMin(), b.GetMin()),
 			Min(a.GetMax(), b.GetMax())
 		);
 	}
+
 
 	// How much of the area of AABB a is covered by the overlap with AABB b
 	template<typename Ret = float, typename T>
@@ -373,5 +396,114 @@ namespace Simple
 			p1.x * (p2.y - p0.y) +
 			p2.x * (p0.y - p1.y)
 		));
+	}
+
+	template<typename T>
+	[[nodiscard]] constexpr T GetSurfaceArea(const Sphere<T>& sphere) noexcept
+	{
+		return static_cast<T>(4.0f * PI<T> *sphere.GetRadius() * sphere.GetRadius());
+	}
+
+	template<typename T>
+	[[nodiscard]] constexpr T GetVolume(const Sphere<T>& sphere) noexcept
+	{
+		return static_cast<T>((4.0f / 3.0f) * PI<T> *sphere.GetRadius() * sphere.GetRadius() * sphere.GetRadius());
+	}
+
+	template<typename T>
+	[[nodiscard]] constexpr T GetSurfaceArea(const SphericalCap<T>& cap) noexcept
+	{
+		return static_cast<T>(2.0f * PI<T> * cap.GetSphereRadius() * cap.GetHeight());
+	}
+
+	template<typename T>
+	[[nodiscard]] constexpr SphericalCap<T> SliceSphere(const Sphere<T>& sphere, const Plane<T>& plane)
+	{
+		const UnitVector3<T> normal = plane.GetNormal();
+
+		const T height = GetDistance(plane, sphere.GetCenter()) + sphere.GetRadius();
+
+		return SphericalCap<T>(sphere, normal, height);
+	}
+
+	enum class eSphereDiskFacingPointError
+	{
+		None,
+		PointEqualsCenter,
+	};
+
+	template<typename T>
+	[[nodiscard]] constexpr std::expected<Disk<T>, eSphereDiskFacingPointError> GetSphereDiskFacingPoint(const Sphere<T>& sphere, const Point3<T>& point)
+	{
+		if (sphere.GetCenter() == point)
+		{
+			return std::unexpected(eSphereDiskFacingPointError::PointEqualsCenter);
+		}
+		const UnitVector3<T> toPoint = GetUnitVector(sphere.GetCenter(), point);
+		return Disk<T>(sphere.GetCenter() + toPoint * sphere.GetRadius(), toPoint, sphere.GetRadius());
+	}
+
+	enum class eGetVisibleSphereDiskFacingPointError
+	{
+		None,
+		ViewpointInside,
+	};
+
+	template<typename T>
+	[[nodiscard]] constexpr std::expected<Disk<T>, eGetVisibleSphereDiskFacingPointError> GetVisibleSphereDiskFacingPoint(const Sphere<T>& sphere, const Point3<T>& point)
+	{
+		// Vector from point to sphere center
+		const Vector3<T> V = sphere.GetCenter() - point;
+		const T d2 = Dot(V, V);
+		const T r = sphere.GetRadius();
+		const T r2 = r * r;
+
+		// If the point is inside or on the sphere, return an empty disk
+		if (d2 <= r2)
+		{
+			return std::unexpected(eGetVisibleSphereDiskFacingPointError::ViewpointInside);
+		}
+
+		const T d = Sqrt(d2);
+
+		// Distance from sphere center to disk center (along V)
+		const T t = r2 / d;
+
+		// Radius of the visible circle on the sphere
+		const T h = r * Sqrt(d2 - r2) / d;
+
+		const UnitVector3<T> normal(V);
+		const Point3<T>  center = sphere.GetCenter() - normal * t;
+		const T          radius = h;
+
+		return Disk<T>{ center, -normal, radius };
+	}
+
+	enum class ePercentageAreaVisibleError
+	{
+		None,
+		ViewpointInsideSphere,
+	};
+
+	template<typename T>
+	[[nodiscard]] constexpr std::expected<Percent<T>, ePercentageAreaVisibleError> GetPercentageAreaVisible(const Sphere<T>& sphere, const Point3<T>& viewPoint) noexcept
+	{
+		if (IsInRange(viewPoint, sphere.GetCenter(), sphere.GetRadius()))
+		{
+			return std::unexpected(ePercentageAreaVisibleError::ViewpointInsideSphere);
+		}
+
+		const Disk<T> disk = GetVisibleSphereDiskFacingPoint(sphere, viewPoint).value();
+
+		SphericalCap<T> cap = SliceSphere(sphere, Plane<T>(disk.GetCenter(), disk.GetNormal()));
+		const T capArea = GetSurfaceArea(cap);
+		const T sphereArea = GetSurfaceArea(sphere);
+		return Percent<T>(capArea / sphereArea);
+	}
+
+	template<typename T>
+	constexpr void Scale(Sphere<T>& sphere, const T& scalar)
+	{
+		sphere.SetRadius(sphere.GetRadius() * scalar);
 	}
 }

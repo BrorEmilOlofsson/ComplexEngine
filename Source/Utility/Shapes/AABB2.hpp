@@ -28,7 +28,7 @@ namespace Simple
 	template<typename T, typename U>
 	[[nodiscard]] constexpr AABB2<T> ToAABB(const AABB2<U>& aabb)
 	{
-		return AABB2<T>::CreateFromMinAndMax(Point2<T>(aabb.GetMin()), Point2<T>(aabb.GetMax()));
+		return AABB2<T>::FromMinAndMax(Point2<T>(aabb.GetMin()), Point2<T>(aabb.GetMax()));
 	}
 
 	template<typename T>
@@ -43,7 +43,7 @@ namespace Simple
 			max = Max(max, p);
 		}
 
-		return AABB2<T>::CreateFromMinAndMax(min, max);
+		return AABB2<T>::FromMinAndMax(min, max);
 	}
 
 	template<typename T>
@@ -53,7 +53,7 @@ namespace Simple
 		const Point2<T> min = aabb.GetMin();
 		const Point2<T> max = aabb.GetMax();
 		const Point2<T> center = LerpPoint(min, max, pivot);
-		return AABB2<T>::CreateFromCenterAndExtent(center, extent);
+		return AABB2<T>::FromCenterAndExtent(center, extent);
 	}
 
 	template<typename T>

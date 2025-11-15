@@ -31,7 +31,7 @@ namespace Simple
 		const PointType<int> clampedMinCoords = Max(minCoords, PointType<int>::Zero());
 		const PointType<int> clampedMaxCoords = Min(maxCoords, PointType<int>::Zero() + VectorType<int>(gridSize) - VectorType<int>::One());
 
-		return AABBType<unsigned int>::CreateFromMinAndMax(PointType<unsigned int>(clampedMinCoords), PointType<unsigned int>(clampedMaxCoords));
+		return AABBType<unsigned int>::FromMinAndMax(PointType<unsigned int>(clampedMinCoords), PointType<unsigned int>(clampedMaxCoords));
 	}
 
 	template<typename T, typename Types>

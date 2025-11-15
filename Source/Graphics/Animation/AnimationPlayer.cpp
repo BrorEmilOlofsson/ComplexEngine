@@ -39,31 +39,64 @@ namespace Simple
 			return bone.localBindPose;
 		}
 
+		Point3f t;
+		{
+			if (keyframes.positions.empty())
+			{
+				t = bone.localBindPose.GetTranslation();
+			}
+			else
+			{
+				auto positionTimeIndexPair = FindKeyFrameIndexPair(keyframes.positionTimestamps, time);
+				const float positonFactor = GetTimeFactor(keyframes.positionTimestamps, time, positionTimeIndexPair.first, positionTimeIndexPair.second);
+
+				const Point3f positionFrom = keyframes.positions[positionTimeIndexPair.first];
+				const Point3f positionTo = keyframes.positions[positionTimeIndexPair.second];
+
+				t = Lerp(positionFrom, positionTo, positonFactor);
+			}
+		}
+
+		Quaternionf r;
+		{
+			if (keyframes.rotations.empty())
+			{
+				r = ToQuaternion(bone.localBindPose);
+			}
+			else
+			{
+				auto rotationTimeIndexPair = FindKeyFrameIndexPair(keyframes.rotationTimestamps, time);
+				const float rotationFactor = GetTimeFactor(keyframes.rotationTimestamps, time, rotationTimeIndexPair.first, rotationTimeIndexPair.second);
+				const Quaternionf rotationFrom = keyframes.rotations[rotationTimeIndexPair.first];
+				const Quaternionf rotationTo = keyframes.rotations[rotationTimeIndexPair.second];
+				r = Slerp(rotationFrom, rotationTo, rotationFactor);
+			}
+		}
+
+		Vector3f s;
+		{
+			if (keyframes.scales.empty())
+			{
+				s = bone.localBindPose.GetScale();
+			}
+			else
+			{
+				auto scaleTimeIndexPair = FindKeyFrameIndexPair(keyframes.scaleTimestamps, time);
+				const float scaleFactor = GetTimeFactor(keyframes.scaleTimestamps, time, scaleTimeIndexPair.first, scaleTimeIndexPair.second);
+
+
+				const Vector3f scaleFrom = keyframes.scales[scaleTimeIndexPair.first];
+				const Vector3f scaleTo = keyframes.scales[scaleTimeIndexPair.second];
+
+				s = Lerp(scaleFrom, scaleTo, scaleFactor);
+				
+			}
+		}
+
 		// 1) Find keyframe interval (t0 -> t1)
-		auto positionTimeIndexPair = FindKeyFrameIndexPair(keyframes.positionTimestamps, time);
-		//auto rotationTimeIndexPair = FindKeyFrameIndexPair(keyframes.rotationTimestamps, time);
-		auto scaleTimeIndexPair = FindKeyFrameIndexPair(keyframes.scaleTimestamps, time);
+		
 
-		const float positonFactor = GetTimeFactor(keyframes.positionTimestamps, time, positionTimeIndexPair.first, positionTimeIndexPair.second);
-		//const float rotationFactor = GetTimeFactor(keyframes.rotationTimestamps, time, rotationTimeIndexPair.first, rotationTimeIndexPair.second);
-		const float scaleFactor = GetTimeFactor(keyframes.scaleTimestamps, time, scaleTimeIndexPair.first, scaleTimeIndexPair.second);
-
-		const Point3f positionFrom = keyframes.positions[positionTimeIndexPair.first];
-		const Point3f positionTo = keyframes.positions[positionTimeIndexPair.second];
-
-		//const Quaternionf rotationFrom = keyframes.rotations[rotationTimeIndexPair.first];
-		//const Quaternionf rotationTo = keyframes.rotations[rotationTimeIndexPair.second];
-
-		const Vector3f scaleFrom = keyframes.scales[scaleTimeIndexPair.first];
-		const Vector3f scaleTo = keyframes.scales[scaleTimeIndexPair.second];
-
-		const Point3f T = Lerp(positionFrom, positionTo, positonFactor);
-		//const Quaternionf R = Slerp(rotationFrom, rotationTo, rotationFactor);
-		const Vector3f S = Lerp(scaleFrom, scaleTo, scaleFactor);
-
-		const Matrix4x4f R = Matrix4x4f::Identity();
-
-		return Matrix4x4f::CreateTRSMatrix(T, R, S);
+		return Matrix4x4f::CreateTRSMatrix(t, ToMatrix(r), s);
 	}
 
 

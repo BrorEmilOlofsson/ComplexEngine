@@ -64,7 +64,7 @@ namespace Simple
 		const Point2i min = GetClientToScreenPos(hWND, aabb.GetMin());
 		const Point2i max = GetClientToScreenPos(hWND, aabb.GetMax());
 
-		return AABB2i::CreateFromMinAndMax(min, max);
+		return AABB2i::FromMinAndMax(min, max);
 	}
 
 	[[nodiscard]] inline DWORD GetWindowStyleCustom(HWND hWND)

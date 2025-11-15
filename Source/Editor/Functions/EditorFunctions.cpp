@@ -18,7 +18,7 @@ namespace Simple
 		ImVec2 pos = ImGui::GetCursorScreenPos();    // Top-left of next item
 		ImVec2 size =ImGui::GetContentRegionAvail();
 
-		return AABB2i::CreateFromMinAndExtent(
+		return AABB2i::FromMinAndExtent(
 			ToPoint2<int>(pos),
 			ToVector2<int>(size)
 		);
@@ -41,7 +41,7 @@ namespace Simple
 		ImVec2 imgMin = ImGui::GetItemRectMin();  // screen-space top-left of the image
 		ImVec2 imgMax = ImGui::GetItemRectMax();  // screen-space bottom-right
 
-		AABB2i rect = AABB2i::CreateFromMinAndMax(
+		AABB2i rect = AABB2i::FromMinAndMax(
 			{ (int)imgMin.x, (int)imgMin.y },
 			{ (int)imgMax.x, (int)imgMax.y }
 		);

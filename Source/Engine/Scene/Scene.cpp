@@ -46,7 +46,7 @@ namespace Simple
 	{
 		const AABB2f renderAABBf = ToAABB<float>(renderAABB);
 
-		const Point2f mousePos = Remap(Point2f(mouseScreenPos), renderAABBf, AABB2f::CreateFromDefaultAndExtent(Vector2f(windowSize)));
+		const Point2f mousePos = Remap(Point2f(mouseScreenPos), renderAABBf, AABB2f::FromDefaultAndExtent(Vector2f(windowSize)));
 		const Point2f correctedMousePos = InvertY(mousePos, static_cast<float>(windowSize.y));
 		return CalculateMouseRay(camera, Point2i(correctedMousePos), windowSize);
 	}
@@ -57,7 +57,7 @@ namespace Simple
 		{
 			mMouseRay = CalculateMouseRay(
 				*mRenderState.GetCamera(),
-				 mRenderState.GetRenderRect().value_or(AABB2i::CreateFromMinAndExtent(Point2i::Zero(), Vector2i(clientSize))),
+				 mRenderState.GetRenderRect().value_or(AABB2i::FromDefaultAndExtent(Vector2i(clientSize))),
 				clientSize,
 				mouseScreenPos
 			);

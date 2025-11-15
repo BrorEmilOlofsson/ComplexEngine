@@ -12,6 +12,8 @@ namespace Simple
 		constexpr Matrix3x3() noexcept;
 		constexpr explicit Matrix3x3(const std::array<T, 9>& array) noexcept;
 
+		[[nodiscard]] constexpr T& operator[](const unsigned int index) noexcept;
+		[[nodiscard]] constexpr const T& operator[](const unsigned int index) const noexcept;
 		[[nodiscard]] constexpr T& operator()(const unsigned int row, const unsigned int column);
 		[[nodiscard]] constexpr const T& operator()(const unsigned int row, const unsigned int column) const;
 
@@ -56,6 +58,18 @@ namespace Simple
 	}
 
 	template<typename T>
+	constexpr T& Matrix3x3<T>::operator[](const unsigned int index) noexcept
+	{
+		return mValues[index];
+	}
+
+	template<typename T>
+	constexpr const T& Matrix3x3<T>::operator[](const unsigned int index) const noexcept
+	{
+		return mValues[index];
+	}
+
+	template<typename T>
 	constexpr T& Matrix3x3<T>::operator()(const unsigned int row, const unsigned int column)
 	{
 		return mValues[GetIndex(row, column)];
@@ -93,7 +107,7 @@ namespace Simple
 	}
 
 	template<typename T>
-	constexpr Matrix3x3<T> Matrix3x3<T>::GetTransposed(const Matrix3x3<T>& aMatrix) noexcept
+	constexpr Matrix3x3<T> Matrix3x3<T>::GetTransposed(const Matrix3x3<T>& matrix) noexcept
 	{
 		Matrix3x3<T> transposed;
 
@@ -101,10 +115,22 @@ namespace Simple
 		{
 			for (unsigned int j = 0; j < Dimensions; j++)
 			{
-				transposed(i, j) = aMatrix(j, i);
+				transposed(i, j) = matrix(j, i);
 			}
 		}
 
 		return transposed;
+	}
+
+	[[nodiscard]] constexpr bool operator==(const Matrix3x3f& a, const Matrix3x3f& b) noexcept
+	{
+		for (unsigned int i = 0; i < 9; ++i)
+		{
+			if (a[i] != b[i])
+			{
+				return false;
+			}
+		}
+		return true;
 	}
 }

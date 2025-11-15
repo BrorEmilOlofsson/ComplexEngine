@@ -1,5 +1,5 @@
 #pragma once
-#include "Engine/Collision/CollisionFunctions.hpp"
+#include "Utility/CollisionFunctions.hpp"
 #include "Utility/Shapes/Sphere.hpp"
 #include "Utility/Math/VectorMath.hpp"
 #include "Engine/Physics/PhysicsObject.hpp"

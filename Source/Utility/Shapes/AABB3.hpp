@@ -40,7 +40,7 @@ namespace Simple
 			max = Max(max, p);
 		}
 
-		return AABB3<T>::CreateFromMinAndMax(min, max);
+		return AABB3<T>::FromMinAndMax(min, max);
 	}
 
 	template<std::ranges::range R, typename TransformF>
@@ -57,13 +57,13 @@ namespace Simple
 			max = Max(max, p);
 		}
 
-		return AABB3<T>::CreateFromMinAndMax(min, max);
+		return AABB3<T>::FromMinAndMax(min, max);
 	}
 
 	template<typename T>
 	[[nodiscard]] constexpr AABB3<T> MinMax(const AABB3<T>& a, const AABB3<T>& b)
 	{
-		return AABB3<T>::CreateFromMinAndMax(Min(a.GetMin(), b.GetMin()), Max(a.GetMax(), b.GetMax()));
+		return AABB3<T>::FromMinAndMax(Min(a.GetMin(), b.GetMin()), Max(a.GetMax(), b.GetMax()));
 	}
 
 	template<typename T>
@@ -74,9 +74,9 @@ namespace Simple
 	}
 
 	template<typename T>
-	[[nodiscard]] constexpr bool IsInside(const Point3<T>& point, const AABB3<T>& aAABB) noexcept
+	[[nodiscard]] constexpr bool IsInside(const Point3<T>& point, const AABB3<T>& aabb) noexcept
 	{
-		return IsInside(point, aAABB.GetMin(), aAABB.GetMax());
+		return IsInside(point, aabb.GetMin(), aabb.GetMax());
 	}
 
 	template<typename T, typename ContainerT = std::array<Point3<T>, 8>>

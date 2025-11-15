@@ -30,9 +30,14 @@ namespace Simple
 		[[nodiscard]] static constexpr UnitVector3<T> Down() noexcept;
 		[[nodiscard]] static constexpr UnitVector3<T> Backward() noexcept;
 
+		[[nodiscard]] friend constexpr UnitVector3<T> operator-(const UnitVector3<T>& vector) noexcept
+		{
+			return UnitVector3<T>(UnsafeTag{}, -vector.mX, -vector.mY, -vector.mZ);
+		}
+
 	private:
 
-		struct UnsafeTag {};
+		struct UnsafeTag { constexpr UnsafeTag() = default; };
 
 		constexpr UnitVector3(UnsafeTag, const T& x, const T& y, const T& z) noexcept;
 
@@ -205,12 +210,6 @@ namespace Simple
 	}
 
 	template<typename T>
-	[[nodiscard]] constexpr UnitVector3<T> operator-(const UnitVector3<T>& vector) noexcept
-	{
-		return UnitVector3<T>(-vector.X(), -vector.Y(), -vector.Z());
-	}
-
-	template<typename T>
 	[[nodiscard]] constexpr Vector3<T> operator*(const UnitVector3<T>& vector, const T& scalar) noexcept
 	{
 		return Vector3<T>(vector.X() * scalar, vector.Y() * scalar, vector.Z() * scalar);
@@ -229,10 +228,10 @@ namespace Simple
 	}
 
 	template<typename T>
-	std::ostream& operator<<(std::ostream& aOS, const UnitVector3<T>& vector)
+	std::ostream& operator<<(std::ostream& os, const UnitVector3<T>& vector)
 	{
-		aOS << "UnitVector3(" << vector.X() << ", " << vector.Y() << ", " << vector.Z() << ")";
-		return aOS;
+		os << "UnitVector3(" << vector.X() << ", " << vector.Y() << ", " << vector.Z() << ")";
+		return os;
 	}
 
 	template<typename T>

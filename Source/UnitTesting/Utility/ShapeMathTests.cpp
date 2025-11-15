@@ -52,8 +52,8 @@ TEST_CASE("Line2 GetProjectedPoint")
 
 TEST_CASE("Get Overlap AABB2")
 {
-	constexpr AABB2f a = AABB2f::CreateFromMinAndMax(Point2f(0, 0), Point2f(5, 5));
-	constexpr AABB2f b = AABB2f::CreateFromMinAndMax(Point2f(3, 3), Point2f(7, 7));
+	constexpr AABB2f a = AABB2f::FromMinAndMax(Point2f(0, 0), Point2f(5, 5));
+	constexpr AABB2f b = AABB2f::FromMinAndMax(Point2f(3, 3), Point2f(7, 7));
 	constexpr std::optional<AABB2f> overlap = GetOverlap(a, b);
 	REQUIRE(overlap.has_value());
 	REQUIRE(overlap->GetMin() == Point2f(3.f, 3.f));
@@ -62,8 +62,8 @@ TEST_CASE("Get Overlap AABB2")
 
 TEST_CASE("Get Overlap AABB3")
 {
-	constexpr AABB3f a = AABB3f::CreateFromMinAndMax(Point3f(0, 0, 0), Point3f(5, 5, 5));
-	constexpr AABB3f b = AABB3f::CreateFromMinAndMax(Point3f(3, 3, 3), Point3f(7, 7, 7));
+	constexpr AABB3f a = AABB3f::FromMinAndMax(Point3f(0, 0, 0), Point3f(5, 5, 5));
+	constexpr AABB3f b = AABB3f::FromMinAndMax(Point3f(3, 3, 3), Point3f(7, 7, 7));
 	constexpr std::optional<AABB3f> overlap = GetOverlap(a, b);
 	REQUIRE(overlap.has_value());
 	REQUIRE(overlap->GetMin() == Point3f(3.f, 3.f, 3.f));
@@ -72,38 +72,38 @@ TEST_CASE("Get Overlap AABB3")
 
 TEST_CASE("Get Area AABB2")
 {
-	constexpr AABB2f aabb = AABB2f::CreateFromMinAndMax(Point2f(0, 0), Point2f(5, 5));
+	constexpr AABB2f aabb = AABB2f::FromMinAndMax(Point2f(0, 0), Point2f(5, 5));
 	constexpr float area = GetArea(aabb);
 	REQUIRE(area == 25.0f);
 }
 
 TEST_CASE("Get Volume AABB3")
 {
-	constexpr AABB3f aabb = AABB3f::CreateFromMinAndMax(Point3f(0, 0, 0), Point3f(5, 5, 5));
+	constexpr AABB3f aabb = AABB3f::FromMinAndMax(Point3f(0, 0, 0), Point3f(5, 5, 5));
 	constexpr float volume = GetVolume(aabb);
 	REQUIRE(volume == 125.0f);
 }
 
 TEST_CASE("Get Overlap Percentage AABB2")
 {
-	constexpr AABB2f a = AABB2f::CreateFromMinAndMax(Point2f(0, 0), Point2f(5, 5));
-	constexpr AABB2f b = AABB2f::CreateFromMinAndMax(Point2f(2.5f, 2.5f), Point2f(7, 7));
+	constexpr AABB2f a = AABB2f::FromMinAndMax(Point2f(0, 0), Point2f(5, 5));
+	constexpr AABB2f b = AABB2f::FromMinAndMax(Point2f(2.5f, 2.5f), Point2f(7, 7));
 	constexpr Percentf overlapPercentage = GetOverlapPercentage(a, b);
 	REQUIRE(overlapPercentage == Percentf(0.25f));
 }
 
 TEST_CASE("Get Overlap Percentage AABB3")
 {
-	constexpr AABB3f a = AABB3f::CreateFromMinAndMax(Point3f(0, 0, 0), Point3f(5, 5, 5));
-	constexpr AABB3f b = AABB3f::CreateFromMinAndMax(Point3f(2.5f, 2.5f, 2.5f), Point3f(7, 7, 7));
+	constexpr AABB3f a = AABB3f::FromMinAndMax(Point3f(0, 0, 0), Point3f(5, 5, 5));
+	constexpr AABB3f b = AABB3f::FromMinAndMax(Point3f(2.5f, 2.5f, 2.5f), Point3f(7, 7, 7));
 	constexpr Percentf overlapPercentage = GetOverlapPercentage(a, b);
 	REQUIRE(overlapPercentage == Percentf(0.125f));
 }
 
 TEST_CASE("Get Overlap Percentage AABB2 No Overlap")
 {
-	constexpr AABB2f a = AABB2f::CreateFromMinAndMax(Point2f(0, 0), Point2f(5, 5));
-	constexpr AABB2f b = AABB2f::CreateFromMinAndMax(Point2f(6, 6), Point2f(10, 10));
+	constexpr AABB2f a = AABB2f::FromMinAndMax(Point2f(0, 0), Point2f(5, 5));
+	constexpr AABB2f b = AABB2f::FromMinAndMax(Point2f(6, 6), Point2f(10, 10));
 	constexpr Percentf overlapPercentage = GetOverlapPercentage(a, b);
 
 	REQUIRE(overlapPercentage == Percentf(0.0f));
@@ -111,24 +111,24 @@ TEST_CASE("Get Overlap Percentage AABB2 No Overlap")
 
 TEST_CASE("Get Overlap Percentage AABB3 No Overlap")
 {
-	constexpr AABB3f a = AABB3f::CreateFromMinAndMax(Point3f(0, 0, 0), Point3f(5, 5, 5));
-	constexpr AABB3f b = AABB3f::CreateFromMinAndMax(Point3f(6, 6, 6), Point3f(10, 10, 10));
+	constexpr AABB3f a = AABB3f::FromMinAndMax(Point3f(0, 0, 0), Point3f(5, 5, 5));
+	constexpr AABB3f b = AABB3f::FromMinAndMax(Point3f(6, 6, 6), Point3f(10, 10, 10));
 	constexpr Percentf overlapPercentage = GetOverlapPercentage(a, b);
 	REQUIRE(overlapPercentage == Percentf(0.0f));
 }
 
 TEST_CASE("Get Overlap Percentage AABB2 Full Overlap")
 {
-	constexpr AABB2f a = AABB2f::CreateFromMinAndMax(Point2f(0, 0), Point2f(5, 5));
-	constexpr AABB2f b = AABB2f::CreateFromMinAndMax(Point2f(1, 1), Point2f(4, 4));
+	constexpr AABB2f a = AABB2f::FromMinAndMax(Point2f(0, 0), Point2f(5, 5));
+	constexpr AABB2f b = AABB2f::FromMinAndMax(Point2f(1, 1), Point2f(4, 4));
 	constexpr Percentf overlapPercentage = GetOverlapPercentage(a, b);
 	REQUIRE(overlapPercentage == Percentf(0.36f));
 }
 
 TEST_CASE("Get Overlap Percentage AABB3 Full Overlap")
 {
-	constexpr AABB3f a = AABB3f::CreateFromMinAndMax(Point3f(0, 0, 0), Point3f(5, 5, 5));
-	constexpr AABB3f b = AABB3f::CreateFromMinAndMax(Point3f(1, 1, 1), Point3f(4, 4, 4));
+	constexpr AABB3f a = AABB3f::FromMinAndMax(Point3f(0, 0, 0), Point3f(5, 5, 5));
+	constexpr AABB3f b = AABB3f::FromMinAndMax(Point3f(1, 1, 1), Point3f(4, 4, 4));
 	constexpr Percentf overlapPercentage = GetOverlapPercentage(a, b);
 	REQUIRE(overlapPercentage == Percentf(0.216f));
 }
@@ -148,8 +148,61 @@ TEST_CASE("Get Area Triangle2")
 	}
 
 	{
-		constexpr AABB3i aabb = AABB3i::CreateFromMinAndMax(Point3i(0, 0, 0), Point3i(5, 5, 5));
+		constexpr AABB3i aabb = AABB3i::FromMinAndMax(Point3i(0, 0, 0), Point3i(5, 5, 5));
 
 		const auto corners = GetCorners<int, std::vector<Point3i>>(aabb);
 	}
+}
+
+TEST_CASE("Get Surface Area Sphere")
+{
+	constexpr Spheref sphere(Point3f::Zero(), 1.0f);
+	constexpr float area = GetSurfaceArea(sphere);
+	REQUIRE(Abs(area - 4.0f * PI<float>) < 0.0001f);
+}
+
+TEST_CASE("Get Volume Sphere")
+{
+	constexpr Spheref sphere(Point3f::Zero(), 1.0f);
+	constexpr float volume = GetVolume(sphere);
+	REQUIRE(Abs(volume - (4.0f / 3.0f) * PI<float>) < 0.0001f);
+}
+
+TEST_CASE("Get Sphere Disk Facing Point")
+{
+	constexpr Spheref sphere(Point3f::Zero(), 1.0f);
+	constexpr Point3f point(0.0f, 0.0f, -5.0f);
+	const auto disk = GetSphereDiskFacingPoint(sphere, point);
+
+	REQUIRE(disk.has_value());
+
+	REQUIRE(disk->GetCenter() == Point3f(0.0f, 0.0f, -1.0f));
+	REQUIRE(disk->GetNormal() == UnitVector3f::Backward());
+	REQUIRE(disk->GetRadius() == 1.0f);
+}
+
+TEST_CASE("Get Sphere Disk Facing Point Error")
+{
+	constexpr Spheref sphere(Point3f::Zero(), 1.0f);
+	constexpr Point3f point = sphere.GetCenter();
+	const auto disk = GetSphereDiskFacingPoint(sphere, point);
+	REQUIRE(!disk.has_value());
+	REQUIRE(disk.error() == eSphereDiskFacingPointError::PointEqualsCenter);
+}
+
+TEST_CASE("Get Visible Sphere Disk Facing Point")
+{
+	constexpr Spheref sphere(Point3f::Zero(), 1.0f);
+	constexpr Point3f viewPosition(0.0f, 0.0f, -5.0f);
+	const auto disk = GetVisibleSphereDiskFacingPoint(sphere, viewPosition);
+	REQUIRE(disk.has_value());
+}
+
+TEST_CASE("Get Percentage Visible")
+{
+	/*constexpr Spheref sphere(Point3f::Zero(), 1.0f);
+
+	constexpr Point3f viewPosition(0.0f, 0.0f, -5.0f);
+
+	constexpr auto percentageVisible = GetPercentageAreaVisible(sphere, viewPosition);*/
 }

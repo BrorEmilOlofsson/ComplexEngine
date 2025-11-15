@@ -55,6 +55,12 @@ namespace Simple
 	}
 
 	template<typename T>
+	[[nodiscard]] constexpr T CopySign(const T& magnitudeSource, const T& signSource) noexcept
+	{
+		return Sign(signSource) * Abs(magnitudeSource);
+	}
+
+	template<typename T>
 	[[nodiscard]] constexpr T BoolToSign(const bool& value) noexcept
 	{
 		return value ? T{ 1 } : T{ -1 };
@@ -90,7 +96,7 @@ namespace Simple
 		return value > min && value < max;
 	}
 
-	template<typename T>
+	template<typename T> requires std::is_arithmetic_v<T>
 	[[nodiscard]] constexpr bool NearlyEqual(const T& a, const T& b, const T& tolerance = static_cast<T>(0.0001)) noexcept
 	{
 		return Abs(a - b) < tolerance;

@@ -20,15 +20,23 @@ namespace Simple
 		animation.name = "TestAnimation";
 		animation.boneKeyFrames.resize(3);
 		BoneKeyFrames& child = animation.boneKeyFrames[1];
-		child.positions = { Point3f(0.0f, 5.0f, 0.0f),   // t = 0.0
-			Point3f(5.0f, 5.0f, 0.0f),   // t = 0.5
-			Point3f(10.0f, 5.0f, 0.0f) };
-		child.positionTimestamps = { 0.0f, 2.5f, 5.0f };
+		//child.positions = { Point3f(0.0f, 5.0f, 0.0f),   // t = 0.0
+		//	Point3f(5.0f, 5.0f, 0.0f),   // t = 0.5
+		//	Point3f(10.0f, 5.0f, 0.0f) };
+		//child.positionTimestamps = { 0.0f, 2.5f, 5.0f };
 		child.rotationTimestamps = { 0.0f, 2.5f, 5.0f };
+
+		const Quaternionf q = ToQuaternion(Matrix4x4f{});
+
+
+		constexpr RotationMatrix3f startMatrix = RotationMatrix3f::FromXY(UnitVector3f::Right(), UnitVector3f::Up());
+		constexpr RotationMatrix3f middleMatrix = RotationMatrix3f::FromXY(UnitVector3f::Backward(), UnitVector3f::Up());
+		constexpr RotationMatrix3f endMatrix = RotationMatrix3f::FromXY(UnitVector3f::Left(), UnitVector3f::Up());
+
 		child.rotations = {
-			Quaternionf(0.0f, 0.0f, 0.0f, 1.0f),                          // 0
-			Quaternionf(0.0f, 0.38268343f, 0.0f, 0.92387953f),           // 45 around Z
-			Quaternionf(0.0f, 0.70710678f, 0.0f, 0.70710678f)            // 90 around Z
+			ToQuaternion(startMatrix),
+			ToQuaternion(middleMatrix),
+			ToQuaternion(endMatrix)
 		};
 
 		child.scaleTimestamps = { 0.0f, 2.5f, 5.0f };
@@ -49,7 +57,7 @@ namespace Simple
 		{
 			Bone& b = bones[0];
 			b.name = "Root";
-			b.parentIndex = UINT32_MAX;
+			b.parentIndex = std::numeric_limits<uint32_t>::max();
 			Matrix4x4f globalBind = Matrix4x4f::CreateTranslationMatrix({ 0,0,0 });
 			b.inverseBindPose = Matrix4x4f::GetFastInverse(globalBind);
 			b.localBindPose = globalBind; // root local = root global

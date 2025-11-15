@@ -223,14 +223,14 @@ namespace Simple
 		return intersectionPoint;
 	}
 
-	[[nodiscard]] constexpr std::optional<Point2f> IntersectionLineSegment2DVsLineSegment2D(const LineSegment2f& aLineSegment1, const LineSegment2f& aLineSegment2)
+	[[nodiscard]] constexpr std::optional<Point2f> IntersectionLineSegment2DVsLineSegment2D(const LineSegment2f& lineSegment1, const LineSegment2f& lineSegment2)
 	{
-		const std::optional<Point2f> intersectionLine = IntersectionLine2DVsLine2D(ToLine(aLineSegment1), ToLine(aLineSegment2));
+		const std::optional<Point2f> intersectionLine = IntersectionLine2DVsLine2D(ToLine(lineSegment1), ToLine(lineSegment2));
 		if (intersectionLine)
 		{
-			const float distance1 = Distance(aLineSegment1.StartPoint(), intersectionLine.value());
-			const float distance2 = Distance(aLineSegment1.EndPoint(), intersectionLine.value());
-			const float line1Length = GetLength(aLineSegment1);
+			const float distance1 = Distance(lineSegment1.StartPoint(), intersectionLine.value());
+			const float distance2 = Distance(lineSegment1.EndPoint(), intersectionLine.value());
+			const float line1Length = GetLength(lineSegment1);
 			if (distance1 <= line1Length && distance2 <= line1Length)
 			{
 				return intersectionLine;
