@@ -1,9 +1,13 @@
 #pragma once
 #include "Utility/Math/Vector3.hpp"
 #include "Utility/Math/UnitVector3.hpp"
+#include "Utility/Math/Quaternion.hpp"
 #include "Utility/Math/Rotator.hpp"
 #include "Utility/Math/Matrix4x4.hpp"
+#include "Utility/Math/RotationMatrix3.hpp"
 #include "Utility/Math/Angle.hpp"
+#include <array>
+#include <cassert>
 
 namespace Simple
 {
@@ -85,49 +89,57 @@ namespace Simple
 	}
 
 	template<typename T>
+	[[nodiscard]] constexpr Quaternion<T> ToQuaternion(const RotationMatrix3<T>& m)
+	{
+		T trace = m(0, 0) + m(1, 1) + m(2, 2);
+		Quaternion<T> q;
+
+		if (trace > 0)
+		{
+			T s = Sqrt(trace + 1) * 2;
+			q.w = T(0.25) * s;
+			q.x = (m(2, 1) - m(1, 2)) / s;
+			q.y = (m(0, 2) - m(2, 0)) / s;
+			q.z = (m(1, 0) - m(0, 1)) / s;
+		}
+		else
+		{
+			if (m(0, 0) > m(1, 1) && m(0, 0) > m(2, 2))
+			{
+				T s = Sqrt(T(1) + m(0, 0) - m(1, 1) - m(2, 2)) * 2;
+				q.w = (m(2, 1) - m(1, 2)) / s;
+				q.x = T(0.25) * s;
+				q.y = (m(0, 1) + m(1, 0)) / s;
+				q.z = (m(0, 2) + m(2, 0)) / s;
+			}
+			else if (m(1, 1) > m(2, 2))
+			{
+				T s = Sqrt(T(1) + m(1, 1) - m(0, 0) - m(2, 2)) * 2;
+				q.w = (m(0, 2) - m(2, 0)) / s;
+				q.x = (m(0, 1) + m(1, 0)) / s;
+				q.y = T(0.25) * s;
+				q.z = (m(1, 2) + m(2, 1)) / s;
+			}
+			else
+			{
+				T s = Sqrt(T(1) + m(2, 2) - m(0, 0) - m(1, 1)) * 2;
+				q.w = (m(1, 0) - m(0, 1)) / s;
+				q.x = (m(0, 2) + m(2, 0)) / s;
+				q.y = (m(1, 2) + m(2, 1)) / s;
+				q.z = T(0.25) * s;
+			}
+		}
+
+		q.Normalize();
+		return q;
+	}
+
+	template<typename T>
 	[[nodiscard]] constexpr Quaternion<T> ToQuaternion(const Matrix4x4<T>& matrix)
 	{
 		assert(matrix.IsOrthogonal() && "Matrix must be orthogonal to convert to Quaternion");
 
-		const T m00 = matrix(0, 0);
-		const T m11 = matrix(1, 1);
-		const T m22 = matrix(2, 2);
-
-		Quaternion<T> quaternion;
-
-		quaternion.w = Sqrt(std::max(T(0), T(1) + m00 + m11 + m22)) * T(0.5);
-
-		quaternion.x = Sqrt(std::max(T(0), T(1) + m00 - m11 - m22)) * T(0.5);
-		quaternion.y = Sqrt(std::max(T(0), T(1) - m00 + m11 - m22)) * T(0.5);
-		quaternion.z = Sqrt(std::max(T(0), T(1) - m00 - m11 + m22)) * T(0.5);
-
-		quaternion.x = CopySign(quaternion.x, matrix(2, 1) - matrix(1, 2));
-		quaternion.y = CopySign(quaternion.y, matrix(0, 2) - matrix(2, 0));
-		quaternion.z = CopySign(quaternion.z, matrix(1, 0) - matrix(0, 1));
-
-		return quaternion;
-	}
-
-	template<typename T>
-	[[nodiscard]] constexpr Quaternion<T> ToQuaternion(const RotationMatrix3<T>& matrix)
-	{
-		const T m00 = matrix(0, 0);
-		const T m11 = matrix(1, 1);
-		const T m22 = matrix(2, 2);
-
-		Quaternion<T> quaternion;
-
-		quaternion.w = Sqrt(Max(T(0), T(1) + m00 + m11 + m22)) * T(0.5);
-
-		quaternion.x = Sqrt(Max(T(0), T(1) + m00 - m11 - m22)) * T(0.5);
-		quaternion.y = Sqrt(Max(T(0), T(1) - m00 + m11 - m22)) * T(0.5);
-		quaternion.z = Sqrt(Max(T(0), T(1) - m00 - m11 + m22)) * T(0.5);
-
-		quaternion.x = CopySign(quaternion.x, matrix(2, 1) - matrix(1, 2));
-		quaternion.y = CopySign(quaternion.y, matrix(0, 2) - matrix(2, 0));
-		quaternion.z = CopySign(quaternion.z, matrix(1, 0) - matrix(0, 1));
-
-		return quaternion;
+		return ToQuaternion(matrix.GetRotationMatrix());
 	}
 
 	template<typename T>
@@ -217,7 +229,7 @@ namespace Simple
 			});
 	}
 
-	// Prioritzes X over Y
+	// Prioritzes X-axis over Y-axis
 	template<typename T>
 	[[nodiscard]] constexpr Matrix4x4<T> CreateMatrixFromXY(const UnitVector3<T>& xAxis, const UnitVector3<T>& yAxis)
 	{
@@ -226,6 +238,7 @@ namespace Simple
 		return CreateMatrixFromAxesUnchecked(xAxis, yAxisCorrected, zAxis);
 	}
 
+	// Prioritzes X-axis over Z-axis
 	template<typename T>
 	[[nodiscard]] constexpr Matrix4x4<T> CreateMatrixFromXZ(const UnitVector3<T>& xAxis, const UnitVector3<T>& zAxis)
 	{
@@ -234,7 +247,7 @@ namespace Simple
 		return CreateMatrixFromAxesUnchecked(xAxis, yAxis, zAxisCorrected);
 	}
 
-	// Prioritzes Y over Z
+	// Prioritzes Y-axis over X-axis
 	template<typename T>
 	[[nodiscard]] constexpr Matrix4x4<T> CreateMatrixFromYX(const UnitVector3<T>& yAxis, const UnitVector3<T>& xAxis)
 	{
@@ -243,12 +256,31 @@ namespace Simple
 		return CreateMatrixFromAxesUnchecked(xAxisCorrected, yAxis, zAxis);
 	}
 
+	// Prioritzes Y-axis over Z-axis
 	template<typename T>
 	[[nodiscard]] constexpr Matrix4x4<T> CreateMatrixFromYZ(const UnitVector3<T>& yAxis, const UnitVector3<T>& zAxis)
 	{
 		const UnitVector3<T> xAxis = Cross(yAxis, zAxis);
 		const UnitVector3<T> zAxisCorrected = Cross(xAxis, yAxis);
 		return CreateMatrixFromAxesUnchecked(xAxis, yAxis, zAxisCorrected);
+	}
+
+	// Prioritzes Z-axis over X-axis
+	template<typename T>
+	[[nodiscard]] constexpr Matrix4x4<T> CreateMatrixFromZX(const UnitVector3<T>& zAxis, const UnitVector3<T>& xAxis)
+	{
+		const UnitVector3<T> yAxis = Cross(zAxis, xAxis);
+		const UnitVector3<T> xAxisCorrected = Cross(yAxis, zAxis);
+		return CreateMatrixFromAxesUnchecked(xAxisCorrected, yAxis, zAxis);
+	}
+
+	// Prioritzes Z-axis over Y-axis
+	template<typename T>
+	[[nodiscard]] constexpr Matrix4x4<T> CreateMatrixFromZY(const UnitVector3<T>& zAxis, const UnitVector3<T>& yAxis)
+	{
+		const UnitVector3<T> xAxis = Cross(yAxis, zAxis);
+		const UnitVector3<T> yAxisCorrected = Cross(zAxis, xAxis);
+		return CreateMatrixFromAxesUnchecked(xAxis, yAxisCorrected, zAxis);
 	}
 
 	template<typename T>

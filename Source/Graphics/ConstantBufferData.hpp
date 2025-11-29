@@ -7,9 +7,6 @@
 #include "Graphics/GraphicsConstants.hpp"
 #include <array>
 
-#undef max
-#undef min
-
 namespace Simple
 {
 	struct alignas(16) PointLightData final

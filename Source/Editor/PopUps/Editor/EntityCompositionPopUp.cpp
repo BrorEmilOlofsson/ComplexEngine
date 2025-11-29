@@ -35,6 +35,12 @@ namespace Simple
 			mRootEntities = GetRootEntities(mEntityCompositionAsset->GetECS());
 			mEntityCompositionAsset->GetECS().GetComponent<NameComponent>(mEntityCompositionAsset->GetRootEntity())->name = "Root";
 		}
+
+		if (!IsActive())
+		{
+			return;
+		}
+
 		Blackboard newBlackboard = blackboard;
 		newBlackboard.Insert<Key_CurrentCamera>(mCamera);
 		newBlackboard.Insert<Key_CurrentRenderState>(mRenderState);

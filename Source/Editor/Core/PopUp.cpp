@@ -11,14 +11,18 @@ namespace Simple
 
 	void PopUp::Update(const Blackboard& blackboard)
 	{
-		if (IsActive())
+		bool& isActive = IsActive();
+		if (isActive)
 		{
-			if (ImGui::Begin(GetImGuiName().c_str(), &IsActive()))
-			{
-				mIsFocus = ImGui::IsWindowFocused();
-			}
+			ImGui::Begin(GetImGuiName().c_str(), &IsActive());
+
+			mIsFocus = ImGui::IsWindowFocused();
 
 			ImGui::End();
+		}
+		else
+		{
+			IsActive() = false;
 		}
 
 		UpdateInternal(blackboard);

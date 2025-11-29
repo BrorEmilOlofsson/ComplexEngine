@@ -128,9 +128,9 @@ namespace Simple
 	}
 
 	template<typename T>
-	constexpr Vector2<T>& operator/=(Vector2<T>& vector, const T& aScalar)
+	constexpr Vector2<T>& operator/=(Vector2<T>& vector, const T& scalar)
 	{
-		const T inverse = (1 / aScalar);
+		const T inverse = (1 / scalar);
 		vector.x *= inverse;
 		vector.y *= inverse;
 		return vector;

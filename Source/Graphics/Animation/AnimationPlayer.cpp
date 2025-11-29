@@ -26,11 +26,15 @@ namespace Simple
 		const float t1 = timestamps[to];
 
 		return Remap0To1(time, t0, t1);//(time - t0) / (t1 - t0);
-		
+
 	}
 
 	Matrix4x4f SampleBoneTransform(const float time, const BoneKeyFrames& keyframes, const Bone& bone)
 	{
+		if (true)
+		{
+			return bone.localBindPose;
+		}
 
 		if (keyframes.positions.empty() &&
 			keyframes.rotations.empty() &&
@@ -38,6 +42,8 @@ namespace Simple
 		{
 			return bone.localBindPose;
 		}
+
+		
 
 		Point3f t;
 		{
@@ -47,13 +53,20 @@ namespace Simple
 			}
 			else
 			{
-				auto positionTimeIndexPair = FindKeyFrameIndexPair(keyframes.positionTimestamps, time);
-				const float positonFactor = GetTimeFactor(keyframes.positionTimestamps, time, positionTimeIndexPair.first, positionTimeIndexPair.second);
+				auto timeIndexPair = FindKeyFrameIndexPair(keyframes.positionTimestamps, time);
+				if (timeIndexPair.first == timeIndexPair.second)
+				{
+					t = keyframes.positions[timeIndexPair.first];
+				}
+				else
+				{
+					const float positonFactor = GetTimeFactor(keyframes.positionTimestamps, time, timeIndexPair.first, timeIndexPair.second);
 
-				const Point3f positionFrom = keyframes.positions[positionTimeIndexPair.first];
-				const Point3f positionTo = keyframes.positions[positionTimeIndexPair.second];
+					const Point3f positionFrom = keyframes.positions[timeIndexPair.first];
+					const Point3f positionTo = keyframes.positions[timeIndexPair.second];
 
-				t = Lerp(positionFrom, positionTo, positonFactor);
+					t = Lerp(positionFrom, positionTo, positonFactor);
+				}
 			}
 		}
 
@@ -65,11 +78,18 @@ namespace Simple
 			}
 			else
 			{
-				auto rotationTimeIndexPair = FindKeyFrameIndexPair(keyframes.rotationTimestamps, time);
-				const float rotationFactor = GetTimeFactor(keyframes.rotationTimestamps, time, rotationTimeIndexPair.first, rotationTimeIndexPair.second);
-				const Quaternionf rotationFrom = keyframes.rotations[rotationTimeIndexPair.first];
-				const Quaternionf rotationTo = keyframes.rotations[rotationTimeIndexPair.second];
-				r = Slerp(rotationFrom, rotationTo, rotationFactor);
+				auto timeIndexPair = FindKeyFrameIndexPair(keyframes.rotationTimestamps, time);
+				if (timeIndexPair.first == timeIndexPair.second)
+				{
+					r = keyframes.rotations[timeIndexPair.first];
+				}
+				else
+				{
+					const float rotationFactor = GetTimeFactor(keyframes.rotationTimestamps, time, timeIndexPair.first, timeIndexPair.second);
+					const Quaternionf rotationFrom = keyframes.rotations[timeIndexPair.first];
+					const Quaternionf rotationTo = keyframes.rotations[timeIndexPair.second];
+					r = Slerp(rotationFrom, rotationTo, rotationFactor);
+				}
 			}
 		}
 
@@ -81,24 +101,62 @@ namespace Simple
 			}
 			else
 			{
-				auto scaleTimeIndexPair = FindKeyFrameIndexPair(keyframes.scaleTimestamps, time);
-				const float scaleFactor = GetTimeFactor(keyframes.scaleTimestamps, time, scaleTimeIndexPair.first, scaleTimeIndexPair.second);
+				auto timeIndexPair = FindKeyFrameIndexPair(keyframes.scaleTimestamps, time);
+				if (timeIndexPair.first == timeIndexPair.second)
+				{
+					s = keyframes.scales[timeIndexPair.first];
+				}
+				else
+				{
+					const float scaleFactor = GetTimeFactor(keyframes.scaleTimestamps, time, timeIndexPair.first, timeIndexPair.second);
 
-
-				const Vector3f scaleFrom = keyframes.scales[scaleTimeIndexPair.first];
-				const Vector3f scaleTo = keyframes.scales[scaleTimeIndexPair.second];
-
-				s = Lerp(scaleFrom, scaleTo, scaleFactor);
-				
+					const Vector3f scaleFrom = keyframes.scales[timeIndexPair.first];
+					const Vector3f scaleTo = keyframes.scales[timeIndexPair.second];
+					s = Lerp(scaleFrom, scaleTo, scaleFactor);
+				}
 			}
 		}
 
 		// 1) Find keyframe interval (t0 -> t1)
-		
+
 
 		return Matrix4x4f::CreateTRSMatrix(t, ToMatrix(r), s);
 	}
 
+	void AnimationPlayer::UpdateTime(const float deltaTime)
+	{
+		if (!mAnimationAsset.IsValid())
+		{
+			return;
+		}
+		const Animation& animation = *mAnimationAsset.Get();
+		mCurrentTime += deltaTime;
+
+		if (mCurrentTime > animation.duration)
+		{
+			mCurrentTime = fmod(mCurrentTime, animation.duration);
+		}
+	}
+
+	void AnimationPlayer::UpdateAnimation(std::span<const Bone> skeletonBones)
+	{
+		UpdateAnimation(mCurrentTime, skeletonBones);
+	}
+
+	void AnimationPlayer::UpdateAnimation(const float currentTime, std::span<const Bone> skeletonBones)
+	{
+		if (!mAnimationAsset.IsValid())
+		{
+			return;
+		}
+
+		const Animation& animation = *mAnimationAsset.Get();
+
+		for (std::size_t boneIndex = 0; boneIndex < animation.boneKeyFrames.size(); boneIndex++)
+		{
+			localBoneMatrices[boneIndex] = SampleBoneTransform(currentTime, animation.boneKeyFrames[boneIndex], skeletonBones[boneIndex]);
+		}
+	}
 
 	void AnimationPlayer::Update(const float deltaTime, std::span<const Bone> skeletonBones)
 	{
@@ -107,18 +165,8 @@ namespace Simple
 			return;
 		}
 
-		const Animation& animation = *mAnimationAsset.Get();
-		mCurrentTime += deltaTime;
-
-		if (mCurrentTime > animation.duration)
-		{
-			mCurrentTime = fmod(mCurrentTime, animation.duration);
-		}
-
-		for (std::size_t boneIndex = 0; boneIndex < animation.boneKeyFrames.size(); boneIndex++)
-		{
-			localBoneMatrices[boneIndex] = SampleBoneTransform(mCurrentTime, animation.boneKeyFrames[boneIndex], skeletonBones[boneIndex]);
-		}
+		UpdateTime(deltaTime);
+		UpdateAnimation(skeletonBones);
 	}
 
 }

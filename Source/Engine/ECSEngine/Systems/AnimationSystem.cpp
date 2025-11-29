@@ -15,37 +15,62 @@ namespace Simple
 	AnimationAsset CreateAnimationAsset()
 	{
 		Animation animation;
-		animation.duration = 5.f;
+		animation.duration = 10.f;
 		animation.framesPerSecond = 1.f;
 		animation.name = "TestAnimation";
 		animation.boneKeyFrames.resize(3);
-		BoneKeyFrames& child = animation.boneKeyFrames[1];
-		//child.positions = { Point3f(0.0f, 5.0f, 0.0f),   // t = 0.0
-		//	Point3f(5.0f, 5.0f, 0.0f),   // t = 0.5
-		//	Point3f(10.0f, 5.0f, 0.0f) };
-		//child.positionTimestamps = { 0.0f, 2.5f, 5.0f };
-		child.rotationTimestamps = { 0.0f, 2.5f, 5.0f };
 
-		const Quaternionf q = ToQuaternion(Matrix4x4f{});
+		{
+			// Parent bone
+
+			BoneKeyFrames& parent = animation.boneKeyFrames[0];
+
+			parent.rotationTimestamps = { 0.0f, 2.5f, 5.0f };
+
+			constexpr RotationMatrix3f startMatrix = RotationMatrix3f::Identity();
+			constexpr RotationMatrix3f middleMatrix = RotationMatrix3f::Identity();
+			constexpr RotationMatrix3f endMatrix = RotationMatrix3f::Identity();
 
 
-		constexpr RotationMatrix3f startMatrix = RotationMatrix3f::FromXY(UnitVector3f::Right(), UnitVector3f::Up());
-		constexpr RotationMatrix3f middleMatrix = RotationMatrix3f::FromXY(UnitVector3f::Backward(), UnitVector3f::Up());
-		constexpr RotationMatrix3f endMatrix = RotationMatrix3f::FromXY(UnitVector3f::Left(), UnitVector3f::Up());
+			parent.rotations = {
+				ToQuaternion(startMatrix),
+				ToQuaternion(middleMatrix),
+				ToQuaternion(endMatrix)
+			};
+		}
 
-		child.rotations = {
-			ToQuaternion(startMatrix),
-			ToQuaternion(middleMatrix),
-			ToQuaternion(endMatrix)
-		};
+		{
+			// Child bone
 
-		child.scaleTimestamps = { 0.0f, 2.5f, 5.0f };
-		child.scales = {
-			Vector3f(1.0f, 1.0f, 1.0f),   // t = 0.0
-			Vector3f(1.0f, 1.0f, 1.0f),   // t = 0.5
-			Vector3f(1.0f, 1.0f, 1.0f)    // t = 1.0
-		};
+			BoneKeyFrames& child = animation.boneKeyFrames[1];
+			child.rotationTimestamps = { 0.0f, 2.5f, 5.0f, 7.5f, 10.f };
 
+			const Quaternionf q = ToQuaternion(Matrix4x4f{});
+
+
+			constexpr RotationMatrix3f m0 = RotationMatrix3f::Identity();
+			constexpr RotationMatrix3f m1 = RotationMatrix3f::FromXY(UnitVector3f::Backward(), UnitVector3f::Up());
+			constexpr RotationMatrix3f m2 = RotationMatrix3f::FromXY(UnitVector3f::Left(), UnitVector3f::Up());
+			constexpr RotationMatrix3f m3 = RotationMatrix3f::FromXY(UnitVector3f::Forward(), UnitVector3f::Up());
+			constexpr RotationMatrix3f m4 = RotationMatrix3f::Identity();
+
+			child.rotations = {
+				ToQuaternion(m0),
+				ToQuaternion(m1),
+				ToQuaternion(m2),
+				ToQuaternion(m3),
+				ToQuaternion(m4)
+			};
+
+		}
+
+		{
+			// Grand child bone
+
+			// No animation for this bone
+
+
+		}
 		return AnimationAsset(std::make_shared<Animation>(animation));
 	}
 
@@ -84,8 +109,7 @@ namespace Simple
 			Matrix4x4f globalBind = Matrix4x4f::CreateTranslationMatrix({ 5,5,0 });
 			b.inverseBindPose = Matrix4x4f::GetFastInverse(globalBind);
 
-			Matrix4x4f parentGlobal =
-				Matrix4x4f::CreateTranslationMatrix({ 0,5,0 }); // Child bind global
+			Matrix4x4f parentGlobal = Matrix4x4f::CreateTranslationMatrix({ 0,5,0 }); // Child bind global
 
 			b.localBindPose = Matrix4x4f::GetFastInverse(parentGlobal) * globalBind;
 		}
@@ -108,16 +132,27 @@ namespace Simple
 
 	static AnimationTestStruct animTest;
 
+	static bool isGoodFrame = false;
+	static bool pause = false;
+
 	void AnimationTest(const float deltaTime)
 	{
-		static unsigned int i = 0;
-		i++;
-		if (i % 2 == 0)
+		isGoodFrame = !isGoodFrame;
+		if (isGoodFrame)
 		{
 			return;
 		}
 
-		animTest.mAnimationPlayer.Update(deltaTime, animTest.mBones);
+
+		if (pause)
+		{
+			animTest.mAnimationPlayer.UpdateAnimation(animTest.mBones);
+			return;
+		}
+		else
+		{
+			animTest.mAnimationPlayer.Update(deltaTime, animTest.mBones);
+		}
 	}
 
 	void AnimationSystem::Update(ECS& ecs, const float deltaTime, const Blackboard& blackboard)
@@ -148,9 +183,14 @@ namespace Simple
 
 	void AnimationSystem::Render(const ECS&, const Blackboard& blackboard)
 	{
+		if (isGoodFrame)
+		{
+			return;
+		}
 		ImGui::Begin("Animation System Debug");
 
 		ImGui::SliderFloat("Animation Time", &animTest.mAnimationPlayer.mCurrentTime, 0.0f, animTest.mAnimationAsset->duration);
+		ImGui::Checkbox("Pause Animation", &pause);
 		ImGui::End();
 		RenderList& renderList = blackboard.Get<Key_CurrentRenderState>().GetRenderList();
 

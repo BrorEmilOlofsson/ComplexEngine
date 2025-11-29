@@ -1,5 +1,6 @@
 #pragma once
-#include "Vector2.hpp"
+#include "Utility/Math/Vector2.hpp"
+#include "Utility/Math/UnitVector2.hpp"
 #include <format>
 
 namespace Simple
@@ -71,6 +72,12 @@ namespace Simple
 		return Point2<T>(point.x + vector.x, point.y + vector.y);
 	}
 
+	template<typename T>
+	[[nodiscard]] constexpr Point2<T> operator+(const Point2<T>& point, const UnitVector2<T>& vector) noexcept
+	{
+		return Point2<T>(point.x + vector.X(), point.y + vector.Y());
+	}
+
 	[[nodiscard]] constexpr Point2i operator+(const Point2i& point, const Vector2ui& vector) noexcept
 	{
 		return point + static_cast<Vector2i>(vector);
@@ -83,6 +90,12 @@ namespace Simple
 	}
 
 	template<typename T>
+	[[nodiscard]] constexpr Point2<T> operator-(const Point2<T>& point, const UnitVector2<T>& vector) noexcept
+	{
+		return Point2<T>(point.x - vector.X(), point.y - vector.Y());
+	}
+
+	template<typename T>
 	[[nodiscard]] constexpr Point2<T> operator-(const Point2<T>& point) noexcept
 	{
 		return Point2<T>(-point.x, -point.y);
@@ -91,14 +104,32 @@ namespace Simple
 	template<typename T>
 	constexpr Point2<T>& operator+=(Point2<T>& point, const Vector2<T>& vector) noexcept
 	{
-		point = point + vector;
+		point.x += vector.x;
+		point.y += vector.y;
+		return point;
+	}
+
+	template<typename T>
+	constexpr Point2<T>& operator+=(Point2<T>& point, const UnitVector2<T>& vector) noexcept
+	{
+		point.x += vector.X();
+		point.y += vector.Y();
 		return point;
 	}
 
 	template<typename T>
 	constexpr Point2<T>& operator-=(Point2<T>& point, const Vector2<T>& vector) noexcept
 	{
-		point = point - vector;
+		point.x -= vector.x;
+		point.y -= vector.y;
+		return point;
+	}
+
+	template<typename T>
+	constexpr Point2<T>& operator-=(Point2<T>& point, const UnitVector2<T>& vector) noexcept
+	{
+		point.x -= vector.X();
+		point.y -= vector.Y();
 		return point;
 	}
 

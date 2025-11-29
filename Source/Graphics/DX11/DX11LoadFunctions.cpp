@@ -120,7 +120,8 @@ namespace Simple
 
 				Bone& bone = bones.emplace_back();
 				bone.name = boneName;
-				bone.inverseBindPose = Matrix4x4f::GetFastInverse(ToMatrix(aiBone.mOffsetMatrix));
+				bone.inverseBindPose = ToMatrix(aiBone.mOffsetMatrix);
+				//bone.inverseBindPose = Matrix4x4f::GetFastInverse(ToMatrix(aiBone.mOffsetMatrix));
 				bone.parentIndex = std::numeric_limits<uint32_t>::max();
 			}
 			else
@@ -172,6 +173,29 @@ namespace Simple
 
 		for (unsigned i = 0; i < node->mNumChildren; ++i)
 			BuildSkeletonHierarchy(node->mChildren[i], thisIdx, bones, boneIndexMap);
+	}
+
+	void ComputeLocalBindPoses(std::vector<Bone>& bones)
+	{
+		for (size_t i = 0; i < bones.size(); i++)
+		{
+			Bone& b = bones[i];
+
+			Matrix4x4f globalBind = Matrix4x4f::GetFastInverse(b.inverseBindPose);
+			
+			if (b.parentIndex == UINT32_MAX)
+			{
+				b.localBindPose = globalBind; // root
+			}
+			else
+			{
+				const Bone& parent = bones[b.parentIndex];
+				Matrix4x4f parentGlobal = Matrix4x4f::GetFastInverse(parent.inverseBindPose);
+
+				b.localBindPose =
+					Matrix4x4f::GetFastInverse(parentGlobal) * globalBind;
+			}
+		}
 	}
 
 	void TraverseNodes(std::vector<DX11Mesh>& meshes, std::vector<Bone>& bones, std::unordered_map<std::string, uint32_t>& boneIndexMap, const aiNode* node, const aiScene* scene, const std::filesystem::path& path,
@@ -364,7 +388,7 @@ namespace Simple
 
 		TraverseNodes(meshes, boneVector, boneIndexMap, scene->mRootNode, scene, path, device, context);
 		BuildSkeletonHierarchy(scene->mRootNode, -1, boneVector, boneIndexMap);
-
+		ComputeLocalBindPoses(boneVector);
 		std::array<Bone, GlobalMaxBones> bones;
 
 		if (boneVector.size() >= GlobalMaxBones)

@@ -1,10 +1,14 @@
 #pragma once
 #include "Utility/Math/Vector2.hpp"
 #include "Utility/Math/Math.hpp"
+#include <iostream>
 
 namespace Simple
 {
 
+	/// <summary>
+	/// A 2D unit vector class that always maintains a length of 1.
+	/// </summary>
 	template<typename T>
 	class UnitVector2 final
 	{
@@ -13,21 +17,30 @@ namespace Simple
 		using value_type = T;
 
 		constexpr UnitVector2() = default;
-		constexpr UnitVector2(const T& aX, const T& aY);
-		constexpr explicit UnitVector2(const Vector2<T>& aVector);
+		constexpr UnitVector2(const T& x, const T& y);
+		constexpr explicit UnitVector2(const Vector2<T>& vector);
 
 		[[nodiscard]] constexpr const T& X() const noexcept;
 		[[nodiscard]] constexpr const T& Y() const noexcept;
 
-		constexpr void SetX(const T& aX);
-		constexpr void SetY(const T& aY);
+		constexpr void SetX(const T& x);
+		constexpr void SetY(const T& y);
 
 		[[nodiscard]] static constexpr UnitVector2<T> Right();
 		[[nodiscard]] static constexpr UnitVector2<T> Up();
 		[[nodiscard]] static constexpr UnitVector2<T> Left();
 		[[nodiscard]] static constexpr UnitVector2<T> Down();
 
+		[[nodiscard]] friend constexpr UnitVector2<T> operator-(const UnitVector2<T>& vector) noexcept
+		{
+			return UnitVector2<T>(UnsafeTag{}, -vector.mX, -vector.mY);
+		}
+
 	private:
+
+		struct UnsafeTag {};
+
+		constexpr UnitVector2(UnsafeTag, const T& x, const T& y);
 
 		constexpr void Assert() const;
 
@@ -41,19 +54,26 @@ namespace Simple
 	using UnitVector2d = UnitVector2<double>;
 
 	template<typename T>
-	constexpr UnitVector2<T>::UnitVector2(const T& aX, const T& aY)
-		: mX(aX)
-		, mY(aY)
+	constexpr UnitVector2<T>::UnitVector2(const T& x, const T& y)
+		: mX(x)
+		, mY(y)
 	{
 		Normalize(mX, mY);
 	}
 
 	template<typename T>
-	constexpr UnitVector2<T>::UnitVector2(const Vector2<T>& aVector)
-		: mX(aVector.x)
-		, mY(aVector.y)
+	constexpr UnitVector2<T>::UnitVector2(const Vector2<T>& vector)
+		: mX(vector.x)
+		, mY(vector.y)
 	{
 		Normalize(mX, mY);
+	}
+
+	template<typename T>
+	constexpr UnitVector2<T>::UnitVector2(UnsafeTag, const T& x, const T& y) 
+		: mX(x)
+		, mY(y)
+	{
 	}
 
 	template<typename T>
@@ -69,17 +89,17 @@ namespace Simple
 	}
 
 	template<typename T>
-	constexpr void UnitVector2<T>::SetX(const T& aX)
+	constexpr void UnitVector2<T>::SetX(const T& x)
 	{
-		mX = aX;
-		Assert();
+		mX = x;
+		Normalize(mX, mY);
 	}
 
 	template<typename T>
-	constexpr void UnitVector2<T>::SetY(const T& aY)
+	constexpr void UnitVector2<T>::SetY(const T& y)
 	{
-		mY = aY;
-		Assert();
+		mY = y;
+		Normalize(mX, mY);
 	}
 
 	template<typename T>
@@ -113,81 +133,74 @@ namespace Simple
 	}
 
 	template<typename T>
-	[[nodiscard]] constexpr bool operator==(const UnitVector2<T>& aA, const UnitVector2<T>& aB) noexcept
+	[[nodiscard]] constexpr bool operator==(const UnitVector2<T>& a, const UnitVector2<T>& b) noexcept
 	{
-		return aA.X() == aB.X() && aA.Y() == aB.Y();
+		return a.X() == b.X() && a.Y() == b.Y();
 	}
 
 	template<typename T>
-	[[nodiscard]] constexpr Vector2<T> operator+(const UnitVector2<T>& aA, const UnitVector2<T>& aB) noexcept
+	[[nodiscard]] constexpr Vector2<T> operator+(const UnitVector2<T>& a, const UnitVector2<T>& b) noexcept
 	{
-		return Vector2<T>(aA.X() + aB.X(), aA.Y() + aB.Y());
+		return Vector2<T>(a.X() + b.X(), a.Y() + b.Y());
 	}
 
 	template<typename T>
-	[[nodiscard]] constexpr Vector2<T> operator+(const Vector2<T>& aA, const UnitVector2<T>& aB) noexcept
+	[[nodiscard]] constexpr Vector2<T> operator+(const Vector2<T>& a, const UnitVector2<T>& b) noexcept
 	{
-		return Vector2<T>(aA.z + aB.X(), aA.y + aB.Y());
+		return Vector2<T>(a.x + b.X(), a.y + b.Y());
 	}
 
 	template<typename T>
-	[[nodiscard]] constexpr Vector2<T> operator+(const UnitVector2<T>& aA, const Vector2<T>& aB) noexcept
+	[[nodiscard]] constexpr Vector2<T> operator+(const UnitVector2<T>& a, const Vector2<T>& b) noexcept
 	{
-		return Vector2<T>(aA.X() + aB.x, aA.Y() + aB.y);
+		return Vector2<T>(a.X() + b.x, a.Y() + b.y);
 	}
 
 	template<typename T>
-	[[nodiscard]] constexpr Vector2<T> operator-(const UnitVector2<T>& aA, const UnitVector2<T>& aB) noexcept
+	[[nodiscard]] constexpr Vector2<T> operator-(const UnitVector2<T>& a, const UnitVector2<T>& b) noexcept
 	{
-		return Vector2<T>(aA.X() - aB.X(), aA.Y() - aB.Y());
+		return Vector2<T>(a.X() - b.X(), a.Y() - b.Y());
 	}
 
 	template<typename T>
-	[[nodiscard]] constexpr Vector2<T> operator-(const Vector2<T>& aA, const UnitVector2<T>& aB) noexcept
+	[[nodiscard]] constexpr Vector2<T> operator-(const Vector2<T>& a, const UnitVector2<T>& b) noexcept
 	{
-		return Vector2<T>(aA.x - aB.X(), aA.y - aB.Y());
+		return Vector2<T>(a.x - b.X(), a.y - b.Y());
 	}
 
 	template<typename T>
-	[[nodiscard]] constexpr Vector2<T> operator-(const UnitVector2<T>& aA, const Vector2<T>& aB) noexcept
+	[[nodiscard]] constexpr Vector2<T> operator-(const UnitVector2<T>& a, const Vector2<T>& b) noexcept
 	{
-		return Vector2<T>(aA.X() - aB.x, aA.Y() - aB.y);
+		return Vector2<T>(a.X() - b.x, a.Y() - b.y);
 	}
 
 	template<typename T>
-	[[nodiscard]] constexpr UnitVector2<T> operator-(const UnitVector2<T>& aVector)
+	[[nodiscard]] constexpr Vector2<T> operator*(const UnitVector2<T>& vector, const T& scalar) noexcept
 	{
-		return UnitVector2<T>(-aVector.X(), -aVector.Y());
+		return Vector2<T>(vector.X() * scalar, vector.Y() * scalar);
 	}
 
 	template<typename T>
-	[[nodiscard]] constexpr Vector2<T> operator*(const UnitVector2<T>& aVector, const T& aScalar) noexcept
+	[[nodiscard]] constexpr Vector2<T> operator*(const T& scalar, const UnitVector2<T>& vector) noexcept
 	{
-		return Vector2<T>(aVector.X() * aScalar, aVector.Y() * aScalar);
+		return vector * scalar;
 	}
 
 	template<typename T>
-	[[nodiscard]] constexpr Vector2<T> operator*(const T& aScalar, const UnitVector2<T>& aVector) noexcept
+	[[nodiscard]] constexpr Vector2<T> operator/(const UnitVector2<T>& vector, const T& scalar)
 	{
-		return aVector * aScalar;
+		return Vector2<T>(vector.X() / scalar, vector.Y() / scalar);
 	}
 
 	template<typename T>
-	[[nodiscard]] constexpr Vector2<T> operator/(const T& aScalar, const UnitVector2<T>& aVector)
+	std::ostream& operator<<(std::ostream& os, const UnitVector2<T>& vector)
 	{
-		return Vector2<T>(aScalar / aVector.X(), aScalar / aVector.Y());
+		return os << "UnitVector2(" << vector.X() << ", " << vector.Y() << ")";
 	}
 
 	template<typename T>
-	std::ostream& operator<<(std::ostream& aOS, const UnitVector2<T>& aVector)
+	[[nodiscard]] constexpr bool NearlyEqual(const UnitVector2<T>& a, const UnitVector2<T>& b, const T& tolerance = static_cast<T>(0.0001)) noexcept
 	{
-		aOS << "UnitVector2(" << aVector.X() << ", " << aVector.Y() << ")";
-		return aOS;
-	}
-
-	template<typename T>
-	[[nodiscard]] constexpr bool NearlyEqual(const UnitVector2<T>& aA, const UnitVector2<T>& aB, const T& aTolerance = static_cast<T>(0.0001)) noexcept
-	{
-		return (Abs(aA.X() - aB.X()) < aTolerance) && (Abs(aA.Y() - aB.Y()) < aTolerance);
+		return (Abs(a.X() - b.X()) < tolerance) && (Abs(a.Y() - b.Y()) < tolerance);
 	}
 }

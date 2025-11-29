@@ -20,6 +20,7 @@ namespace Simple
 		constexpr explicit Point3(const Point3<U>& point) noexcept;
 
 		[[nodiscard]] static constexpr Point3<T> Zero() noexcept;
+		[[nodiscard]] static constexpr Point3<T> One() noexcept;
 
 	public:
 
@@ -57,6 +58,12 @@ namespace Simple
 	}
 
 	template<typename T>
+	constexpr Point3<T> Point3<T>::One() noexcept
+	{
+		return Point3<T>(1, 1, 1);
+	}
+
+	template<typename T>
 	[[nodiscard]] constexpr bool operator==(const Point3<T>& a, const Point3<T>& b) noexcept
 	{
 		return a.x == b.x && a.y == b.y && a.z == b.z;
@@ -81,22 +88,56 @@ namespace Simple
 	}
 
 	template<typename T>
+	[[nodiscard]] constexpr Point3<T> operator-(const Point3<T>& point, const UnitVector3<T>& vector) noexcept
+	{
+		return Point3<T>(point.x - vector.X(), point.y - vector.Y(), point.z - vector.Z());
+	}
+
+	template<typename T>
 	[[nodiscard]] constexpr Vector3<T> operator-(const Point3<T>& a, const Point3<T>& b) noexcept
 	{
 		return Vector3<T>(a.x - b.x, a.y - b.y, a.z - b.z);
 	}
 
 	template<typename T>
+	[[nodiscard]] constexpr Point3<T> operator-(const Point3<T>& point) noexcept
+	{
+		return Point3<T>(-point.x, -point.y, -point.z);
+	}
+
+	template<typename T>
 	constexpr Point3<T>& operator+=(Point3<T>& point, const Vector3<T>& vector) noexcept
 	{
-		point = point + vector;
+		point.x += vector.x;
+		point.y += vector.y;
+		point.z += vector.z;
+		return point;
+	}
+
+	template<typename T>
+	constexpr Point3<T>& operator+=(Point3<T>& point, const UnitVector3<T>& vector) noexcept
+	{
+		point.x += vector.X();
+		point.y += vector.Y();
+		point.z += vector.Z();
 		return point;
 	}
 
 	template<typename T>
 	constexpr Point3<T>& operator-=(Point3<T>& point, const Vector3<T>& vector) noexcept
 	{
-		point = point - vector;
+		point.x -= vector.x;
+		point.y -= vector.y;
+		point.z -= vector.z;
+		return point;
+	}
+
+	template<typename T>
+	constexpr Point3<T>& operator-=(Point3<T>& point, const UnitVector3<T>& vector) noexcept
+	{
+		point.x -= vector.X();
+		point.y -= vector.Y();
+		point.z -= vector.Z();
 		return point;
 	}
 

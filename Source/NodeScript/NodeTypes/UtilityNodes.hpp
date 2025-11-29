@@ -17,9 +17,6 @@ namespace FLY_NAMESPACE
 		return std::clamp(aValue, aMin, aMax);
 	}
 
-#undef min
-#undef max
-
 	template<typename T>
 	constexpr T Min(const T& aValue1, const T& aValue2)
 	{

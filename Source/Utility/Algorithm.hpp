@@ -6,9 +6,6 @@
 #include <vector>
 #include <unordered_set>
 
-#undef min
-#undef max
-
 namespace Simple
 {
 	template<typename T>

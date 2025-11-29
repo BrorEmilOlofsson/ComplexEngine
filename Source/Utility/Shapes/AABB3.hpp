@@ -6,9 +6,6 @@
 #include <span>
 #include <array>
 
-#undef min
-#undef max
-
 namespace Simple
 {
 

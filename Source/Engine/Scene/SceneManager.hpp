@@ -6,8 +6,6 @@
 #include "Utility/EventDispatcher.hpp"
 #include "Engine/Scene/SceneSettings.hpp"
 
-#undef max
-
 namespace Simple
 {
 

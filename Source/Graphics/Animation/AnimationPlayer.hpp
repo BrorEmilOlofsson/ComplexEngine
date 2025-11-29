@@ -11,6 +11,9 @@ namespace Simple
 	{
 	public:
 
+		void UpdateTime(const float deltaTime);
+		void UpdateAnimation(std::span<const Bone> skeletonBones);
+		void UpdateAnimation(const float currentTime, std::span<const Bone> skeletonBones);
 		void Update(const float deltaTime, std::span<const Bone> skeletonBones);
 
 		std::array<Matrix4x4f, GlobalMaxBones> localBoneMatrices;

@@ -8,6 +8,7 @@
 #include <optional>
 #include "Utility/Math/MathConstants.hpp"
 #include "Utility/Math/Angle.hpp"
+#include "Utility/Assert.hpp"
 
 namespace Simple
 {
@@ -292,7 +293,7 @@ namespace Simple
 	{
 		if (!IsNormalized(x, y))
 		{
-			throw std::runtime_error("Vector is not normalized");
+			ASSERT(false && "Vector is not normalized");
 		}
 	}
 
@@ -307,19 +308,19 @@ namespace Simple
 	{
 		if (!IsNormalized(x, y, z))
 		{
-			throw std::runtime_error("Vector is not normalized");
+			ASSERT(false && "Vector is not normalized");
 		}
 	}
 
-	template<bool ThrowError = true, typename T>
-	constexpr void Normalize(T& x, T& y, T& z, T& w) noexcept(!ThrowError)
+	template<bool Assert = true, typename T>
+	constexpr void Normalize(T& x, T& y, T& z, T& w) noexcept(!Assert)
 	{
 		const T lengthSquared = LengthSquared(x, y, z, w);
 		if (lengthSquared == T{ 0 })
 		{
-			if constexpr (ThrowError)
+			if constexpr (Assert)
 			{
-				throw std::runtime_error("Cannot normalize zero vector");
+				ASSERT(false && "Cannot normalize zero vector");
 			}
 			else
 			{
@@ -340,15 +341,15 @@ namespace Simple
 		}
 	}
 
-	template<bool ThrowError = true, typename T>
-	constexpr void Normalize(T& x, T& y, T& z) noexcept(!ThrowError)
+	template<bool Assert = true, typename T>
+	constexpr void Normalize(T& x, T& y, T& z) noexcept(!Assert)
 	{
 		const T lengthSquared = LengthSquared(x, y, z);
 		if (lengthSquared == T{ 0 })
 		{
-			if constexpr (ThrowError)
+			if constexpr (Assert)
 			{
-				throw std::runtime_error("Cannot normalize zero vector");
+				ASSERT(false && "Cannot normalize zero vector");
 			}
 			else
 			{
@@ -368,15 +369,15 @@ namespace Simple
 		}
 	}
 
-	template<bool ThrowError = true, typename T>
-	constexpr void Normalize(T& x, T& y) noexcept(!ThrowError)
+	template<bool Assert = true, typename T>
+	constexpr void Normalize(T& x, T& y) noexcept(!Assert)
 	{
 		const T lengthSquared = LengthSquared(x, y);
 		if (lengthSquared == T{ 0 })
 		{
-			if constexpr (ThrowError)
+			if constexpr (Assert)
 			{
-				throw std::runtime_error("Cannot normalize zero vector");
+				ASSERT(false && "Cannot normalize zero vector");
 			}
 			else
 			{

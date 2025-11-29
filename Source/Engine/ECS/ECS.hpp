@@ -1,7 +1,7 @@
 #pragma once
 #include "EntityID.hpp"
 #include "ComponentPool.hpp"
-#include "System.hpp"
+#include "ECSSystem.hpp"
 #include "Utility/Blackboard.hpp"
 #include "Utility/TypeList.hpp"
 #include <bitset>

@@ -6,6 +6,9 @@
 namespace Simple
 {
 
+	/// <summary>
+	/// A 3D unit vector class that always maintains a length of 1.
+	/// </summary>
 	template<typename T>
 	class UnitVector3 final
 	{
@@ -37,7 +40,7 @@ namespace Simple
 
 	private:
 
-		struct UnsafeTag { constexpr UnsafeTag() = default; };
+		struct UnsafeTag {};
 
 		constexpr UnitVector3(UnsafeTag, const T& x, const T& y, const T& z) noexcept;
 
@@ -101,21 +104,21 @@ namespace Simple
 	constexpr void UnitVector3<T>::SetX(const T& x)
 	{
 		mX = x;
-		Assert();
+		Normalize(mX, mY, mZ);
 	}
 
 	template<typename T>
 	constexpr void UnitVector3<T>::SetY(const T& y)
 	{
 		mY = y;
-		Assert();
+		Normalize(mX, mY, mZ);
 	}
 
 	template<typename T>
 	constexpr void UnitVector3<T>::SetZ(const T& z)
 	{
 		mZ = z;
-		Assert();
+		Normalize(mX, mY, mZ);
 	}
 
 	template<typename T>
@@ -187,7 +190,9 @@ namespace Simple
 	template<typename T>
 	constexpr Vector3<T>& operator+=(Vector3<T>& vectorA, const UnitVector3<T>& vectorB) noexcept
 	{
-		vectorA = vectorA + vectorB;
+		vectorA.x += vectorB.X();
+		vectorA.y += vectorB.Y();
+		vectorA.z += vectorB.Z();
 		return vectorA;
 	}
 
@@ -210,6 +215,15 @@ namespace Simple
 	}
 
 	template<typename T>
+	constexpr Vector3<T>& operator-=(Vector3<T>& vectorA, const UnitVector3<T>& vectorB) noexcept
+	{
+		vectorA.x -= vectorB.X();
+		vectorA.y -= vectorB.Y();
+		vectorA.z -= vectorB.Z();
+		return vectorA;
+	}
+
+	template<typename T>
 	[[nodiscard]] constexpr Vector3<T> operator*(const UnitVector3<T>& vector, const T& scalar) noexcept
 	{
 		return Vector3<T>(vector.X() * scalar, vector.Y() * scalar, vector.Z() * scalar);
@@ -222,16 +236,15 @@ namespace Simple
 	}
 
 	template<typename T>
-	[[nodiscard]] constexpr Vector3<T> operator/(const T& scalar, const UnitVector3<T>& vector)
+	[[nodiscard]] constexpr Vector3<T> operator/(const UnitVector3<T>& vector, const T& scalar) noexcept
 	{
-		return Vector3<T>(scalar / vector.X(), scalar / vector.Y(), scalar / vector.Z());
+		return Vector3<T>(vector.X() / scalar, vector.Y() / scalar, vector.Z() / scalar);
 	}
 
 	template<typename T>
 	std::ostream& operator<<(std::ostream& os, const UnitVector3<T>& vector)
 	{
-		os << "UnitVector3(" << vector.X() << ", " << vector.Y() << ", " << vector.Z() << ")";
-		return os;
+		return os << "UnitVector3(" << vector.X() << ", " << vector.Y() << ", " << vector.Z() << ")";
 	}
 
 	template<typename T>

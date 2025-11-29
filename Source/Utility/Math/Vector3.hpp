@@ -109,36 +109,39 @@ namespace Simple
 	}
 
 	template<typename T>
-	[[nodiscard]] constexpr Vector3<T> operator/(const T& scalar, const Vector3<T>& vector)
-	{
-		return Vector3<T>(scalar / vector.x, scalar / vector.y, scalar / vector.z);
-	}
-
-	template<typename T>
 	constexpr Vector3<T>& operator+=(Vector3<T>& a, const Vector3<T>& b) noexcept
 	{
-		a = a + b;
+		a.x += b.x;
+		a.y += b.y;
+		a.z += b.z;
 		return a;
 	}
 
 	template<typename T>
 	constexpr Vector3<T>& operator-=(Vector3<T>& a, const Vector3<T>& b) noexcept
 	{
-		a = a + b;
+		a.x -= b.x;
+		a.y -= b.y;
+		a.z -= b.z;
 		return a;
 	}
 
 	template<typename T>
 	constexpr Vector3<T>& operator*=(Vector3<T>& vector, const T& scalar) noexcept
 	{
-		vector = vector * scalar;
+		vector.x *= scalar;
+		vector.y *= scalar;
+		vector.z *= scalar;
 		return vector;
 	}
 
 	template<typename T>
 	constexpr Vector3<T>& operator/=(Vector3<T>& vector, const T& scalar)
 	{
-		vector = vector / scalar;
+		const T inverse = (1 / scalar);
+		vector.x *= inverse;
+		vector.y *= inverse;
+		vector.z *= inverse;
 		return vector;
 	}
 

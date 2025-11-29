@@ -1,8 +1,11 @@
 #pragma once
-#include "Engine/ECS/System.hpp"
+#include "Utility/Blackboard.hpp"
 
 namespace Simple
 {
+
+	class ECS;
+
 	class CameraSystem final
 	{
 	public:

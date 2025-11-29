@@ -12,8 +12,6 @@
 #include <xhash>
 #include "SystemTypes/FlyNone.hpp"
 
-#undef max
-
 #define FLY_CONCATENATE_DETAIL(x, y) x##y
 #define FLY_CONCATENATE(x, y) FLY_CONCATENATE_DETAIL(x, y)
 

@@ -5,8 +5,8 @@
 #include "Utility/Shapes/Cylinder.hpp"
 #include "Utility/Math/Math.hpp"
 #include "Utility/Math/VectorMath.hpp"
-
-#undef min
+#include "Utility/Math/Point3.hpp"
+#include <utility>
 
 namespace Simple
 {
@@ -108,15 +108,19 @@ namespace Simple
 
 	constexpr bool DetectCollision(const AABB3f& aabb, const Ray3f& ray)
 	{
-		const Vector3f invDir = 1.0f / ray.GetDirection();
+		const UnitVector3f rayDir = ray.GetDirection();
+		const Point3f rayOrigin = ray.GetOrigin();
+		const Point3f aabbMin = aabb.GetMin();
+		const Point3f aabbMax = aabb.GetMax();
+		const Vector3f invDir = { 1.0f / rayDir.X(), 1.0f / rayDir.Y(), 1.0f / rayDir.Z()};
 
-		float tMin = (aabb.GetMin().x - ray.GetOrigin().x) * invDir.x;
-		float tMax = (aabb.GetMax().x - ray.GetOrigin().x) * invDir.x;
+		float tMin = (aabbMin.x - rayOrigin.x) * invDir.x;
+		float tMax = (aabbMax.x - rayOrigin.x) * invDir.x;
 
 		if (tMin > tMax) std::swap(tMin, tMax);
 
-		float tYMin = (aabb.GetMin().y - ray.GetOrigin().y) * invDir.y;
-		float tYMax = (aabb.GetMax().y - ray.GetOrigin().y) * invDir.y;
+		float tYMin = (aabbMin.y - rayOrigin.y) * invDir.y;
+		float tYMax = (aabbMax.y - rayOrigin.y) * invDir.y;
 
 		if (tYMin > tYMax) std::swap(tYMin, tYMax);
 
@@ -125,8 +129,8 @@ namespace Simple
 		if (tYMin > tMin) tMin = tYMin;
 		if (tYMax < tMax) tMax = tYMax;
 
-		float tZMin = (aabb.GetMin().z - ray.GetOrigin().z) * invDir.z;
-		float tZMax = (aabb.GetMax().z - ray.GetOrigin().z) * invDir.z;
+		float tZMin = (aabbMin.z - rayOrigin.z) * invDir.z;
+		float tZMax = (aabbMax.z - rayOrigin.z) * invDir.z;
 
 		if (tZMin > tZMax) std::swap(tZMin, tZMax);
 

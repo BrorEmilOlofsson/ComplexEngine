@@ -4,8 +4,6 @@
 #include <cmath>
 #include <concepts>
 
-#undef min
-
 // Euler's number
 template<std::floating_point T>
 constexpr T Napier = T{ 2.71828 };
