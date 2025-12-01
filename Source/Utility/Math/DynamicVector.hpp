@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
-#include <span>
+#include <initializer_list>
+#include "Utility/Assert.hpp"
 
 namespace Simple
 {
@@ -14,14 +15,20 @@ namespace Simple
 
 		constexpr DynamicVector() = default;
 
-		constexpr explicit DynamicVector(std::size_t dimensionCount)
-			: mValues(dimensionCount)
+		[[nodiscard]] static constexpr DynamicVector<T> CreateFromDimensionCount(const std::size_t dimensionCount)
 		{
+			return DynamicVector<T>(dimensionCount);
 		}
 
-		constexpr explicit DynamicVector(std::initializer_list<T> list)
-			: mValues(list)
+		[[nodiscard]] static constexpr DynamicVector<T> CreateFromValues(std::initializer_list<T> list)
 		{
+			return DynamicVector<T>(std::move(list));
+		}
+
+		template<typename... Values> requires (std::same_as<T, Values> && ...)
+		[[nodiscard]] static constexpr DynamicVector<T> CreateFromValues(Values&&... values)
+		{
+			return DynamicVector<T>({ std::forward<Values>(values)... });
 		}
 
 		[[nodiscard]] constexpr T& operator[](std::size_t index)
@@ -57,10 +64,60 @@ namespace Simple
 
 	private:
 
+		constexpr explicit DynamicVector(std::size_t dimensionCount)
+			: mValues(dimensionCount)
+		{
+		}
+
+		constexpr explicit DynamicVector(std::initializer_list<T> list)
+			: mValues(std::move(list))
+		{
+		}
+
+	private:
+
 		std::vector<T> mValues;
 	};
 
 	using DynamicVectorf = DynamicVector<float>;
 	using DynamicVectorui = DynamicVector<unsigned int>;
 	using DynamicVectord = DynamicVector<double>;
+
+	template<typename T>
+	[[nodiscard]] constexpr DynamicVector<T> operator+(const DynamicVector<T>& a, const DynamicVector<T>& b)
+	{
+		const std::size_t dimensionCount = a.GetDimensionCount();
+		ASSERT(dimensionCount == b.GetDimensionCount() && "Dimensions are not the same");
+		DynamicVector<T> result = DynamicVector<T>::CreateFromDimensionCount(dimensionCount);
+		for (std::size_t i = 0; i < dimensionCount; i++)
+		{
+			result[i] = a[i] + b[i];
+		}
+		return result;
+	}
+
+	template<typename T>
+	[[nodiscard]] constexpr DynamicVector<T> operator-(const DynamicVector<T>& a, const DynamicVector<T>& b)
+	{
+		const std::size_t dimensionCount = a.GetDimensionCount();
+		ASSERT(dimensionCount == b.GetDimensionCount() && "Dimensions are not the same");
+		DynamicVector<T> result = DynamicVector<T>::CreateFromDimensionCount(dimensionCount);
+		for (std::size_t i = 0; i < dimensionCount; i++)
+		{
+			result[i] = a[i] - b[i];
+		}
+		return result;
+	}
+
+	template<typename T>
+	[[nodiscard]] constexpr DynamicVector<T> operator-(const DynamicVector<T>& vector)
+	{
+		const std::size_t dimensionCount = vector.GetDimensionCount();
+		DynamicVector<T> result = DynamicVector<T>::CreateFromDimensionCount(dimensionCount);
+		for (std::size_t i = 0; i < dimensionCount; i++)
+		{
+			result[i] = -vector[i];
+		}
+		return result;
+	}
 }

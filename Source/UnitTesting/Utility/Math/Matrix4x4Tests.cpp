@@ -5,7 +5,7 @@
 
 using namespace Simple;
 
-TEST_CASE("Identity Matrix")
+TEST_CASE("Identity Matrix", "[Matrix4x4]")
 {
 	Matrix4x4f matrix = Matrix4x4f::Identity();
 	REQUIRE(matrix(0, 0) == 1.f);
@@ -27,13 +27,13 @@ TEST_CASE("Identity Matrix")
 }
 
 
-TEST_CASE("Matrix default constructor is identity")
+TEST_CASE("Matrix4x4::Default Constructor", "[Matrix4x4]")
 {
 	Matrix4x4f matrix;
 	REQUIRE(matrix == Matrix4x4f::Identity());
 }
 
-TEST_CASE("Matrix4x4 Zero")
+TEST_CASE("Matrix4x4::Zero", "[Matrix4x4]")
 {
 	const Matrix4x4f matrix = Matrix4x4f::Zero();
 	for (unsigned int pos = 0; pos < 16; ++pos)
@@ -42,7 +42,7 @@ TEST_CASE("Matrix4x4 Zero")
 	}
 }
 
-TEST_CASE("Matrix4x4 constructor with values")
+TEST_CASE("Matrix4x4 constructor with values", "[Matrix4x4]")
 {
 	const Matrix4x4f matrix
 	(
@@ -71,7 +71,7 @@ TEST_CASE("Matrix4x4 constructor with values")
 	REQUIRE(matrix[15] == 16.f);
 }
 
-TEST_CASE("Matrix4x4 indexing")
+TEST_CASE("Matrix4x4 indexing", "[Matrix4x4]")
 {
 	const Matrix4x4f matrix
 	(
@@ -118,7 +118,7 @@ TEST_CASE("Matrix4x4 indexing")
 	REQUIRE(matrix(3, 3) == 1.f);
 }
 
-TEST_CASE("Matrix4x4 multiplication")
+TEST_CASE("Matrix4x4 multiplication", "[Matrix4x4]")
 {
 	constexpr Matrix4x4f matrixA
 	(
@@ -160,7 +160,7 @@ TEST_CASE("Matrix4x4 multiplication")
 	REQUIRE(result[15] == 386.f);
 }
 
-TEST_CASE("Matrix4x4 Multiplication with Vector")
+TEST_CASE("Matrix4x4 Multiplication with Vector", "[Matrix4x4]")
 {
 	{
 		// Identity matrix
@@ -186,7 +186,7 @@ TEST_CASE("Matrix4x4 Multiplication with Vector")
 }
 
 
-TEST_CASE("Matrix4x4 Equals")
+TEST_CASE("Matrix4x4 Equals", "[Matrix4x4]")
 {
 	const Matrix4x4f matrixA
 	(
@@ -222,7 +222,7 @@ TEST_CASE("Matrix4x4 Equals")
 	REQUIRE(matrixA != matrixC);
 }
 
-TEST_CASE("Matrix4x4 SetTranslation")
+TEST_CASE("Matrix4x4 SetTranslation", "[Matrix4x4]")
 {
 	Matrix4x4f matrix;
 	const Point3f translation(1.f, 2.f, 3.f);
@@ -233,7 +233,7 @@ TEST_CASE("Matrix4x4 SetTranslation")
 	REQUIRE(matrix[14] == 3.f);
 }
 
-TEST_CASE("Matrix4x4 SetScale")
+TEST_CASE("Matrix4x4 SetScale", "[Matrix4x4]")
 {
 	Matrix4x4f matrix;
 	const Vector3f scale(2.f, 3.f, 4.f);
@@ -244,7 +244,7 @@ TEST_CASE("Matrix4x4 SetScale")
 	REQUIRE(matrix[10] == 4.f);
 }
 
-TEST_CASE("Matrix4x4 GetTranslation")
+TEST_CASE("Matrix4x4 GetTranslation", "[Matrix4x4]")
 {
 	const Matrix4x4f matrix
 	(
@@ -259,7 +259,7 @@ TEST_CASE("Matrix4x4 GetTranslation")
 	REQUIRE(translation == Point3f(7.f, 8.f, 9.f));
 }
 
-TEST_CASE("Matrix4x4 GetScale")
+TEST_CASE("Matrix4x4 GetScale", "[Matrix4x4]")
 {
 	const Matrix4x4f matrix
 	(
@@ -274,7 +274,7 @@ TEST_CASE("Matrix4x4 GetScale")
 	REQUIRE(scale == Vector3f(2.f, 3.f, 4.f));
 }
 
-TEST_CASE("Matrix4x4 Get Scaled Vectors")
+TEST_CASE("Matrix4x4 Get Scaled Vectors", "[Matrix4x4]")
 {
 	const Matrix4x4f matrix
 	(
@@ -314,7 +314,7 @@ TEST_CASE("Matrix4x4 Get Unscaled Vectors")
 	REQUIRE(forward == UnitVector3f(1.f, 0.f, 0.f));
 }
 
-TEST_CASE("Matrix4x4 GetTransposed")
+TEST_CASE("Matrix4x4 GetTransposed", "[Matrix4x4]")
 {
 	const Matrix4x4f matrix
 	(
@@ -345,7 +345,7 @@ TEST_CASE("Matrix4x4 GetTransposed")
 	REQUIRE(matrix[15] == transposedMatrix[15]);
 }
 
-TEST_CASE("Matrix4x4 CreateTranslationMatrix")
+TEST_CASE("Matrix4x4 CreateTranslationMatrix", "[Matrix4x4]")
 {
 	constexpr Point3f translation(3.f, 4.f, 5.f);
 	constexpr Matrix4x4f translationMatrix = Matrix4x4f::CreateTranslationMatrix(translation);
@@ -361,7 +361,7 @@ TEST_CASE("Matrix4x4 CreateTranslationMatrix")
 	REQUIRE(translationMatrix == expectedMatrix);
 }
 
-TEST_CASE("Matrix4x4 CreateScaleMatrix")
+TEST_CASE("Matrix4x4 CreateScaleMatrix", "[Matrix4x4]")
 {
 	constexpr Vector3f scale(2.f, 3.f, 4.f);
 	constexpr Matrix4x4f scaleMatrix = Matrix4x4f::CreateScaleMatrix(scale);
@@ -377,7 +377,7 @@ TEST_CASE("Matrix4x4 CreateScaleMatrix")
 	REQUIRE(scaleMatrix == expectedMatrix);
 }
 
-TEST_CASE("Matrix4x4 CreateRotationMatrix")
+TEST_CASE("Matrix4x4 CreateRotationMatrix", "[Matrix4x4]")
 {
 
 	constexpr RotationMatrix3f rotationMatrix
@@ -402,7 +402,7 @@ TEST_CASE("Matrix4x4 CreateRotationMatrix")
 	REQUIRE(m == expectedMatrix);
 }
 
-TEST_CASE("Matrix4x4 CreateTRSMatrix")
+TEST_CASE("Matrix4x4 CreateTRSMatrix", "[Matrix4x4]")
 {
 	constexpr Point3f translation = Point3f(10, 20, 30);
 	const Matrix4x4f rotationMatrix = Matrix4x4f::CreateRotationAroundZ(Degreesf(45.f));
@@ -424,7 +424,7 @@ TEST_CASE("Matrix4x4 CreateTRSMatrix")
 }
 
 
-TEST_CASE("GetFastInverse")
+TEST_CASE("GetFastInverse", "[Matrix4x4]")
 {
 
 	Matrix4x4f world = CreateMatrixFromXY(UnitVector3f::Forward(), UnitVector3f::Up());
@@ -436,7 +436,7 @@ TEST_CASE("GetFastInverse")
 	REQUIRE(test == Matrix4x4f::Identity());
 }
 
-TEST_CASE("Matrix4x4 rotation axes unchanged")
+TEST_CASE("Matrix4x4 rotation axes unchanged", "[Matrix4x4]")
 {
 	{ // Rotate on X axis
 		Matrix4x4f matrix;

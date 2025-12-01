@@ -1,6 +1,6 @@
 #pragma once
 #include <cassert>
-#include <exception>
+#include "Utility/Assert.hpp"
 
 namespace Simple
 {
@@ -8,10 +8,7 @@ namespace Simple
 	template<typename BoundsChecker, typename T>
 	constexpr void AssertBounds(const T& min, const T& max)
 	{
-		if (!BoundsChecker{}(min, max))
-		{
-			throw std::runtime_error("Bounds assertion failed: Min must be less than or equal to Max.");
-		}
+		ASSERT(BoundsChecker{}(min, max));
 	}
 
 	template<typename T, typename BoundsChecker = std::less_equal<T>>

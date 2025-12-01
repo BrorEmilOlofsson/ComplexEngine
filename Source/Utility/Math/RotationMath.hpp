@@ -91,7 +91,7 @@ namespace Simple
 	template<typename T>
 	[[nodiscard]] constexpr Quaternion<T> ToQuaternion(const RotationMatrix3<T>& m)
 	{
-		T trace = m(0, 0) + m(1, 1) + m(2, 2);
+		const T trace = m(0, 0) + m(1, 1) + m(2, 2);
 		Quaternion<T> q;
 
 		if (trace > 0)

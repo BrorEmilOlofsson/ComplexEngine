@@ -112,15 +112,16 @@ namespace Simple
 		const Point3f rayOrigin = ray.GetOrigin();
 		const Point3f aabbMin = aabb.GetMin();
 		const Point3f aabbMax = aabb.GetMax();
-		const Vector3f invDir = { 1.0f / rayDir.X(), 1.0f / rayDir.Y(), 1.0f / rayDir.Z()};
 
-		float tMin = (aabbMin.x - rayOrigin.x) * invDir.x;
-		float tMax = (aabbMax.x - rayOrigin.x) * invDir.x;
+		const float invX = 1.f / rayDir.X();
+		float tMin = (aabbMin.x - rayOrigin.x) * invX;
+		float tMax = (aabbMax.x - rayOrigin.x) * invX;
 
 		if (tMin > tMax) std::swap(tMin, tMax);
 
-		float tYMin = (aabbMin.y - rayOrigin.y) * invDir.y;
-		float tYMax = (aabbMax.y - rayOrigin.y) * invDir.y;
+		const float invY = 1.f / rayDir.Y();
+		float tYMin = (aabbMin.y - rayOrigin.y) * invY;
+		float tYMax = (aabbMax.y - rayOrigin.y) * invY;
 
 		if (tYMin > tYMax) std::swap(tYMin, tYMax);
 
@@ -129,8 +130,9 @@ namespace Simple
 		if (tYMin > tMin) tMin = tYMin;
 		if (tYMax < tMax) tMax = tYMax;
 
-		float tZMin = (aabbMin.z - rayOrigin.z) * invDir.z;
-		float tZMax = (aabbMax.z - rayOrigin.z) * invDir.z;
+		const float invZ = 1.f / rayDir.Z();
+		float tZMin = (aabbMin.z - rayOrigin.z) * invZ;
+		float tZMax = (aabbMax.z - rayOrigin.z) * invZ;
 
 		if (tZMin > tZMax) std::swap(tZMin, tZMax);
 

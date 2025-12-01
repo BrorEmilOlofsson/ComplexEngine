@@ -4,7 +4,7 @@
 
 using namespace Simple;
 
-TEST_CASE("Vector3 Default Construction", "[vector3]")
+TEST_CASE("Vector3 Default Construction", "[Vector3]")
 {
     const Vector3f vecf;
     REQUIRE(vecf.x == 0.0f);
@@ -20,7 +20,7 @@ TEST_CASE("Vector3 Default Construction", "[vector3]")
     REQUIRE(veci.z == 0);
 }
 
-TEST_CASE("Vector3 Construction", "[vector3]")
+TEST_CASE("Vector3 Construction", "[Vector3]")
 {
     const Vector3f vec1(3.0f, 4.0f, 5.0f);
     REQUIRE(vec1.x == 3.0f);
@@ -36,7 +36,7 @@ TEST_CASE("Vector3 Construction", "[vector3]")
     REQUIRE(vec3.z == 9);
 }
 
-TEST_CASE("Vector3 Constants", "[vector3]")
+TEST_CASE("Vector3 Constants", "[Vector3]")
 {
     const Vector3f zero = Vector3f::Zero();
     const Vector3f one = Vector3f::One();
@@ -44,7 +44,7 @@ TEST_CASE("Vector3 Constants", "[vector3]")
     REQUIRE(one == Vector3f(1.0f, 1.0f, 1.0f));
 }
 
-TEST_CASE("Vector3 Equality Operator", "[vector3]")
+TEST_CASE("Vector3 Equality Operator", "[Vector3]")
 {
     const Vector3i a(1, 2, 3);
     const Vector3i b(1, 2, 3);
@@ -53,7 +53,7 @@ TEST_CASE("Vector3 Equality Operator", "[vector3]")
     REQUIRE(a != c);
 }
 
-TEST_CASE("Vector3 Type Conversion", "[vector3]")
+TEST_CASE("Vector3 Type Conversion", "[Vector3]")
 {
     const Vector3i vecInt(3, 4, 5);
     const Vector3f vecFloat = static_cast<Vector3f>(vecInt);
@@ -66,7 +66,7 @@ TEST_CASE("Vector3 Type Conversion", "[vector3]")
     REQUIRE(vecDouble.z == 5.0);
 }
 
-TEST_CASE("Vector3 addition", "[vector3]")
+TEST_CASE("Vector3 addition", "[Vector3]")
 {
     const Vector3f a(1, 2, 3);
     const Vector3f b(4, 5, 6);
@@ -77,7 +77,7 @@ TEST_CASE("Vector3 addition", "[vector3]")
     REQUIRE(result.z == 9);
 }
 
-TEST_CASE("Vector3 subtraction", "[vector3]")
+TEST_CASE("Vector3 subtraction", "[Vector3]")
 {
     const Vector3f a(11, 2, -13);
     const Vector3f b(4, 5, 6);
@@ -88,7 +88,7 @@ TEST_CASE("Vector3 subtraction", "[vector3]")
     REQUIRE(result.z == -19);
 }
 
-TEST_CASE("Vector3 multiplication", "[vector3]")
+TEST_CASE("Vector3 multiplication", "[Vector3]")
 {
     const Vector3f a(11, 2, -13);
     const Vector3f b(4, 5, 6);
@@ -99,7 +99,7 @@ TEST_CASE("Vector3 multiplication", "[vector3]")
     REQUIRE(result.z == -78);
 }
 
-TEST_CASE("Vector3 division", "[vector3]")
+TEST_CASE("Vector3 division", "[Vector3]")
 {
     const Vector3f a(11, 2, -13);
     const Vector3f b(4, 5, 6);
@@ -110,7 +110,7 @@ TEST_CASE("Vector3 division", "[vector3]")
     REQUIRE(result.z == -13.f / 6.f);
 }
 
-TEST_CASE("Vector3 addition assignment", "[vector3]")
+TEST_CASE("Vector3 addition assignment", "[Vector3]")
 {
     Vector3f a(1, 2, 3);
     const Vector3f b(4, 5, 6);
@@ -120,7 +120,7 @@ TEST_CASE("Vector3 addition assignment", "[vector3]")
     REQUIRE(a.z == 9);
 }
 
-TEST_CASE("Vector3 subtraction assignment", "[vector3]")
+TEST_CASE("Vector3 subtraction assignment", "[Vector3]")
 {
     Vector3f a(11, 2, -13);
     const Vector3f b(4, 5, 6);
@@ -130,7 +130,7 @@ TEST_CASE("Vector3 subtraction assignment", "[vector3]")
     REQUIRE(a.z == -19);
 }
 
-TEST_CASE("Vector3 multiplication assignment", "[vector3]")
+TEST_CASE("Vector3 multiplication assignment", "[Vector3]")
 {
     Vector3f a(11, 2, -13);
     const float scalar = 3.0f;
@@ -140,7 +140,7 @@ TEST_CASE("Vector3 multiplication assignment", "[vector3]")
     REQUIRE(a.z == -39);
 }
 
-TEST_CASE("Vector3 division assignment", "[vector3]")
+TEST_CASE("Vector3 division assignment", "[Vector3]")
 {
     Vector3f a(11, 2, -13);
     const float scalar = 2.0f;
@@ -150,7 +150,7 @@ TEST_CASE("Vector3 division assignment", "[vector3]")
     REQUIRE(a.z == -6.5f);
 }
 
-TEST_CASE("Vector3 negation", "[vector3]")
+TEST_CASE("Vector3 negation", "[Vector3]")
 {
     const Vector3f vec(1.0f, -2.0f, 3.0f);
     const Vector3f negated = -vec;
@@ -159,7 +159,7 @@ TEST_CASE("Vector3 negation", "[vector3]")
     REQUIRE(negated.z == -3.0f);
 }
 
-TEST_CASE("Vector3 scalar multiplication", "[vector3]")
+TEST_CASE("Vector3 scalar multiplication", "[Vector3]")
 {
     const Vector3f vec(2.0f, -3.0f, 4.0f);
     const float scalar = 3.0f;
@@ -169,7 +169,7 @@ TEST_CASE("Vector3 scalar multiplication", "[vector3]")
     REQUIRE(result.z == 12.0f);
 }
 
-TEST_CASE("Vector3 scalar division", "[vector3]")
+TEST_CASE("Vector3 scalar division", "[Vector3]")
 {
     const Vector3f vec(6.0f, -9.0f, 12.0f);
     const float scalar = 3.0f;

@@ -3,9 +3,27 @@
 #include "Utility/Math/Vector3.hpp"
 #include "Utility/Math/UnitVector3.hpp"
 #include "Utility/Math/VectorMath.hpp"
+#include "Utility/Assert.hpp"
+#include <array>
+#include <limits>
 
 namespace Simple
 {
+
+	template<typename T>
+	[[nodiscard]] constexpr T GetDeterminant(const Matrix3x3<T>& m) noexcept
+	{
+		return m(0, 0) * (m(1, 1) * m(2, 2) - m(1, 2) * m(2, 1)) -
+			m(0, 1) * (m(1, 0) * m(2, 2) - m(1, 2) * m(2, 0)) +
+			m(0, 2) * (m(1, 0) * m(2, 1) - m(1, 1) * m(2, 0));
+	}
+
+	template<typename T>
+	[[nodiscard]] constexpr bool IsPure(const Matrix3x3<T>& m) noexcept
+	{
+		const T det = GetDeterminant(m);
+		return Abs(det - static_cast<T>(1)) < std::numeric_limits<T>::epsilon();
+	}
 
 	template<typename T>
 	class RotationMatrix3 final
@@ -17,10 +35,19 @@ namespace Simple
 
 		[[nodiscard]] constexpr const T& operator()(const unsigned int row, const unsigned int column) const;
 
-		[[nodiscard]] constexpr UnitVector3<T> GetRight() const;
-		[[nodiscard]] constexpr UnitVector3<T> GetUp() const;
-		[[nodiscard]] constexpr UnitVector3<T> GetForward() const;
-		[[nodiscard]] constexpr T GetDeterminant() const noexcept;
+		[[nodiscard]] constexpr const UnitVector3<T>& GetRight() const noexcept;
+		[[nodiscard]] constexpr const UnitVector3<T>& GetUp() const noexcept;
+		[[nodiscard]] constexpr const UnitVector3<T>& GetForward() const noexcept;
+
+		[[nodiscard]] constexpr Matrix3x3<T> ToMatrix() const noexcept
+		{
+			return Matrix3x3<T>
+				({
+					mRight.X(), mRight.Y(), mRight.Z(),
+					mUp.X(),    mUp.Y(),    mUp.Z(),
+					mForward.X(), mForward.Y(), mForward.Z()
+				});
+		}
 
 		[[nodiscard]] static constexpr RotationMatrix3<T> Identity() noexcept;
 		[[nodiscard]] static constexpr RotationMatrix3<T> FromAxes(const UnitVector3<T>& right, const UnitVector3<T>& up, const UnitVector3<T>& forward);
@@ -28,81 +55,74 @@ namespace Simple
 
 		[[nodiscard]] friend constexpr bool operator==(const RotationMatrix3<T>& a, const RotationMatrix3<T>& b) noexcept
 		{
-			return a.mMatrix == b.mMatrix;
+			return a.mRight == b.mRight && a.mUp == b.mUp && a.mForward == b.mForward;
 		}
 
 	private:
 
-		[[nodiscard]] constexpr bool IsPure() const noexcept;
+		constexpr RotationMatrix3(const UnitVector3<T>& right, const UnitVector3<T>& up, const UnitVector3<T>& forward) noexcept
+			: mRight(right)
+			, mUp(up)
+			, mForward(forward)
+		{
+		}
 
 	private:
 
-		Matrix3x3<T> mMatrix;
+		UnitVector3<T> mRight = UnitVector3<T>::Right();
+		UnitVector3<T> mUp = UnitVector3<T>::Up();
+		UnitVector3<T> mForward = UnitVector3<T>::Forward();
 	};
+
 
 	using RotationMatrix3f = RotationMatrix3<float>;
 	using RotationMatrix3d = RotationMatrix3<double>;
 
 	template<typename T>
 	constexpr RotationMatrix3<T>::RotationMatrix3(const std::array<T, 9>& values)
-		: mMatrix(values)
+		: mRight(values[0], values[1], values[2])
+		, mUp(values[3], values[4], values[5])
+		, mForward(values[6], values[7], values[8])
 	{
-		if (!IsPure())
-		{
-			throw std::invalid_argument("The provided matrix is not a pure rotation matrix.");
-		}
+		ASSERT(IsPure(ToMatrix()) && "The provided matrix is not a pure rotation matrix.");
 	}
 
 	template<typename T>
 	constexpr const T& RotationMatrix3<T>::operator()(const unsigned int row, const unsigned int column) const
 	{
-		return mMatrix(row, column);
+		static_assert(sizeof(RotationMatrix3<T>) == sizeof(T) * 3 * 3);
+		const unsigned int index = row * 3 + column;
+		return reinterpret_cast<const T*>(this)[index];
 	}
 
 	template<typename T>
-	constexpr UnitVector3<T> RotationMatrix3<T>::GetRight() const
+	constexpr const UnitVector3<T>& RotationMatrix3<T>::GetRight() const noexcept
 	{
-		return UnitVector3<T>(mMatrix(0, 0), mMatrix(0, 1), mMatrix(0, 2));
+		return mRight;
 	}
 
 	template<typename T>
-	constexpr UnitVector3<T> RotationMatrix3<T>::GetUp() const
+	constexpr const UnitVector3<T>& RotationMatrix3<T>::GetUp() const noexcept
 	{
-		return UnitVector3<T>(mMatrix(1, 0), mMatrix(1, 1), mMatrix(1, 2));
+		return mUp;
 	}
 
 	template<typename T>
-	constexpr UnitVector3<T> RotationMatrix3<T>::GetForward() const
+	constexpr const UnitVector3<T>& RotationMatrix3<T>::GetForward() const noexcept
 	{
-		return UnitVector3<T>(mMatrix(2, 0), mMatrix(2, 1), mMatrix(2, 2));
-	}
-
-	template<typename T>
-	constexpr T RotationMatrix3<T>::GetDeterminant() const noexcept
-	{
-		return mMatrix(0, 0) * (mMatrix(1, 1) * mMatrix(2, 2) - mMatrix(1, 2) * mMatrix(2, 1)) -
-			mMatrix(0, 1) * (mMatrix(1, 0) * mMatrix(2, 2) - mMatrix(1, 2) * mMatrix(2, 0)) +
-			mMatrix(0, 2) * (mMatrix(1, 0) * mMatrix(2, 1) - mMatrix(1, 1) * mMatrix(2, 0));
-	}
-
-	template<typename T>
-	constexpr bool RotationMatrix3<T>::IsPure() const noexcept
-	{
-		const T det = GetDeterminant();
-		const T epsilon = static_cast<T>(1e-6);
-		return Abs(det - static_cast<T>(1)) < epsilon;
+		return mForward;
 	}
 
 	template<typename T>
 	constexpr RotationMatrix3<T> RotationMatrix3<T>::Identity() noexcept
 	{
-		return RotationMatrix3({ 1, 0, 0, 0, 1, 0, 0, 0, 1 });
+		return RotationMatrix3(UnitVector3<T>::Right(), UnitVector3<T>::Up(), UnitVector3<T>::Forward());
 	}
 
 	template<typename T>
 	constexpr RotationMatrix3<T> RotationMatrix3<T>::FromAxes(const UnitVector3<T>& right, const UnitVector3<T>& up, const UnitVector3<T>& forward)
 	{
-		return RotationMatrix3<T>({ right.X(), right.Y(), right.Z(), up.X(), up.Y(), up.Z(), forward.X(), forward.Y(), forward.Z() });
+		return RotationMatrix3<T>(right, up, forward);
 	}
 
 	template<typename T>
@@ -116,22 +136,28 @@ namespace Simple
 	template<typename T>
 	[[nodiscard]] constexpr Vector3<T> operator*(const Vector3<T>& vector, const RotationMatrix3<T>& matrix) noexcept
 	{
+		const UnitVector3<T> right = matrix.GetRight();
+		const UnitVector3<T> up = matrix.GetUp();
+		const UnitVector3<T> forward = matrix.GetForward();
 		return Vector3<T>
 			(
-				vector.x * matrix(0, 0) + vector.y * matrix(1, 0) + vector.z * matrix(2, 0),
-				vector.x * matrix(0, 1) + vector.y * matrix(1, 1) + vector.z * matrix(2, 1),
-				vector.x * matrix(0, 2) + vector.y * matrix(1, 2) + vector.z * matrix(2, 2)
+				vector.x * right.X() + vector.y * up.X() + vector.z * forward.X(),
+				vector.x * right.Y() + vector.y * up.Y() + vector.z * forward.Y(),
+				vector.x * right.Z() + vector.y * up.Z() + vector.z * forward.Z()
 			);
 	}
 
 	template<typename T>
 	[[nodiscard]] constexpr UnitVector3<T> operator*(const UnitVector3<T>& vector, const RotationMatrix3<T>& matrix)
 	{
+		const UnitVector3<T> right = matrix.GetRight();
+		const UnitVector3<T> up = matrix.GetUp();
+		const UnitVector3<T> forward = matrix.GetForward();
 		return UnitVector3<T>
 			(
-				vector.X() * matrix(0, 0) + vector.Y() * matrix(1, 0) + vector.Z() * matrix(2, 0),
-				vector.X() * matrix(0, 1) + vector.Y() * matrix(1, 1) + vector.Z() * matrix(2, 1),
-				vector.X() * matrix(0, 2) + vector.Y() * matrix(1, 2) + vector.Z() * matrix(2, 2)
+				vector.X() * right.X() + vector.Y() * up.X() + vector.Z() * forward.X(),
+				vector.X() * right.Y() + vector.Y() * up.Y() + vector.Z() * forward.Y(),
+				vector.X() * right.Z() + vector.Y() * up.Z() + vector.Z() * forward.Z()
 			);
 	}
 

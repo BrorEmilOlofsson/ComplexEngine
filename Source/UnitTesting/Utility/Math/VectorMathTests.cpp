@@ -4,7 +4,7 @@
 
 using namespace Simple;
 
-TEST_CASE("VectorMath::Vector3 Dot Product", "[vectormath]")
+TEST_CASE("VectorMath::Vector3 Dot Product", "[VectorMath]")
 {
 	const Vector3f a(1.0f, 2.0f, 3.0f);
 	const Vector3f b(4.0f, -5.0f, 6.0f);
@@ -12,7 +12,7 @@ TEST_CASE("VectorMath::Vector3 Dot Product", "[vectormath]")
 	REQUIRE(result == (1.0f * 4.0f + 2.0f * -5.0f + 3.0f * 6.0f));
 }
 
-TEST_CASE("VectorMath::Vector3 Cross", "[vectormath]")
+TEST_CASE("VectorMath::Vector3 Cross", "[VectorMath]")
 {
     constexpr UnitVector3f right = UnitVector3f::Right();
     constexpr UnitVector3f up = UnitVector3f::Up();

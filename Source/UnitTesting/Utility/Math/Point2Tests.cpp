@@ -4,14 +4,14 @@
 
 using namespace Simple;
 
-TEST_CASE("Point2 constructor and accessors", "[point2]")
+TEST_CASE("Point2 constructor and accessors", "[Point2]")
 {
 	const Point2f p(3.5f, -2.0f);
 	REQUIRE(p.x == 3.5f);
 	REQUIRE(p.y == -2.0f);
 }
 
-TEST_CASE("Point2 static constants", "[point2]")
+TEST_CASE("Point2 static constants", "[Point2]")
 {
 	constexpr Point2f zero = Point2f::Zero();
 	constexpr Point2f one = Point2f::One();
@@ -21,7 +21,7 @@ TEST_CASE("Point2 static constants", "[point2]")
 	REQUIRE(one.y == 1.0f);
 }
 
-TEST_CASE("Point2 template conversion", "[point2]")
+TEST_CASE("Point2 template conversion", "[Point2]")
 {
 	const Point2i intPoint(4, 5);
 	const Point2f floatPoint = Point2f(intPoint);
@@ -29,14 +29,14 @@ TEST_CASE("Point2 template conversion", "[point2]")
 	REQUIRE(floatPoint.y == 5.0f);
 }
 
-TEST_CASE("Point2 default constructor", "[point2]")
+TEST_CASE("Point2 default constructor", "[Point2]")
 {
 	const Point2f defaultPoint;
 	REQUIRE(defaultPoint.x == 0.0f);
 	REQUIRE(defaultPoint.y == 0.0f);
 }
 
-TEST_CASE("Point2 subtraction", "[point2]")
+TEST_CASE("Point2 subtraction", "[Point2]")
 {
 	const Point2f a(5.0f, 7.0f);
 	const Point2f b(2.0f, 3.0f);
@@ -45,7 +45,7 @@ TEST_CASE("Point2 subtraction", "[point2]")
 	REQUIRE(result.y == 4.0f);
 }
 
-TEST_CASE("Point2 equality", "[point2]")
+TEST_CASE("Point2 equality", "[Point2]")
 {
 	const Point2f a(1.0f, 2.0f);
 	const Point2f b(1.0f, 2.0f);
@@ -54,7 +54,7 @@ TEST_CASE("Point2 equality", "[point2]")
 	REQUIRE(a != c);
 }
 
-TEST_CASE("Point2 addition with Vector2", "[point2]")
+TEST_CASE("Point2 addition with Vector2", "[Point2]")
 {
 	const Point2f point(1.0f, 2.0f);
 	const Vector2f vector(3.0f, 4.0f);
@@ -63,7 +63,7 @@ TEST_CASE("Point2 addition with Vector2", "[point2]")
 	REQUIRE(result.y == 6.0f);
 }
 
-TEST_CASE("Point2 addition with UnitVector2", "[point2]")
+TEST_CASE("Point2 addition with UnitVector2", "[Point2]")
 {
 	const Point2f point(1.0f, 2.0f);
 	const UnitVector2f unitVector = UnitVector2f::Right();
@@ -72,7 +72,7 @@ TEST_CASE("Point2 addition with UnitVector2", "[point2]")
 	REQUIRE(result.y == 2.0f);
 }
 
-TEST_CASE("Point2 subtraction with Vector2", "[point2]")
+TEST_CASE("Point2 subtraction with Vector2", "[Point2]")
 {
 	const Point2f point(5.0f, 7.0f);
 	const Vector2f vector(2.0f, 3.0f);
@@ -81,7 +81,7 @@ TEST_CASE("Point2 subtraction with Vector2", "[point2]")
 	REQUIRE(result.y == 4.0f);
 }
 
-TEST_CASE("Point2 subtraction with UnitVector2", "[point2]")
+TEST_CASE("Point2 subtraction with UnitVector2", "[Point2]")
 {
 	const Point2f point(5.0f, 7.0f);
 	const UnitVector2f unitVector = UnitVector2f::Up();
@@ -90,7 +90,7 @@ TEST_CASE("Point2 subtraction with UnitVector2", "[point2]")
 	REQUIRE(result.y == 6.0f);
 }
 
-TEST_CASE("Point2 negation", "[point2]")
+TEST_CASE("Point2 negation", "[Point2]")
 {
 	const Point2f point(3.0f, -4.0f);
 	const Point2f result = -point;
@@ -98,7 +98,7 @@ TEST_CASE("Point2 negation", "[point2]")
 	REQUIRE(result.y == 4.0f);
 }
 
-TEST_CASE("Point2 addition assignment with Vector2", "[point2]")
+TEST_CASE("Point2 addition assignment with Vector2", "[Point2]")
 {
 	Point2f point(1.0f, 2.0f);
 	const Vector2f vector(3.0f, 4.0f);
@@ -107,7 +107,7 @@ TEST_CASE("Point2 addition assignment with Vector2", "[point2]")
 	REQUIRE(point.y == 6.0f);
 }
 
-TEST_CASE("Point2 addition assignment with UnitVector2", "[point2]")
+TEST_CASE("Point2 addition assignment with UnitVector2", "[Point2]")
 {
 	Point2f point(1.0f, 2.0f);
 	const UnitVector2f unitVector = UnitVector2f::Right();
@@ -116,7 +116,7 @@ TEST_CASE("Point2 addition assignment with UnitVector2", "[point2]")
 	REQUIRE(point.y == 2.0f);
 }
 
-TEST_CASE("Point2 subtraction assignment with Vector2", "[point2]")
+TEST_CASE("Point2 subtraction assignment with Vector2", "[Point2]")
 {
 	Point2f point(5.0f, 7.0f);
 	const Vector2f vector(2.0f, 3.0f);
@@ -125,7 +125,7 @@ TEST_CASE("Point2 subtraction assignment with Vector2", "[point2]")
 	REQUIRE(point.y == 4.0f);
 }
 
-TEST_CASE("Point2 subtraction assignment with UnitVector2", "[point2]")
+TEST_CASE("Point2 subtraction assignment with UnitVector2", "[Point2]")
 {
 	Point2f point(5.0f, 7.0f);
 	const UnitVector2f unitVector = UnitVector2f::Up();

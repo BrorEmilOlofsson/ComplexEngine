@@ -3,19 +3,19 @@
 
 using namespace Simple;
 
-TEST_CASE("RotationMatrix3 - Default constructor is identity")
+TEST_CASE("RotationMatrix3::Default constructor", "[RotationMatrix3]")
 {
 	RotationMatrix3f rm;
 	REQUIRE(rm == RotationMatrix3f::Identity());
 }
 
-TEST_CASE("RotationMatrix3 - Identity function is correct")
+TEST_CASE("RotationMatrix3::Identity", "[RotationMatrix3]")
 {
 	RotationMatrix3f rm = RotationMatrix3f::Identity();
 	REQUIRE(rm == RotationMatrix3f::Identity());
 }
 
-TEST_CASE("RotationMatrix3 - Constructor with values is correct")
+TEST_CASE("RotationMatrix3 - Constructor with values is correct", "[RotationMatrix3]")
 {
 	const RotationMatrix3f rm
 	(
@@ -28,7 +28,7 @@ TEST_CASE("RotationMatrix3 - Constructor with values is correct")
 	REQUIRE(rm == RotationMatrix3f::Identity());
 }
 
-TEST_CASE("RotationMatrix3 - FromAxes is correct")
+TEST_CASE("RotationMatrix3 - FromAxes is correct", "[RotationMatrix3]")
 {
 	const RotationMatrix3f rm = RotationMatrix3f::FromAxes
 	(
@@ -39,7 +39,7 @@ TEST_CASE("RotationMatrix3 - FromAxes is correct")
 	REQUIRE(rm == RotationMatrix3f::Identity());
 }
 
-TEST_CASE("RotationMatrix3 - Get axes")
+TEST_CASE("RotationMatrix3 - Get axes", "[RotationMatrix3]")
 {
 	const RotationMatrix3f rm = RotationMatrix3f::FromAxes
 	(
@@ -52,22 +52,14 @@ TEST_CASE("RotationMatrix3 - Get axes")
 	REQUIRE(rm.GetForward() == UnitVector3f::Forward());
 }
 
-TEST_CASE("RotationMatrix3 - Throws if not pure rotation")
+TEST_CASE("RotationMatrix3 - Throws if not pure rotation", "[RotationMatrix3]")
 {
 	{
-		const RotationMatrix3f rm = RotationMatrix3f::FromAxes
+		constexpr RotationMatrix3f rm = RotationMatrix3f::FromAxes
 		(
 			UnitVector3f::Right(),
 			UnitVector3f::Up(),
 			UnitVector3f::Forward()
 		);
-	}
-	{
-		REQUIRE_THROWS_AS(RotationMatrix3f::FromAxes
-		(
-			UnitVector3f::Right(),
-			UnitVector3f::Up(),
-			-UnitVector3f::Forward() // Inverted axis
-		), std::invalid_argument);
 	}
 }

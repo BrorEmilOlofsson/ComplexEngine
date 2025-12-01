@@ -1,7 +1,10 @@
 #pragma once
 #include <vector>
+#include <concepts>
 #include <stdexcept>
+#include "Utility/Assert.hpp"
 #include "Utility/Math/DynamicVector.hpp"
+#include "Utility/Math/DynamicUnitVector.hpp"
 
 namespace Simple
 {
@@ -15,16 +18,22 @@ namespace Simple
 
 		constexpr DynamicPoint() = default;
 
-		constexpr explicit DynamicPoint(const std::size_t dimensionCount)
-			: mValues(dimensionCount)
+		[[nodiscard]] static constexpr DynamicPoint<T> CreateFromDimensionCount(const std::size_t dimensionCount)
 		{
+			return DynamicPoint<T>(dimensionCount);
 		}
 
-		constexpr explicit DynamicPoint(std::initializer_list<T> list)
-			: mValues(list)
+		[[nodiscard]] static constexpr DynamicPoint<T> CreateFromValues(std::initializer_list<T> list)
 		{
+			return DynamicPoint<T>(std::move(list));
 		}
-		
+
+		template<typename... Values> requires (std::same_as<T, Values> && ...)
+		[[nodiscard]] static constexpr DynamicPoint<T> CreateFromValues(Values&&... values)
+		{
+			return DynamicPoint<T>({ std::forward<Values>(values)... });
+		}
+
 		[[nodiscard]] constexpr T& operator[](const std::size_t index)
 		{
 			return mValues[index];
@@ -55,7 +64,17 @@ namespace Simple
 			mValues.push_back(std::move(value));
 		}
 
-		friend constexpr bool operator==(const DynamicPoint& a, const DynamicPoint& b) noexcept;
+	private:
+
+		constexpr explicit DynamicPoint(const std::size_t dimensionCount)
+			: mValues(dimensionCount)
+		{
+		}
+
+		constexpr explicit DynamicPoint(std::initializer_list<T> list)
+			: mValues(std::move(list))
+		{
+		}
 
 	private:
 
@@ -72,20 +91,24 @@ namespace Simple
 		{
 			return false;
 		}
-		return a.mValues == b.mValues;
+		for (std::size_t i = 0; i < a.GetDimensionCount(); i++)
+		{
+			if (a[i] != b[i])
+			{
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	template<typename T, typename Operation>
-	[[nodiscard]] constexpr DynamicPoint<T> PerformOperation(const DynamicPoint<T>& point, const DynamicVector<T>& vector, Operation&& operation)
+	[[nodiscard]] constexpr DynamicPoint<T> PerformOperation(const DynamicPoint<T>& point, const auto& vector, Operation&& operation)
 	{
 		const std::size_t dimensionCount = point.GetDimensionCount();
-		if (dimensionCount != vector.GetDimensionCount())
-		{
-			throw std::invalid_argument("Dimensions are not the same");
-		}
+		ASSERT(dimensionCount == vector.GetDimensionCount() && "Dimensions are not the same");
 
-		DynamicPoint<T> result;
-		result.SetDimensionCount(dimensionCount);
+		DynamicPoint<T> result = DynamicPoint<T>::CreateFromDimensionCount(dimensionCount);
 
 		for (std::size_t i = 0; i < dimensionCount; i++)
 		{
@@ -102,33 +125,84 @@ namespace Simple
 	}
 
 	template<typename T>
+	[[nodiscard]] constexpr DynamicPoint<T> operator+(const DynamicPoint<T>& point, const DynamicUnitVector<T>& vector)
+	{
+		return PerformOperation(point, vector, std::plus{});
+	}
+
+	template<typename T>
 	[[nodiscard]] constexpr DynamicPoint<T> operator-(const DynamicPoint<T>& point, const DynamicVector<T>& vector)
 	{
 		return PerformOperation(point, vector, std::minus{});
 	}
 
 	template<typename T>
-	[[nodiscard]] constexpr DynamicPoint<T>& operator+=(DynamicPoint<T>& point, const DynamicVector<T>& vector)
+	[[nodiscard]] constexpr DynamicPoint<T> operator-(const DynamicPoint<T>& point, const DynamicUnitVector<T>& vector)
 	{
-		point = point + vector;
+		return PerformOperation(point, vector, std::minus{});
+	}
+
+	template<typename T>
+	constexpr DynamicPoint<T>& operator+=(DynamicPoint<T>& point, const DynamicVector<T>& vector)
+	{
+		const std::size_t dimensionCount = point.GetDimensionCount();
+		ASSERT(dimensionCount == vector.GetDimensionCount() && "Dimensions are not the same");
+
+		for (std::size_t i = 0; i < dimensionCount; i++)
+		{
+			point[i] += vector[i];
+		}
+
 		return point;
 	}
 
 	template<typename T>
-	[[nodiscard]] constexpr DynamicPoint<T>& operator-=(DynamicPoint<T>& point, const DynamicVector<T>& vector)
+	constexpr DynamicPoint<T>& operator+=(DynamicPoint<T>& point, const DynamicUnitVector<T>& vector)
 	{
-		point = point - vector;
+		const std::size_t dimensionCount = point.GetDimensionCount();
+		ASSERT(dimensionCount == vector.GetDimensionCount() && "Dimensions are not the same");
+
+		for (std::size_t i = 0; i < dimensionCount; i++)
+		{
+			point[i] += vector[i];
+		}
+
 		return point;
 	}
 
-	template<typename T> 
+	template<typename T>
+	constexpr DynamicPoint<T>& operator-=(DynamicPoint<T>& point, const DynamicVector<T>& vector)
+	{
+		const std::size_t dimensionCount = point.GetDimensionCount();
+		ASSERT(dimensionCount == vector.GetDimensionCount() && "Dimensions are not the same");
+
+		for (std::size_t i = 0; i < dimensionCount; i++)
+		{
+			point[i] -= vector[i];
+		}
+
+		return point;
+	}
+
+	template<typename T>
+	constexpr DynamicPoint<T>& operator-=(DynamicPoint<T>& point, const DynamicUnitVector<T>& vector)
+	{
+		const std::size_t dimensionCount = point.GetDimensionCount();
+		ASSERT(dimensionCount == vector.GetDimensionCount() && "Dimensions are not the same");
+
+		for (std::size_t i = 0; i < dimensionCount; i++)
+		{
+			point[i] -= vector[i];
+		}
+
+		return point;
+	}
+
+	template<typename T>
 	[[nodiscard]] constexpr DynamicVector<T> operator-(const DynamicPoint<T>& a, const DynamicPoint<T>& b)
 	{
 		const std::size_t dimensionCount = a.GetDimensionCount();
-		if (dimensionCount != b.GetDimensionCount())
-		{
-			throw std::invalid_argument("Dimensions are not the same");
-		}
+		ASSERT(dimensionCount == b.GetDimensionCount() && "Dimensions are not the same");
 
 		DynamicVector<T> result;
 		result.SetDimensionCount(dimensionCount);

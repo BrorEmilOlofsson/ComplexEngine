@@ -46,17 +46,13 @@ namespace Simple
 	template<typename T>
 	[[nodiscard]] constexpr T DistanceSquared(const DynamicPoint<T>& point1, const DynamicPoint<std::optional<T>>& point2)
 	{
-		if (point1.GetDimensionCount() != point2.GetDimensionCount())
-		{
-			assert(false);
-			return std::numeric_limits<T>::max();
-		}
+		ASSERT(point1.GetDimensionCount() == point2.GetDimensionCount() && "The input values are not the same dimension");
 
 		T result{};
 		const std::size_t dimensionCount = point1.GetDimensionCount();
 		for (std::size_t i = 0; i < dimensionCount; i++)
 		{
-			result += Square(point1[i] - (point2[i] ? point2[i].value() : 0));
+			result += Square(point1[i] - (point2[i].value_or(0)));
 		}
 		return result;
 	}
@@ -77,10 +73,7 @@ namespace Simple
 	{
 		using ReturnType = decltype(transformation1(point1[0]));
 		const std::size_t dimensionCount = size(point1);
-		if (dimensionCount != size(point2))
-		{
-			throw std::invalid_argument("The input values are not the same dimension");
-		}
+		ASSERT(dimensionCount == size(point2) && "The input values are not the same dimension");
 
 		ReturnType result{};
 		for (size_t i = 0; i < dimensionCount; i++)

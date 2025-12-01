@@ -4,7 +4,7 @@
 
 using namespace Simple;
 
-TEST_CASE("Vector2 Default Construction", "[vector2]")
+TEST_CASE("Vector2 Default Construction", "[Vector2]")
 {
 	constexpr Vector2f vecf;
 	REQUIRE(vecf.x == 0.0f);
@@ -17,7 +17,7 @@ TEST_CASE("Vector2 Default Construction", "[vector2]")
 	REQUIRE(veci.y == 0);
 }
 
-TEST_CASE("Vector2 Construction", "[vector2]")
+TEST_CASE("Vector2 Construction", "[Vector2]")
 {
 	constexpr Vector2f vec1(3.0f, 4.0f);
 	REQUIRE(vec1.x == 3.0f);
@@ -30,7 +30,7 @@ TEST_CASE("Vector2 Construction", "[vector2]")
 	REQUIRE(vec3.y == 8);
 }
 
-TEST_CASE("Vector2 Constants", "[vector2]")
+TEST_CASE("Vector2 Constants", "[Vector2]")
 {
 	constexpr Vector2f zero = Vector2f::Zero();
 	constexpr Vector2f one = Vector2f::One();
@@ -38,7 +38,7 @@ TEST_CASE("Vector2 Constants", "[vector2]")
 	REQUIRE(one == Vector2f(1.0f, 1.0f));
 }
 
-TEST_CASE("Vector2 Equality Operator", "[vector2]")
+TEST_CASE("Vector2 Equality Operator", "[Vector2]")
 {
 	constexpr Vector2i vecA(1, 2);
 	constexpr Vector2i vecB(1, 2);
@@ -47,7 +47,7 @@ TEST_CASE("Vector2 Equality Operator", "[vector2]")
 	REQUIRE(vecA != vecC);
 }
 
-TEST_CASE("Vector2 Type Conversion", "[vector2]")
+TEST_CASE("Vector2 Type Conversion", "[Vector2]")
 {
 	constexpr Vector2i vecInt(3, 4);
 	constexpr Vector2f vecFloat = static_cast<Vector2f>(vecInt);
@@ -58,7 +58,7 @@ TEST_CASE("Vector2 Type Conversion", "[vector2]")
 	REQUIRE(vecDouble.y == 4.0);
 }
 
-TEST_CASE("Vector2 addition", "[vector2]")
+TEST_CASE("Vector2 addition", "[Vector2]")
 {
 	constexpr Vector2i vecA(1, 2);
 	constexpr Vector2i vecB(3, 4);
@@ -66,7 +66,7 @@ TEST_CASE("Vector2 addition", "[vector2]")
 	REQUIRE(result == Vector2i(4, 6));
 }
 
-TEST_CASE("Vector2 subtraction", "[vector2]")
+TEST_CASE("Vector2 subtraction", "[Vector2]")
 {
 	constexpr Vector2i vecA(5, 7);
 	constexpr Vector2i vecB(2, 3);
@@ -74,7 +74,7 @@ TEST_CASE("Vector2 subtraction", "[vector2]")
 	REQUIRE(result == Vector2i(3, 4));
 }
 
-TEST_CASE("Vector2 addition assignment", "[vector2]")
+TEST_CASE("Vector2 addition assignment", "[Vector2]")
 {
 	Vector2i vecA(1, 2);
 	const Vector2i vecB(3, 4);
@@ -82,7 +82,7 @@ TEST_CASE("Vector2 addition assignment", "[vector2]")
 	REQUIRE(vecA == Vector2i(4, 6));
 }
 
-TEST_CASE("Vector2 subtraction assignment", "[vector2]")
+TEST_CASE("Vector2 subtraction assignment", "[Vector2]")
 {
 	Vector2i vecA(5, 7);
 	const Vector2i vecB(2, 3);
@@ -90,7 +90,7 @@ TEST_CASE("Vector2 subtraction assignment", "[vector2]")
 	REQUIRE(vecA == Vector2i(3, 4));
 }
 
-TEST_CASE("Vector2 component-wise multiplication", "[vector2]")
+TEST_CASE("Vector2 component-wise multiplication", "[Vector2]")
 {
 	constexpr Vector2i vecA(2, 3);
 	constexpr Vector2i vecB(4, 5);
@@ -98,7 +98,7 @@ TEST_CASE("Vector2 component-wise multiplication", "[vector2]")
 	REQUIRE(result == Vector2i(8, 15));
 }
 
-TEST_CASE("Vector2 component-wise division", "[vector2]")
+TEST_CASE("Vector2 component-wise division", "[Vector2]")
 {
 	constexpr Vector2i vecA(8, 15);
 	constexpr Vector2i vecB(2, 3);
@@ -106,7 +106,7 @@ TEST_CASE("Vector2 component-wise division", "[vector2]")
 	REQUIRE(result == Vector2i(4, 5));
 }
 
-TEST_CASE("Vector2 scalar multiplication", "[vector2]")
+TEST_CASE("Vector2 scalar multiplication", "[Vector2]")
 {
 	constexpr Vector2f vec(2, 3);
 	constexpr float scalar = 4;
@@ -116,7 +116,7 @@ TEST_CASE("Vector2 scalar multiplication", "[vector2]")
 	REQUIRE(result2 == Vector2f(8, 12));
 }
 
-TEST_CASE("Vector2 scalar division", "[vector2]")
+TEST_CASE("Vector2 scalar division", "[Vector2]")
 {
 	constexpr Vector2f vec(8, 12);
 	constexpr float scalar = 4;
@@ -124,7 +124,7 @@ TEST_CASE("Vector2 scalar division", "[vector2]")
 	REQUIRE(result == Vector2f(2, 3));
 }
 
-TEST_CASE("Vector2 scalar multiplication assignment", "[vector2]")
+TEST_CASE("Vector2 scalar multiplication assignment", "[Vector2]")
 {
 	Vector2f vec(2, 3);
 	const float scalar = 4;
@@ -132,7 +132,7 @@ TEST_CASE("Vector2 scalar multiplication assignment", "[vector2]")
 	REQUIRE(vec == Vector2f(8, 12));
 }
 
-TEST_CASE("Vector2 scalar division assignment", "[vector2]")
+TEST_CASE("Vector2 scalar division assignment", "[Vector2]")
 {
 	Vector2f vec(8, 12);
 	const float scalar = 4;
@@ -140,7 +140,7 @@ TEST_CASE("Vector2 scalar division assignment", "[vector2]")
 	REQUIRE(vec == Vector2f(2, 3));
 }
 
-TEST_CASE("Vector2 negation", "[vector2]")
+TEST_CASE("Vector2 negation", "[Vector2]")
 {
 	constexpr Vector2i vec(3, -4);
 	constexpr Vector2i result = -vec;

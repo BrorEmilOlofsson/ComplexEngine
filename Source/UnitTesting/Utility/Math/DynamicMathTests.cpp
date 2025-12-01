@@ -2,11 +2,34 @@
 #include "Utility/Math/DynamicPoint.hpp"
 #include "Utility/Math/DynamicVector.hpp"
 #include "Utility/Math/DynamicMath.hpp"
-#include "Utility/Math/RotationMath.hpp"
+#include "Utility/Math/DynamicUnitVector.hpp"
+#include "Utility/Math/Math.hpp"
 
 using namespace Simple;
 
-TEST_CASE("Dynamic Point")
+TEST_CASE("DynamicMath::GetUnitVector", "[DynamicMath]")
 {
+	const DynamicPointf pointA = DynamicPointf::CreateFromValues({ 1.0f, 2.0f, 3.0f });
+	const DynamicPointf pointB = DynamicPointf::CreateFromValues({ 4.0f, 6.0f, 8.0f });
+	const DynamicUnitVectorf unitVector = GetUnitVector(pointA, pointB);
+	REQUIRE(NearlyEqual(unitVector[0], 0.42426407f));
+	REQUIRE(NearlyEqual(unitVector[1], 0.56568542f));
+	REQUIRE(NearlyEqual(unitVector[2], 0.70710678f));
+}
 
+TEST_CASE("DynamicMath::DistanceSquared", "[DynamicMath]")
+{
+	const DynamicPointf pointA = DynamicPointf::CreateFromValues({ 1.0f, 2.0f, 3.0f });
+	const DynamicPointf pointB = DynamicPointf::CreateFromValues({ 4.0f, 6.0f, 8.0f });
+	const float distanceSquared = DistanceSquared(pointA, pointB);
+	REQUIRE(NearlyEqual(distanceSquared, 50.0f));
+}
+
+TEST_CASE("DynamicMath::Distance", "[DynamicMath]")
+{
+	const DynamicPointf pointA = DynamicPointf::CreateFromValues({ 1.0f, 2.0f, 3.0f });
+	const DynamicPointf pointB = DynamicPointf::CreateFromValues({ 4.0f, 6.0f, 8.0f });
+
+	const float distance = Distance(pointA, pointB);
+	REQUIRE(NearlyEqual(distance, 7.07106781f));
 }

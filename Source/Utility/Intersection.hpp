@@ -74,9 +74,9 @@ namespace Simple
 		const Point3f& min = aabb.GetMin();
 		const Point3f& max = aabb.GetMax();
 
-		if (Abs(ray.GetDirection().X()) < std::numeric_limits<float>::epsilon())
+		if (Abs(rayDirection.X()) < std::numeric_limits<float>::epsilon())
 		{
-			if (ray.GetOrigin().x < aabb.GetMin().x || ray.GetOrigin().x > aabb.GetMax().x)
+			if (rayOrigin.x < min.x || rayOrigin.x > max.x)
 			{
 				return std::nullopt;
 			}
@@ -90,9 +90,9 @@ namespace Simple
 			std::swap(txMin, txMax);
 		}
 
-		if (Abs(ray.GetDirection().Y()) < std::numeric_limits<float>::epsilon())
+		if (Abs(rayDirection.Y()) < std::numeric_limits<float>::epsilon())
 		{
-			if (ray.GetOrigin().y < aabb.GetMin().y || ray.GetOrigin().y > aabb.GetMax().y)
+			if (rayOrigin.y < min.y || rayOrigin.y > max.y)
 			{
 				return std::nullopt;
 			}
@@ -121,9 +121,9 @@ namespace Simple
 			txMax = tyMax;
 		}
 
-		if (Abs(ray.GetDirection().Z()) < std::numeric_limits<float>::epsilon())
+		if (Abs(rayDirection.Z()) < std::numeric_limits<float>::epsilon())
 		{
-			if (ray.GetOrigin().z < aabb.GetMin().z || ray.GetOrigin().z > aabb.GetMax().z)
+			if (rayOrigin.z < min.z || rayOrigin.z > max.z)
 			{
 				return std::nullopt;
 			}

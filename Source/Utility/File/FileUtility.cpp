@@ -1,9 +1,7 @@
 #include "Utility/Precompiled/UtilityPch.hpp"
 #include "Utility/File/FileUtility.hpp"
 #include "Utility/Win/WinConsole.hpp"
-#include "Utility/Algorithm.hpp"
 #include <fstream>
-#include <cassert>
 
 namespace Simple
 {

@@ -306,10 +306,7 @@ namespace Simple
 	template<typename T>
 	constexpr void AssertNormalized(const T& x, const T& y, const T& z)
 	{
-		if (!IsNormalized(x, y, z))
-		{
-			ASSERT(false && "Vector is not normalized");
-		}
+		ASSERT(IsNormalized(x, y, z) && "Vector is not normalized");
 	}
 
 	template<bool Assert = true, typename T>

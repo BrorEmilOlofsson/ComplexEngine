@@ -453,17 +453,20 @@ namespace Simple
 	{
 		Matrix4x4<T> result = Matrix4x4<T>::Identity();
 
-		result(0, 0) = rotationMatrix(0, 0);
-		result(1, 0) = rotationMatrix(1, 0);
-		result(2, 0) = rotationMatrix(2, 0);
+		const auto& right = rotationMatrix.GetRight();
+		const auto& up = rotationMatrix.GetUp();
+		const auto& forward = rotationMatrix.GetForward();
+		result(0, 0) = right.X();
+		result(0, 1) = right.Y();
+		result(0, 2) = right.Z();
 
-		result(0, 1) = rotationMatrix(0, 1);
-		result(1, 1) = rotationMatrix(1, 1);
-		result(2, 1) = rotationMatrix(2, 1);
+		result(1, 0) = up.X();
+		result(1, 1) = up.Y();
+		result(1, 2) = up.Z();
 
-		result(0, 2) = rotationMatrix(0, 2);
-		result(1, 2) = rotationMatrix(1, 2);
-		result(2, 2) = rotationMatrix(2, 2);
+		result(2, 0) = forward.X();
+		result(2, 1) = forward.Y();
+		result(2, 2) = forward.Z();
 
 		return result;
 	}

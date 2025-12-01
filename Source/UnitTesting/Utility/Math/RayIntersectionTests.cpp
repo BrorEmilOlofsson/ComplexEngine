@@ -32,7 +32,7 @@ TEST_CASE("Ray Vs AABB Intersection")
 	constexpr AABB3f aabb = AABB3f::FromMinAndMax(Point3f(0, 0, 0), Point3f(1, 1, 2));
 	constexpr Ray3f ray(Point3f(0.3f, 0, -1.f), UnitVector3f::Forward());
 
-	auto result = IntersectionRayAABB(ray, aabb);
+	const auto result = IntersectionRayAABB(ray, aabb);
 
 	REQUIRE(result.has_value());
 	REQUIRE(result->hitPoint == Point3f(0.3f, 0, 0));

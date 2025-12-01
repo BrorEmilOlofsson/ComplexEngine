@@ -1,7 +1,4 @@
 #pragma once
-#include <cstddef>
-#include <algorithm>
-#include <cassert>
 
 namespace Simple
 {
