@@ -116,7 +116,7 @@ TEST_CASE("Vector2 scalar multiplication", "[Vector2]")
 	REQUIRE(result2 == Vector2f(8, 12));
 }
 
-TEST_CASE("Vector2 scalar division", "[Vector2]")
+TEST_CASE("Vector2::Division Operator (Vector2 / Scalar)", "[Vector2]")
 {
 	constexpr Vector2f vec(8, 12);
 	constexpr float scalar = 4;
@@ -124,7 +124,15 @@ TEST_CASE("Vector2 scalar division", "[Vector2]")
 	REQUIRE(result == Vector2f(2, 3));
 }
 
-TEST_CASE("Vector2 scalar multiplication assignment", "[Vector2]")
+TEST_CASE("Vector2::Multiplication Assignment Operator (Vector2 *= Vector2)", "[Vector2]")
+{
+	Vector2i vecA(2, 3);
+	const Vector2i vecB(4, 5);
+	vecA *= vecB;
+	REQUIRE(vecA == Vector2i(8, 15));
+}
+
+TEST_CASE("Vector2::Multiplication Assignment Operator (Vector2 *= Scalar", "[Vector2]")
 {
 	Vector2f vec(2, 3);
 	const float scalar = 4;
@@ -132,7 +140,15 @@ TEST_CASE("Vector2 scalar multiplication assignment", "[Vector2]")
 	REQUIRE(vec == Vector2f(8, 12));
 }
 
-TEST_CASE("Vector2 scalar division assignment", "[Vector2]")
+TEST_CASE("Vector2::Division Assignment Operator (Vector2 /= Vector2)", "[Vector2]")
+{
+	Vector2f vec(8, 12);
+	const Vector2f vecB(4, 5);
+	vec /= vecB;
+	REQUIRE(vec == Vector2f(2, 2.4f));
+}
+
+TEST_CASE("Vector2::Division Assignment Operator (Vector2 /= Scalar)", "[Vector2]")
 {
 	Vector2f vec(8, 12);
 	const float scalar = 4;
@@ -140,7 +156,7 @@ TEST_CASE("Vector2 scalar division assignment", "[Vector2]")
 	REQUIRE(vec == Vector2f(2, 3));
 }
 
-TEST_CASE("Vector2 negation", "[Vector2]")
+TEST_CASE("Vector2::Negation Operator", "[Vector2]")
 {
 	constexpr Vector2i vec(3, -4);
 	constexpr Vector2i result = -vec;

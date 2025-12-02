@@ -118,3 +118,23 @@ TEST_CASE("DynamicUnitVector::Subtraction Operator (DynamicVector - DynamicUnitV
 	REQUIRE(NearlyEqual(result[0], -0.5f));
 	REQUIRE(NearlyEqual(result[1], 0.5f));
 }
+
+TEST_CASE("DynamicUnitVector::Multiplication Operator (DynamicUnitVector * Scalar)", "[DynamicUnitVector]")
+{
+	const DynamicUnitVectorf unitVector = DynamicUnitVectorf::CreateFromValues(0.6f, 0.8f);
+	const float scalar = 5.0f;
+	const DynamicVectorf result = unitVector * scalar;
+	REQUIRE(result.GetDimensionCount() == 2);
+	REQUIRE(NearlyEqual(result[0], 3.0f));
+	REQUIRE(NearlyEqual(result[1], 4.0f));
+}
+
+TEST_CASE("DynamicUnitVector::Multiplication Operator (Scalar * DynamicUnitVector)", "[DynamicUnitVector]")
+{
+	const DynamicUnitVectorf unitVector = DynamicUnitVectorf::CreateFromValues(0.6f, 0.8f);
+	const float scalar = 5.0f;
+	const DynamicVectorf result = scalar * unitVector;
+	REQUIRE(result.GetDimensionCount() == 2);
+	REQUIRE(NearlyEqual(result[0], 3.0f));
+	REQUIRE(NearlyEqual(result[1], 4.0f));
+}

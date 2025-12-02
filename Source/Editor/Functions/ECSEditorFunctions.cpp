@@ -803,7 +803,7 @@ namespace Simple
 		{
 			const UnitVector3f camForward = GetUnitVector(oldCamPos, entityPos);
 			const UnitVector3f camRight = Cross(UnitVector3f::Up(), camForward);
-			const Matrix4x4f matrix = CreateMatrixFromXZ(camRight, camForward);
+			const RotationMatrix3f matrix = RotationMatrix3f::FromXZ(camRight, camForward);
 			camera.GetTransform().SetRotation(matrix);
 			const Point3f newCamPos = entityPos + (-camForward) * offsetDistance;
 			camera.SetPosition(newCamPos);

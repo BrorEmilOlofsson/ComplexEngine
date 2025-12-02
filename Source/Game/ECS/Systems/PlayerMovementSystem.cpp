@@ -121,7 +121,7 @@ static void HandleRotation(Transform& transform, const Transform& planetTransfor
 		forward = GetUnitVector(Point3f::Zero(), proj);
 	}
 
-	transform.SetRotation(CreateMatrixFromYZ(upVector, forward));
+	transform.SetRotation(RotationMatrix3f::FromYZ(upVector, forward));
 }
 
 static void HandleMovement(PlayerMovementComponent& playerMovementComponent, Transform& playerTransform, const float deltaTime, const PlanetComponent& planetComponent, const Transform& planetTransform, const InputState& input)

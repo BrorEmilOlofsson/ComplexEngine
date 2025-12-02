@@ -136,6 +136,24 @@ namespace Simple
 	}
 
 	template<typename T>
+	constexpr Vector3<T>& operator*=(Vector3<T>& vector, const Vector3<T>& b)
+	{
+		vector.x *= b.x;
+		vector.y *= b.y;
+		vector.z *= b.z;
+		return vector;
+	}
+
+	template<typename T>
+	constexpr Vector3<T>& operator/=(Vector3<T>& vector, const Vector3<T>& b)
+	{
+		vector.x /= b.x;
+		vector.y /= b.y;
+		vector.z /= b.z;
+		return vector;
+	}
+
+	template<typename T>
 	constexpr Vector3<T>& operator/=(Vector3<T>& vector, const T& scalar)
 	{
 		const T inverse = (1 / scalar);

@@ -203,12 +203,29 @@ namespace Simple
 	{
 		const std::size_t dimensions = a.GetDimensionCount();
 		ASSERT(dimensions == b.GetDimensionCount() && "Dimensions are not the same");
-		DynamicVector<T> v;
-		v.SetDimensionCount(dimensions); 
+		DynamicVector<T> v = DynamicVector<T>::CreateFromDimensionCount(dimensions);
 		for (std::size_t i = 0; i < dimensions; i++)
 		{
 			v[i] = a[i] - b[i];
 		}
 		return v;
+	}
+
+	template<typename T>
+	[[nodiscard]] constexpr DynamicVector<T> operator*(const DynamicUnitVector<T>& a, const T& scalar)
+	{
+		const std::size_t dimensions = a.GetDimensionCount();
+		DynamicVector<T> v = DynamicVector<T>::CreateFromDimensionCount(dimensions);
+		for (std::size_t i = 0; i < dimensions; i++)
+		{
+			v[i] = a[i] * scalar;
+		}
+		return v;
+	}
+
+	template<typename T>
+	[[nodiscard]] constexpr DynamicVector<T> operator*(const T& scalar, const DynamicUnitVector<T>& a)
+	{
+		return a * scalar;
 	}
 }

@@ -22,7 +22,7 @@ namespace Simple
 
 		constexpr void SetPosition(const Point3f& position);
 		constexpr void SetRotation(const Rotatorf& rotation);
-		constexpr void SetRotation(const Matrix4x4f& rotationMatrix);
+		constexpr void SetRotation(const RotationMatrix3f& rotationMatrix);
 		constexpr void SetScale(const Vector3f& scale);
 		constexpr void SetMatrix(const Matrix4x4f& matrix);
 		constexpr void MovePosition(const Vector3f& change);
@@ -80,11 +80,11 @@ namespace Simple
 		mMatrix.SetTranslation(position);
 	}
 
-	constexpr void Transform3::SetRotation(const Matrix4x4f& rotationMatrix)
+	constexpr void Transform3::SetRotation(const RotationMatrix3f& rotationMatrix)
 	{
 		const Vector3f scale = mMatrix.GetScale();
 		const Point3f position = mMatrix.GetTranslation();
-		mMatrix = rotationMatrix * Matrix4x4f::CreateScaleMatrix(scale) * Matrix4x4f::CreateTranslationMatrix(position);
+		mMatrix = Matrix4x4f::CreateRotationMatrix(rotationMatrix) * Matrix4x4f::CreateScaleMatrix(scale) * Matrix4x4f::CreateTranslationMatrix(position);
 	}
 
 	constexpr void Transform3::SetScale(const Vector3f& scale)

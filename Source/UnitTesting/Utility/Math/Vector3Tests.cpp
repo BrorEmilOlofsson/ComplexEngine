@@ -44,15 +44,6 @@ TEST_CASE("Vector3 Constants", "[Vector3]")
     REQUIRE(one == Vector3f(1.0f, 1.0f, 1.0f));
 }
 
-TEST_CASE("Vector3 Equality Operator", "[Vector3]")
-{
-    const Vector3i a(1, 2, 3);
-    const Vector3i b(1, 2, 3);
-    const Vector3i c(2, 3, 4);
-    REQUIRE(a == b);
-    REQUIRE(a != c);
-}
-
 TEST_CASE("Vector3 Type Conversion", "[Vector3]")
 {
     const Vector3i vecInt(3, 4, 5);
@@ -66,7 +57,25 @@ TEST_CASE("Vector3 Type Conversion", "[Vector3]")
     REQUIRE(vecDouble.z == 5.0);
 }
 
-TEST_CASE("Vector3 addition", "[Vector3]")
+TEST_CASE("Vector3::Equality Operator", "[Vector3]")
+{
+    const Vector3i a(1, 2, 3);
+    const Vector3i b(1, 2, 3);
+    const Vector3i c(2, 3, 4);
+    REQUIRE(a == b);
+    REQUIRE(!(a == c));
+}
+
+TEST_CASE("Vector3::Inequality Operator", "[Vector3]")
+{
+    const Vector3i a(1, 2, 3);
+    const Vector3i b(1, 2, 3);
+    const Vector3i c(2, 3, 4);
+    REQUIRE(!(a != b));
+    REQUIRE(a != c);
+}
+
+TEST_CASE("Vector3::Addition Operator", "[Vector3]")
 {
     const Vector3f a(1, 2, 3);
     const Vector3f b(4, 5, 6);
@@ -77,7 +86,7 @@ TEST_CASE("Vector3 addition", "[Vector3]")
     REQUIRE(result.z == 9);
 }
 
-TEST_CASE("Vector3 subtraction", "[Vector3]")
+TEST_CASE("Vector3::Subtraction Operator", "[Vector3]")
 {
     const Vector3f a(11, 2, -13);
     const Vector3f b(4, 5, 6);
@@ -88,7 +97,7 @@ TEST_CASE("Vector3 subtraction", "[Vector3]")
     REQUIRE(result.z == -19);
 }
 
-TEST_CASE("Vector3 multiplication", "[Vector3]")
+TEST_CASE("Vector3::Multiplication Operator", "[Vector3]")
 {
     const Vector3f a(11, 2, -13);
     const Vector3f b(4, 5, 6);
@@ -99,7 +108,7 @@ TEST_CASE("Vector3 multiplication", "[Vector3]")
     REQUIRE(result.z == -78);
 }
 
-TEST_CASE("Vector3 division", "[Vector3]")
+TEST_CASE("Vector3::Division Operator", "[Vector3]")
 {
     const Vector3f a(11, 2, -13);
     const Vector3f b(4, 5, 6);
@@ -110,7 +119,7 @@ TEST_CASE("Vector3 division", "[Vector3]")
     REQUIRE(result.z == -13.f / 6.f);
 }
 
-TEST_CASE("Vector3 addition assignment", "[Vector3]")
+TEST_CASE("Vector3::Addition Assignment Operator", "[Vector3]")
 {
     Vector3f a(1, 2, 3);
     const Vector3f b(4, 5, 6);
@@ -120,7 +129,7 @@ TEST_CASE("Vector3 addition assignment", "[Vector3]")
     REQUIRE(a.z == 9);
 }
 
-TEST_CASE("Vector3 subtraction assignment", "[Vector3]")
+TEST_CASE("Vector3::Subtraction Assignment Operator", "[Vector3]")
 {
     Vector3f a(11, 2, -13);
     const Vector3f b(4, 5, 6);
@@ -130,7 +139,17 @@ TEST_CASE("Vector3 subtraction assignment", "[Vector3]")
     REQUIRE(a.z == -19);
 }
 
-TEST_CASE("Vector3 multiplication assignment", "[Vector3]")
+TEST_CASE("Vector3::Multiplication Assignment Operator (Vector3 *= Vector3)", "[Vector3]")
+{
+    Vector3f a(11, 2, -13);
+    const Vector3f b(2.f, 1.f, -4.f);
+    a *= b;
+	REQUIRE(a.x == 22);
+    REQUIRE(a.y == 2);
+	REQUIRE(a.z == 52);
+}
+
+TEST_CASE("Vector3::Multiplication Assignment Operator (Vector3 *= Scalar)", "[Vector3]")
 {
     Vector3f a(11, 2, -13);
     const float scalar = 3.0f;
@@ -140,7 +159,17 @@ TEST_CASE("Vector3 multiplication assignment", "[Vector3]")
     REQUIRE(a.z == -39);
 }
 
-TEST_CASE("Vector3 division assignment", "[Vector3]")
+TEST_CASE("Vector3::Division Assignment Operator (Vector3 /= Vector3)", "[Vector3]")
+{
+    Vector3f a(11, 2, -13);
+    const Vector3f b(2.f, 1.f, -4.f);
+    a /= b;
+	REQUIRE(a.x == 5.5f);
+	REQUIRE(a.y == 2.0f);
+	REQUIRE(a.z == 3.25f);
+}
+
+TEST_CASE("Vector3::Division Assignment Operator (Vector3 /= Scalar)", "[Vector3]")
 {
     Vector3f a(11, 2, -13);
     const float scalar = 2.0f;
@@ -150,7 +179,7 @@ TEST_CASE("Vector3 division assignment", "[Vector3]")
     REQUIRE(a.z == -6.5f);
 }
 
-TEST_CASE("Vector3 negation", "[Vector3]")
+TEST_CASE("Vector3::Negation Operator", "[Vector3]")
 {
     const Vector3f vec(1.0f, -2.0f, 3.0f);
     const Vector3f negated = -vec;
@@ -159,7 +188,7 @@ TEST_CASE("Vector3 negation", "[Vector3]")
     REQUIRE(negated.z == -3.0f);
 }
 
-TEST_CASE("Vector3 scalar multiplication", "[Vector3]")
+TEST_CASE("Vector3::Multiplication Operator (Vector3 * Scalar)", "[Vector3]")
 {
     const Vector3f vec(2.0f, -3.0f, 4.0f);
     const float scalar = 3.0f;
@@ -169,7 +198,7 @@ TEST_CASE("Vector3 scalar multiplication", "[Vector3]")
     REQUIRE(result.z == 12.0f);
 }
 
-TEST_CASE("Vector3 scalar division", "[Vector3]")
+TEST_CASE("Vector3::Division Operator (Vector3 / Scalar)", "[Vector3]")
 {
     const Vector3f vec(6.0f, -9.0f, 12.0f);
     const float scalar = 3.0f;

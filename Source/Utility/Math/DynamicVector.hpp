@@ -26,7 +26,7 @@ namespace Simple
 		}
 
 		template<typename... Values> requires (std::same_as<T, Values> && ...)
-		[[nodiscard]] static constexpr DynamicVector<T> CreateFromValues(Values&&... values)
+			[[nodiscard]] static constexpr DynamicVector<T> CreateFromValues(Values&&... values)
 		{
 			return DynamicVector<T>({ std::forward<Values>(values)... });
 		}
@@ -84,6 +84,23 @@ namespace Simple
 	using DynamicVectord = DynamicVector<double>;
 
 	template<typename T>
+	[[nodiscard]] constexpr bool operator==(const DynamicVector<T>& a, const DynamicVector<T>& b) noexcept
+	{
+		if (a.GetDimensionCount() != b.GetDimensionCount())
+		{
+			return false;
+		}
+		for (std::size_t i = 0; i < a.GetDimensionCount(); i++)
+		{
+			if (a[i] != b[i])
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	template<typename T>
 	[[nodiscard]] constexpr DynamicVector<T> operator+(const DynamicVector<T>& a, const DynamicVector<T>& b)
 	{
 		const std::size_t dimensionCount = a.GetDimensionCount();
@@ -119,5 +136,103 @@ namespace Simple
 			result[i] = -vector[i];
 		}
 		return result;
+	}
+
+	template<typename T>
+	[[nodiscard]] constexpr DynamicVector<T> operator*(const DynamicVector<T>& a, const T& scalar)
+	{
+		const std::size_t dimensionCount = a.GetDimensionCount();
+		DynamicVector<T> result = DynamicVector<T>::CreateFromDimensionCount(dimensionCount);
+		for (std::size_t i = 0; i < dimensionCount; i++)
+		{
+			result[i] = a[i] * scalar;
+		}
+		return result;
+	}
+
+	template<typename T>
+	[[nodiscard]] constexpr DynamicVector<T> operator*(const T& scalar, const DynamicVector<T>& a)
+	{
+		return a * scalar;
+	}
+
+	template<typename T>
+	[[nodiscard]] constexpr DynamicVector<T> operator/(const DynamicVector<T>& a, const T& scalar)
+	{
+		const std::size_t dimensionCount = a.GetDimensionCount();
+		DynamicVector<T> result = DynamicVector<T>::CreateFromDimensionCount(dimensionCount);
+		for (std::size_t i = 0; i < dimensionCount; i++)
+		{
+			result[i] = a[i] / scalar;
+		}
+		return result;
+	}
+
+	template<typename T>
+	constexpr DynamicVector<T>& operator+=(DynamicVector<T>& a, const DynamicVector<T>& b)
+	{
+		const std::size_t dimensionCount = a.GetDimensionCount();
+		ASSERT(dimensionCount == b.GetDimensionCount() && "Dimensions are not the same");
+		for (std::size_t i = 0; i < dimensionCount; i++)
+		{
+			a[i] += b[i];
+		}
+		return a;
+	}
+
+	template<typename T>
+	constexpr DynamicVector<T>& operator-=(DynamicVector<T>& a, const DynamicVector<T>& b)
+	{
+		const std::size_t dimensionCount = a.GetDimensionCount();
+		ASSERT(dimensionCount == b.GetDimensionCount() && "Dimensions are not the same");
+		for (std::size_t i = 0; i < dimensionCount; i++)
+		{
+			a[i] -= b[i];
+		}
+		return a;
+	}
+
+	template<typename T>
+	constexpr DynamicVector<T>& operator*=(DynamicVector<T>& a, const DynamicVector<T>& b)
+	{
+		const std::size_t dimensionCount = a.GetDimensionCount();
+		for (std::size_t i = 0; i < dimensionCount; i++)
+		{
+			a[i] *= b[i];
+		}
+		return a;
+	}
+
+	template<typename T>
+	constexpr DynamicVector<T>& operator*=(DynamicVector<T>& a, const T& scalar)
+	{
+		const std::size_t dimensionCount = a.GetDimensionCount();
+		for (std::size_t i = 0; i < dimensionCount; i++)
+		{
+			a[i] *= scalar;
+		}
+		return a;
+	}
+
+	template<typename T>
+	constexpr DynamicVector<T>& operator/=(DynamicVector<T>& a, const DynamicVector<T>& b)
+	{
+		const std::size_t dimensionCount = a.GetDimensionCount();
+		for (std::size_t i = 0; i < dimensionCount; i++)
+		{
+			a[i] /= b[i];
+		}
+		return a;
+	}
+
+	template<typename T>
+	constexpr DynamicVector<T>& operator/=(DynamicVector<T>& a, const T& scalar)
+	{
+		const std::size_t dimensionCount = a.GetDimensionCount();
+		for (std::size_t i = 0; i < dimensionCount; i++)
+		{
+			a[i] /= scalar;
+		}
+		return a;
 	}
 }

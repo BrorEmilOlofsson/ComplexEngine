@@ -22,7 +22,14 @@ namespace Simple
 	[[nodiscard]] constexpr bool IsPure(const Matrix3x3<T>& m) noexcept
 	{
 		const T det = GetDeterminant(m);
-		return Abs(det - static_cast<T>(1)) < std::numeric_limits<T>::epsilon();
+		if constexpr (std::same_as<T, float>)
+		{
+			return Abs(det - T{ 1 }) < T{ 1e-4 };
+		}
+		else
+		{
+			return Abs(det - T{ 1 }) < T{ 1e-8 };
+		}
 	}
 
 	template<typename T>
@@ -42,16 +49,23 @@ namespace Simple
 		[[nodiscard]] constexpr Matrix3x3<T> ToMatrix() const noexcept
 		{
 			return Matrix3x3<T>
-				({
-					mRight.X(), mRight.Y(), mRight.Z(),
-					mUp.X(),    mUp.Y(),    mUp.Z(),
-					mForward.X(), mForward.Y(), mForward.Z()
-				});
+				(
+					{
+						mRight.X(), mRight.Y(), mRight.Z(),
+						mUp.X(),	mUp.Y(),    mUp.Z(),
+						mForward.X(), mForward.Y(), mForward.Z()
+					}
+				);
 		}
 
 		[[nodiscard]] static constexpr RotationMatrix3<T> Identity() noexcept;
 		[[nodiscard]] static constexpr RotationMatrix3<T> FromAxes(const UnitVector3<T>& right, const UnitVector3<T>& up, const UnitVector3<T>& forward);
 		[[nodiscard]] static constexpr RotationMatrix3<T> FromXY(const UnitVector3<T>& xAxis, const UnitVector3<T>& yAxis);
+		[[nodiscard]] static constexpr RotationMatrix3<T> FromXZ(const UnitVector3<T>& xAxis, const UnitVector3<T>& zAxis);
+		[[nodiscard]] static constexpr RotationMatrix3<T> FromYX(const UnitVector3<T>& yAxis, const UnitVector3<T>& xAxis);
+		[[nodiscard]] static constexpr RotationMatrix3<T> FromYZ(const UnitVector3<T>& yAxis, const UnitVector3<T>& zAxis);
+		[[nodiscard]] static constexpr RotationMatrix3<T> FromZX(const UnitVector3<T>& zAxis, const UnitVector3<T>& xAxis);
+		[[nodiscard]] static constexpr RotationMatrix3<T> FromZY(const UnitVector3<T>& zAxis, const UnitVector3<T>& yAxis);
 
 		[[nodiscard]] friend constexpr bool operator==(const RotationMatrix3<T>& a, const RotationMatrix3<T>& b) noexcept
 		{
@@ -65,6 +79,11 @@ namespace Simple
 			, mUp(up)
 			, mForward(forward)
 		{
+			const auto det = GetDeterminant(ToMatrix());
+			det;
+			const auto dot = Dot(up, forward);
+			dot;
+			ASSERT(IsPure(ToMatrix()) && "The provided axes do not form a pure rotation matrix.");
 		}
 
 	private:
@@ -129,8 +148,48 @@ namespace Simple
 	constexpr RotationMatrix3<T> RotationMatrix3<T>::FromXY(const UnitVector3<T>& xAxis, const UnitVector3<T>& yAxis)
 	{
 		const UnitVector3<T> zAxis = Cross(xAxis, yAxis);
-		const UnitVector3<T> correctedYAxis = Cross(zAxis, xAxis);
-		return FromAxes(xAxis, correctedYAxis, zAxis);
+		const UnitVector3<T> yAxisCorrected = Cross(zAxis, xAxis);
+		return FromAxes(xAxis, yAxisCorrected, zAxis);
+	}
+
+	template<typename T>
+	constexpr RotationMatrix3<T> RotationMatrix3<T>::FromXZ(const UnitVector3<T>& xAxis, const UnitVector3<T>& zAxis)
+	{
+		const UnitVector3<T> yAxis = Cross(zAxis, xAxis);
+		const UnitVector3<T> zAxisCorrected = Cross(xAxis, yAxis);
+		return FromAxes(xAxis, yAxis, zAxisCorrected);
+	}
+
+	template<typename T>
+	constexpr RotationMatrix3<T> RotationMatrix3<T>::FromYX(const UnitVector3<T>& yAxis, const UnitVector3<T>& xAxis)
+	{
+		const UnitVector3<T> zAxis = Cross(xAxis, yAxis);
+		const UnitVector3<T> xAxisCorrected = Cross(yAxis, zAxis);
+		return FromAxes(xAxisCorrected, yAxis, zAxis);
+	}
+
+	template<typename T>
+	constexpr RotationMatrix3<T> RotationMatrix3<T>::FromYZ(const UnitVector3<T>& yAxis, const UnitVector3<T>& zAxis)
+	{
+		const UnitVector3<T> xAxis = Cross(yAxis, zAxis);
+		const UnitVector3<T> zAxisCorrected = Cross(xAxis, yAxis);
+		return FromAxes(xAxis, yAxis, zAxisCorrected);
+	}
+
+	template<typename T>
+	constexpr RotationMatrix3<T> RotationMatrix3<T>::FromZX(const UnitVector3<T>& zAxis, const UnitVector3<T>& xAxis)
+	{
+		const UnitVector3<T> yAxis = Cross(zAxis, xAxis);
+		const UnitVector3<T> xAxisCorrected = Cross(yAxis, zAxis);
+		return FromAxes(xAxisCorrected, yAxis, zAxis);
+	}
+
+	template<typename T>
+	constexpr RotationMatrix3<T> RotationMatrix3<T>::FromZY(const UnitVector3<T>& zAxis, const UnitVector3<T>& yAxis)
+	{
+		const UnitVector3<T> xAxis = Cross(yAxis, zAxis);
+		const UnitVector3<T> yAxisCorrected = Cross(zAxis, xAxis);
+		return FromAxes(xAxis, yAxisCorrected, zAxis);
 	}
 
 	template<typename T>

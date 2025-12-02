@@ -233,54 +233,42 @@ namespace Simple
 	template<typename T>
 	[[nodiscard]] constexpr Matrix4x4<T> CreateMatrixFromXY(const UnitVector3<T>& xAxis, const UnitVector3<T>& yAxis)
 	{
-		const UnitVector3<T> zAxis = Cross(xAxis, yAxis);
-		const UnitVector3<T> yAxisCorrected = Cross(zAxis, xAxis);
-		return CreateMatrixFromAxesUnchecked(xAxis, yAxisCorrected, zAxis);
+		return Matrix4x4<T>::CreateRotationMatrix(RotationMatrix3<T>::FromXY(xAxis, yAxis));
 	}
 
 	// Prioritzes X-axis over Z-axis
 	template<typename T>
 	[[nodiscard]] constexpr Matrix4x4<T> CreateMatrixFromXZ(const UnitVector3<T>& xAxis, const UnitVector3<T>& zAxis)
 	{
-		const UnitVector3<T> yAxis = Cross(zAxis, xAxis);
-		const UnitVector3<T> zAxisCorrected = Cross(xAxis, yAxis);
-		return CreateMatrixFromAxesUnchecked(xAxis, yAxis, zAxisCorrected);
+		return Matrix4x4<T>::CreateRotationMatrix(RotationMatrix3<T>::FromXZ(xAxis, zAxis));
 	}
 
 	// Prioritzes Y-axis over X-axis
 	template<typename T>
 	[[nodiscard]] constexpr Matrix4x4<T> CreateMatrixFromYX(const UnitVector3<T>& yAxis, const UnitVector3<T>& xAxis)
 	{
-		const UnitVector3<T> zAxis = Cross(xAxis, yAxis);
-		const UnitVector3<T> xAxisCorrected = Cross(yAxis, zAxis);
-		return CreateMatrixFromAxesUnchecked(xAxisCorrected, yAxis, zAxis);
+		return Matrix4x4<T>::CreateRotationMatrix(RotationMatrix3<T>::FromYX(yAxis, xAxis));
 	}
 
 	// Prioritzes Y-axis over Z-axis
 	template<typename T>
 	[[nodiscard]] constexpr Matrix4x4<T> CreateMatrixFromYZ(const UnitVector3<T>& yAxis, const UnitVector3<T>& zAxis)
 	{
-		const UnitVector3<T> xAxis = Cross(yAxis, zAxis);
-		const UnitVector3<T> zAxisCorrected = Cross(xAxis, yAxis);
-		return CreateMatrixFromAxesUnchecked(xAxis, yAxis, zAxisCorrected);
+		return Matrix4x4<T>::CreateRotationMatrix(RotationMatrix3<T>::FromYZ(yAxis, zAxis));
 	}
 
 	// Prioritzes Z-axis over X-axis
 	template<typename T>
 	[[nodiscard]] constexpr Matrix4x4<T> CreateMatrixFromZX(const UnitVector3<T>& zAxis, const UnitVector3<T>& xAxis)
 	{
-		const UnitVector3<T> yAxis = Cross(zAxis, xAxis);
-		const UnitVector3<T> xAxisCorrected = Cross(yAxis, zAxis);
-		return CreateMatrixFromAxesUnchecked(xAxisCorrected, yAxis, zAxis);
+		return Matrix4x4<T>::CreateRotationMatrix(RotationMatrix3<T>::FromZX(zAxis, xAxis));
 	}
 
 	// Prioritzes Z-axis over Y-axis
 	template<typename T>
 	[[nodiscard]] constexpr Matrix4x4<T> CreateMatrixFromZY(const UnitVector3<T>& zAxis, const UnitVector3<T>& yAxis)
 	{
-		const UnitVector3<T> xAxis = Cross(yAxis, zAxis);
-		const UnitVector3<T> yAxisCorrected = Cross(zAxis, xAxis);
-		return CreateMatrixFromAxesUnchecked(xAxis, yAxisCorrected, zAxis);
+		return Matrix4x4<T>::CreateRotationMatrix(RotationMatrix3<T>::FromZY(zAxis, yAxis));
 	}
 
 	template<typename T>

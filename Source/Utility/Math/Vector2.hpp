@@ -120,10 +120,26 @@ namespace Simple
 	}
 
 	template<typename T>
+	constexpr Vector2<T>& operator*=(Vector2<T>& vector, const Vector2<T>& b) noexcept
+	{
+		vector.x *= b.x;
+		vector.y *= b.y;
+		return vector;
+	}
+
+	template<typename T>
 	constexpr Vector2<T>& operator*=(Vector2<T>& vector, const T& scalar) noexcept
 	{
 		vector.x *= scalar;
 		vector.y *= scalar;
+		return vector;
+	}
+
+	template<typename T>
+	constexpr Vector2<T>& operator/=(Vector2<T>& vector, const Vector2<T>& b)
+	{
+		vector.x /= b.x;
+		vector.y /= b.y;
 		return vector;
 	}
 
