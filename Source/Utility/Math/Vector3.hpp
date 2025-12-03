@@ -24,10 +24,14 @@ namespace Simple
 		using value_type = T;
 	};
 
-	using Vector3i = Vector3<int>;
 	using Vector3f = Vector3<float>;
 	using Vector3d = Vector3<double>;
-	using Vector3ui = Vector3<unsigned int>;
+	using Vector3i32 = Vector3<int32_t>;
+	using Vector3ui32 = Vector3<uint32_t>;
+    using Vector3i64 = Vector3<int64_t>;
+    using Vector3ui64 = Vector3<uint64_t>;
+    using Vector3i = Vector3i32;
+    using Vector3ui = Vector3ui32;
 
 	template<typename T>
 	constexpr Vector3<T>::Vector3(const T& x, const T& y, const T& z) noexcept
@@ -66,11 +70,17 @@ namespace Simple
 		return Vector3<T>(1, 1, 1);
 	}
 
-	template<typename T>
-	[[nodiscard]] constexpr Vector3<T> operator+(const Vector3<T>& a, const Vector3<T>& b) noexcept
+	template<typename T, typename U>
+	[[nodiscard]] constexpr auto operator+(const Vector3<T>& a, const Vector3<U>& b) noexcept -> Vector3<std::common_type_t<T, U>>
 	{
-		return Vector3<T>(a.x + b.x, a.y + b.y, a.z + b.z);
-	}
+		using R =  std::common_type_t<T, U>;
+		return Vector3<R>
+			(
+				static_cast<R>(a.x) + static_cast<R>(b.x),
+				static_cast<R>(a.y) + static_cast<R>(b.y),
+				static_cast<R>(a.z) + static_cast<R>(b.z)
+			);
+    }
 
 	template<typename T>
 	[[nodiscard]] constexpr Vector3<T> operator-(const Vector3<T>& a, const Vector3<T>& b) noexcept

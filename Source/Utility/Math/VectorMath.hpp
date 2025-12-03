@@ -272,7 +272,7 @@ namespace Simple
 	template<typename T>
 	[[nodiscard]] constexpr Point3<T> RemoveZ(const Point3<T>& point) noexcept
 	{
-		return UnitVector3<T>(point.x, point.y, 0);
+		return Point3<T>(point.x, point.y, 0);
 	}
 
 	template<typename T>
@@ -341,11 +341,11 @@ namespace Simple
 		return Point3<T>(Max(a.x, b.x), Max(a.y, b.y), Max(a.z, b.z));
 	}
 
-	template<typename T>
+	/*template<typename T>
 	[[nodiscard]] constexpr Point2<T> LerpPoint(const Point2<T>& a, const Point2<T>& b, const Vector2f& t) noexcept
 	{
 		return a + static_cast<Vector2<T>>(static_cast<Vector2f>(b - a) * t);
-	}
+	}*/
 
 	template<typename T>
 	[[nodiscard]] constexpr T DistanceSquared(const Point3<T>& a, const Point3<T>& b) noexcept

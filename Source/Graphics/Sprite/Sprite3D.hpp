@@ -19,7 +19,7 @@ namespace Simple
 
 		Transform mTransform;
 		Vector2f mScale = Vector2f::One();
-		AABB2l mUVAABB = AABB2l::FromDefaultAndExtent(Vector2l(512, 512));
+		AABB2i mUVAABB = AABB2i::FromDefaultAndExtent(Vector2i(512, 512));
 		Color mColor = Colors::White;
 		Vector2f mPivot;
 		TextureAssetHandle mTexture;

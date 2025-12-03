@@ -76,14 +76,14 @@ namespace Simple
 		return Point2<T>(static_cast<T>(point.x), static_cast<T>(point.y));
 	}
 
-	[[nodiscard]] inline RECT ToRECT(const AABB2l& aabb)
+	[[nodiscard]] inline RECT ToRECT(const AABB2i64& aabb)
 	{
 		return RECT
 		{
-			.left = aabb.GetMin().x,
-			.top = aabb.GetMin().y,
-			.right = aabb.GetMax().x,
-			.bottom = aabb.GetMax().y
+			.left = static_cast<LONG>(aabb.GetMin().x),
+            .top = static_cast<LONG>(aabb.GetMin().y),
+            .right = static_cast<LONG>(aabb.GetMax().x),
+            .bottom = static_cast<LONG>(aabb.GetMax().y)
 		};
 	}
 
@@ -99,7 +99,7 @@ namespace Simple
 	}
 
 	template<typename T = float>
-	inline AABB2<T> ToAABB(RECT rect)
+	inline AABB2<T> ToAABB(const RECT& rect)
 	{
 		return AABB2<T>::FromMinAndMax
 		(

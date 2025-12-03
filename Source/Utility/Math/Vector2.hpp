@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include <iostream>
 #include <format>
 
@@ -24,9 +25,12 @@ namespace Simple
 
 	using Vector2f = Vector2<float>;
 	using Vector2d = Vector2<double>;
-	using Vector2i = Vector2<int>;
-	using Vector2ui = Vector2<unsigned int>;
-	using Vector2l = Vector2<long>;
+	using Vector2i32 = Vector2<int32_t>;
+	using Vector2ui32 = Vector2<uint32_t>;
+	using Vector2i64 = Vector2<int64_t>;
+	using Vector2ui64 = Vector2<uint64_t>;
+    using Vector2i = Vector2i32;
+	using Vector2ui = Vector2ui32;
 
 	template<typename T>
 	constexpr Vector2<T>::Vector2(const T& x, const T& y) noexcept
@@ -73,22 +77,32 @@ namespace Simple
 		return Vector2<T>(-vector.x, -vector.y);
 	}
 
-	template<typename T>
-	[[nodiscard]] constexpr Vector2<T> operator*(const Vector2<T>& vector, const T& scalar) noexcept
+	template<typename T, typename U>
+    [[nodiscard]] constexpr auto operator*(const Vector2<T>& vector, const U& scalar) noexcept -> Vector2<std::common_type_t<T, U>>
 	{
-		return Vector2<T>(vector.x * scalar, vector.y * scalar);
+        using R = std::common_type_t<T, U>;
+		return Vector2<R>
+			(
+				static_cast<R>(vector.x) * static_cast<R>(scalar),
+				static_cast<R>(vector.y) * static_cast<R>(scalar)
+			);
 	}
 
-	template<typename T>
-	[[nodiscard]] constexpr Vector2<T> operator*(const T& scalar, const Vector2<T>& vector) noexcept
+	template<typename T, typename U>
+	[[nodiscard]] constexpr auto operator*(const U& scalar, const Vector2<T>& vector) noexcept -> Vector2<std::common_type_t<T, U>>
 	{
 		return vector * scalar;
 	}
 
-	template<typename T>
-	[[nodiscard]] constexpr Vector2<T> operator*(const Vector2<T>& a, const Vector2<T>& b) noexcept
+	template<typename T, typename U>
+	[[nodiscard]] constexpr auto operator*(const Vector2<T>& a, const Vector2<U>& b) noexcept -> Vector2<std::common_type_t<T, U>>
 	{
-		return Vector2<T>(a.x * b.x, a.y * b.y);
+		using R = std::common_type_t<T, U>;
+		return 
+		{
+			static_cast<R>(a.x) * static_cast<R>(b.x),
+			static_cast<R>(a.y) * static_cast<R>(b.y)
+		};
 	}
 
 	template<typename T>

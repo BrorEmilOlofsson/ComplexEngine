@@ -21,9 +21,12 @@ namespace Simple
 	using AABB2 = Bounds<Point2<T>, AABB2BoundsChecker>;
 
 	using AABB2f = AABB2<float>;
-	using AABB2i = AABB2<int>;
-	using AABB2ui = AABB2<unsigned int>;
-	using AABB2l = AABB2<long>;
+	using AABB2i32 = AABB2<int32_t>;
+	using AABB2ui32 = AABB2<uint32_t>;
+    using AABB2i64 = AABB2<int64_t>;
+    using AABB2ui64 = AABB2<uint64_t>;
+    using AABB2i = AABB2i32;
+    using AABB2ui = AABB2ui32;
 
 	template<typename T, typename U>
 	[[nodiscard]] constexpr AABB2<T> ToAABB(const AABB2<U>& aabb)
@@ -52,7 +55,7 @@ namespace Simple
 		const Vector2<T> extent = static_cast<Vector2<T>>(static_cast<Vector2f>(aabb.GetExtent()) * scale);
 		const Point2<T> min = aabb.GetMin();
 		const Point2<T> max = aabb.GetMax();
-		const Point2<T> center = LerpPoint(min, max, pivot);
+		const Point2<T> center = Point2<T>(Lerp(min, max, pivot));
 		return AABB2<T>::FromCenterAndExtent(center, extent);
 	}
 

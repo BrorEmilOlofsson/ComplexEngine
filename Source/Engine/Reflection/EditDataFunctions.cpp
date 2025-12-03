@@ -210,14 +210,6 @@ namespace Simple
 		return viewAndEditResult;
 	}
 
-	ViewAndEditResult ViewAndEditValue(Vector2l& value, const std::string& variableName)
-	{
-		Vector2i a = static_cast<Vector2i>(value);
-		auto v = ViewAndEditValue(a, variableName);
-		value = static_cast<Vector2l>(a);
-		return v;
-	}
-
 	ViewAndEditResult ViewAndEditValue(Vector3f& value, const std::string& variableName)
 	{
 		ViewAndEditResult viewAndEditResult;
@@ -248,14 +240,6 @@ namespace Simple
 		viewAndEditResult.isEdited = ImGui::DragInt2(variableName.c_str(), &value.x);
 		viewAndEditResult.isActive = ImGui::IsItemActive();
 		return viewAndEditResult;
-	}
-
-	ViewAndEditResult ViewAndEditValue(Point2l& value, const std::string& variableName)
-	{
-		Point2i a = static_cast<Point2i>(value);
-		auto v = ViewAndEditValue(a, variableName);
-		value = static_cast<Point2l>(a);
-		return v;
 	}
 
 	ViewAndEditResult ViewAndEditValue(Point3f& value, const std::string& variableName)

@@ -20,7 +20,7 @@ namespace Simple
 	}
 
 	template<typename T>
-	[[nodiscard]] constexpr T Sqrt(const T& value) noexcept
+	[[nodiscard]] constexpr auto Sqrt(const T& value) noexcept
 	{
 		return std::sqrt(value);
 	}
@@ -117,33 +117,40 @@ namespace Simple
 	}
 
 	template<typename T, typename U>
-	[[nodiscard]] constexpr T Lerp(const T& start, const T& target, const U& percent) noexcept
+	concept Lerpable = requires(const T& start, const T& end, const U& percent)
 	{
-		return static_cast<T>(start + percent * (target - start));
+		{ start + percent * (end - start) } -> std::convertible_to<T>;
+    };
+
+
+	template<typename T, typename U> /*requires Lerpable<T, U>*/
+    [[nodiscard]] constexpr auto Lerp(const T& start, const T& end, const U& percent) noexcept(std::is_trivially_constructible_v<T>) -> decltype(start + percent * (end - start))
+	{
+		return start + (end - start) * percent;
 	}
 
 	template<typename T, typename U>
-	[[nodiscard]] constexpr T LerpClamped(const T& start, const T& target, const U& percent) noexcept
+	[[nodiscard]] constexpr auto LerpClamped(const T& start, const T& end, const U& percent) noexcept(std::is_trivially_constructible_v<T>) -> decltype(start + percent * (end - start))
 	{
-		return Lerp(start, target, std::clamp(percent, U{ 0 }, U{ 1 }));
+		return Lerp(start, end, Clamp(percent, U{ 0 }, U{ 1 }));
 	}
 
 	template<typename T, typename U>
-	[[nodiscard]] constexpr T SmoothStep(const T& start, const T& target, const U& percent) noexcept
+	[[nodiscard]] constexpr T SmoothStep(const T& start, const T& end, const U& percent) noexcept
 	{
-		const U percentClamped = std::clamp(percent, 0.0f, 1.0f);
+		const U percentClamped = Clamp(percent, 0.0f, 1.0f);
 		const U t = percentClamped * percentClamped * (3.0f - 2.0f * percentClamped);
-		return Lerp(start, target, t);
+		return Lerp(start, end, t);
 	}
 
 	template<typename T>
-	[[nodiscard]] constexpr auto Remap0To1(const T& value, const T& a, const T& b) noexcept -> decltype((value - a) / (b - a))
+	[[nodiscard]] constexpr auto Remap0To1(const T& value, const T& a, const T& b) noexcept(std::is_trivially_constructible_v<T>) -> decltype((value - a) / (b - a))
 	{
 		return (value - a) / (b - a);
 	}
 
 	template<typename T>
-	[[nodiscard]] constexpr T Remap(const T& value, const T& oldMin, const T& oldMax, const T& newMin, const T& newMax) noexcept
+	[[nodiscard]] constexpr auto Remap(const T& value, const T& oldMin, const T& oldMax, const T& newMin, const T& newMax) noexcept(std::is_trivially_constructible_v<T>)
 	{
 		using PercentType = std::conditional_t<std::integral<T>, double, T>;
 		return Lerp(newMin, newMax, Remap0To1<PercentType>(value, oldMin, oldMax));

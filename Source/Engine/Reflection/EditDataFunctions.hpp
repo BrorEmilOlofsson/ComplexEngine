@@ -47,12 +47,10 @@ namespace Simple
 
 	ViewAndEditResult ViewAndEditValue(Vector2f& value, const std::string& variableName);
 	ViewAndEditResult ViewAndEditValue(Vector2i& value, const std::string& variableName);
-	ViewAndEditResult ViewAndEditValue(Vector2l& value, const std::string& variableName);
 	ViewAndEditResult ViewAndEditValue(Vector3f& value, const std::string& variableName);
 	ViewAndEditResult ViewAndEditValue(Vector4f& value, const std::string& variableName);
 	ViewAndEditResult ViewAndEditValue(Point2f& value, const std::string& variableName);
 	ViewAndEditResult ViewAndEditValue(Point2i& value, const std::string& variableName);
-	ViewAndEditResult ViewAndEditValue(Point2l& value, const std::string& variableName);
 	ViewAndEditResult ViewAndEditValue(Point3f& value, const std::string& variableName);
 	ViewAndEditResult ViewAndEditValue(UnitVector2f& value, const std::string& variableName);
 	ViewAndEditResult VisualizeInScene(UnitVector3f& value, const Point3f& origin, const Camera& camera, class RenderList& renderList);

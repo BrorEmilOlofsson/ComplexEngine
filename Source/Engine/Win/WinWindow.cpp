@@ -1,9 +1,7 @@
 #include "Engine/Precompiled/EnginePch.hpp"
 #include "WinWindow.hpp"
 #include "Utility/Win/WinAdapterFunctions.hpp"
-#include "Utility/Algorithm.hpp"
 #include <External/imgui/imgui.h>
-#include <External/imgui/imgui_impl_win32.h>
 #include "Utility/Win/WinUtility.hpp"
 #include "Utility/Win/WinConsole.hpp"
 #include "Utility/Win/WinException.hpp"
@@ -250,9 +248,10 @@ namespace Simple
 		}
 		else
 		{
-			AABB2i currentClientRect = GetClientBounds();
 			mResizeBuffer.fullScreen = false;
-			AABB2i scaledClientAABB = ScaleAABB(currentClientRect, static_cast<Vector2f>(windowSize) / static_cast<Vector2f>(currentClientRect.GetExtent()));
+			const AABB2i currentClientRect = GetClientBounds();
+			const Vector2f scale = static_cast<Vector2f>(windowSize) / static_cast<Vector2f>(currentClientRect.GetExtent());
+			const AABB2i scaledClientAABB = ScaleAABB(currentClientRect, scale);
 			mResizeBuffer.windowedRect = GetAdjustedWindowRect(scaledClientAABB, GetStyle());
 			mResizeBuffer.windowedStyle = GetStyle();
 		}

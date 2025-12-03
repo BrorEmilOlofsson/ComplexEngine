@@ -1,6 +1,7 @@
 #pragma once
 #include "Utility/Math/Vector3.hpp"
 #include "Utility/Math/UnitVector3.hpp"
+#include <cstdint>
 #include <iostream>
 #include <format>
 
@@ -31,8 +32,12 @@ namespace Simple
 
 	using Point3f = Point3<float>;
 	using Point3d = Point3<double>;
-	using Point3i = Point3<int>;
-	using Point3ui = Point3<unsigned int>;
+	using Point3i32 = Point3<int32_t>;
+	using Point3ui32 = Point3<uint32_t>;
+    using Point3i64 = Point3<int64_t>;
+    using Point3ui64 = Point3<uint64_t>;
+    using Point3i = Point3i32;
+    using Point3ui = Point3ui32;
 
 	template<typename T>
 	constexpr Point3<T>::Point3(const T& x, const T& y, const T& z) noexcept

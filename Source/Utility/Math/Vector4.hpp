@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <cstdint>
 
 namespace Simple
 {
@@ -19,10 +20,14 @@ namespace Simple
 		[[nodiscard]] static constexpr Vector4 Zero() noexcept;
 	};
 
-	using Vector4i = Vector4<int32_t>;
-	using Vector4ui = Vector4<uint32_t>;
 	using Vector4f = Vector4<float>;
 	using Vector4d = Vector4<double>;
+	using Vector4i32 = Vector4<int32_t>;
+	using Vector4ui32 = Vector4<uint32_t>;
+	using Vector4i64 = Vector4<int64_t>;
+	using Vector4ui64 = Vector4<uint64_t>;
+	using Vector4i = Vector4i32;
+    using Vector4ui = Vector4ui32;
 
 	template<typename T>
 	constexpr Vector4<T>::Vector4(const T& x, const T& y, const T& z, const T& w) noexcept

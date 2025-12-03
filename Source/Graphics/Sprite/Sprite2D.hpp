@@ -16,7 +16,7 @@ namespace Simple
 
 		void SetPosition(const Point2f& position) { mPosition = position; }
 		void SetScale(const Vector2f& scale) { mScale = scale; }
-		void SetUVAABB(const AABB2l& uvAABB) { mUVAABB = uvAABB; }
+		void SetUVAABB(const AABB2i& uvAABB) { mUVAABB = uvAABB; }
 		void SetColor(const Color& color) { mColor = color; }
 		void SetPivot(const Vector2f& pivot) { mPivot = pivot; }
 		void SetTexture(TextureAssetHandle textureAsset);
@@ -26,7 +26,7 @@ namespace Simple
 
 		[[nodiscard]] const Point2f& GetPosition() const { return mPosition; }
 		[[nodiscard]] const Vector2f& GetScale() const { return mScale; }
-		[[nodiscard]] const AABB2l& GetUVAABB() const { return mUVAABB; }
+		[[nodiscard]] const AABB2i& GetUVAABB() const { return mUVAABB; }
 		[[nodiscard]] const Color& GetColor() const { return mColor; }
 		[[nodiscard]] const Vector2f& GetPivot() const { return mPivot; }
 		[[nodiscard]] TextureAssetHandle GetTexture() const;
@@ -38,7 +38,7 @@ namespace Simple
 
 		Point2f mPosition;
 		Vector2f mScale = Vector2f::One();
-		AABB2l mUVAABB = AABB2l::FromDefaultAndExtent(Vector2l(512, 512));
+		AABB2i mUVAABB = AABB2i::FromDefaultAndExtent(Vector2i(512, 512));
 		Color mColor = Colors::White;
 		Vector2f mPivot;
 		TextureAssetHandle mTexture;
