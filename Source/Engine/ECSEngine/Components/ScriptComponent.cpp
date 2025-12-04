@@ -13,7 +13,7 @@ namespace Simple
 {
 	void RegisterScriptComponent() {}
 
-	COMPONENT(ScriptComponent);
+	REGISTER_COMPONENT(ScriptComponent);
 
 	REGISTER_MEMBER(ScriptComponent::classInstance);
 }

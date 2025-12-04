@@ -7,7 +7,7 @@ namespace Simple
 
 	void RegisterSprite2DComponent() {}
 
-	COMPONENT(Sprite2DComponent);
+	REGISTER_COMPONENT(Sprite2DComponent);
 
 	REGISTER_MEMBER(Sprite2D::mPosition);
 	REGISTER_MEMBER(Sprite2D::mRotationDegrees);

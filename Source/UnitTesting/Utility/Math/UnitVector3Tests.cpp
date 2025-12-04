@@ -50,9 +50,9 @@ TEST_CASE("UnitVector3::Vector3 constructor", "[unitvector3]")
 		constexpr Vector3f vec(5.f, 5.f, 5.f);
 		const UnitVector3f unitVec(vec);
 
-		REQUIRE(NearlyEqual(unitVec.X(), 0.577350f, 0.0001f));
-		REQUIRE(NearlyEqual(unitVec.Y(), 0.577350f, 0.0001f));
-		REQUIRE(NearlyEqual(unitVec.Z(), 0.577350f, 0.0001f));
+		REQUIRE(NearlyEqual(unitVec.X(), 0.577350f));
+		REQUIRE(NearlyEqual(unitVec.Y(), 0.577350f));
+		REQUIRE(NearlyEqual(unitVec.Z(), 0.577350f));
 
 	}
 
@@ -65,23 +65,23 @@ TEST_CASE("UnitVector3::Setters", "[unitvector3]")
 		UnitVector3f vector = UnitVector3f::Forward();
 		vector.SetX(1.f);
 
-		REQUIRE(NearlyEqual(vector.X(), 0.7071f, 0.0001f));
+		REQUIRE(NearlyEqual(vector.X(), 0.7071f));
 		REQUIRE(vector.Y() == 0.0f);
-		REQUIRE(NearlyEqual(vector.Z(), 0.7071f, 0.0001f));
+		REQUIRE(NearlyEqual(vector.Z(), 0.7071f));
 	}
 	{
 		UnitVector3f vector = UnitVector3f::Right();
 		vector.SetY(1.f);
-		REQUIRE(NearlyEqual(vector.X(), 0.7071f, 0.0001f));
-		REQUIRE(NearlyEqual(vector.Y(), 0.7071f, 0.0001f));
+		REQUIRE(NearlyEqual(vector.X(), 0.7071f));
+		REQUIRE(NearlyEqual(vector.Y(), 0.7071f));
 		REQUIRE(vector.Z() == 0.0f);
 	}
 	{
 		UnitVector3f vector = UnitVector3f::Up();
 		vector.SetZ(1.f);
 		REQUIRE(vector.X() == 0.0f);
-		REQUIRE(NearlyEqual(vector.Y(), 0.7071f, 0.0001f));
-		REQUIRE(NearlyEqual(vector.Z(), 0.7071f, 0.0001f));
+		REQUIRE(NearlyEqual(vector.Y(), 0.7071f));
+		REQUIRE(NearlyEqual(vector.Z(), 0.7071f));
 	}
 }
 

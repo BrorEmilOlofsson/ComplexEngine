@@ -7,5 +7,5 @@ namespace Simple
 
 	void RegisterEntityCompositionComponent() {}
 
-	COMPONENT(EntityCompositionComponent);
+	REGISTER_COMPONENT(EntityCompositionComponent);
 }

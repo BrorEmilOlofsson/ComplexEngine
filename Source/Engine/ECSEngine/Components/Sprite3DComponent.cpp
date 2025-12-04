@@ -9,7 +9,7 @@ namespace Simple
 	{
 	}
 
-	COMPONENT(Sprite3DComponent);
+	REGISTER_COMPONENT(Sprite3DComponent);
 	REGISTER_MEMBER(Sprite3DComponent::sprite);
 	REGISTER_MEMBER(Sprite3D::mColor);
 	REGISTER_MEMBER(Sprite3D::mRotation);

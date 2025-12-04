@@ -8,7 +8,7 @@ namespace Simple
 	void RegisterTransformComponent() {}
 
 
-	COMPONENT(TransformComponent, IsDefaultComponent{});
+	REGISTER_COMPONENT(TransformComponent, IsDefaultComponent{});
 
 	REGISTER_MEMBER(TransformComponent::transform);
 }

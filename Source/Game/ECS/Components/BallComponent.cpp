@@ -4,4 +4,4 @@
 
 void RegisterBallComponent() {}
 
-COMPONENT(BallComponent);
+REGISTER_COMPONENT(BallComponent);

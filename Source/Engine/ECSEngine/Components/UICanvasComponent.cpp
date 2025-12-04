@@ -9,5 +9,5 @@ namespace Simple
 	{
 	}
 
-	COMPONENT(UICanvasComponent);
+	REGISTER_COMPONENT(UICanvasComponent);
 }

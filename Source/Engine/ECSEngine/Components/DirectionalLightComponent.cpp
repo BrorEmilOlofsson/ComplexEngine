@@ -8,7 +8,7 @@ namespace Simple
 
 	void RegisterDirectionalLightComponent() {}
 
-	COMPONENT(DirectionalLightComponent);
+	REGISTER_COMPONENT(DirectionalLightComponent);
 
 	REGISTER_MEMBER(DirectionalLightComponent::directionalLight);
 }

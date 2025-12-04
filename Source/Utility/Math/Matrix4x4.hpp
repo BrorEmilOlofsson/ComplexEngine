@@ -793,11 +793,11 @@ namespace Simple
 	}
 
 	template<typename T>
-	[[nodiscard]] constexpr bool NearlyEqual(const Matrix4x4<T>& a, const Matrix4x4<T>& b, const T epsilon = std::numeric_limits<T>::epsilon()) noexcept
+	[[nodiscard]] constexpr bool NearlyEqual(const Matrix4x4<T>& a, const Matrix4x4<T>& b, const Tolerance<T>& tolerance = {}) noexcept
 	{
 		for (unsigned int i = 0; i < 16; ++i)
 		{
-			if (!NearlyEqual(a[i], b[i], epsilon))
+			if (!NearlyEqual(a[i], b[i], tolerance))
 			{
 				return false;
 			}

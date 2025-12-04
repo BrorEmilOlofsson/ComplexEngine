@@ -54,15 +54,15 @@ TEST_CASE("UnitVector2::Setters", "[unitvector2]")
 		UnitVector2f vector = UnitVector2f::Up();
 		vector.SetX(1.f);
 
-		REQUIRE(NearlyEqual(vector.X(), 0.7071f, 0.0001f));
-		REQUIRE(NearlyEqual(vector.Y(), 0.7071f, 0.0001f));
+		REQUIRE(NearlyEqual(vector.X(), 0.7071f));
+		REQUIRE(NearlyEqual(vector.Y(), 0.7071f));
 	}
 	{
 		UnitVector2f vector = UnitVector2f::Right();
 		vector.SetY(1.f);
 
-		REQUIRE(NearlyEqual(vector.X(), 0.7071f, 0.0001f));
-		REQUIRE(NearlyEqual(vector.Y(), 0.7071f, 0.0001f));
+		REQUIRE(NearlyEqual(vector.X(), 0.7071f));
+		REQUIRE(NearlyEqual(vector.Y(), 0.7071f));
 	}
 }
 

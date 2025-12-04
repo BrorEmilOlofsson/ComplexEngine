@@ -194,7 +194,7 @@ namespace Simple
 			}
 			else
 			{
-				dir = Normalized(-added);
+				dir = ToNormalized(-added);
 			}
 
 			const Vector3f dir3D = ToVector3XZ(dir);

@@ -7,7 +7,7 @@ namespace Simple
 	void RegisterCameraComponent() {}
 
 
-	COMPONENT(CameraComponent);
+	REGISTER_COMPONENT(CameraComponent);
 
 	REGISTER_MEMBER(CameraComponent::camera);
 	REGISTER_MEMBER(CameraComponent::freeFly);

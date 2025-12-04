@@ -5,4 +5,4 @@
 
 void RegisterPhysicsComponent() {}
 
-COMPONENT(PhysicsComponent);
+REGISTER_COMPONENT(PhysicsComponent);

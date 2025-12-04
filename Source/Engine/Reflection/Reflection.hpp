@@ -55,7 +55,7 @@ namespace Simple
 
 #include "Utility/MacroUtility.hpp"
 
-#define COMPONENT(ComponentType, ...) \
+#define REGISTER_COMPONENT(ComponentType, ...) \
     static bool ComponentRegistered_##ComponentType = []() { \
         Simple::__RegisterComponent::RegisterComponent<ComponentType>(__VA_ARGS__); \
         return true; \

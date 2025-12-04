@@ -2,7 +2,7 @@
 #include "PlayerMovementComponent.hpp"
 #include "Engine/Reflection/Reflection.hpp"
 
-COMPONENT(PlayerMovementComponent);
+REGISTER_COMPONENT(PlayerMovementComponent);
 
 REGISTER_MEMBER(PlayerMovementComponent::walkSpeed);
 REGISTER_MEMBER(PlayerMovementComponent::rotationRate);

@@ -4,6 +4,6 @@
 
 void RegisterPlayerShootingComponent() {}
 
-COMPONENT(PlayerShootingComponent);
+REGISTER_COMPONENT(PlayerShootingComponent);
 
 REGISTER_MEMBER(PlayerShootingComponent::shotPower);

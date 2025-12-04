@@ -24,7 +24,7 @@ namespace Simple
 	}
 
 
-	COMPONENT(SkyBoxComponent);
+	REGISTER_COMPONENT(SkyBoxComponent);
 
 	REGISTER_MEMBER(SkyBoxComponent::mesh);
 	REGISTER_MEMBER(SkyBoxComponent::texture);

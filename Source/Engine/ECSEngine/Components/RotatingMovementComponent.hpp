@@ -10,6 +10,7 @@ namespace Simple
 		UnitVector3f rotationAxis;
 		float rotationSpeed = 10.f;
 		eTransformMode transformMode = eTransformMode::World;
+
 	};
 
 	void RegisterRotatingMovementComponent();

@@ -28,7 +28,7 @@ namespace Simple
 	{
 	}
 
-	COMPONENT(MeshComponent);
+	REGISTER_COMPONENT(MeshComponent);
 
 	REGISTER_MEMBER(MeshComponent::mesh);
 	REGISTER_MEMBER(MeshComponent::textures);

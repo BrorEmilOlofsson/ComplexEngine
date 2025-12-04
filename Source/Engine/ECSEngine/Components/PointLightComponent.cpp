@@ -6,7 +6,7 @@ namespace Simple
 {
 	void RegisterPointLightComponent() {}
 
-	COMPONENT(PointLightComponent);
+	REGISTER_COMPONENT(PointLightComponent);
 
 	REGISTER_MEMBER(PointLightComponent::pointLight);
 }

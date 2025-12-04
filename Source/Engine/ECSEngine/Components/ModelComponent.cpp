@@ -27,7 +27,7 @@ namespace Simple
 	{
 	}
 
-	COMPONENT(ModelComponent);
+	REGISTER_COMPONENT(ModelComponent);
 
 	REGISTER_MEMBER(ModelComponent::model);
 	REGISTER_MEMBER(ModelComponent::textures);

@@ -7,6 +7,6 @@ void RegisterPlanetComponent()
 {
 }
 
-COMPONENT(PlanetComponent);
+REGISTER_COMPONENT(PlanetComponent);
 REGISTER_MEMBER(PlanetComponent::radius);
 REGISTER_MEMBER(PlanetComponent::gravityMagnitude);

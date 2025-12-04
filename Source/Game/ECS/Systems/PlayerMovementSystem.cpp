@@ -57,7 +57,7 @@ static Vector3f GetMovementVector(const Transform& transform, const Simple::Inpu
 	{
 		return Vector3f::Zero();
 	}
-	return Normalized(ToWorldSpace(moveVector, transform.GetMatrix()));
+	return ToNormalized(ToWorldSpace(moveVector, transform.GetMatrix()));
 
 }
 

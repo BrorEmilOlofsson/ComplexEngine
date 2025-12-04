@@ -44,7 +44,7 @@ namespace Simple
 			moveDirection.y += direction * upDir * moveSpeed * deltaTime;
 		}
 
-		const Point3f targetPosition = currentPosition + Normalized(moveDirection) * (moveSpeed *  deltaTime);
+		const Point3f targetPosition = currentPosition + ToNormalized(moveDirection) * (moveSpeed *  deltaTime);
 		mouseDelta = Vector2f(mouseDelta) * (rotationSpeed * 0.003f);
 		if (mouseDelta == Vector2f::Zero())
 		{

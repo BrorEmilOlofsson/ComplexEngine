@@ -2,6 +2,7 @@
 #include "Utility/Math/Vector3.hpp"
 #include "Utility/Math/Math.hpp"
 #include <iostream>
+#include <array>
 
 namespace Simple
 {
@@ -17,6 +18,7 @@ namespace Simple
 		constexpr UnitVector3() = default;
 		constexpr UnitVector3(const T& x, const T& y, const T& z);
 		constexpr explicit UnitVector3(const Vector3<T>& vector);
+		constexpr explicit UnitVector3(const std::array<T, 3>& array);
 
 		[[nodiscard]] constexpr const T& X() const noexcept;
 		[[nodiscard]] constexpr const T& Y() const noexcept;
@@ -66,6 +68,14 @@ namespace Simple
 	}
 
 	template<typename T>
+	constexpr UnitVector3<T>::UnitVector3(UnsafeTag, const T& x, const T& y, const T& z) noexcept
+		: mX(x)
+		, mY(y)
+		, mZ(z)
+	{
+	}
+
+	template<typename T>
 	constexpr UnitVector3<T>::UnitVector3(const Vector3<T>& vector)
 		: mX(vector.x)
 		, mY(vector.y)
@@ -75,12 +85,13 @@ namespace Simple
 	}
 
 	template<typename T>
-	constexpr UnitVector3<T>::UnitVector3(UnsafeTag, const T& x, const T& y, const T& z) noexcept
-		: mX(x)
-		, mY(y)
-		, mZ(z)
+	constexpr UnitVector3<T>::UnitVector3(const std::array<T, 3>& array)
+		: mX(array[0])
+		, mY(array[1])
+		, mZ(array[2])
 	{
-	}
+		Normalize(mX, mY, mZ);
+    }
 
 	template<typename T>
 	constexpr const T& UnitVector3<T>::X() const noexcept

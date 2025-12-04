@@ -9,7 +9,7 @@ namespace Simple
 	{
 	}
 
-	COMPONENT(ArrowComponent);
+	REGISTER_COMPONENT(ArrowComponent);
 	REGISTER_MEMBER(ArrowComponent::length);
 	REGISTER_MEMBER(ArrowComponent::thickness);
 	REGISTER_MEMBER(ArrowComponent::color);

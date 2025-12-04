@@ -6,5 +6,5 @@ namespace Simple
 {
 	void RegisterBloomComponent() {}
 
-	COMPONENT(BloomComponent);
+	REGISTER_COMPONENT(BloomComponent);
 }

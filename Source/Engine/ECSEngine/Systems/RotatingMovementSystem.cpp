@@ -6,13 +6,18 @@
 namespace Simple
 {
 
+    void PerformRotation(Transform& transform, const UnitVector3f& rotationAxis, const float rotationSpeed, const float deltaTime)
+	{
+		const Degreesf degrees(deltaTime * rotationSpeed);
+		const Matrix4x4f matrix = GetRotatedMatrixAroundAxis(transform.GetMatrix(), rotationAxis, degrees);
+		transform.SetRotation(matrix.GetRotationMatrix());
+	}
+
 	void RotatingMovementSystem::Update(ECS& ecs, const float deltaTime, const Blackboard&)
 	{
 		ecs.ForEach([deltaTime](TransformComponent& transformComponent, const RotatingMovementComponent& rotatingMovement)
 			{
-				const Degreesf degrees(deltaTime * rotatingMovement.rotationSpeed);
-				const Matrix4x4f matrix = GetRotatedMatrixAroundAxis(transformComponent.transform.GetMatrix(), rotatingMovement.rotationAxis, degrees);
-				transformComponent.transform.SetMatrix(matrix);
+                PerformRotation(transformComponent.transform, rotatingMovement.rotationAxis, rotatingMovement.rotationSpeed, deltaTime);
 			});
 	}
 }

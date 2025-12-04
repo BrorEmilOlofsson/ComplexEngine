@@ -7,7 +7,7 @@ namespace Simple
 	
 	void RegisterAnimatedModelComponent() {}
 
-	COMPONENT(AnimatedModelComponent);
+	REGISTER_COMPONENT(AnimatedModelComponent);
 	REGISTER_MEMBER(AnimatedModelComponent::modelHandle);
 	REGISTER_MEMBER(AnimatedModelComponent::textures);
 }

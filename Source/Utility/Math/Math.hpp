@@ -1,10 +1,12 @@
 #pragma once
-#include <vector>
 #include <utility>
 #include <algorithm>
 #include <concepts>
 #include <array>
 #include <cmath>
+#include <cstdint>
+#include <limits>
+#include <type_traits>
 #include <optional>
 #include "Utility/Math/MathConstants.hpp"
 #include "Utility/Math/Angle.hpp"
@@ -12,6 +14,12 @@
 
 namespace Simple
 {
+
+	template<typename T>
+	struct Tolerance
+	{
+        T value = std::numeric_limits<T>::epsilon();
+	};
 
 	template<typename T>
 	[[nodiscard]] constexpr T Square(const T& value) noexcept
@@ -97,10 +105,10 @@ namespace Simple
 		return value > min && value < max;
 	}
 
-	template<typename T> requires std::is_arithmetic_v<T>
-	[[nodiscard]] constexpr bool NearlyEqual(const T& a, const T& b, const T& tolerance = static_cast<T>(0.0001)) noexcept
+	template<std::floating_point T>
+	[[nodiscard]] constexpr bool NearlyEqual(const T& a, const T& b, const Tolerance<T>& tolerance = Tolerance{ static_cast<T>(0.0001) }) noexcept
 	{
-		return Abs(a - b) < tolerance;
+		return Abs(a - b) < tolerance.value;
 	}
 
 	template<typename T>
@@ -117,13 +125,6 @@ namespace Simple
 	}
 
 	template<typename T, typename U>
-	concept Lerpable = requires(const T& start, const T& end, const U& percent)
-	{
-		{ start + percent * (end - start) } -> std::convertible_to<T>;
-    };
-
-
-	template<typename T, typename U> /*requires Lerpable<T, U>*/
     [[nodiscard]] constexpr auto Lerp(const T& start, const T& end, const U& percent) noexcept(std::is_trivially_constructible_v<T>) -> decltype(start + percent * (end - start))
 	{
 		return start + (end - start) * percent;
@@ -290,9 +291,9 @@ namespace Simple
 	}
 
 	template<typename T>
-	[[nodiscard]] constexpr bool IsNormalized(const T& x, const T& y) noexcept
+	[[nodiscard]] constexpr bool IsNormalized(const T& x, const T& y, const Tolerance<T>& tolerance = Tolerance<T>{ static_cast<T>(0.0001) }) noexcept
 	{
-		return LengthSquared(x, y) == static_cast<T>(1.0);
+		return NearlyEqual(LengthSquared(x, y), static_cast<T>(1.0), tolerance);
 	}
 
 	template<typename T>
@@ -304,10 +305,10 @@ namespace Simple
 		}
 	}
 
-	template<typename T>
-	[[nodiscard]] constexpr bool IsNormalized(const T& x, const T& y, const T& z) noexcept
+	template<std::floating_point T>
+	[[nodiscard]] constexpr bool IsNormalized(const T& x, const T& y, const T& z, const Tolerance<T>& tolerance = Tolerance<T>{ static_cast<T>(0.0001) }) noexcept
 	{
-		return LengthSquared(x, y, z) == static_cast<T>(1.0);
+		return NearlyEqual(LengthSquared(x, y, z), static_cast<T>(1.0), tolerance);
 	}
 
 	template<typename T>

@@ -341,11 +341,11 @@ namespace Simple
 		return Point3<T>(Max(a.x, b.x), Max(a.y, b.y), Max(a.z, b.z));
 	}
 
-	/*template<typename T>
-	[[nodiscard]] constexpr Point2<T> LerpPoint(const Point2<T>& a, const Point2<T>& b, const Vector2f& t) noexcept
+	template<typename T>
+	[[nodiscard]] constexpr T DistanceSquared(const Point2<T>& a, const Point2<T>& b) noexcept
 	{
-		return a + static_cast<Vector2<T>>(static_cast<Vector2f>(b - a) * t);
-	}*/
+		return Square(a.x - b.x) + Square(a.y - b.y);
+	}
 
 	template<typename T>
 	[[nodiscard]] constexpr T DistanceSquared(const Point3<T>& a, const Point3<T>& b) noexcept
@@ -354,19 +354,13 @@ namespace Simple
 	}
 
 	template<typename T>
-	[[nodiscard]] constexpr T DistanceSquared(const Point2<T>& a, const Point2<T>& b) noexcept
-	{
-		return Square(a.x - b.x) + Square(a.y - b.y);
-	}
-
-	template<typename T>
-	[[nodiscard]] constexpr T Distance(const Point3<T>& a, const Point3<T>& b) noexcept
+	[[nodiscard]] constexpr T Distance(const Point2<T>& a, const Point2<T>& b) noexcept
 	{
 		return Sqrt(DistanceSquared(a, b));
 	}
 
 	template<typename T>
-	[[nodiscard]] constexpr T Distance(const Point2<T>& a, const Point2<T>& b) noexcept
+	[[nodiscard]] constexpr T Distance(const Point3<T>& a, const Point3<T>& b) noexcept
 	{
 		return Sqrt(DistanceSquared(a, b));
 	}
@@ -420,7 +414,7 @@ namespace Simple
 	}
 
 	template<typename T>
-	[[nodiscard]] constexpr Vector2<T> Normalized(const Vector2<T>& vector)
+	[[nodiscard]] constexpr Vector2<T> ToNormalized(const Vector2<T>& vector)
 	{
 		Vector2<T> result = vector;
 		Normalize(result);
@@ -428,7 +422,7 @@ namespace Simple
 	}
 
 	template<typename T>
-	[[nodiscard]] constexpr Vector3<T> Normalized(const Vector3<T>& vector)
+	[[nodiscard]] constexpr Vector3<T> ToNormalized(const Vector3<T>& vector)
 	{
 		Vector3<T> result = vector;
 		Normalize(result);
@@ -498,45 +492,46 @@ namespace Simple
 	template<typename T>
 	[[nodiscard]] constexpr Vector3<T> Cross(const Vector3<T>& a, const Vector3<T>& b)
 	{
-		const auto result = Cross(a.x, a.y, a.z, b.x, b.y, b.z);
-		return Vector3<T>(result[0], result[1], result[2]);
+		return Vector3<T>(Cross(a.x, a.y, a.z, b.x, b.y, b.z));
 	}
 
 	template<template<typename> typename Ret = UnitVector3, typename T>
 	[[nodiscard]] constexpr Ret<T> Cross(const UnitVector3<T>& a, const UnitVector3<T>& b)
 	{
-		const auto result = Cross(a.X(), a.Y(), a.Z(), b.X(), b.Y(), b.Z());
-		return Ret<T>(result[0], result[1], result[2]);
+		return Ret<T>(Cross(a.X(), a.Y(), a.Z(), b.X(), b.Y(), b.Z()));
 	}
 
 	template<typename T>
 	[[nodiscard]] constexpr Vector3<T> Cross(const Vector3<T>& a, const UnitVector3<T>& b)
 	{
-		const auto result = Cross(a.x, a.y, a.z, b.X(), b.Y(), b.Z());
-		return Vector3<T>(result[0], result[1], result[2]);
+		return Vector3<T>(Cross(a.x, a.y, a.z, b.X(), b.Y(), b.Z()));
 	}
 
 	template<typename T>
 	[[nodiscard]] constexpr Vector3<T> Cross(const UnitVector3<T>& a, const Vector3<T>& b)
 	{
-		const auto result = Cross(a.X(), a.Y(), a.Z(), b.x, b.y, b.z);
-		return Vector3<T>(result[0], result[1], result[2]);
+		return Vector3<T>(Cross(a.X(), a.Y(), a.Z(), b.x, b.y, b.z));
 	}
 
-	template<typename T>
-	[[nodiscard]] constexpr Point3<T> InterpPoint(const Point3<T>& current, const Point3<T>& target, const float interpSpeed, const float deltaTime)
+	template<typename T, typename U, typename V>
+	[[nodiscard]] constexpr Point3<T> InterpPoint(const Point3<T>& current, const Point3<T>& target, const U interpSpeed, const V deltaTime)
 	{
-		const Vector3<T> deltaVector = target - current;
+		Vector3<T> deltaVector = target - current;
 		const T deltaVectorLengthSquared = LengthSquared(deltaVector);
-		const T maxStep = interpSpeed * deltaTime;
+		const auto maxStep = interpSpeed * deltaTime;
 
 		if (deltaVectorLengthSquared <= Square(maxStep))
 		{
 			return target;
 		}
 
-		const UnitVector3<T> deltaMove = UnitVector3f(deltaVector);
-		return current + deltaMove * maxStep;
+        // Manual normalization to avoid double Square calculation
+		const T length = Sqrt(deltaVectorLengthSquared);
+        deltaVector.x /= length;
+        deltaVector.y /= length;
+        deltaVector.z /= length;
+
+		return current + deltaVector * maxStep;
 	}
 
 	template<typename T>
@@ -570,6 +565,16 @@ namespace Simple
 			return -angleRadians; // Flip the sign for clockwise rotations
 		}
 
+		return angleRadians;
+	}
+
+	// 
+	template<typename T>
+    [[nodiscard]] constexpr Radians<T> CalculateAngleNew(const UnitVector2<T>& a, const UnitVector2<T>& b)
+	{
+		const T dot = Dot(a, b);
+		const T cross = Cross(a, b);
+		const Radians<T> angleRadians = ATan2(cross, dot);
 		return angleRadians;
 	}
 

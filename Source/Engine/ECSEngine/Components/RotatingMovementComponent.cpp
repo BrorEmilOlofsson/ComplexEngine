@@ -6,7 +6,7 @@ namespace Simple
 {
 	void RegisterRotatingMovementComponent() {}
 
-	COMPONENT(RotatingMovementComponent);
+	REGISTER_COMPONENT(RotatingMovementComponent);
 
 	REGISTER_MEMBER(RotatingMovementComponent::rotationAxis);
 	REGISTER_MEMBER(RotatingMovementComponent::rotationSpeed);

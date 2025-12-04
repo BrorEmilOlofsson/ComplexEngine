@@ -312,14 +312,6 @@ TEST_CASE("VectorMath::RemoveZ (UnitVector3)", "[VectorMath]")
     REQUIRE(vectorNoZ.Z() == 0.0f);
 }
 
-TEST_CASE("VectorMath::Dot (Vector3)", "[VectorMath]")
-{
-    const Vector3f a(1.0f, 2.0f, 3.0f);
-    const Vector3f b(4.0f, -5.0f, 6.0f);
-    const float result = Dot(a, b);
-    REQUIRE(result == (1.0f * 4.0f + 2.0f * -5.0f + 3.0f * 6.0f));
-}
-
 TEST_CASE("VectorMath::Min (Vector2)", "[VectorMath]")
 {
     constexpr Vector2f a(1.0f, 4.0f);
@@ -396,53 +388,348 @@ TEST_CASE("VectorMath::Max (Point3)", "[VectorMath]")
     REQUIRE(result.z == 5.0f);
 }
 
-TEST_CASE("VectorMath::Lerp (Point2f (float))", "[VectorMath]")
+TEST_CASE("VectorMath::DistanceSquared (Point2)", "[VectorMath]")
 {
-    constexpr Point2f a(5.0f, 5.0f);
-    constexpr Point2f b(10.0f, 10.0f);
-
-    constexpr Point2f result = Lerp(a, b, 0.5f);
-    REQUIRE(result.x == 7.5f);
-    REQUIRE(result.y == 7.5f);
+    constexpr Point2f a(1.f, 2.f);
+    constexpr Point2f b(2.f, 5.f);
+    constexpr float result = DistanceSquared(a, b);
+    REQUIRE(result == 10.f);
 }
 
-TEST_CASE("VectorMath::Lerp (Point2i (float))", "[VectorMath]")
+TEST_CASE("VectorMath::DistanceSquared (Point3)", "[VectorMath]")
 {
-    constexpr Point2i a(5, 5);
-    constexpr Point2i b(10, 10);
-    constexpr Point2i result = Lerp(a, b, 0.5f);
-    REQUIRE(result.x == 7);
-    REQUIRE(result.y == 7);
+    constexpr Point3f a(1.f, 2.f, 3.f);
+    constexpr Point3f b(4.f, 6.f, 3.f);
+    constexpr float result = DistanceSquared(a, b);
+    REQUIRE(result == 25.f);
 }
 
-TEST_CASE("VectorMath::Lerp (Point2i (int))", "[VectorMath]")
+TEST_CASE("VectorMath::Distance (Point2)", "[VectorMath]")
 {
-    constexpr Point2i a(5, 5);
-    constexpr Point2i b(10, 10);
-    constexpr Point2i result = Lerp(a, b, 2);
-    REQUIRE(result.x == 15);
-    REQUIRE(result.y == 15);
+    constexpr Point2f a(1.f, 2.f);
+    constexpr Point2f b(2.f, 5.f);
+    const float result = Distance(a, b);
+    REQUIRE(NearlyEqual(result, 3.16227766f));
 }
 
-TEST_CASE("VectorMath::Lerp (Point2f (Vector2f))", "[VectorMath]")
+TEST_CASE("VectorMath::Distance (Point3)", "[VectorMath]")
 {
-    constexpr Point2f a(5.0f, 5.0f);
-    constexpr Point2f b(10.0f, 10.0f);
-    constexpr Point2f result = Lerp(a, b, Vector2f(0.5f, 0.2f));
-    REQUIRE(result.x == 7.5f);
-    REQUIRE(result.y == 6.f);
+    constexpr Point3f a(1.f, 2.f, 3.f);
+    constexpr Point3f b(4.f, 6.f, 3.f);
+    const float result = Distance(a, b);
+    REQUIRE(NearlyEqual(result, 5.0f));
 }
 
-TEST_CASE("VectorMath::Lerp (Point2i (Vector2f))", "[VectorMath]")
+TEST_CASE("VectorMath::LengthSquared (Vector2)", "[VectorMath]")
 {
-    constexpr Point2i a(5, 5);
-    constexpr Point2i b(10, 10);
-    constexpr Point2i result = Lerp(a, b, Vector2f(0.5f, 0.2f));
-    REQUIRE(result.x == 7);
-    REQUIRE(result.y == 6);
+    constexpr Vector2f vec(3.f, 4.f);
+    constexpr float result = LengthSquared(vec);
+    REQUIRE(result == 25.f);
 }
 
-TEST_CASE("VectorMath::Cross (Vector3)", "[VectorMath]")
+TEST_CASE("VectorMath::LengthSquared (Vector3)", "[VectorMath]")
+{
+    constexpr Vector3f vec(2.f, 3.f, 6.f);
+    constexpr float result = LengthSquared(vec);
+    REQUIRE(result == 49.f);
+}
+
+TEST_CASE("VectorMath::Length (Vector2)", "[VectorMath]")
+{
+    constexpr Vector2f vec(3.f, 4.f);
+    const float result = Length(vec);
+    REQUIRE(result == 5.f);
+}
+
+TEST_CASE("VectorMath::Length (Vector3)", "[VectorMath]")
+{
+    constexpr Vector3f vec(2.f, 3.f, 6.f);
+    const float result = Length(vec);
+    REQUIRE(NearlyEqual(result, 7.f));
+}
+
+TEST_CASE("VectorMath::IsNormalized (Vector2)", "[VectorMath]")
+{
+    {
+        constexpr Vector2f v(2.f, 1.f);
+        constexpr bool s = IsNormalized(v);
+        REQUIRE_FALSE(s);
+    }
+
+    {
+        constexpr Vector2f v(1.f, 0.f);
+        constexpr bool s = IsNormalized(v);
+        REQUIRE(s);
+    }
+
+    {
+        constexpr Vector2f v(0.6f, 0.8f);
+        const bool s = IsNormalized(v);
+        REQUIRE(s);
+    }
+}
+
+TEST_CASE("VectorMath::IsNormalized (Vector3)", "[VectorMath]")
+{
+    {
+        constexpr Vector3f v(2.f, 1.f, 0.f);
+        constexpr bool s = IsNormalized(v);
+        REQUIRE_FALSE(s);
+    }
+    {
+        constexpr Vector3f v(1.f, 0.f, 0.f);
+        constexpr bool s = IsNormalized(v);
+        REQUIRE(s);
+    }
+    {
+        constexpr Vector3f v(0.57735027f, 0.57735027f, 0.57735027f); // Approximate normalized vector
+        const bool s = IsNormalized(v);
+        REQUIRE(s);
+    }
+}
+
+TEST_CASE("VectorMath::Normalize (Vector2)", "[VectorMath]")
+{
+    Vector2f v(3.f, 4.f);
+    Normalize(v);
+    REQUIRE(NearlyEqual(v.x, 0.6f));
+    REQUIRE(NearlyEqual(v.y, 0.8f));
+}
+
+TEST_CASE("VectorMath::Normalize (Vector3)", "[VectorMath]")
+{
+    Vector3f v(2.f, 3.f, 6.f);
+    Normalize(v);
+    REQUIRE(NearlyEqual(v.x, 0.28571427f));
+    REQUIRE(NearlyEqual(v.y, 0.42857143f));
+    REQUIRE(NearlyEqual(v.z, 0.85714286f));
+}
+
+TEST_CASE("VectorMath::ToNormalized (Vector2)", "[VectorMath]")
+{
+    constexpr Vector2f v(3.f, 4.f);
+    const Vector2f normalized = ToNormalized(v);
+    REQUIRE(NearlyEqual(normalized.x, 0.6f));
+    REQUIRE(NearlyEqual(normalized.y, 0.8f));
+}
+
+TEST_CASE("VectorMath::ToNormalized (Vector3)", "[VectorMath]")
+{
+    constexpr Vector3f v(2.f, 3.f, 6.f);
+    const Vector3f normalized = ToNormalized(v);
+    REQUIRE(NearlyEqual(normalized.x, 0.28571427f));
+    REQUIRE(NearlyEqual(normalized.y, 0.42857143f));
+    REQUIRE(NearlyEqual(normalized.z, 0.85714286f));
+}
+
+TEST_CASE("VectorMath::Dot (Vector2, Vector2)", "[VectorMath]")
+{
+    const Vector2f a(1.0f, 2.0f);
+    const Vector2f b(4.0f, -5.0f);
+    const float result = Dot(a, b);
+    REQUIRE(result == (1.0f * 4.0f + 2.0f * -5.0f));
+}
+
+TEST_CASE("VectorMath::Dot (UnitVector2, UnitVector2)", "[VectorMath]")
+{
+    const UnitVector2f a(0.6f, 0.8f); // Normalized vector
+    const UnitVector2f b(0.8f, -0.6f); // Normalized vector
+    const float result = Dot(a, b);
+    REQUIRE(NearlyEqual(result, (0.6f * 0.8f + 0.8f * -0.6f)));
+}
+
+TEST_CASE("VectorMath::Dot (Vector2, UnitVector2)", "[VectorMath]")
+{
+    const Vector2f a(1.0f, 2.0f);
+    const UnitVector2f b(0.8f, -0.6f); // Normalized vector
+    const float result = Dot(a, b);
+    REQUIRE(NearlyEqual(result, (1.0f * 0.8f + 2.0f * -0.6f)));
+}
+
+TEST_CASE("VectorMath::Dot (UnitVector2, Vector2)", "[VectorMath]")
+{
+    const UnitVector2f a(0.6f, 0.8f); // Normalized vector
+    const Vector2f b(4.0f, -5.0f);
+    const float result = Dot(a, b);
+    REQUIRE(NearlyEqual(result, (0.6f * 4.0f + 0.8f * -5.0f)));
+}
+
+TEST_CASE("VectorMath::Dot (Vector3, Vector3)", "[VectorMath]")
+{
+    const Vector3f a(1.0f, 2.0f, 3.0f);
+    const Vector3f b(4.0f, -5.0f, 6.0f);
+    const float result = Dot(a, b);
+    REQUIRE(result == (1.0f * 4.0f + 2.0f * -5.0f + 3.0f * 6.0f));
+}
+
+TEST_CASE("VectorMath::Dot (UnitVector3, UnitVector3)", "[VectorMath]")
+{
+    const UnitVector3f a(0.57735027f, 0.57735027f, 0.57735027f); // Approximate normalized vector
+    const UnitVector3f b(0.70710678f, -0.70710678f, 0.0f); // Approximate normalized vector
+    const float result = Dot(a, b);
+    REQUIRE(NearlyEqual(result, (0.57735027f * 0.70710678f + 0.57735027f * -0.70710678f + 0.57735027f * 0.0f)));
+}
+
+TEST_CASE("VectorMath::Dot (Vector3, UnitVector3)", "[VectorMath]")
+{
+    const Vector3f a(1.0f, 2.0f, 3.0f);
+    const UnitVector3f b(0.70710678f, -0.70710678f, 0.0f); // Approximate normalized vector
+    const float result = Dot(a, b);
+    REQUIRE(NearlyEqual(result, (1.0f * 0.70710678f + 2.0f * -0.70710678f + 3.0f * 0.0f)));
+}
+
+TEST_CASE("VectorMath::Dot (UnitVector3, Vector3)", "[VectorMath]")
+{
+    const UnitVector3f a(0.57735027f, 0.57735027f, 0.57735027f); // Approximate normalized vector
+    const Vector3f b(4.0f, -5.0f, 6.0f);
+    const float result = Dot(a, b);
+    REQUIRE(NearlyEqual(result, (0.57735027f * 4.0f + 0.57735027f * -5.0f + 0.57735027f * 6.0f)));
+}
+
+TEST_CASE("VectorMath::Cross (Vector2)", "[VectorMath]")
+{
+    constexpr Vector2f right(1.f, 0.f);
+    constexpr Vector2f up(0.f, 1.f);
+    {
+        constexpr float result = Cross(right, up);
+        REQUIRE(result == 1.f);
+    }
+    {
+        const float result = Cross(up, right);
+        REQUIRE(result == -1.f);
+    }
+}
+
+TEST_CASE("VectorMath::Cross (UnitVector2)", "[VectorMath]")
+{
+    constexpr UnitVector2f right = UnitVector2f::Right();
+    constexpr UnitVector2f up = UnitVector2f::Up();
+    {
+        constexpr float result = Cross(right, up);
+        REQUIRE(result == 1.f);
+    }
+    {
+        const float result = Cross(up, right);
+        REQUIRE(result == -1.f);
+    }
+}
+
+TEST_CASE("VectorMath::Cross (Vector3, Vector3)", "[VectorMath]")
+{
+    constexpr Vector3f right(1, 0, 0);
+    constexpr Vector3f up(0, 1, 0);
+    constexpr Vector3f forward(0, 0, 1);
+    {
+        const Vector3f result = Cross(right, up);
+        REQUIRE(result == forward);
+    }
+    {
+        const Vector3f result = Cross(up, right);
+        REQUIRE(result == -forward);
+    }
+    {
+        const Vector3f result = Cross(up, forward);
+        REQUIRE(result == right);
+    }
+    {
+        const Vector3f result = Cross(forward, up);
+        REQUIRE(result == -right);
+    }
+    {
+        const Vector3f result = Cross(forward, right);
+        REQUIRE(result == up);
+    }
+    {
+        const Vector3f result = Cross(right, forward);
+        REQUIRE(result == -up);
+    }
+}
+
+TEST_CASE("VectorMath::Cross (Vector3, UnitVector3)", "[VectorMath]")
+{
+    constexpr UnitVector3f right = UnitVector3f::Right();
+    constexpr UnitVector3f up = UnitVector3f::Up();
+    constexpr UnitVector3f forward = UnitVector3f::Forward();
+    constexpr UnitVector3f left = UnitVector3f::Left();
+    constexpr UnitVector3f down = UnitVector3f::Down();
+    constexpr UnitVector3f backward = UnitVector3f::Backward();
+    constexpr Vector3f vecRight(1.f, 0.f, 0.f);
+    constexpr Vector3f vecUp(0.f, 1.f, 0.f);
+    constexpr Vector3f vecForward(0.f, 0.f, 1.f);
+
+    {
+        const Vector3f result = Cross(vecRight, up);
+        REQUIRE(result == vecForward);
+    }
+    {
+        const Vector3f result = Cross(vecUp, right);
+        REQUIRE(result == -vecForward);
+    }
+    {
+        const Vector3f result = Cross(vecUp, forward);
+        REQUIRE(result == vecRight);
+    }
+    {
+        const Vector3f result = Cross(vecForward, up);
+        REQUIRE(result == -vecRight);
+    }
+    {
+        const Vector3f result = Cross(vecForward, right);
+        REQUIRE(result == vecUp);
+    }
+    {
+        const Vector3f result = Cross(vecRight, forward);
+        REQUIRE(result == -vecUp);
+    }
+    {
+        const Vector3f result = Cross(-vecForward, right);
+        REQUIRE(result == -vecUp);
+    }
+}
+
+TEST_CASE("VectorMath::Cross (UnitVector3, Vector3)", "[VectorMath]")
+{
+    constexpr UnitVector3f right = UnitVector3f::Right();
+    constexpr UnitVector3f up = UnitVector3f::Up();
+    constexpr UnitVector3f forward = UnitVector3f::Forward();
+    constexpr UnitVector3f left = UnitVector3f::Left();
+    constexpr UnitVector3f down = UnitVector3f::Down();
+    constexpr UnitVector3f backward = UnitVector3f::Backward();
+    constexpr Vector3f vecRight(1.f, 0.f, 0.f);
+    constexpr Vector3f vecUp(0.f, 1.f, 0.f);
+    constexpr Vector3f vecForward(0.f, 0.f, 1.f);
+
+    {
+        const Vector3f result = Cross(right, vecUp);
+        REQUIRE(result == vecForward);
+    }
+    {
+        const Vector3f result = Cross(up, vecRight);
+        REQUIRE(result == -vecForward);
+    }
+    {
+        const Vector3f result = Cross(up, vecForward);
+        REQUIRE(result == vecRight);
+    }
+    {
+        const Vector3f result = Cross(forward, vecUp);
+        REQUIRE(result == -vecRight);
+    }
+    {
+        const Vector3f result = Cross(forward, vecRight);
+        REQUIRE(result == vecUp);
+    }
+    {
+        const Vector3f result = Cross(right, vecForward);
+        REQUIRE(result == -vecUp);
+    }
+    {
+        const Vector3f result = Cross(-forward, vecRight);
+        REQUIRE(result == -vecUp);
+    }
+}
+
+TEST_CASE("VectorMath::Cross (UnitVector3, UnitVector3)", "[VectorMath]")
 {
     constexpr UnitVector3f right = UnitVector3f::Right();
     constexpr UnitVector3f up = UnitVector3f::Up();
@@ -481,6 +768,64 @@ TEST_CASE("VectorMath::Cross (Vector3)", "[VectorMath]")
     }
 }
 
+TEST_CASE("VectorMath::InterpPoint")
+{
+    constexpr Point3f point1(10.f, 10.f, 10.f);
+    constexpr Point3f target = Point3f::Zero();
+
+    const Point3f p = InterpPoint(point1, target, 10.f, 0.1f);
+
+    REQUIRE(NearlyEqual(p.x, 9.42264938f));
+    REQUIRE(NearlyEqual(p.y, 9.42264938f));
+    REQUIRE(NearlyEqual(p.z, 9.42264938f));
+}
+
+
+TEST_CASE("VectorMath::CalculateAngleNew (UnitVector2)", "[VectorMath]")
+{
+    {
+        constexpr UnitVector2f right = UnitVector2f::Right();
+        constexpr UnitVector2f up = UnitVector2f::Up();
+        const Radiansf angle = CalculateAngleNew(right, up);
+        REQUIRE(angle == ToRadians(Degreesf(90)));
+    }
+    {
+        constexpr UnitVector2f down = UnitVector2f::Down();
+        constexpr UnitVector2f up = UnitVector2f::Up();
+        const Radiansf angle = CalculateAngleNew(down, up);
+        REQUIRE(angle == ToRadians(Degreesf(180.f)));
+    }
+    {
+        constexpr UnitVector2f right = UnitVector2f::Right();
+        constexpr UnitVector2f up = UnitVector2f::Up();
+        const Radiansf angle = CalculateAngleNew(up, right);
+        REQUIRE(angle == ToRadians(Degreesf(-90.f)));
+    }
+    {
+        constexpr UnitVector2f down = UnitVector2f::Down();
+        constexpr UnitVector2f up = UnitVector2f::Up();
+        const Radiansf angle = CalculateAngleNew(up, down);
+        REQUIRE(angle == ToRadians(Degreesf(180.f)));
+    }
+}
+
+//TEST_CASE("VectorMath::CalculateAngle", "[VectorMath]")
+//{
+//    {
+//        constexpr UnitVector2f right = UnitVector2f::Right();
+//        constexpr UnitVector2f up = UnitVector2f::Up();
+//        const Radiansf angle = CalculateAngle(right, up);
+//        REQUIRE(angle == ToRadians(Degreesf(90)));
+//    }
+//    {
+//        constexpr UnitVector2f vec1(0, 1);
+//        const UnitVector2f vec2(1, 1);
+//        const Radiansf angle = CalculateAngle(vec1, vec2);
+//        REQUIRE(angle == ToRadians(Degreesf(45)));
+//    }
+//}
+
+
 TEST_CASE("VectorMath::GetUnitVector")
 {
     constexpr Point3f p1(10, 20.f, 100.f);
@@ -513,16 +858,6 @@ TEST_CASE("VectorMath::GetPerpendicularVector")
     const UnitVector3f perp = GetPerpendicularVector(forward);
 
     REQUIRE(Dot(forward, perp) == 0.f);
-}
-
-TEST_CASE("VectorMath::InterpPoint")
-{
-    constexpr Point3f point1(10, 0, 0);
-    constexpr Point3f target;
-
-    const Point3f p = InterpPoint(point1, target, 10.f, 0.1f);
-
-    REQUIRE(p == Point3f(9, 0, 0));
 }
 
 TEST_CASE("VectorMath::CalculateAngle")
@@ -571,4 +906,51 @@ TEST_CASE("VectorMath::ToClipCoords")
     constexpr Point2f clipCoords = ToClipCoords(point, size);
 
     REQUIRE(clipCoords == Point2f(-1, 0));
+}
+
+
+TEST_CASE("VectorMath::Lerp (Point2f (float))", "[VectorMath]")
+{
+    constexpr Point2f a(5.0f, 5.0f);
+    constexpr Point2f b(10.0f, 10.0f);
+
+    constexpr Point2f result = Lerp(a, b, 0.5f);
+    REQUIRE(result.x == 7.5f);
+    REQUIRE(result.y == 7.5f);
+}
+
+TEST_CASE("VectorMath::Lerp (Point2i (float))", "[VectorMath]")
+{
+    constexpr Point2i a(5, 5);
+    constexpr Point2i b(10, 10);
+    constexpr Point2i result = Lerp(a, b, 0.5f);
+    REQUIRE(result.x == 7);
+    REQUIRE(result.y == 7);
+}
+
+TEST_CASE("VectorMath::Lerp (Point2i (int))", "[VectorMath]")
+{
+    constexpr Point2i a(5, 5);
+    constexpr Point2i b(10, 10);
+    constexpr Point2i result = Lerp(a, b, 2);
+    REQUIRE(result.x == 15);
+    REQUIRE(result.y == 15);
+}
+
+TEST_CASE("VectorMath::Lerp (Point2f (Vector2f))", "[VectorMath]")
+{
+    constexpr Point2f a(5.0f, 5.0f);
+    constexpr Point2f b(10.0f, 10.0f);
+    constexpr Point2f result = Lerp(a, b, Vector2f(0.5f, 0.2f));
+    REQUIRE(result.x == 7.5f);
+    REQUIRE(result.y == 6.f);
+}
+
+TEST_CASE("VectorMath::Lerp (Point2i (Vector2f))", "[VectorMath]")
+{
+    constexpr Point2i a(5, 5);
+    constexpr Point2i b(10, 10);
+    constexpr Point2i result = Lerp(a, b, Vector2f(0.5f, 0.2f));
+    REQUIRE(result.x == 7);
+    REQUIRE(result.y == 6);
 }

@@ -9,7 +9,7 @@ namespace Simple
 	{
 	}
 
-	COMPONENT(NameComponent, IsDefaultComponent{});
+	REGISTER_COMPONENT(NameComponent, IsDefaultComponent{});
 
 	REGISTER_MEMBER(NameComponent::name);
 

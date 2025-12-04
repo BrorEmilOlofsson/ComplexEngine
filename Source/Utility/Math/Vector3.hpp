@@ -1,4 +1,6 @@
 #pragma once
+#include <cstdint>
+#include <array>
 #include <iostream>
 #include "Utility/Math/Math.hpp"
 
@@ -15,6 +17,8 @@ namespace Simple
 		constexpr Vector3() noexcept = default;
 		constexpr Vector3(const T& x, const T& y, const T& z) noexcept;
 		constexpr explicit Vector3(const T& value) noexcept;
+		constexpr explicit Vector3(const std::array<T, 3>& array) noexcept;
+
 		template<typename U>
 		constexpr explicit Vector3(const Vector3<U>& vector) noexcept;
 
@@ -48,6 +52,14 @@ namespace Simple
 		, z(value)
 	{
 	}
+
+	template<typename T>
+	constexpr Vector3<T>::Vector3(const std::array<T, 3>& array) noexcept
+		: x(array[0])
+		, y(array[1])
+		, z(array[2])
+	{
+    }
 
 	template<typename T>
 	template<typename U>
@@ -192,8 +204,8 @@ namespace Simple
 	}
 
 	template<typename T>
-	[[nodiscard]] constexpr bool NearlyEqual(const Vector3<T>& a, const Vector3<T>& b, const T& tolerance = static_cast<T>(0.0001)) noexcept
+	[[nodiscard]] constexpr bool NearlyEqual(const Vector3<T>& a, const Vector3<T>& b, const Tolerance<T>& tolerance = Tolerance<T>{ static_cast<T>(0.0001) }) noexcept
 	{
-		return (Abs(a.x - b.x) < tolerance) && (Abs(a.y - b.y) < tolerance) && (Abs(a.z - b.z) < tolerance);
+        return NearlyEqual(a.x, b.x, tolerance) && NearlyEqual(a.y, b.y, tolerance) && NearlyEqual(a.z, b.z, tolerance);
 	}
 }
