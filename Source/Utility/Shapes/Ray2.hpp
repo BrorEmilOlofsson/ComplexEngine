@@ -11,8 +11,9 @@ namespace Simple
 	public:
 
 		constexpr Ray2() = default;
-		constexpr Ray2(const Point2<T>& origin, const UnitVector2<T>& direction);
-		constexpr Ray2(const Point2<T>& origin, const Point2<T>& point);
+
+		[[nodiscard]] static constexpr Ray2<T> FromOriginAndDirection(const Point2<T>& origin, const UnitVector2<T>& direction);
+        [[nodiscard]] static constexpr Ray2<T> FromOriginAndPoint(const Point2<T>& origin, const Point2<T>& point);
 
 		constexpr const Point2<T>& GetOrigin() const;
 		constexpr const UnitVector2<T>& GetDirection() const;
@@ -24,11 +25,16 @@ namespace Simple
 
 	private:
 
+		constexpr Ray2(const Point2<T>& origin, const UnitVector2<T>& direction);
+		
+	public:
+
 		Point2<T> mOrigin;
-		UnitVector2<T> mDirection;
+		UnitVector2<T> mDirection = UnitVector2d::Right();
 	};
 
 	using Ray2f = Ray2<float>;
+	using Ray2d = Ray2<double>;
 
 	template<typename T>
 	constexpr Ray2<T>::Ray2(const Point2<T>& origin, const UnitVector2<T>& direction)
@@ -38,11 +44,16 @@ namespace Simple
 	}
 
 	template<typename T>
-	constexpr Ray2<T>::Ray2(const Point2<T>& origin, const Point2<T>& point)
-		: mOrigin(origin)
-		, mDirection(point - origin)
+	constexpr Ray2<T> Ray2<T>::FromOriginAndDirection(const Point2<T>& origin, const UnitVector2<T>& direction)
 	{
-	}
+		return Ray2<T>(origin, direction);
+    }
+
+	template<typename T>
+	constexpr Ray2<T> Ray2<T>::FromOriginAndPoint(const Point2<T>& origin, const Point2<T>& point)
+	{
+		return Ray2<T>(origin, UnitVector2<T>(point - origin));
+    }
 
 	template<typename T>
 	constexpr const Point2<T>& Ray2<T>::GetOrigin() const

@@ -1,6 +1,7 @@
 #pragma once
 #include "Utility/Math/Point3.hpp"
 #include "Utility/Math/UnitVector3.hpp"
+#include "Utility/Math/VectorMath.hpp"
 
 namespace Simple
 {
@@ -11,14 +12,19 @@ namespace Simple
 	public:
 
 		constexpr Plane() = default;
-		constexpr Plane(const Point3<T>& point0, const Point3<T>& point1, const Point3<T>& point2);
-		constexpr Plane(const Point3<T>& point, const UnitVector3<T>& normal);
+
+        [[nodiscard]] static constexpr Plane<T> FromPoints(const Point3<T>& point0, const Point3<T>& point1, const Point3<T>& point2);
+        [[nodiscard]] static constexpr Plane<T> FromPointAndNormal(const Point3<T>& point, const UnitVector3<T>& normal);
 
 		[[nodiscard]] constexpr Point3<T> GetPoint() const;
 		[[nodiscard]] constexpr const UnitVector3<T>& GetNormal() const;
 
-		void SetPoint(const Point3<T>& point);
-		void SetNormal(const UnitVector3<T>& normal);
+		constexpr void SetPoint(const Point3<T>& point);
+		constexpr void SetNormal(const UnitVector3<T>& normal);
+
+	private:
+
+		constexpr Plane(const Point3<T>& point, const UnitVector3<T>& normal);
 
 	private:
 
@@ -29,14 +35,19 @@ namespace Simple
 	using Planef = Plane<float>;
 
 	template<typename T>
-	constexpr Plane<T>::Plane(const Point3<T>& point0, const Point3<T>& point1, const Point3<T>& point2)
-		: mPoint(point0)
+	constexpr Plane<T> Plane<T>::FromPoints(const Point3<T>& point0, const Point3<T>& point1, const Point3<T>& point2)
 	{
 		const Vector3<T> vector1 = point1 - point0;
 		const Vector3<T> vector2 = point2 - point0;
+        const Vector3<T> normalVector = Cross(vector1, vector2);
+        return Plane<T>(point0, UnitVector3<T>(normalVector));
+    }
 
-		mNormal = UnitVector3<T>(Cross(vector1, vector2));
-	}
+	template<typename T>
+	constexpr Plane<T> Plane<T>::FromPointAndNormal(const Point3<T>& point, const UnitVector3<T>& normal)
+	{
+		return Plane<T>(point, normal);
+    }
 
 	template<typename T>
 	constexpr Plane<T>::Plane(const Point3<T>& point, const UnitVector3<T>& normal)
@@ -58,13 +69,13 @@ namespace Simple
 	}
 
 	template<typename T>
-	void Plane<T>::SetPoint(const Point3<T>& point)
+	constexpr void Plane<T>::SetPoint(const Point3<T>& point)
 	{
 		mPoint = point;
 	}
 
 	template<typename T>
-	void Plane<T>::SetNormal(const UnitVector3<T>& normal)
+	constexpr void Plane<T>::SetNormal(const UnitVector3<T>& normal)
 	{
 		mNormal = normal;
 	}

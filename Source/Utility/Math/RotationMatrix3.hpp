@@ -40,7 +40,8 @@ namespace Simple
 		constexpr RotationMatrix3() noexcept = default;
 		constexpr explicit RotationMatrix3(const std::array<T, 9>& values);
 
-		[[nodiscard]] constexpr const T& operator()(const unsigned int row, const unsigned int column) const;
+		[[nodiscard]] constexpr const T& operator()(const unsigned int row, const unsigned int column) const noexcept;
+		[[nodiscard]] constexpr const T& operator[](const unsigned int index) const noexcept;
 
 		[[nodiscard]] constexpr const UnitVector3<T>& GetRight() const noexcept;
 		[[nodiscard]] constexpr const UnitVector3<T>& GetUp() const noexcept;
@@ -66,6 +67,9 @@ namespace Simple
 		[[nodiscard]] static constexpr RotationMatrix3<T> FromYZ(const UnitVector3<T>& yAxis, const UnitVector3<T>& zAxis);
 		[[nodiscard]] static constexpr RotationMatrix3<T> FromZX(const UnitVector3<T>& zAxis, const UnitVector3<T>& xAxis);
 		[[nodiscard]] static constexpr RotationMatrix3<T> FromZY(const UnitVector3<T>& zAxis, const UnitVector3<T>& yAxis);
+        [[nodiscard]] static constexpr RotationMatrix3<T> FromX(const UnitVector3<T>& xAxis);
+        [[nodiscard]] static constexpr RotationMatrix3<T> FromY(const UnitVector3<T>& yAxis);
+		[[nodiscard]] static constexpr RotationMatrix3<T> FromZ(const UnitVector3<T>& zAxis);
 
 		[[nodiscard]] friend constexpr bool operator==(const RotationMatrix3<T>& a, const RotationMatrix3<T>& b) noexcept
 		{
@@ -107,10 +111,17 @@ namespace Simple
 	}
 
 	template<typename T>
-	constexpr const T& RotationMatrix3<T>::operator()(const unsigned int row, const unsigned int column) const
+	constexpr const T& RotationMatrix3<T>::operator()(const unsigned int row, const unsigned int column) const noexcept
 	{
 		static_assert(sizeof(RotationMatrix3<T>) == sizeof(T) * 3 * 3);
 		const unsigned int index = row * 3 + column;
+		return reinterpret_cast<const T*>(this)[index];
+	}
+
+	template<typename T>
+	constexpr const T& RotationMatrix3<T>::operator[](const unsigned int index) const noexcept
+	{
+		static_assert(sizeof(RotationMatrix3<T>) == sizeof(T) * 3 * 3);
 		return reinterpret_cast<const T*>(this)[index];
 	}
 
@@ -191,6 +202,34 @@ namespace Simple
 		const UnitVector3<T> yAxisCorrected = Cross(zAxis, xAxis);
 		return FromAxes(xAxis, yAxisCorrected, zAxis);
 	}
+
+	template<typename T>
+	constexpr RotationMatrix3<T> RotationMatrix3<T>::FromX(const UnitVector3<T>& xAxis)
+	{
+		const UnitVector3<T> yAxis = GetPerpendicularVector(xAxis);
+		return FromXY(xAxis, yAxis);
+    }
+
+	template<typename T>
+	constexpr RotationMatrix3<T> RotationMatrix3<T>::FromY(const UnitVector3<T>& yAxis)
+	{
+		const UnitVector3<T> zAxis = GetPerpendicularVector(yAxis);
+		return FromYZ(yAxis, zAxis);
+    }
+
+	template<typename T>
+	constexpr RotationMatrix3<T> RotationMatrix3<T>::FromZ(const UnitVector3<T>& zAxis)
+	{
+		const UnitVector3<T> xAxis = GetPerpendicularVector(zAxis);
+		return FromXZ(xAxis, zAxis);
+    }
+
+	template<typename T>
+	[[nodiscard]] constexpr RotationMatrix3<T> operator*(const RotationMatrix3<T>& a, const RotationMatrix3<T>& b)
+	{
+        auto m = a.ToMatrix() * b.ToMatrix();
+		return RotationMatrix3<T>(m.GetValues());
+    }
 
 	template<typename T>
 	[[nodiscard]] constexpr Vector3<T> operator*(const Vector3<T>& vector, const RotationMatrix3<T>& matrix) noexcept

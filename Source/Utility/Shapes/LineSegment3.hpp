@@ -10,13 +10,18 @@ namespace Simple
 	public:
 
 		constexpr LineSegment3() = default;
-		constexpr LineSegment3(const Point3<T>& startPoint, const Point3<T>& endPoint);
+
+		[[nodiscard]] static constexpr LineSegment3<T> FromPoints(const Point3<T>& startPoint, const Point3<T>& endPoint);
 
 		[[nodiscard]] constexpr Point3<T>& StartPoint();
 		[[nodiscard]] constexpr Point3<T>& EndPoint();
 
 		[[nodiscard]] constexpr const Point3<T>& StartPoint() const;
 		[[nodiscard]] constexpr const Point3<T>& EndPoint() const;
+
+	private:
+
+		constexpr LineSegment3(const Point3<T>& startPoint, const Point3<T>& endPoint);
 
 	private:
 
@@ -32,6 +37,12 @@ namespace Simple
 		, mEndPoint(endPoint)
 	{
 	}
+
+	template<typename T>
+	constexpr LineSegment3<T> LineSegment3<T>::FromPoints(const Point3<T>& startPoint, const Point3<T>& endPoint)
+	{
+		return LineSegment3<T>(startPoint, endPoint);
+    }
 
 	template<typename T>
 	constexpr Point3<T>& LineSegment3<T>::StartPoint()

@@ -54,7 +54,7 @@ namespace Simple
 			RenderFrustrum(frustrum, Colors::Lime, renderList);
 
 			DrawSphere sphere;
-			sphere.sphere = Spheref(camera.GetPosition(), 0.1f);
+			sphere.sphere = Spheref::FromCenterAndRadius(camera.GetPosition(), 0.1f);
 			sphere.color = Colors::Gray;
 
 			renderList.AddSphere(sphere, false);

@@ -173,7 +173,7 @@ TEST_CASE("Matrix4x4 Multiplication with Vector", "[Matrix4x4]")
 	}
 
 	{
-		constexpr Matrix4x4f matrix = CreateMatrixFromXZ(UnitVector3f::Forward(), UnitVector3f::Left());
+		constexpr Matrix4x4f matrix = Matrix4x4f::CreateRotationMatrix(RotationMatrix3f::FromXZ(UnitVector3f::Forward(), UnitVector3f::Left()));
 
 		constexpr Vector3f vector(1.f, 0.f, 0.f);
 
@@ -427,7 +427,7 @@ TEST_CASE("Matrix4x4 CreateTRSMatrix", "[Matrix4x4]")
 TEST_CASE("GetFastInverse", "[Matrix4x4]")
 {
 
-	Matrix4x4f world = CreateMatrixFromXY(UnitVector3f::Forward(), UnitVector3f::Up());
+	Matrix4x4f world = Matrix4x4f::CreateRotationMatrix(RotationMatrix3f::FromXY(UnitVector3f::Forward(), UnitVector3f::Up()));
 	world.SetTranslation(Point3f(10.f, 5.f, -3.f));
 
 	Matrix4x4f view = Matrix4x4f::GetFastInverse(world);

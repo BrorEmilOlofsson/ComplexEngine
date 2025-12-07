@@ -42,7 +42,7 @@ namespace Simple
 			const Point3f& pos33D = navmesh.mNavmeshData.m3DVertices[newNode.mVertexIndices[2]];
 			newNode.mCenter3D = AveragePoint(pos13D, pos23D, pos33D);
 
-			newNode.mPlane = Planef(newNode.mCenter3D, pos23D, pos33D);
+			newNode.mPlane = Planef::FromPoints(newNode.mCenter3D, pos23D, pos33D);
 
 			if (newNode.mPlane.GetNormal().Y() <= 0)
 			{

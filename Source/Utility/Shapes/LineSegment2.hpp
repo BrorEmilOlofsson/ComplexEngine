@@ -11,7 +11,8 @@ namespace Simple
 	public:
 
 		constexpr LineSegment2() = default;
-		constexpr LineSegment2(const Point2<T>& startPoint, const Point2<T>& endPoint);
+
+        [[nodiscard]] static constexpr LineSegment2<T> FromPoints(const Point2<T>& startPoint, const Point2<T>& endPoint);
 
 		[[nodiscard]] constexpr Point2<T>& StartPoint() noexcept;
 		[[nodiscard]] constexpr Point2<T>& EndPoint() noexcept;
@@ -21,11 +22,16 @@ namespace Simple
 
 	private:
 
+		constexpr LineSegment2(const Point2<T>& startPoint, const Point2<T>& endPoint);
+
+	private:
+
 		Point2<T> mStartPoint;
 		Point2<T> mEndPoint;
 	};
 
 	using LineSegment2f = LineSegment2<float>;
+	using LineSegment2d = LineSegment2<double>;
 
 	template<typename T>
 	constexpr LineSegment2<T>::LineSegment2(const Point2<T>& startPoint, const Point2<T>& endPoint)
@@ -33,6 +39,12 @@ namespace Simple
 		, mEndPoint(endPoint)
 	{
 	}
+	
+	template<typename T>
+	constexpr LineSegment2<T> LineSegment2<T>::FromPoints(const Point2<T>& startPoint, const Point2<T>& endPoint)
+	{
+		return LineSegment2<T>(startPoint, endPoint);
+    }
 
 	template<typename T>
 	constexpr Point2<T>& LineSegment2<T>::StartPoint() noexcept

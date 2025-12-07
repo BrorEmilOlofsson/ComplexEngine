@@ -220,38 +220,38 @@ namespace Simple
 		mPyramidRenderer.Render(*mDeviceContext.Get(), unlitPixelShader, vertexShader, renderList.GetPyramids(), colorCB,
 			[](const DrawPyramid& drawPyramid)
 			{
-				Matrix4x4f matrix = CreateMatrixFromY(drawPyramid.direction);
-				matrix.SetTranslation(drawPyramid.startPoint);
-				matrix.SetScale(Vector3f(drawPyramid.thickness, drawPyramid.thickness, drawPyramid.thickness));
-				return matrix;
+                RotationMatrix3f rotation = RotationMatrix3f::FromY(drawPyramid.direction);
+                Vector3f scale = Vector3f(drawPyramid.thickness, drawPyramid.thickness, drawPyramid.thickness);
+
+				return Matrix4x4f::CreateTRSMatrix(drawPyramid.startPoint, rotation, scale);
 			});
 
 		mCylinderRenderer.Render(*mDeviceContext.Get(), unlitPixelShader, vertexShader, renderList.GetCylinders(), colorCB,
 			[](const DrawCylinder& drawCylinder)
 			{
-				Matrix4x4f matrix = CreateMatrixFromY(drawCylinder.cylinder.GetAxis());
-				matrix.SetTranslation(drawCylinder.cylinder.GetLowerPoint());
-				matrix.SetScale(Vector3f(drawCylinder.cylinder.GetRadius() * 2, drawCylinder.cylinder.GetHeight(), drawCylinder.cylinder.GetRadius() * 2));
-				return matrix;
+				RotationMatrix3f matrix = RotationMatrix3f::FromY(drawCylinder.cylinder.GetAxis());
+				Point3f position = drawCylinder.cylinder.GetLowerPoint();
+				Vector3f scale = Vector3f(drawCylinder.cylinder.GetRadius() * 2, drawCylinder.cylinder.GetHeight(), drawCylinder.cylinder.GetRadius() * 2);
+				return Matrix4x4f::CreateTRSMatrix(position, matrix, scale);
 			});
 
 		mPlaneRenderer.Render(*mDeviceContext.Get(), unlitPixelShader, vertexShader, renderList.GetPlanes(), colorCB,
 			[](const DrawPlane& drawPlane)
 			{
-				Matrix4x4f matrix = CreateMatrixFromY(drawPlane.plane.GetNormal());
-				matrix.SetScale(Vector3f(10000, 10000, 10000));
-				matrix.SetTranslation(drawPlane.plane.GetPoint());
-				return matrix;
+				RotationMatrix3f matrix = RotationMatrix3f::FromY(drawPlane.plane.GetNormal());
+				Vector3f scale = Vector3f(10000, 10000, 10000);
+				Point3f position = drawPlane.plane.GetPoint();
+				return Matrix4x4f::CreateTRSMatrix(position, matrix, scale);
 			}
 		);
 
 		mArrowRenderer.Render(*mDeviceContext.Get(), unlitPixelShader, vertexShader, renderList.GetArrows(), colorCB,
 			[](const DrawArrow& drawArrow)
 			{
-				Matrix4x4f matrix = CreateMatrixFromY(GetUnitVector(drawArrow.startPoint, drawArrow.endPoint));
-				matrix.SetTranslation(drawArrow.startPoint);
-				matrix.SetScale(Vector3f(drawArrow.thickness, Distance(drawArrow.startPoint, drawArrow.endPoint), drawArrow.thickness));
-				return matrix;
+				RotationMatrix3f matrix = RotationMatrix3f::FromY(GetUnitVector(drawArrow.startPoint, drawArrow.endPoint));
+				Point3f position = drawArrow.startPoint;
+				Vector3f scale = Vector3f(drawArrow.thickness, Distance(drawArrow.startPoint, drawArrow.endPoint), drawArrow.thickness);
+				return  Matrix4x4f::CreateTRSMatrix(position, matrix, scale);
 			});
 
 		mSphereRenderer.Render(*mDeviceContext.Get(), unlitPixelShader, vertexShader, renderList.GetSpheres(), colorCB,

@@ -8,7 +8,7 @@ TEST_CASE("Ray Vs Sphere Intersection")
 {
 	{
 		constexpr Ray3f ray(Point3f(0.f, 0, -10.f), UnitVector3f::Forward());
-		constexpr Spheref sphere(5.f);
+		constexpr Spheref sphere = Spheref::FromRadius(5.f);
 
 		auto result = IntersectionRaySphere(ray, sphere);
 
@@ -18,7 +18,7 @@ TEST_CASE("Ray Vs Sphere Intersection")
 
 	{
 		constexpr Ray3f ray(Point3f(-6.f, 0, -10.f), UnitVector3f::Forward());
-		constexpr Spheref sphere(5.f);
+		constexpr Spheref sphere = Spheref::FromRadius(5.f);
 
 		auto result = IntersectionRaySphere(ray, sphere);
 
@@ -50,7 +50,7 @@ TEST_CASE("Ray Vs Plane Intersection")
 	}
 	{
 		constexpr Ray3f ray(Point3f(1, 1, 1), UnitVector3f::Down());
-		constexpr Planef plane(Point3f::Zero(), UnitVector3f::Down());
+		constexpr Planef plane = Planef::FromPointAndNormal(Point3f::Zero(), UnitVector3f::Down());
 
 		constexpr auto result = IntersectionRayPlane(ray, plane);
 		REQUIRE(result.has_value());

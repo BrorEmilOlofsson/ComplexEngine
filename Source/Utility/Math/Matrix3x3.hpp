@@ -19,6 +19,10 @@ namespace Simple
 
 		[[nodiscard]] constexpr T* GetDataPtr() noexcept;
 		[[nodiscard]] constexpr const T* GetDataPtr() const noexcept;
+		[[nodiscard]] constexpr const std::array<T, 9>& GetValues() const noexcept
+		{
+			return mValues;
+        }
 
 		[[nodiscard]] static constexpr Matrix3x3<T> Identity() noexcept;
 		[[nodiscard]] static constexpr Matrix3x3<T> GetTransposed(const Matrix3x3<T>& aMatrix) noexcept;
@@ -27,6 +31,7 @@ namespace Simple
 		{
 			return row * Dimensions + column;
 		}
+
 
 	private:
 
@@ -133,4 +138,23 @@ namespace Simple
 		}
 		return true;
 	}
+
+	template<typename T>
+	[[nodiscard]] constexpr Matrix3x3<T> operator*(const Matrix3x3<T>& a, const Matrix3x3<T>& b) noexcept
+	{
+		Matrix3x3<T> result;
+		for (unsigned int row = 0; row < 3; ++row)
+		{
+			for (unsigned int col = 0; col < 3; ++col)
+			{
+				T sum = T(0);
+				for (unsigned int k = 0; k < 3; ++k)
+				{
+					sum += a(row, k) * b(k, col);
+				}
+				result(row, col) = sum;
+			}
+		}
+		return result;
+    }
 }

@@ -43,7 +43,7 @@ namespace Simple
 		constexpr void SetExtent(const ExtentType& extent);
 		constexpr void SetMin(const T& min);
 		constexpr void SetMax(const T& max);
-		constexpr void SetMinMax(const T& min, const T& max);
+		constexpr void SetMinAndMax(const T& min, const T& max);
 		constexpr void SetMinAndExtent(const T& min, const ExtentType& extent);
 
 		[[nodiscard]] constexpr const T& GetMin() const noexcept;
@@ -78,10 +78,10 @@ namespace Simple
 	}
 
 	template<typename T, typename BoundsChecker>
-	constexpr void Bounds<T, BoundsChecker>::SetCenterAndExtent(const T& aCenter, const ExtentType& extent)
+	constexpr void Bounds<T, BoundsChecker>::SetCenterAndExtent(const T& center, const ExtentType& extent)
 	{
-		mMin = aCenter - extent / static_cast<ScalarType>(2);
-		mMax = aCenter + extent / static_cast<ScalarType>(2);
+		mMin = center - extent / static_cast<ScalarType>(2);
+		mMax = center + extent / static_cast<ScalarType>(2);
 
 		Assert();
 	}
@@ -113,7 +113,7 @@ namespace Simple
 	}
 
 	template<typename T, typename BoundsChecker>
-	constexpr void Bounds<T, BoundsChecker>::SetMinMax(const T& min, const T& max)
+	constexpr void Bounds<T, BoundsChecker>::SetMinAndMax(const T& min, const T& max)
 	{
 		mMin = min;
 		mMax = max;
@@ -121,10 +121,10 @@ namespace Simple
 	}
 
 	template<typename T, typename BoundsChecker>
-	constexpr void Bounds<T, BoundsChecker>::SetMinAndExtent(const T& min, const ExtentType& aExtent)
+	constexpr void Bounds<T, BoundsChecker>::SetMinAndExtent(const T& min, const ExtentType& extent)
 	{
 		mMin = min;
-		mMax = min + aExtent;
+		mMax = min + extent;
 		Assert();
 	}
 

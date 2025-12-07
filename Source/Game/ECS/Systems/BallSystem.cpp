@@ -29,7 +29,7 @@ static void CreateBall(Simple::ECS& ecs)
 
 	const Simple::Circumferencef circumference(0.7f);
 	const Simple::Radiusf ballRadius = Simple::ToRadius(circumference);
-	const Simple::Spheref ballSphere(startPoint, ballRadius.Value());
+	const Simple::Spheref ballSphere = Spheref::FromCenterAndRadius(startPoint, ballRadius.Value());
 
 	physicsComponent.physicsObject.SetShape(ballSphere);
 	transformComponent.transform.SetPosition(ballSphere.GetCenter());

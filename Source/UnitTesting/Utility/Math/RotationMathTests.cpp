@@ -4,72 +4,72 @@
 
 using namespace Simple;
 
-TEST_CASE("RotationMath::CreateMatrixFromXY", "[RotationMath]")
-{
-	{
-		constexpr UnitVector3f x = UnitVector3f::Right();
-		constexpr UnitVector3f y = UnitVector3f::Up();
-
-		const Matrix4x4f matrix = CreateMatrixFromXY(x, y);
-		const UnitVector3f z = matrix.GetForward();
-		REQUIRE(NearlyEqual(z, UnitVector3f::Forward()));
-	}
-}
-
-TEST_CASE("RotationMath::CreateMatrixFromXZ", "[RotationMath]")
-{
-	constexpr UnitVector3f x = UnitVector3f::Right();
-	constexpr UnitVector3f z = UnitVector3f::Forward();
-	const Matrix4x4f matrix = CreateMatrixFromXZ(x, z);
-	const UnitVector3f y = matrix.GetUp();
-	REQUIRE(NearlyEqual(y, UnitVector3f::Up()));
-}
-
-TEST_CASE("RotationMath::CreateMatrixFromYX", "[RotationMath]")
-{
-	{
-		constexpr UnitVector3f y = UnitVector3f::Up();
-		constexpr UnitVector3f x = UnitVector3f::Right();
-
-		const Matrix4x4f matrix = CreateMatrixFromYX(y, x);
-		const UnitVector3f z = matrix.GetForward();
-		REQUIRE(NearlyEqual(z, UnitVector3f::Forward()));
-	}
-}
-
-TEST_CASE("RotationMath::CreateMatrixFromYZ", "[RotationMath]")
-{
-	{
-		constexpr UnitVector3f y = UnitVector3f::Up();
-		constexpr UnitVector3f z = UnitVector3f::Forward();
-
-		const Matrix4x4f matrix = CreateMatrixFromYZ(y, z);
-		const UnitVector3f x = matrix.GetRight();
-		REQUIRE(NearlyEqual(x, UnitVector3f::Right()));
-	}
-}
-
-TEST_CASE("RotationMath::CreateMatrixFromZX", "[RotationMath]")
-{
-	{
-		constexpr UnitVector3f z = UnitVector3f::Forward();
-		constexpr UnitVector3f x = UnitVector3f::Right();
-		const Matrix4x4f matrix = CreateMatrixFromZX(z, x);
-		const UnitVector3f y = matrix.GetUp();
-		REQUIRE(NearlyEqual(y, UnitVector3f::Up()));
-	}
-}
-
-TEST_CASE("RotationMath::CreateMatrixFromZY", "[RotationMath]")
-{
-	{
-		constexpr UnitVector3f z = UnitVector3f::Forward();
-		constexpr UnitVector3f y = UnitVector3f::Up();
-		const Matrix4x4f matrix = CreateMatrixFromZY(z, y);
-		const UnitVector3f x = matrix.GetRight();
-		REQUIRE(NearlyEqual(x, UnitVector3f::Right()));
-	}
-}
+//TEST_CASE("RotationMath::CreateMatrixFromXY", "[RotationMath]")
+//{
+//	{
+//		constexpr UnitVector3f x = UnitVector3f::Right();
+//		constexpr UnitVector3f y = UnitVector3f::Up();
+//
+//		const Matrix4x4f matrix = CreateMatrixFromXY(x, y);
+//		const UnitVector3f z = matrix.GetForward();
+//		REQUIRE(NearlyEqual(z, UnitVector3f::Forward()));
+//	}
+//}
+//
+//TEST_CASE("RotationMath::CreateMatrixFromXZ", "[RotationMath]")
+//{
+//	constexpr UnitVector3f x = UnitVector3f::Right();
+//	constexpr UnitVector3f z = UnitVector3f::Forward();
+//	const Matrix4x4f matrix = CreateMatrixFromXZ(x, z);
+//	const UnitVector3f y = matrix.GetUp();
+//	REQUIRE(NearlyEqual(y, UnitVector3f::Up()));
+//}
+//
+//TEST_CASE("RotationMath::CreateMatrixFromYX", "[RotationMath]")
+//{
+//	{
+//		constexpr UnitVector3f y = UnitVector3f::Up();
+//		constexpr UnitVector3f x = UnitVector3f::Right();
+//
+//		const Matrix4x4f matrix = CreateMatrixFromYX(y, x);
+//		const UnitVector3f z = matrix.GetForward();
+//		REQUIRE(NearlyEqual(z, UnitVector3f::Forward()));
+//	}
+//}
+//
+//TEST_CASE("RotationMath::CreateMatrixFromYZ", "[RotationMath]")
+//{
+//	{
+//		constexpr UnitVector3f y = UnitVector3f::Up();
+//		constexpr UnitVector3f z = UnitVector3f::Forward();
+//
+//		const Matrix4x4f matrix = CreateMatrixFromYZ(y, z);
+//		const UnitVector3f x = matrix.GetRight();
+//		REQUIRE(NearlyEqual(x, UnitVector3f::Right()));
+//	}
+//}
+//
+//TEST_CASE("RotationMath::CreateMatrixFromZX", "[RotationMath]")
+//{
+//	{
+//		constexpr UnitVector3f z = UnitVector3f::Forward();
+//		constexpr UnitVector3f x = UnitVector3f::Right();
+//		const Matrix4x4f matrix = CreateMatrixFromZX(z, x);
+//		const UnitVector3f y = matrix.GetUp();
+//		REQUIRE(NearlyEqual(y, UnitVector3f::Up()));
+//	}
+//}
+//
+//TEST_CASE("RotationMath::CreateMatrixFromZY", "[RotationMath]")
+//{
+//	{
+//		constexpr UnitVector3f z = UnitVector3f::Forward();
+//		constexpr UnitVector3f y = UnitVector3f::Up();
+//		const Matrix4x4f matrix = CreateMatrixFromZY(z, y);
+//		const UnitVector3f x = matrix.GetRight();
+//		REQUIRE(NearlyEqual(x, UnitVector3f::Right()));
+//	}
+//}
 
 
 TEST_CASE("Rotation matrix")
@@ -103,7 +103,8 @@ TEST_CASE("ToWorldSpace")
 		Matrix4x4f parentMatrix;
 		parentMatrix.SetTranslation(Point3f(10, 10, 10));
 
-		Matrix4x4f childMatrix = CreateMatrixFromXY(UnitVector3f::Right(), UnitVector3f::Forward());
+		Matrix4x4f childMatrix = Matrix4x4f::CreateRotationMatrix(RotationMatrix3f::FromXY(UnitVector3f::Right(), UnitVector3f::Forward()));
+		//Matrix4x4f childMatrix = CreateMatrixFromXY(UnitVector3f::Right(), UnitVector3f::Forward());
 		childMatrix.SetTranslation(Point3f(0, 0, -10));
 
 		RotateMatrixAroundAxis(parentMatrix, UnitVector3f::Up(), ToRadians(Degreesf(90.f)));
@@ -136,8 +137,8 @@ TEST_CASE("ToLocalSpace")
 
 	// Rotation
 	{
-		constexpr Matrix4x4f parentMatrixInWorldSpace = CreateMatrixFromXY(UnitVector3f::Forward(), UnitVector3f::Up()) * Matrix4x4f::CreateTranslationMatrix(Point3f(10, 10, 10));
-
+		//constexpr Matrix4x4f parentMatrixInWorldSpace = CreateMatrixFromXY(UnitVector3f::Forward(), UnitVector3f::Up()) * Matrix4x4f::CreateTranslationMatrix(Point3f(10, 10, 10));
+		constexpr Matrix4x4f parentMatrixInWorldSpace = Matrix4x4f::CreateTRMatrix(Point3f(10, 10, 10), RotationMatrix3f::FromXY(UnitVector3f::Forward(), UnitVector3f::Up()));
 		constexpr Matrix4x4f childMatrixInWorldSpace = Matrix4x4f::CreateTranslationMatrix(Point3f(15, 15, 5));
 
 		constexpr Matrix4x4f local = ToLocalSpace(childMatrixInWorldSpace, parentMatrixInWorldSpace);
@@ -159,8 +160,10 @@ TEST_CASE("ToLocalSpace")
 
 	// Rotation
 	{
-		constexpr Matrix4x4f parentMatrixInWorldSpace = CreateMatrixFromXY(UnitVector3f::Forward(), UnitVector3f::Up()) * Matrix4x4f::CreateTranslationMatrix(Point3f(10, 10, 10));
-		constexpr Matrix4x4f childMatrixInWorldSpace = CreateMatrixFromXY(UnitVector3f::Backward(), UnitVector3f::Down()) * Matrix4x4f::CreateTranslationMatrix(Point3f(15, 15, 5));
+		//constexpr Matrix4x4f parentMatrixInWorldSpace = CreateMatrixFromXY(UnitVector3f::Forward(), UnitVector3f::Up()) * Matrix4x4f::CreateTranslationMatrix(Point3f(10, 10, 10));
+		constexpr Matrix4x4f parentMatrixInWorldSpace = Matrix4x4f::CreateTRMatrix(Point3f(10, 10, 10), RotationMatrix3f::FromXY(UnitVector3f::Forward(), UnitVector3f::Up()));
+		//constexpr Matrix4x4f childMatrixInWorldSpace = CreateMatrixFromXY(UnitVector3f::Backward(), UnitVector3f::Down()) * Matrix4x4f::CreateTranslationMatrix(Point3f(15, 15, 5));
+		constexpr Matrix4x4f childMatrixInWorldSpace = Matrix4x4f::CreateTRMatrix(Point3f(15, 15, 5), RotationMatrix3f::FromXY(UnitVector3f::Backward(), UnitVector3f::Down()));;
 
 		constexpr Matrix4x4f local = ToLocalSpace(childMatrixInWorldSpace, parentMatrixInWorldSpace);
 		constexpr Matrix4x4f world = ToWorldSpace(local, parentMatrixInWorldSpace);
@@ -181,7 +184,8 @@ TEST_CASE("ToLocalSpace")
 
 	// Rotation
 	{
-		Matrix4x4f parentMatrixInWorldSpace = CreateMatrixFromXY(UnitVector3f::Backward(), UnitVector3f::Left());
+		//Matrix4x4f parentMatrixInWorldSpace = CreateMatrixFromXY(UnitVector3f::Backward(), UnitVector3f::Left());
+		Matrix4x4f parentMatrixInWorldSpace = Matrix4x4f::CreateRotationMatrix(RotationMatrix3f::FromXY(UnitVector3f::Backward(), UnitVector3f::Left()));
 		parentMatrixInWorldSpace.SetTranslation(Point3f(10, 10, 10));
 
 		Matrix4x4f childMatrixInWorldSpace;
@@ -199,7 +203,7 @@ TEST_CASE("Transform vector local to world space")
 	{
 		constexpr UnitVector3f forward = UnitVector3f::Forward();
 
-		const Matrix4x4f matrix = Matrix4x4f::CreateTRMatrix(RotationMatrix3f::FromXY(UnitVector3f::Backward(), UnitVector3f::Left()), Point3f(5, 5, 5));
+		const Matrix4x4f matrix = Matrix4x4f::CreateTRMatrix(Point3f(5, 5, 5), RotationMatrix3f::FromXY(UnitVector3f::Backward(), UnitVector3f::Left()));
 
 		const UnitVector3f worldVector = ToWorldSpace(forward, matrix);
 
@@ -208,7 +212,7 @@ TEST_CASE("Transform vector local to world space")
 	{
 		constexpr Vector3f forward(0, 0, 1);
 
-		constexpr Matrix4x4f matrix = CreateMatrixFromYZ(UnitVector3f::Backward(), UnitVector3f::Left()) * Matrix4x4f::CreateTranslationMatrix(Point3f(5, 5, 5));
+		constexpr Matrix4x4f matrix = Matrix4x4f::CreateTRMatrix(Point3f(5, 5, 5), RotationMatrix3f::FromYZ(UnitVector3f::Backward(), UnitVector3f::Left()));
 
 		const Vector3f worldVector = ToWorldSpace(forward, matrix);
 

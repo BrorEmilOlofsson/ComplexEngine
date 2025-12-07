@@ -86,7 +86,7 @@ namespace Simple
 			const float t = Dot(toSphere, cylinderAxis);
 			const Point3f closestPoint = aCylinder.GetLowerPoint() + t * cylinderAxis;
 
-			Spheref s2(closestPoint, aCylinder.GetRadius());
+			Spheref s2 = Spheref::FromCenterAndRadius(closestPoint, aCylinder.GetRadius());
 
 			ResolveCollision(aSphere, s2, aData1, aData2);
 		}

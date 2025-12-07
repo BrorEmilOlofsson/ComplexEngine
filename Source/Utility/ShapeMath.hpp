@@ -24,35 +24,41 @@ namespace Simple
 	template<typename T>
 	[[nodiscard]] constexpr Line2<T> ToLine(const LineSegment2<T>& lineSegment)
 	{
-		return Line2<T>(lineSegment.StartPoint(), lineSegment.EndPoint());
+		return Line2<T>::FromPoints(lineSegment.StartPoint(), lineSegment.EndPoint());
 	}
 
 	template<typename T>
 	[[nodiscard]] constexpr Line3<T> ToLine(const LineSegment3<T>& lineSegment)
 	{
-		return Line3<T>(lineSegment.StartPoint(), lineSegment.EndPoint());
+		return Line3<T>::FromPoints(lineSegment.StartPoint(), lineSegment.EndPoint());
 	}
 
 	template<typename T>
 	[[nodiscard]] constexpr LineSegment2<T> ToLineSegment(const Ray2<T>& ray, const T& distance)
 	{
-		return LineSegment2<T>(ray.GetOrigin(), ray.GetPointAtDistance(distance));
+		return LineSegment2<T>::FromPoints(ray.GetOrigin(), ray.GetPointAtDistance(distance));
 	}
 
 	template<typename T>
 	[[nodiscard]] constexpr LineSegment3<T> ToLineSegment(const Ray3<T>& ray, const T& distance)
 	{
-		return LineSegment3<T>(ray.GetOrigin(), ray.GetPointAtDistance(distance));
+		return LineSegment3<T>::FromPoints(ray.GetOrigin(), ray.GetPointAtDistance(distance));
 	}
 
 	template<typename T>
 	[[nodiscard]] constexpr Plane<T> ToPlane(const Triangle3<T>& triangle)
 	{
-		return Plane<T>(triangle.GetPoint0(), triangle.GetPoint1(), triangle.GetPoint2());
+		return Plane<T>::FromPoints(triangle.GetPoint0(), triangle.GetPoint1(), triangle.GetPoint2());
 	}
 
 	template<typename T>
 	[[nodiscard]] constexpr Point2<T> Remap(const Point2<T>& point, const AABB2<T>& from, const AABB2<T>& to)
+	{
+		return Remap(point, from.GetMin(), from.GetMax(), to.GetMin(), to.GetMax());
+	}
+
+	template<typename T>
+	[[nodiscard]] constexpr Point3<T> Remap(const Point3<T>& point, const AABB3<T>& from, const AABB3<T>& to)
 	{
 		return Remap(point, from.GetMin(), from.GetMax(), to.GetMin(), to.GetMax());
 	}
@@ -64,33 +70,33 @@ namespace Simple
 	}
 
 	template<typename T>
-	[[nodiscard]] constexpr Point3<T> Remap(const Point3<T>& point, const AABB3<T>& from, const AABB3<T>& to)
+	[[nodiscard]] constexpr Point3<T> Remap0To1(const Point3<T>& point, const AABB3<T>& from)
 	{
-		return Remap(point, from.GetMin(), from.GetMax(), to.GetMin(), to.GetMax());
+		return Remap(point, from.GetMin(), from.GetMax(), Point3<T>::Zero(), Point3<T>::One());
 	}
 
 	template<typename T>
 	[[nodiscard]] constexpr AABB2<T> OffsetAABB(const AABB2<T>& aabb, const Vector2<T>& offset)
 	{
-		return AABB2<T>::CreateFromMinAndMax(aabb.GetMin() + offset, aabb.GetMax() + offset);
+		return AABB2<T>::FromMinAndMax(aabb.GetMin() + offset, aabb.GetMax() + offset);
 	}
 
 	template<typename T>
 	[[nodiscard]] constexpr AABB2<T> ToAABB2XY(const AABB3<T>& aabb)
 	{
-		return AABB2<T>::CreateFromMinAndMax(ToPoint2XY(aabb.GetMin()), ToPoint2XY(aabb.GetMax()));
+		return AABB2<T>::FromMinAndMax(ToPoint2XY(aabb.GetMin()), ToPoint2XY(aabb.GetMax()));
 	}
 
 	template<typename T>
 	[[nodiscard]] constexpr AABB2<T> ToAABB2XZ(const AABB3<T>& aabb)
 	{
-		return AABB2<T>::CreateFromMinAndMax(ToPoint2XZ(aabb.GetMin()), ToPoint2XZ(aabb.GetMax()));
+		return AABB2<T>::FromMinAndMax(ToPoint2XZ(aabb.GetMin()), ToPoint2XZ(aabb.GetMax()));
 	}
 
 	template<typename T>
 	[[nodiscard]] constexpr AABB2<T> ToAABB2YZ(const AABB3<T>& aabb)
 	{
-		return AABB2<T>::CreateFromMinAndMax(ToPoint2YZ(aabb.GetMin()), ToPoint2YZ(aabb.GetMax()));
+		return AABB2<T>::FromMinAndMax(ToPoint2YZ(aabb.GetMin()), ToPoint2YZ(aabb.GetMax()));
 	}
 
 	template<typename T>
@@ -289,7 +295,7 @@ namespace Simple
 		Vector3<T> pointOnLine =
 			((Cross(n1xn2, n2) * d1) + (Cross(n1, n1xn2) * d2)) / dirLengthSq;
 
-		return Line3<T>(Point3<T>::Zero() + pointOnLine, UnitVector3<T>(direction));
+		return Line3<T>::FromPointAndDirection(Point3<T>::Zero() + pointOnLine, UnitVector3<T>(direction));
 	}
 
 	template<typename T>

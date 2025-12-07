@@ -10,9 +10,10 @@ namespace Simple
 	public:
 
 		constexpr Line2() = default;
-		constexpr Line2(const Point2<T>& point, const UnitVector2<T>& direction);
-		constexpr Line2(const Point2<T>& point1, const Point2<T>& point2);
-		constexpr Line2(const Point2<T>& point, const Vector2<T>& direction);
+
+		[[nodiscard]] static constexpr Line2 FromPoints(const Point2<T>& point1, const Point2<T>& point2);
+        [[nodiscard]] static constexpr Line2 FromPointAndDirection(const Point2<T>& point, const UnitVector2<T>& direction);
+        [[nodiscard]] static constexpr Line2 FromPointAndDirection(const Point2<T>& point, const Vector2<T>& direction);
 
 		constexpr void SetPoint(const Point2<T>& point);
 		constexpr void SetDirection(const UnitVector2<T>& direction);
@@ -22,8 +23,12 @@ namespace Simple
 
 	private:
 
+		constexpr Line2(const Point2<T>& point, const UnitVector2<T>& direction);
+
+	private:
+
 		Point2<T> mPoint;
-		UnitVector2<T> mDirection;
+		UnitVector2<T> mDirection = UnitVector2<T>::Right();
 	};
 
 	using Line2f = Line2<float>;
@@ -36,23 +41,27 @@ namespace Simple
 	}
 
 	template<typename T>
-	constexpr Line2<T>::Line2(const Point2<T>& point1, const Point2<T>& point2)
-		: mPoint(point1)
-		, mDirection(UnitVector2<T>(point2 - point1))
+	constexpr Line2<T> Line2<T>::FromPoints(const Point2<T>& point1, const Point2<T>& point2)
 	{
+        return Line2<T>(point1, UnitVector2<T>(point2 - point1));
 	}
 
 	template<typename T>
-	constexpr Line2<T>::Line2(const Point2<T>& aPoint, const Vector2<T>& direction)
-		: mPoint(aPoint)
-		, mDirection(UnitVector2<T>(direction))
+	constexpr Line2<T> Line2<T>::FromPointAndDirection(const Point2<T>& point, const UnitVector2<T>& direction)
 	{
+		return Line2<T>(point, direction);
 	}
 
 	template<typename T>
-	constexpr void Line2<T>::SetPoint(const Point2<T>& aPoint)
+	constexpr Line2<T> Line2<T>::FromPointAndDirection(const Point2<T>& point, const Vector2<T>& direction)
 	{
-		mPoint = aPoint;
+        return Line2<T>(point, UnitVector2<T>(direction));
+	}
+
+	template<typename T>
+	constexpr void Line2<T>::SetPoint(const Point2<T>& point)
+	{
+		mPoint = point;
 	}
 
 	template<typename T>

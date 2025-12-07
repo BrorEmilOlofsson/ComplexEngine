@@ -70,7 +70,7 @@ namespace Simple
 		[[nodiscard]] static constexpr Matrix4x4<T> CreateTranslationMatrix(const Point3<T>& translation);
 		[[nodiscard]] static constexpr Matrix4x4<T> CreateScaleMatrix(const Vector3<T>& scale);
 
-		[[nodiscard]] static constexpr Matrix4x4<T> CreateTRMatrix(const RotationMatrix3<T>& rotationMatrix, const Point3<T>& translation);
+		[[nodiscard]] static constexpr Matrix4x4<T> CreateTRMatrix(const Point3<T>& translation, const RotationMatrix3<T>& rotationMatrix);
 		[[nodiscard]] static constexpr Matrix4x4<T> CreateTRSMatrix(const Point3<T>& translation, const Matrix4x4<T>& rotationMatrix, const Vector3<T>& scale);
 		[[nodiscard]] static constexpr Matrix4x4<T> CreateTRSMatrix(const Point3<T>& translation, const RotationMatrix3<T>& rotationMatrix, const Vector3<T>& scale);
 
@@ -484,7 +484,7 @@ namespace Simple
 	}
 
 	template<typename T>
-	constexpr Matrix4x4<T> Matrix4x4<T>::CreateTRMatrix(const RotationMatrix3<T>& rotationMatrix, const Point3<T>& translation)
+	constexpr Matrix4x4<T> Matrix4x4<T>::CreateTRMatrix(const Point3<T>& translation, const RotationMatrix3<T>& rotationMatrix)
 	{
 		return CreateRotationMatrix(rotationMatrix)
 			* CreateTranslationMatrix(translation);
@@ -501,7 +501,7 @@ namespace Simple
 	template<typename T>
 	constexpr Matrix4x4<T> Matrix4x4<T>::CreateTRSMatrix(const Point3<T>& translation, const RotationMatrix3<T>& rotationMatrix, const Vector3<T>& scale)
 	{
-		return CreateTRSMatrix(scale, CreateRotationMatrix(rotationMatrix), translation);
+		return CreateTRSMatrix(translation, CreateRotationMatrix(rotationMatrix), scale);
 	}
 
 	template<typename T>

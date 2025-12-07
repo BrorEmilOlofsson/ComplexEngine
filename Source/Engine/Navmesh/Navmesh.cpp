@@ -82,7 +82,7 @@ namespace Simple
 	{
 		PROFILER_FUNCTION(profiler::colors::Grey300);
 
-		const LineSegment2f lineSegment(ToPoint2XZ(startPosition), ToPoint2XZ(endPosition));
+		const LineSegment2f lineSegment = LineSegment2f::FromPoints(ToPoint2XZ(startPosition), ToPoint2XZ(endPosition));
 
 		const AABB2f aabb2D = ToAABB2(lineSegment);
 		const std::unordered_set<NavmeshWallIndex> wallsInside = mWallGrid.GetObjectsByAABB(aabb2D);
@@ -149,7 +149,7 @@ namespace Simple
 			Point2f point;
 		};
 
-		LineSegment2f lineSegmentCheck = LineSegment2f(startPos2D, endPos2D);
+		LineSegment2f lineSegmentCheck = LineSegment2f::FromPoints(startPos2D, endPos2D);
 		Point2f closestPoint;
 		float closestDistance = std::numeric_limits<float>::max();
 		for (const NavmeshWallIndex wallIndex : walls)
@@ -230,7 +230,7 @@ namespace Simple
 			const LineSegment2f lineSegmentWall = GetLineSegment2DFromEdge(mWalls[wallIndex]);
 
 			const UnitVector2f normal = GetNormal(lineSegmentWall);
-			LineSegment2f lineSegmentCheck = LineSegment2f(pos2D + (-normal) * 1000.f, pos2D + normal * 1000.f);
+			LineSegment2f lineSegmentCheck = LineSegment2f::FromPoints(pos2D + (-normal) * 1000.f, pos2D + normal * 1000.f);
 			if (std::optional<Point2f> intersection = IntersectionLineSegment2DVsLineSegment2D(lineSegmentWall, lineSegmentCheck))
 			{
 				const float distance = Distance(pos2D, intersection.value());
@@ -445,6 +445,6 @@ namespace Simple
 
 	LineSegment2f Navmesh::GetLineSegment2DFromEdge(const NavmeshEdge& edge) const
 	{
-		return LineSegment2f(mNavmeshData.mVertices[edge.first], mNavmeshData.mVertices[edge.second]);
+		return LineSegment2f::FromPoints(mNavmeshData.mVertices[edge.first], mNavmeshData.mVertices[edge.second]);
 	}
 }

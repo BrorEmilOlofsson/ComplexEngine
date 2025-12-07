@@ -825,41 +825,6 @@ TEST_CASE("VectorMath::CalculateAngleNew (UnitVector2)", "[VectorMath]")
 //    }
 //}
 
-
-TEST_CASE("VectorMath::GetUnitVector")
-{
-    constexpr Point3f p1(10, 20.f, 100.f);
-    constexpr Point3f p2(10.f, 21.f, 101.f);
-
-    REQUIRE(GetUnitVector(p1, p2) == UnitVector3f(Vector3f(0, 1, 1)));
-}
-
-
-TEST_CASE("VectorMath::GetReflectionVector")
-{
-    {
-        constexpr UnitVector3f forward = UnitVector3f::Forward();
-        constexpr UnitVector3f backward = UnitVector3f::Backward();
-        constexpr UnitVector3f reflection = GetReflectionVector(forward, backward);
-        REQUIRE(reflection == backward);
-    }
-    {
-        constexpr Vector3f direction(1, 1, 1);
-        constexpr UnitVector3f normal = UnitVector3f::Backward();
-        const UnitVector3f reflection = GetReflectionVector(direction, normal);
-        REQUIRE(NearlyEqual(reflection, UnitVector3f(1, 1, -1)));
-    }
-}
-
-TEST_CASE("VectorMath::GetPerpendicularVector")
-{
-    constexpr UnitVector3f forward = UnitVector3f::Forward();
-
-    const UnitVector3f perp = GetPerpendicularVector(forward);
-
-    REQUIRE(Dot(forward, perp) == 0.f);
-}
-
 TEST_CASE("VectorMath::CalculateAngle")
 {
     {
@@ -887,8 +852,81 @@ TEST_CASE("VectorMath::CalculateAngle")
     }
 }
 
+TEST_CASE("VectorMath::IsInRange (Point2)", "[VectorMath]")
+{
+    constexpr Point2f center(0.f, 0.f);
+    constexpr float range = 5.f;
+    {
+        constexpr Point2f testPoint(3.f, 4.f);
+        constexpr bool inRange = IsInRange(center, testPoint, range);
+        REQUIRE(inRange);
+    }
+    {
+        constexpr Point2f testPoint(6.f, 0.f);
+        constexpr bool inRange = IsInRange(center, testPoint, range);
+        REQUIRE_FALSE(inRange);
+    }
+}
 
-TEST_CASE("Average Point")
+TEST_CASE("VectorMath::IsInRange (Point3)", "[VectorMath]")
+{
+    constexpr Point3f center(0.f, 0.f, 0.f);
+    constexpr float range = 5.f;
+    {
+        constexpr Point3f testPoint(3.f, 4.f, 0.f);
+        constexpr bool inRange = IsInRange(center, testPoint, range);
+        REQUIRE(inRange);
+    }
+    {
+        constexpr Point3f testPoint(6.f, 0.f, 0.f);
+        constexpr bool inRange = IsInRange(center, testPoint, range);
+        REQUIRE_FALSE(inRange);
+    }
+}
+
+TEST_CASE("VectorMath::GetUnitVector (UnitVector2)", "[VectorMath]")
+{
+    constexpr Point2f p1(10.f, 20.f);
+    constexpr Point2f p2(10.f, 25.f);
+    const UnitVector2f result = GetUnitVector(p1, p2);
+    REQUIRE(result == UnitVector2f::Up());
+}
+
+TEST_CASE("VectorMath::GetUnitVector (UnitVector3)", "[VectorMath]")
+{
+    constexpr Point3f p1(10, 20.f, 100.f);
+    constexpr Point3f p2(10.f, 21.f, 101.f);
+    const UnitVector3f result = GetUnitVector(p1, p2);
+    REQUIRE(result == UnitVector3f(Vector3f(0, 1, 1)));
+}
+
+TEST_CASE("VectorMath::GetReflectionVector", "[VectorMath]")
+{
+    {
+        constexpr UnitVector3f forward = UnitVector3f::Forward();
+        constexpr UnitVector3f backward = UnitVector3f::Backward();
+        constexpr UnitVector3f reflection = GetReflectionVector(forward, backward);
+        REQUIRE(reflection == backward);
+    }
+    {
+        constexpr Vector3f direction(1, 1, 1);
+        constexpr UnitVector3f normal = UnitVector3f::Backward();
+        const UnitVector3f reflection = GetReflectionVector(direction, normal);
+        REQUIRE(NearlyEqual(reflection, UnitVector3f(1, 1, -1)));
+    }
+}
+
+TEST_CASE("VectorMath::GetPerpendicularVector", "[VectorMath]")
+{
+    constexpr UnitVector3f forward = UnitVector3f::Forward();
+
+    const UnitVector3f perp = GetPerpendicularVector(forward);
+
+    REQUIRE(Dot(forward, perp) == 0.f);
+}
+
+
+TEST_CASE("VectorMath::Average Point (Point2)", "[VectorMath]")
 {
 
     constexpr Point2f p1 = Point2f::Zero();
@@ -896,9 +934,22 @@ TEST_CASE("Average Point")
 
     constexpr Point2f p3 = AveragePoint(p1, p2);
 
+    REQUIRE(p3 == Point2f(0.5, 0.5f));
+
 }
 
-TEST_CASE("VectorMath::ToClipCoords")
+TEST_CASE("VectorMath::Average Point (Point3)", "[VectorMath]")
+{
+
+    constexpr Point3f p1 = Point3f::Zero();
+    constexpr Point3f p2 = Point3f::One();
+
+    constexpr Point3f p3 = AveragePoint(p1, p2);
+
+    REQUIRE(p3 == Point3f(0.5, 0.5f, 0.5f));
+}
+
+TEST_CASE("VectorMath::ToClipCoords", "[VectorMath]")
 {
     constexpr Point2i point(0, 50);
     constexpr Vector2ui size(100u, 100u);

@@ -12,15 +12,17 @@ namespace Simple
 
 		constexpr Ray3() = default;
 		constexpr Ray3(const Point3<T>& origin, const UnitVector3<T>& direction);
-		constexpr Ray3(const Point3<T>& origin, const Point3<T>& point);
 
-		constexpr const Point3<T>& GetOrigin() const;
-		constexpr const UnitVector3<T>& GetDirection() const;
+		[[nodiscard]] static constexpr Ray3<T> FromOriginAndDirection(const Point3<T>& origin, const UnitVector3<T>& direction);
+        [[nodiscard]] static constexpr Ray3<T> FromOriginAndPoint(const Point3<T>& origin, const Point3<T>& point);
+
+		[[nodiscard]] constexpr const Point3<T>& GetOrigin() const;
+		[[nodiscard]] constexpr const UnitVector3<T>& GetDirection() const;
 
 		constexpr void SetOrigin(const Point3<T>& origin);
 		constexpr void SetDirection(const UnitVector3<T>& direction);
 
-		constexpr Point3<T> GetPointAtDistance(const T& distance) const;
+		[[nodiscard]] constexpr Point3<T> GetPointAtDistance(const T& distance) const;
 
 	private:
 
@@ -29,6 +31,7 @@ namespace Simple
 	};
 
 	using Ray3f = Ray3<float>;
+	using Ray3d = Ray3<double>;
 
 	template<typename T>
 	constexpr Ray3<T>::Ray3(const Point3<T>& origin, const UnitVector3<T>& direction)
@@ -38,10 +41,15 @@ namespace Simple
 	}
 
 	template<typename T>
-	constexpr Ray3<T>::Ray3(const Point3<T>& origin, const Point3<T>& point)
-		: mOrigin(origin)
-		, mDirection(point - origin)
+	constexpr Ray3<T> Ray3<T>::FromOriginAndDirection(const Point3<T>& origin, const UnitVector3<T>& direction)
 	{
+		return Ray3<T>(origin, direction);
+    }
+
+	template<typename T>
+	constexpr Ray3<T> Ray3<T>::FromOriginAndPoint(const Point3<T>& origin, const Point3<T>& point)
+	{
+        return Ray3<T>(origin, UnitVector3<T>(point - origin));
 	}
 
 	template<typename T>

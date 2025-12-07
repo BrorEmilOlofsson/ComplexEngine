@@ -229,49 +229,49 @@ namespace Simple
 			});
 	}
 
-	// Prioritzes X-axis over Y-axis
-	template<typename T>
-	[[nodiscard]] constexpr Matrix4x4<T> CreateMatrixFromXY(const UnitVector3<T>& xAxis, const UnitVector3<T>& yAxis)
-	{
-		return Matrix4x4<T>::CreateRotationMatrix(RotationMatrix3<T>::FromXY(xAxis, yAxis));
-	}
+	//// Prioritzes X-axis over Y-axis
+	//template<typename T>
+	//[[nodiscard]] constexpr Matrix4x4<T> CreateMatrixFromXY(const UnitVector3<T>& xAxis, const UnitVector3<T>& yAxis)
+	//{
+	//	return Matrix4x4<T>::CreateRotationMatrix(RotationMatrix3<T>::FromXY(xAxis, yAxis));
+	//}
 
-	// Prioritzes X-axis over Z-axis
-	template<typename T>
-	[[nodiscard]] constexpr Matrix4x4<T> CreateMatrixFromXZ(const UnitVector3<T>& xAxis, const UnitVector3<T>& zAxis)
-	{
-		return Matrix4x4<T>::CreateRotationMatrix(RotationMatrix3<T>::FromXZ(xAxis, zAxis));
-	}
+	//// Prioritzes X-axis over Z-axis
+	//template<typename T>
+	//[[nodiscard]] constexpr Matrix4x4<T> CreateMatrixFromXZ(const UnitVector3<T>& xAxis, const UnitVector3<T>& zAxis)
+	//{
+	//	return Matrix4x4<T>::CreateRotationMatrix(RotationMatrix3<T>::FromXZ(xAxis, zAxis));
+	//}
 
-	// Prioritzes Y-axis over X-axis
-	template<typename T>
-	[[nodiscard]] constexpr Matrix4x4<T> CreateMatrixFromYX(const UnitVector3<T>& yAxis, const UnitVector3<T>& xAxis)
-	{
-		return Matrix4x4<T>::CreateRotationMatrix(RotationMatrix3<T>::FromYX(yAxis, xAxis));
-	}
+	//// Prioritzes Y-axis over X-axis
+	//template<typename T>
+	//[[nodiscard]] constexpr Matrix4x4<T> CreateMatrixFromYX(const UnitVector3<T>& yAxis, const UnitVector3<T>& xAxis)
+	//{
+	//	return Matrix4x4<T>::CreateRotationMatrix(RotationMatrix3<T>::FromYX(yAxis, xAxis));
+	//}
 
-	// Prioritzes Y-axis over Z-axis
-	template<typename T>
-	[[nodiscard]] constexpr Matrix4x4<T> CreateMatrixFromYZ(const UnitVector3<T>& yAxis, const UnitVector3<T>& zAxis)
-	{
-		return Matrix4x4<T>::CreateRotationMatrix(RotationMatrix3<T>::FromYZ(yAxis, zAxis));
-	}
+	//// Prioritzes Y-axis over Z-axis
+	//template<typename T>
+	//[[nodiscard]] constexpr Matrix4x4<T> CreateMatrixFromYZ(const UnitVector3<T>& yAxis, const UnitVector3<T>& zAxis)
+	//{
+	//	return Matrix4x4<T>::CreateRotationMatrix(RotationMatrix3<T>::FromYZ(yAxis, zAxis));
+	//}
 
-	// Prioritzes Z-axis over X-axis
-	template<typename T>
-	[[nodiscard]] constexpr Matrix4x4<T> CreateMatrixFromZX(const UnitVector3<T>& zAxis, const UnitVector3<T>& xAxis)
-	{
-		return Matrix4x4<T>::CreateRotationMatrix(RotationMatrix3<T>::FromZX(zAxis, xAxis));
-	}
+	//// Prioritzes Z-axis over X-axis
+	//template<typename T>
+	//[[nodiscard]] constexpr Matrix4x4<T> CreateMatrixFromZX(const UnitVector3<T>& zAxis, const UnitVector3<T>& xAxis)
+	//{
+	//	return Matrix4x4<T>::CreateRotationMatrix(RotationMatrix3<T>::FromZX(zAxis, xAxis));
+	//}
 
-	// Prioritzes Z-axis over Y-axis
-	template<typename T>
-	[[nodiscard]] constexpr Matrix4x4<T> CreateMatrixFromZY(const UnitVector3<T>& zAxis, const UnitVector3<T>& yAxis)
-	{
-		return Matrix4x4<T>::CreateRotationMatrix(RotationMatrix3<T>::FromZY(zAxis, yAxis));
-	}
+	//// Prioritzes Z-axis over Y-axis
+	//template<typename T>
+	//[[nodiscard]] constexpr Matrix4x4<T> CreateMatrixFromZY(const UnitVector3<T>& zAxis, const UnitVector3<T>& yAxis)
+	//{
+	//	return Matrix4x4<T>::CreateRotationMatrix(RotationMatrix3<T>::FromZY(zAxis, yAxis));
+	//}
 
-	template<typename T>
+	/*template<typename T>
 	[[nodiscard]] constexpr Matrix4x4<T> CreateMatrixFromX(const UnitVector3<T>& xAxis)
 	{
 		const UnitVector3<T> yAxis = GetPerpendicularVector(xAxis);
@@ -290,7 +290,7 @@ namespace Simple
 	{
 		const UnitVector3<T> xAxis = GetPerpendicularVector(zAxis);
 		return CreateMatrixFromXZ(xAxis, zAxis);
-	}
+	}*/
 
 	template<typename T>
 	[[nodiscard]] constexpr Rotator<T> ToRotator(const Matrix4x4<T>& matrix)
@@ -401,6 +401,30 @@ namespace Simple
 	}
 
 	template<typename T>
+	[[nodiscard]] constexpr RotationMatrix3<T> CreateRotationMatrixAroundAxis(const UnitVector3<T>& axis, Radians<T> angle)
+	{
+		const T x = axis.X();
+		const T y = axis.Y();
+		const T z = axis.Z();
+		const T c = Cos(angle);
+		const T s = Sin(angle);
+		const T t = static_cast<T>(1) - c;
+		std::array<T, 9> values
+		{
+			t * x * x + c,
+			t * x * y - s * z,
+			t * x * z + s * y,
+			t * x * y + s * z,
+			t * y * y + c,
+			t * y * z - s * x,
+			t * x * z - s * y,
+			t * y * z + s * x,
+			t * z * z + c
+		};
+		return RotationMatrix3<T>(values);
+    }
+
+	template<typename T>
 	[[nodiscard]] constexpr Matrix4x4<T> GetRotatedMatrixAroundAxis(const Matrix4x4<T>& matrix, const UnitVector3<T>& axis, const Radians<T>& angle)
 	{
 		Matrix4x4<T> m = matrix;
@@ -410,6 +434,12 @@ namespace Simple
 		m.SetTranslation(previousTranslation);
 		return m;
 	}
+
+	template<typename T>
+	[[nodiscard]] constexpr RotationMatrix3<T> GetRotatedRotationMatrixAroundAxis(const RotationMatrix3<T>& matrix, const UnitVector3<T>& axis, const Radians<T>& angle)
+	{
+        return matrix * CreateRotationMatrixAroundAxis(axis, angle);
+    }
 
 	template<typename T>
 	[[nodiscard]] constexpr Matrix4x4<T> GetRotatedMatrixAroundAxis(const Matrix4x4<T>& matrix, const UnitVector3<T>& axis, const Degrees<T>& angle)
@@ -427,6 +457,18 @@ namespace Simple
 	constexpr void RotateMatrixAroundAxis(Matrix4x4<T>& matrix, const UnitVector3<T>& axis, const Degrees<T>& angle)
 	{
 		RotateMatrixAroundAxis(matrix, axis, ToRadians(angle));
+	}
+
+	template<typename T>
+	constexpr void RotateMatrixAroundAxis(RotationMatrix3<T>& matrix, const UnitVector3<T>& axis, const Radians<T>& angle)
+	{
+		matrix = GetRotatedRotationMatrixAroundAxis(matrix, axis, angle);
+	}
+
+	template<typename T> 
+	constexpr void RotateMatrixAroundAxis(RotationMatrix3<T>& matrix, const UnitVector3<T>& axis, const Degrees<T>& angle)
+	{
+        matrix = GetRotatedRotationMatrixAroundAxis(matrix, axis, ToRadians(angle));
 	}
 
 	template<typename T>

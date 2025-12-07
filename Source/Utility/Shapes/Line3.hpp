@@ -11,9 +11,10 @@ namespace Simple
 	public:
 
 		constexpr Line3() = default;
-		constexpr Line3(const Point3<T>& point, const UnitVector3<T>& direction);
-		constexpr Line3(const Point3<T>& point1, const Point3<T>& point2);
-		constexpr Line3(const Point3<T>& point, const Vector3<T>& direction);
+
+		[[nodiscard]] static constexpr Line3 FromPoints(const Point3<T>& point1, const Point3<T>& point2);
+		[[nodiscard]] static constexpr Line3 FromPointAndDirection(const Point3<T>& point, const UnitVector3<T>& direction);
+        [[nodiscard]] static constexpr Line3 FromPointAndDirection(const Point3<T>& point, const Vector3<T>& direction);
 
 		constexpr void SetPoint(const Point3<T>& point);
 		constexpr void SetDirection(const UnitVector3<T>& direction);
@@ -23,32 +24,40 @@ namespace Simple
 
 	private:
 
+		constexpr Line3(const Point3<T>& point, const UnitVector3<T>& direction) noexcept;
+
+	private:
+
 		Point3<T> mPoint;
-		UnitVector3<T> mDirection;
+		UnitVector3<T> mDirection = UnitVector3<T>::Forward();
 	};
 
 	using Line3f = Line3<float>;
 	using Line3d = Line3<double>;
 
 	template<typename T>
-	constexpr Line3<T>::Line3(const Point3<T>& point, const UnitVector3<T>& direction)
+	constexpr Line3<T>::Line3(const Point3<T>& point, const UnitVector3<T>& direction) noexcept
 		: mPoint(point)
 		, mDirection(direction)
 	{
 	}
 
 	template<typename T>
-	constexpr Line3<T>::Line3(const Point3<T>& point1, const Point3<T>& point2)
-		: mPoint(point1)
-		, mDirection(UnitVector3<T>(point2 - point1))
+	constexpr Line3<T> Line3<T>::FromPoints(const Point3<T>& point1, const Point3<T>& point2)
 	{
+        return Line3<T>(point1, UnitVector3<T>(point2 - point1));
 	}
 
 	template<typename T>
-	constexpr Line3<T>::Line3(const Point3<T>& point, const Vector3<T>& direction)
-		: mPoint(point)
-		, mDirection(UnitVector3<T>(direction))
+	constexpr Line3<T> Line3<T>::FromPointAndDirection(const Point3<T>& point, const UnitVector3<T>& direction)
 	{
+		return Line3<T>(point, direction);
+	}
+
+	template<typename T>
+	constexpr Line3<T> Line3<T>::FromPointAndDirection(const Point3<T>& point, const Vector3<T>& direction)
+	{
+        return Line3<T>(point, UnitVector3<T>(direction));
 	}
 
 	template<typename T>

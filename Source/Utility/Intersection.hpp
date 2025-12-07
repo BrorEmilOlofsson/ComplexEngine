@@ -153,7 +153,7 @@ namespace Simple
 
 	[[nodiscard]] constexpr std::optional<RayHitResult> IntersectionRayDisk(const Ray3f& ray, const Diskf& disk)
 	{
-		const auto planeResult = IntersectionRayPlane(ray, Planef(disk.GetCenter(), disk.GetNormal()));
+		const auto planeResult = IntersectionRayPlane(ray, Planef::FromPointAndNormal(disk.GetCenter(), disk.GetNormal()));
 
 		if (planeResult)
 		{

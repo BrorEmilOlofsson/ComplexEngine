@@ -270,8 +270,7 @@ namespace Simple
 	ViewAndEditResult VisualizeInScene(UnitVector3f& value, const Point3f& origin, const Camera& camera, RenderList& renderList)
 	{
 		ViewAndEditResult viewAndEditResult;
-		Matrix4x4f matrix = CreateMatrixFromZ(value);
-		matrix.SetTranslation(origin);
+		Matrix4x4f matrix = Matrix4x4f::CreateTRMatrix(origin, RotationMatrix3f::FromZ(value));
 		if (ImGuizmo::Manipulate(camera.GetViewMatrix().GetDataPtr(), camera.GetProjectionMatrix().GetDataPtr(), ImGuizmo::OPERATION::ROTATE, ImGuizmo::MODE::WORLD, matrix.GetDataPtr()))
 		{
 			value = matrix.GetForward();
