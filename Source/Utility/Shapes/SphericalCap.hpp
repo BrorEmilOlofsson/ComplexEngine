@@ -1,62 +1,75 @@
 #pragma once
 #include "Utility/Math/UnitVector3.hpp"
 #include "Utility/Shapes/Sphere.hpp"
+#include "Utility/Height.hpp"
 
 namespace Simple
 {
 
-	template<typename T>
-	class SphericalCap final
-	{
-	public:
+    template<typename T>
+    class SphericalCap final
+    {
+    public:
 
-		constexpr SphericalCap() = default;
-		constexpr SphericalCap(const Sphere<T>& sphere, const UnitVector3<T>& normal, const T height)
-			: mSphere(sphere)
-			, mNormal(normal)
-			, mHeight(height)
-		{
-			if (height > mSphere.GetDiameter())
-			{
-				throw std::invalid_argument("SphericalCap height cannot be greater than the diameter of the sphere.");
-			}
-		}
-		
-		[[nodiscard]] constexpr const Point3<T>& GetSphereCenter() const noexcept;
-		[[nodiscard]] constexpr T GetSphereRadius() const noexcept;
-		[[nodiscard]] constexpr const UnitVector3<T>& GetNormal() const noexcept;
-		[[nodiscard]] constexpr T GetHeight() const noexcept;
+        constexpr SphericalCap() = default;
 
-	private:
+        [[nodiscard]] static constexpr SphericalCap<T> FromSphereAndNormalAndHeight(const Sphere<T>& sphere, const UnitVector3<T>& normal, const Height<T> height);
 
-		Sphere<T> mSphere;
-		UnitVector3<T> mNormal = UnitVector3<T>::Up();
-		T mHeight = T{};
-	};
+        [[nodiscard]] constexpr const Point3<T>& GetSphereCenter() const noexcept;
+        [[nodiscard]] constexpr Radius<T> GetSphereRadius() const noexcept;
+        [[nodiscard]] constexpr const UnitVector3<T>& GetNormal() const noexcept;
+        [[nodiscard]] constexpr Height<T> GetHeight() const noexcept;
 
-	using SphericalCapf = SphericalCap<float>;
+    private:
 
-	template<typename T>
-	constexpr const Point3<T>& SphericalCap<T>::GetSphereCenter() const noexcept
-	{
-		return mSphere.GetCenter();
-	}
+        constexpr SphericalCap(const Sphere<T>& sphere, const UnitVector3<T>& normal, const Height<T> height);
 
-	template<typename T>
-	constexpr T SphericalCap<T>::GetSphereRadius() const noexcept
-	{
-		return mSphere.GetRadius();
-	}
+    private:
 
-	template<typename T>
-	constexpr const UnitVector3<T>& SphericalCap<T>::GetNormal() const noexcept
-	{
-		return mNormal;
-	}
+        Sphere<T> mSphere;
+        UnitVector3<T> mNormal = UnitVector3<T>::Up();
+        Height<T> mHeight = T{};
+    };
 
-	template<typename T>
-	constexpr T SphericalCap<T>::GetHeight() const noexcept
-	{
-		return mHeight;
-	}
+    using SphericalCapf = SphericalCap<float>;
+    using SphericalCapd = SphericalCap<double>;
+
+    template<typename T>
+    constexpr SphericalCap<T>::SphericalCap(const Sphere<T>& sphere, const UnitVector3<T>& normal, const Height<T> height)
+        : mSphere(sphere)
+        , mNormal(normal)
+        , mHeight(height)
+    {
+        ASSERT(height.Value() <= sphere.GetDiameter().Value() && "Height of spherical cap cannot be greater than the diameter of the sphere");
+    }
+
+    template<typename T>
+    constexpr SphericalCap<T> SphericalCap<T>::FromSphereAndNormalAndHeight(const Sphere<T>& sphere, const UnitVector3<T>& normal, const Height<T> height)
+    {
+        return SphericalCap<T>(sphere, normal, height);
+    }
+
+    template<typename T>
+    constexpr const Point3<T>& SphericalCap<T>::GetSphereCenter() const noexcept
+    {
+        return mSphere.GetCenter();
+    }
+
+    template<typename T>
+    constexpr Radius<T> SphericalCap<T>::GetSphereRadius() const noexcept
+    {
+        return mSphere.GetRadius();
+    }
+
+    template<typename T>
+    constexpr const UnitVector3<T>& SphericalCap<T>::GetNormal() const noexcept
+    {
+        return mNormal;
+    }
+
+    template<typename T>
+    constexpr Height<T> SphericalCap<T>::GetHeight() const noexcept
+    {
+        return mHeight;
+    }
 }

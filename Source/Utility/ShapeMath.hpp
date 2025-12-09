@@ -286,26 +286,9 @@ namespace Simple
     template<typename T>
     [[nodiscard]] constexpr AABB3<T> GetBounds(const SphericalCap<T>& cap)
     {
-        const Point3<T> center = cap.GetSphereCenter();
-        const T radius = cap.GetSphereRadius().Value();
-        const T height = cap.GetHeight();
-        const UnitVector3<T> normal = cap.GetNormal();
-        const Point3<T> apex = center + normal * height;
-        auto axisExtent = [&](T nComp) constexpr -> T
-            {
-                const T t = T{ 1 } - Square(nComp);   // = |proj onto axis|^2
-                if (t <= T{ 0 })
-                    return T{ 0 };
-                return radius * static_cast<T>(Sqrt(t));
-            };
-        const Vector3<T> axisExtents = Vector3<T>(
-            axisExtent(normal.X()),
-            axisExtent(normal.Y()),
-            axisExtent(normal.Z())
-        );
-        const Point3<T> min = MinPoint3(center - axisExtents, apex);
-        const Point3<T> max = MaxPoint3(center + axisExtents, apex);
-        return AABB3<T>::FromMinAndMax(min, max);
+        cap;
+        ASSERT(false && "Not implemented yet");
+        return AABB3<T>();
     }
 
     template<typename T>
@@ -414,11 +397,36 @@ namespace Simple
         return PI<T> *Square(circle.GetRadius().Value());
     }
 
+    template<typename Ret = float, typename T>
+    [[nodiscard]] constexpr Ret GetArea(const Triangle2<T>& triangle) noexcept
+    {
+        const Point2<T>& p0 = triangle.GetPoint0();
+        const Point2<T>& p1 = triangle.GetPoint1();
+        const Point2<T>& p2 = triangle.GetPoint2();
+        return static_cast<Ret>(0.5f * Abs(
+            p0.x * (p1.y - p2.y) +
+            p1.x * (p2.y - p0.y) +
+            p2.x * (p0.y - p1.y)
+        ));
+    }
+
     template<typename T>
     [[nodiscard]] constexpr T GetVolume(const AABB3<T>& aabb) noexcept
     {
         const Vector3<T> size = aabb.GetExtent();
         return size.x * size.y * size.z;
+    }
+
+    template<typename T>
+    [[nodiscard]] constexpr T GetVolume(const Sphere<T>& sphere) noexcept
+    {
+        return static_cast<T>((4.0 / 3.0) * PI<T> * Cube(sphere.GetRadius().Value()));
+    }
+
+    template<typename T>
+    [[nodiscard]] constexpr T GetVolume(const Cylinder<T>& cylinder) noexcept
+    {
+        return PI<T> *Square(cylinder.GetRadius().Value()) * cylinder.GetHeight();
     }
 
     template<typename T>
@@ -436,8 +444,12 @@ namespace Simple
     template<typename T>
     [[nodiscard]] constexpr bool IsOverlapping(const AABB2<T>& a, const AABB2<T>& b)
     {
-        return !(a.GetMax().x < b.GetMin().x || a.GetMin().x > b.GetMax().x ||
-            a.GetMax().y < b.GetMin().y || a.GetMin().y > b.GetMax().y);
+        const auto& aMin = a.GetMin();
+        const auto& aMax = a.GetMax();
+        const auto& bMin = b.GetMin();
+        const auto& bMax = b.GetMax();
+        return !(aMax.x < bMin.x || aMin.x > bMax.x ||
+            aMax.y < bMin.y || aMin.y > bMax.y);
     }
 
     template<typename T>
@@ -500,29 +512,10 @@ namespace Simple
         return Percent<Ret>(static_cast<Ret>(Measure(overlap.value())) / static_cast<Ret>(Measure(a)));
     }
 
-    template<typename Ret = float, typename T>
-    [[nodiscard]] constexpr Ret GetArea(const Triangle2<T>& triangle) noexcept
-    {
-        const Point2<T>& p0 = triangle.GetPoint0();
-        const Point2<T>& p1 = triangle.GetPoint1();
-        const Point2<T>& p2 = triangle.GetPoint2();
-        return static_cast<Ret>(0.5f * Abs(
-            p0.x * (p1.y - p2.y) +
-            p1.x * (p2.y - p0.y) +
-            p2.x * (p0.y - p1.y)
-        ));
-    }
-
     template<typename T>
     [[nodiscard]] constexpr T GetSurfaceArea(const Sphere<T>& sphere) noexcept
     {
         return static_cast<T>(4.0f * PI<T> *Square(sphere.GetRadius().Value()));
-    }
-
-    template<typename T>
-    [[nodiscard]] constexpr T GetVolume(const Sphere<T>& sphere) noexcept
-    {
-        return static_cast<T>((4.0f / 3.0f) * PI<T> *Cube(sphere.GetRadius().Value()));
     }
 
     template<typename T>

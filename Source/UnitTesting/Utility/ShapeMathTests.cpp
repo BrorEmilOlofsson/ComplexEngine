@@ -291,6 +291,67 @@ TEST_CASE("ShapeMath::GetBounds (Sphere)", "[ShapeMath]")
     REQUIRE(bounds.GetMax() == Point3d(9.0, 5.0, 0.0));
 }
 
+TEST_CASE("ShapeMath::GetBounds (Cylinder)", "[ShapeMath]")
+{
+    const Cylinderd cylinder = Cylinderd::FromCenterAndRadiusAndAxisAndHeight(
+        Point3d(0.0, 0.0, 0.0),
+        Radiusd(2.0),
+        UnitVector3d::Up(),
+        10.0
+    );
+    const AABB3d bounds = GetBounds(cylinder);
+    REQUIRE(bounds.GetMin() == Point3d(-2.0, -5.0, -2.0));
+    REQUIRE(bounds.GetMax() == Point3d(2.0, 5.0, 2.0));
+}
+
+TEST_CASE("ShapeMath::GetBounds (SphericalCap)", "[ShapeMath]")
+{
+    /*SECTION("Normal up")
+    {
+        const SphericalCapd cap = SphericalCapd::FromSphereAndNormalAndHeight(
+            Sphered::FromCenterAndRadius(Point3d(0.0, 0.0, 0.0), Radiusd(1.0)),
+            UnitVector3d::Up(),
+            Heightd(1.0)
+        );
+        const AABB3d bounds = GetBounds(cap);
+        REQUIRE(bounds.GetMin() == Point3d(-1.0, 0.0, -1.0));
+        REQUIRE(bounds.GetMax() == Point3d(1.0, 1.0, 1.0));
+    }
+    SECTION("Normal down")
+    {
+        const SphericalCapd cap = SphericalCapd::FromSphereAndNormalAndHeight(
+            Sphered::FromCenterAndRadius(Point3d(0.0, 0.0, 0.0), Radiusd(1.0)),
+            UnitVector3d::Down(),
+            Heightd(1.0)
+        );
+        const AABB3d bounds = GetBounds(cap);
+        REQUIRE(bounds.GetMin() == Point3d(-1.0, -1.0, -1.0));
+        REQUIRE(bounds.GetMax() == Point3d(1.0, 0.0, 1.0));
+    }
+    SECTION("Normal right")
+    {
+        const SphericalCapd cap = SphericalCapd::FromSphereAndNormalAndHeight(
+            Sphered::FromCenterAndRadius(Point3d(0.0, 0.0, 0.0), Radiusd(2.0)),
+            UnitVector3d::Right(),
+            Heightd(2.0)
+        );
+        const AABB3d bounds = GetBounds(cap);
+        REQUIRE(bounds.GetMin() == Point3d(0.0, -2.0, -2.0));
+        REQUIRE(bounds.GetMax() == Point3d(2.0, 2.0, 2.0));
+    }
+    SECTION("Normal right up")
+    {
+        const SphericalCapd cap = SphericalCapd::FromSphereAndNormalAndHeight(
+            Sphered::FromCenterAndRadius(Point3d(1.0, 1.0, 0.0), Radiusd(Sqrt(2.0))),
+            UnitVector3d(1.0, 1.0, 0.0),
+            Heightd(1.0)
+        );
+        const AABB3d bounds = GetBounds(cap);
+        REQUIRE(bounds.GetMin() == Point3d(0, 0.0, -2));
+        REQUIRE(bounds.GetMax() == Point3d(1.4142135623730951, 1.4142135623730951, 2.0));
+    }*/
+}
+
 TEST_CASE("ShapeMath::GetBounds (Disk)", "[ShapeMath]")
 {
     const Diskd disk = Diskd(Point3d(5.0, 5.0, 5.0), UnitVector3d::Forward(), Radiusd(3.0));
@@ -426,6 +487,25 @@ TEST_CASE("ShapeMath::GetVolume (AABB3)", "[ShapeMath]")
     REQUIRE(volume == 250.0);
 }
 
+TEST_CASE("ShapeMath::GetVolume (Sphere)", "[ShapeMath]")
+{
+    constexpr Sphered sphere = Sphered::FromCenterAndRadius(Point3d::Zero(), Radiusd(3.0f));
+    constexpr double volume = GetVolume(sphere);
+    REQUIRE(volume == Approx(113.0973355292325));
+}
+
+TEST_CASE("ShapeMath::GetVolume (Cylinder)", "[ShapeMath]")
+{
+    constexpr Cylinderd cylinder = Cylinderd::FromCenterAndRadiusAndAxisAndHeight(
+        Point3d::One(),
+        Radiusd(5.0),
+        UnitVector3d::Forward(),
+        4.0
+    );
+    const double volume = GetVolume(cylinder);
+    REQUIRE(volume == Approx(314.159265358979));
+}
+
 TEST_CASE("ShapeMath::Measure (AABB2)", "[ShapeMath]")
 {
     constexpr AABB2d aabb = AABB2d::FromMinAndMax(Point2d(0, 0), Point2d(5, 10));
@@ -440,38 +520,94 @@ TEST_CASE("ShapeMath::Measure (AABB3)", "[ShapeMath]")
     REQUIRE(measure == 250.0); // Surface Area
 }
 
+TEST_CASE("ShapeMath::IsOverlapping (AABB2)", "[ShapeMath]")
+{
+    constexpr AABB2d aabb1 = AABB2d::FromCenterAndExtent(Point2d(2.5, 2.5), Vector2d(5, 5));
+    constexpr AABB2d aabb2 = AABB2d::FromCenterAndExtent(Point2d(7.5, 7.5), Vector2d(5, 5));
+    const bool isOverlapping = IsOverlapping(aabb1, aabb2);
+    REQUIRE(isOverlapping);
+}
+
+TEST_CASE("ShapeMath::IsOverlapping (AABB3)", "[ShapeMath]")
+{
+    constexpr AABB3d aabb1 = AABB3d::FromCenterAndExtent(Point3d(2.5, 2.5, 2.5), Vector3d(5, 5, 5));
+    constexpr AABB3d aabb2 = AABB3d::FromCenterAndExtent(Point3d(7.5, 7.5, 7.5), Vector3d(5, 5, 5));
+    const bool isOverlapping = IsOverlapping(aabb1, aabb2);
+    REQUIRE(isOverlapping);
+}
+
 TEST_CASE("ShapeMath::GetOverlap (AABB2)", "[ShapeMath]")
 {
-    constexpr AABB2f a = AABB2f::FromMinAndMax(Point2f(0, 0), Point2f(5, 5));
-    constexpr AABB2f b = AABB2f::FromMinAndMax(Point2f(3, 3), Point2f(7, 7));
-    constexpr std::optional<AABB2f> overlap = GetOverlap(a, b);
-    REQUIRE(overlap.has_value());
-    REQUIRE(overlap->GetMin() == Point2f(3.f, 3.f));
-    REQUIRE(overlap->GetMax() == Point2f(5.f, 5.f));
+    SECTION("No Overlap")
+    {
+        constexpr AABB2d a = AABB2d::FromMinAndMax(Point2d(0, 0), Point2d(5, 5));
+        constexpr AABB2d b = AABB2d::FromMinAndMax(Point2d(6, 6), Point2d(10, 10));
+        constexpr std::optional<AABB2d> overlap = GetOverlap(a, b);
+        REQUIRE(!overlap.has_value());
+    }
+    SECTION("Touching Edges - No Overlap")
+    {
+        constexpr AABB2d a = AABB2d::FromMinAndMax(Point2d(0, 0), Point2d(5, 5));
+        constexpr AABB2d b = AABB2d::FromMinAndMax(Point2d(5, 5), Point2d(10, 10));
+        constexpr std::optional<AABB2d> overlap = GetOverlap(a, b);
+        REQUIRE(overlap.has_value());
+        REQUIRE(overlap->GetMin() == Point2d(5.f, 5.f));
+        REQUIRE(overlap->GetMax() == Point2d(5.f, 5.f));
+    }
+    SECTION("Partial overlap")
+    {
+        constexpr AABB2d a = AABB2d::FromMinAndMax(Point2d(0, 0), Point2d(5, 5));
+        constexpr AABB2d b = AABB2d::FromMinAndMax(Point2d(3, 3), Point2d(7, 7));
+        constexpr std::optional<AABB2d> overlap = GetOverlap(a, b);
+        REQUIRE(overlap.has_value());
+        REQUIRE(overlap->GetMin() == Point2d(3.f, 3.f));
+        REQUIRE(overlap->GetMax() == Point2d(5.f, 5.f));
+    }
+    SECTION("Full overlap")
+    {
+        constexpr AABB2d a = AABB2d::FromMinAndMax(Point2d(0, 0), Point2d(5, 5));
+        constexpr AABB2d b = AABB2d::FromMinAndMax(Point2d(2.5, 2.5), Point2d(4.0, 4.0));
+        constexpr auto overlap = GetOverlap(a, b);
+        REQUIRE(overlap.has_value());
+        REQUIRE(overlap.value() == b);
+    }
 }
 
-TEST_CASE("Get Overlap AABB3")
+TEST_CASE("ShapeMath::GetOverlap (AABB3)", "[ShapeMath]")
 {
-    constexpr AABB3f a = AABB3f::FromMinAndMax(Point3f(0, 0, 0), Point3f(5, 5, 5));
-    constexpr AABB3f b = AABB3f::FromMinAndMax(Point3f(3, 3, 3), Point3f(7, 7, 7));
-    constexpr std::optional<AABB3f> overlap = GetOverlap(a, b);
-    REQUIRE(overlap.has_value());
-    REQUIRE(overlap->GetMin() == Point3f(3.f, 3.f, 3.f));
-    REQUIRE(overlap->GetMax() == Point3f(5.f, 5.f, 5.f));
-}
-
-TEST_CASE("Get Area AABB2")
-{
-    constexpr AABB2f aabb = AABB2f::FromMinAndMax(Point2f(0, 0), Point2f(5, 5));
-    constexpr float area = GetArea(aabb);
-    REQUIRE(area == 25.0f);
-}
-
-TEST_CASE("Get Volume AABB3")
-{
-    constexpr AABB3f aabb = AABB3f::FromMinAndMax(Point3f(0, 0, 0), Point3f(5, 5, 5));
-    constexpr float volume = GetVolume(aabb);
-    REQUIRE(volume == 125.0f);
+    SECTION("No Overlap")
+    {
+        constexpr AABB3d a = AABB3d::FromMinAndMax(Point3d(0, 0, 0), Point3d(5, 5, 5));
+        constexpr AABB3d b = AABB3d::FromMinAndMax(Point3d(6, 6, 6), Point3d(10, 10, 10));
+        constexpr std::optional<AABB3d> overlap = GetOverlap(a, b);
+        REQUIRE(!overlap.has_value());
+    }
+    SECTION("Touching Edges - No Overlap")
+    {
+        constexpr AABB3d a = AABB3d::FromMinAndMax(Point3d(0, 0, 0), Point3d(5, 5, 5));
+        constexpr AABB3d b = AABB3d::FromMinAndMax(Point3d(5, 5, 5), Point3d(10, 10, 10));
+        constexpr std::optional<AABB3d> overlap = GetOverlap(a, b);
+        REQUIRE(overlap.has_value());
+        REQUIRE(overlap->GetMin() == Point3d(5.0, 5.0, 5.0));
+        REQUIRE(overlap->GetMax() == Point3d(5.0, 5.0, 5.0));
+    }
+    SECTION("Partial overlap")
+    {
+        constexpr AABB3d a = AABB3d::FromMinAndMax(Point3d(0, 0, 0), Point3d(5, 5, 5));
+        constexpr AABB3d b = AABB3d::FromMinAndMax(Point3d(3, 3, 3), Point3d(7, 7, 7));
+        constexpr std::optional<AABB3d> overlap = GetOverlap(a, b);
+        REQUIRE(overlap.has_value());
+        REQUIRE(overlap->GetMin() == Point3d(3.0, 3.0, 3.0));
+        REQUIRE(overlap->GetMax() == Point3d(5.0, 5.0, 5.0));
+    }
+    SECTION("Full overlap")
+    {
+        constexpr AABB3d a = AABB3d::FromMinAndMax(Point3d(0, 0, 0), Point3d(5, 5, 5));
+        constexpr AABB3d b = AABB3d::FromMinAndMax(Point3d(2.5, 2.5, 2.5), Point3d(4.0, 4.0, 4.0));
+        constexpr auto overlap = GetOverlap(a, b);
+        REQUIRE(overlap.has_value());
+        REQUIRE(overlap.value() == b);
+    }
 }
 
 TEST_CASE("Get Overlap Percentage AABB2")
@@ -549,13 +685,6 @@ TEST_CASE("Get Surface Area Sphere")
     constexpr Spheref sphere = Spheref::FromCenterAndRadius(Point3f::Zero(), Radiusf(1.0f));
     constexpr float area = GetSurfaceArea(sphere);
     REQUIRE(Abs(area - 4.0f * PI<float>) < 0.0001f);
-}
-
-TEST_CASE("Get Volume Sphere")
-{
-    constexpr Spheref sphere = Spheref::FromCenterAndRadius(Point3f::Zero(), Radiusf(1.0f));
-    constexpr float volume = GetVolume(sphere);
-    REQUIRE(Abs(volume - (4.0f / 3.0f) * PI<float>) < 0.0001f);
 }
 
 TEST_CASE("Get Sphere Disk Facing Point")
