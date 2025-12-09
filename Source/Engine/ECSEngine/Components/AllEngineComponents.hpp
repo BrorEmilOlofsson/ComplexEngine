@@ -17,6 +17,7 @@
 #include "Engine/ECSEngine/Components/UICanvasComponent.hpp"
 #include "Engine/ECSEngine/Components/RotatingMovementComponent.hpp"
 #include "Engine/ECSEngine/Components/ArrowComponent.hpp"
+#include "Engine/ECSEngine/Components/CylinderComponent.hpp"
 
 namespace Simple
 {
@@ -41,5 +42,6 @@ namespace Simple
 		RegisterUICanvasComponent();
 		RegisterRotatingMovementComponent();
 		RegisterArrowComponent();
+        RegisterCylinderComponent();
 	}
 }

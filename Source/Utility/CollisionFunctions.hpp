@@ -21,7 +21,7 @@ namespace Simple
 	constexpr bool DetectCollision(const Point3<T>& point, const Sphere<T>& sphere)
 	{
 		const T distanceSquared = DistanceSquared(point, sphere.GetCenter());
-		const T sumRadiiSquared = Square(sphere.GetRadius());
+		const T sumRadiiSquared = Square(sphere.GetRadius().Value());
 		return distanceSquared <= sumRadiiSquared;
 	}
 
@@ -49,15 +49,17 @@ namespace Simple
 			(closestPoint.y - sphereCenter.y) * (closestPoint.y - sphereCenter.y) +
 			(closestPoint.z - sphereCenter.z) * (closestPoint.z - sphereCenter.z);
 
+        const float radius = sphere.GetRadius().Value();
 		// If the distance is less than the radius, they intersect
-		return distanceSquared < (sphere.GetRadius() * sphere.GetRadius());
+		return distanceSquared < Square(radius);
 	}
 
 	constexpr bool DetectCollision(const Spheref& sphere, const Ray3f& ray)
 	{
 		const Vector3f rayOriginToSphere = sphere.GetCenter() - ray.GetOrigin();
 
-		const float sphereRadiusSqr = sphere.GetRadius() * sphere.GetRadius();
+        const float radius = sphere.GetRadius().Value();
+		const float sphereRadiusSqr = Square(radius);
 		if (LengthSquared(rayOriginToSphere) <= sphereRadiusSqr)
 		{
 			return true;
@@ -223,10 +225,10 @@ namespace Simple
 	constexpr bool DetectCollision(const Sphere<T>& sphere, const Cylinder<T>& cylinder)
 	{
 		const Point3<T>& sphereCenter = sphere.GetCenter();
-		const T sphereRadius = sphere.GetRadius();
+		const T sphereRadius = sphere.GetRadius().Value();
 		const Point3<T> cylinderP0 = cylinder.GetLowerPoint();
 		const Point3<T> cylinderP1 = cylinder.GetUpperPoint();
-		const T cylinderRadius = cylinder.GetRadius();
+		const T cylinderRadius = cylinder.GetRadius().Value();
 
 		const UnitVector3<T>& cylinderAxis = cylinder.GetAxis();
 		//const Vector3<T> cylinderAxis = cylinderP1 - cylinderP0;

@@ -62,7 +62,7 @@ namespace Simple
 		constexpr std::size_t lineCount = 20;
 		constexpr Radiansf rotationAngle = ToRadians(Degreesf(360) / static_cast<float>(lineCount));
 
-		const Point3f startPoint = disk.GetCenter() + GetPerpendicularVector(disk.GetNormal()) * disk.GetRadius();
+		const Point3f startPoint = disk.GetCenter() + GetPerpendicularVector(disk.GetNormal()) * disk.GetRadius().Value();
 		Point3f previousPoint = startPoint;
 
 		std::array<DrawLine, lineCount> lines{};
@@ -94,7 +94,7 @@ namespace Simple
 		constexpr std::size_t lineCount = 20;
 		constexpr Radiansf rotationAngle = ToRadians(Degreesf(360) / static_cast<float>(lineCount));
 
-		const Point3f startPoint = cylinder.GetLowerPoint() + GetPerpendicularVector(cylinder.GetAxis()) * cylinder.GetRadius();
+		const Point3f startPoint = cylinder.GetLowerPoint() + GetPerpendicularVector(cylinder.GetAxis()) * cylinder.GetRadius().Value();
 
 		const Vector3f toOther = cylinder.GetAxis() * cylinder.GetHeight();
 

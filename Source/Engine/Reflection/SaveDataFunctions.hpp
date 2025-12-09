@@ -8,6 +8,7 @@
 #include "Utility/RGBColor.hpp"
 #include "Utility/Shapes/AABB2.hpp"
 #include "Utility/Shapes/AABB3.hpp"
+#include "Utility/Shapes/Cylinder.hpp"
 #include "Engine/ECS/EntityID.hpp"
 #include "Engine/Reflection/DataTypeID.hpp"
 #include "Utility/Asset/AssetTypes.hpp"
@@ -138,6 +139,17 @@ namespace Simple
 
 		return json;
 	}
+
+	template<typename T>
+	[[nodiscard]] nlohmann::json ToJSON(const Cylinder<T>& cylinder)
+	{
+		nlohmann::json json;
+		json["Center"] = ToJSON(cylinder.GetCenter());
+		json["Axis"] = ToJSON(cylinder.GetAxis());
+		json["Radius"] = ::ToJSON(cylinder.GetRadius().Value());
+		json["Height"] = ::ToJSON(cylinder.GetHeight());
+		return json;
+    }
 
 	[[nodiscard]] nlohmann::json ToJSON(const Color& color);
 	[[nodiscard]] nlohmann::json ToJSON(const RGBColor& color);

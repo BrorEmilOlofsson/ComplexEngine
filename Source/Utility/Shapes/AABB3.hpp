@@ -22,34 +22,20 @@ namespace Simple
 	using AABB3 = Bounds<Point3<T>, AABB3BoundsChecker>;
 
 	using AABB3f = AABB3<float>;
-	using AABB3i = AABB3<int>;
+	using AABB3d = AABB3<double>;
+    using AABB3i32 = AABB3<int32_t>;
+	using AABB3i = AABB3i32;
 
 	template<std::ranges::range R>
-	[[nodiscard]] constexpr auto CreateAABB3FromPoints(const R& aPoints)
+	[[nodiscard]] constexpr auto CreateAABB3FromPoints(const R& points)
 	{
-		using T = typename std::remove_cvref_t<decltype(aPoints[0])>::value_type;
+		using T = typename std::remove_cvref_t<decltype(points[0])>::value_type;
+
 		Point3<T> min(std::numeric_limits<T>::max(), std::numeric_limits<T>::max(), std::numeric_limits<T>::max());
 		Point3<T> max(std::numeric_limits<T>::lowest(), std::numeric_limits<T>::lowest(), std::numeric_limits<T>::lowest());
 
-		for (const auto& p : aPoints)
+		for (const auto& p : points)
 		{
-			min = Min(min, p);
-			max = Max(max, p);
-		}
-
-		return AABB3<T>::FromMinAndMax(min, max);
-	}
-
-	template<std::ranges::range R, typename TransformF>
-	[[nodiscard]] constexpr auto CreateAABB3FromPoints(const R& range, TransformF&& transformFunc)
-	{
-		using T = typename decltype(transformFunc(range[0]))::value_type;
-		Point3<T> min(std::numeric_limits<T>::max(), std::numeric_limits<T>::max(), std::numeric_limits<T>::max());
-		Point3<T> max(std::numeric_limits<T>::lowest(), std::numeric_limits<T>::lowest(), std::numeric_limits<T>::lowest());
-
-		for (const auto& i : range)
-		{
-			const Point3<T> p = transformFunc(i);
 			min = Min(min, p);
 			max = Max(max, p);
 		}

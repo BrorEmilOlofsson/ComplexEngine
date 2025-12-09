@@ -3,33 +3,28 @@
 #include "Utility/Math/Math.hpp"
 #include "Utility/StrongType.hpp"
 #include "Utility/Clamper.hpp"
+#include <type_traits>
 
 namespace Simple
 {
 
 	template<typename T>
-	using Radius = StrongCheckedType<T, PositiveChecker<T>, struct ST_Radius>;
+	using Radius = StrongAssertedTypeNew<T, PositiveOrZeroAsserter<T>, struct ST_Radius, EquatableTrait, ComparableTrait>;
 
 	using Radiusf = Radius<float>;
+	using Radiusd = Radius<double>;
 
 	template<typename T>
-	struct ST_Scalar<Radius<T>> : std::true_type {};
-
-	template<typename T>
-	using Diameter = StrongCheckedType<T, PositiveChecker<T>, struct ST_Diameter>;
+	using Diameter = StrongAssertedTypeNew<T, PositiveOrZeroAsserter<T>, struct ST_Diameter, EquatableTrait, ComparableTrait>;
 
 	using Diameterf = Diameter<float>;
+	using Diameterd = Diameter<double>;
 
 	template<typename T>
-	struct ST_Scalar<Diameter<T>> : std::true_type {};
-
-	template<typename T>
-	using Circumference = StrongCheckedType<T, PositiveChecker<T>, struct ST_Circumference>;
-
-	template<typename T>
-	struct ST_Scalar<Circumference<T>> : std::true_type {};
+	using Circumference = StrongAssertedTypeNew<T, PositiveOrZeroAsserter<T>, struct ST_Circumference, EquatableTrait, ComparableTrait>;
 
 	using Circumferencef = Circumference<float>;
+	using Circumferenced = Circumference<double>;
 
 	template<typename T>
 	constexpr Radius<T> ToRadius(const Circumference<T>& circumference)
@@ -54,4 +49,7 @@ namespace Simple
 	{
 		return Circumference<T>(radius.Value() * 2 * PI<T>);
 	}
+
+	template<typename T>
+	constexpr auto Add(const Radius<T>& a, const Radius<T>& b) -> T;
 }

@@ -100,7 +100,7 @@ static Vector3f GetGravityVector(const Transform& playerTransform, const PlanetC
 
 static bool CheckPlanetCollision(const Transform& playerTransform, const PlanetComponent& planetComponent, const Transform& planetTransform)
 {
-	return DetectCollision(playerTransform.GetPosition(), Spheref::FromCenterAndRadius(planetTransform.GetPosition(), planetComponent.radius));
+	return DetectCollision(playerTransform.GetPosition(), Spheref::FromCenterAndRadius(planetTransform.GetPosition(), Radiusf(planetComponent.radius)));
 }
 
 static void HandleRotation(Transform& transform, const Transform& planetTransform)
@@ -182,7 +182,7 @@ static void RenderPlanets(const ECS& ecs, RenderList& renderList)
 	for (auto [entityID, planetComponent] : ecs.ViewUsingEntityID<PlanetComponent>())
 	{
 		Transform planetTransform = GetWorldTransform(ecs, entityID);
-		renderList.AddSphere(DrawSphere{ Spheref::FromCenterAndRadius(planetTransform.GetPosition(), planetComponent.radius), Colors::Yellow });
+		renderList.AddSphere(DrawSphere{ Spheref::FromCenterAndRadius(planetTransform.GetPosition(), Radiusf(planetComponent.radius)), Colors::Yellow });
 	}
 }
 

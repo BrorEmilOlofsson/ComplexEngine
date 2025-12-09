@@ -6,6 +6,7 @@
 #include "Engine/ECSEngine/Systems/AnimationSystem.hpp"
 #include "Engine/ECSEngine/Systems/RotatingMovementSystem.hpp"
 #include "Engine/ECSEngine/Systems/NavmeshSystem.hpp"
+#include "Engine/ECSEngine/Systems/DebugShapeSystem.hpp"
 #include "Engine/ECSEngine/Components/AllEngineComponents.hpp"
 #include "Utility/File/FileUtility.hpp"
 #include "Engine/Reflection/EngineReflectionRegistration.hpp"
@@ -31,6 +32,7 @@ namespace Simple
 		ECSRegistry::Get().RegisterSystem<CameraSystem>();
 		ECSRegistry::Get().RegisterSystem<AnimationSystem>();
 		ECSRegistry::Get().RegisterSystem<NavmeshSystem>();
+		ECSRegistry::Get().RegisterSystem<DebugShapeSystem>();
 		DataTypeRegistry::GetInstance().Assert();
 		mBlackboard = std::make_shared<Blackboard>();
 		mAssetManager = std::make_shared<AssetManager>();

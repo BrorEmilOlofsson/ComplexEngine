@@ -160,7 +160,7 @@ namespace Simple
 		return viewAndEditResult;
 	}
 
-	static ViewAndEditResult ViewAndEditValue(float& value, const std::string& variableName, float speed, float min = 0.f, float max = 0.f)
+	ViewAndEditResult ViewAndEditValue(float& value, const std::string& variableName, float speed, float min = 0.f, float max = 0.f)
 	{
 		const float width = CalculateItemWidth(1);
 		ImGui::SetNextItemWidth(width);
@@ -245,7 +245,7 @@ namespace Simple
 	ViewAndEditResult ViewAndEditValue(Point3f& value, const std::string& variableName)
 	{
 		ViewAndEditResult viewAndEditResult;
-		viewAndEditResult.isEdited = ImGui::DragFloat3(variableName.c_str(), &value.x);
+		viewAndEditResult.isEdited = ImGui::DragFloat3(variableName.c_str(), &value.x, 0.01f);
 		viewAndEditResult.isActive = ImGui::IsItemActive();
 		return viewAndEditResult;
 	}

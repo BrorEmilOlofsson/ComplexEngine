@@ -92,11 +92,11 @@ namespace Simple
 		}
 		if (startHit)
 		{
-			RenderSphere(Spheref::FromCenterAndRadius(startHit->m3DPosition, 0.1f), Colors::SkyBlue, renderList);
+			RenderSphere(Spheref::FromCenterAndRadius(startHit->m3DPosition, Radiusf(0.1f)), Colors::SkyBlue, renderList);
 		}
 		if (endHit)
 		{
-			RenderSphere(Spheref::FromCenterAndRadius(endHit->m3DPosition, 0.1f), Colors::Navy, renderList);
+			RenderSphere(Spheref::FromCenterAndRadius(endHit->m3DPosition, Radiusf(0.1f)), Colors::Navy, renderList);
 		}
 		if (!path.empty())
 		{

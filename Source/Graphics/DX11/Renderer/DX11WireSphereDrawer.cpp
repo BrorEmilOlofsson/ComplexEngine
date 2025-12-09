@@ -80,7 +80,8 @@ namespace Simple
 		context.UpdateSubresource(mVertexBuffer.Get(), 0, nullptr, mMeshData.vertices.data(), 0, 0);
 
 		Transform transform;
-		transform.SetScale(Vector3f(drawSphere.sphere.GetRadius(), drawSphere.sphere.GetRadius(), drawSphere.sphere.GetRadius()));
+        const float radius = drawSphere.sphere.GetRadius().Value();
+		transform.SetScale(Vector3f(radius, radius, radius));
 		transform.SetPosition(drawSphere.sphere.GetCenter());
 
 		TransformBufferData objectBuffer = {};

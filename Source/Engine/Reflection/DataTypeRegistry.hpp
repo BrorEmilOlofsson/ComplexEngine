@@ -355,7 +355,7 @@ namespace Simple
 
 			if (ownerDataType == nullptr)
 			{
-				RegisterDataType<OwnerType>(); //NOTE(v11.3.4): In case the inline order happen to choose REGISTER_PROPERTY first :(
+				RegisterDataType<OwnerType>();
 			}
 		}
 

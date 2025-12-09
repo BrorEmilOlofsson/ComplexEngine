@@ -2,7 +2,17 @@
 #include "Utility/Math/Vector2.hpp"
 #include "Utility/Math/Vector3.hpp"
 #include "Utility/Math/Vector4.hpp"
+#include "Utility/Math/Point2.hpp"
+#include "Utility/Math/Point3.hpp"
 #include "Utility/Math/Transform3.hpp"
+#include "Utility/Math/UnitVector2.hpp"
+#include "Utility/Math/UnitVector3.hpp"
+#include "Utility/Color.hpp"
+#include "Utility/RGBColor.hpp"
+#include "Utility/Math/Angle.hpp"
+#include "Utility/Shapes/AABB2.hpp"
+#include "Utility/Shapes/AABB3.hpp"
+#include "Utility/Shapes/Cylinder.hpp"
 #include "Utility/Math/TransformMode.hpp"
 
 #include "Utility/Camera.hpp"
@@ -43,10 +53,12 @@ namespace Simple
 	REGISTER_DATATYPE(UnitVector2f);
 	REGISTER_DATATYPE(UnitVector3f);
 	REGISTER_DATATYPE(Color);
+    REGISTER_DATATYPE(RGBColor);
 	REGISTER_DATATYPE(Radiansf);
 	REGISTER_DATATYPE(Degreesf);
 	REGISTER_DATATYPE(AABB2f);
 	REGISTER_DATATYPE(AABB2i);
+	REGISTER_DATATYPE(Cylinderf);
 	REGISTER_DATATYPE(EntityID);
 	REGISTER_DATATYPE(eTransformMode);
 }

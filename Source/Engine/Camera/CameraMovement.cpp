@@ -58,6 +58,7 @@ namespace Simple
             rotationMatrix = RotationMatrix3f::FromXY(RemoveY(rotationMatrix.GetRight()), rotationMatrix.GetUp());
             RotateMatrixAroundAxis(rotationMatrix, cameraRight, Degreesf(mouseDelta.y));
             camera.GetTransform().SetRotation(rotationMatrix);
+            camera.SetPosition(targetPosition);
         }
 
        /* {

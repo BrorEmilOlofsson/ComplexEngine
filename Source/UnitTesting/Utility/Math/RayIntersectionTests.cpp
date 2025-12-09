@@ -8,17 +8,17 @@ TEST_CASE("Ray Vs Sphere Intersection")
 {
 	{
 		constexpr Ray3f ray(Point3f(0.f, 0, -10.f), UnitVector3f::Forward());
-		constexpr Spheref sphere = Spheref::FromRadius(5.f);
+		constexpr Spheref sphere = Spheref::FromRadius(Radiusf(5.f));
 
 		auto result = IntersectionRaySphere(ray, sphere);
 
 		REQUIRE(result.has_value());
 		REQUIRE(result->hitPoint == Point3f(0, 0, -5.f));
 	}
-
+	constexpr Radiusf r = Radiusf(5.f);
 	{
 		constexpr Ray3f ray(Point3f(-6.f, 0, -10.f), UnitVector3f::Forward());
-		constexpr Spheref sphere = Spheref::FromRadius(5.f);
+		constexpr Spheref sphere = Spheref::FromRadius(Radiusf(5.f));
 
 		auto result = IntersectionRaySphere(ray, sphere);
 
@@ -60,7 +60,7 @@ TEST_CASE("Ray Vs Plane Intersection")
 TEST_CASE("Ray Vs Disk Intersection")
 {
 	constexpr Ray3f ray(Point3f(1, 1, -1), UnitVector3f::Forward());
-	constexpr Diskf disk(Point3f::Zero(), UnitVector3f::Backward(), 5.f);
+	constexpr Diskf disk(Point3f::Zero(), UnitVector3f::Backward(), Radiusf(5.f));
 
 	const auto result = IntersectionRayDisk(ray, disk);
 }

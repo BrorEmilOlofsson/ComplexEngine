@@ -25,7 +25,7 @@ namespace Simple
 	[[nodiscard]] constexpr std::optional<RayHitResult> IntersectionRaySphere(const Ray3f& ray, const Spheref& sphere)
 	{
 		const float b = 2.0f * Dot(ray.GetOrigin() - sphere.GetCenter(), ray.GetDirection());
-		const float c = DistanceSquared(ray.GetOrigin(), sphere.GetCenter()) - Square(sphere.GetRadius());
+		const float c = DistanceSquared(ray.GetOrigin(), sphere.GetCenter()) - Square(sphere.GetRadius().Value());
 		const float discriminant = b * b - 4.0f * c;
 
 		if (discriminant < 0.0f)
@@ -157,7 +157,7 @@ namespace Simple
 
 		if (planeResult)
 		{
-			if (IsInRange(planeResult->hitPoint, disk.GetCenter(), disk.GetRadius()))
+			if (IsInRange(planeResult->hitPoint, disk.GetCenter(), disk.GetRadius().Value()))
 			{
 				return planeResult;
 			}

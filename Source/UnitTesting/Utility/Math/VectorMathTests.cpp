@@ -598,6 +598,11 @@ TEST_CASE("VectorMath::Cross (Vector2)", "[VectorMath]")
         const float result = Cross(up, right);
         REQUIRE(result == -1.f);
     }
+    SECTION("Cross with self")
+    {
+        constexpr float result = Cross(right, right);
+        REQUIRE(result == 0.f);
+    }
 }
 
 TEST_CASE("VectorMath::Cross (UnitVector2)", "[VectorMath]")
@@ -642,6 +647,11 @@ TEST_CASE("VectorMath::Cross (Vector3, Vector3)", "[VectorMath]")
     {
         const Vector3f result = Cross(right, forward);
         REQUIRE(result == -up);
+    }
+    SECTION("Cross with self")
+    {
+        const Vector3f result = Cross(right, right);
+        REQUIRE(result == Vector3f::Zero());
     }
 }
 

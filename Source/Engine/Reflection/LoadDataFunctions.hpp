@@ -8,6 +8,7 @@
 #include "Utility/RGBColor.hpp"
 #include "Utility/Shapes/AABB2.hpp"
 #include "Utility/Shapes/AABB3.hpp"
+#include "Utility/Shapes/Cylinder.hpp"
 #include "Engine/ECS/EntityID.hpp"
 #include "Engine/Reflection/DataTypeID.hpp"
 #include "Utility/Asset/AssetTypes.hpp"
@@ -126,6 +127,20 @@ namespace Simple
 		FromJSON(min, json.at("Min"));
 		FromJSON(max, json.at("Max"));
 		aabb = AABB3<T>(min, max);
+	}
+
+	template<typename T>
+    void FromJSON(Cylinder<T>& cylinder, const nlohmann::json& json)
+	{
+		Point3<T> center;
+		UnitVector3<T> axis;
+		T radius = T{};
+		T height = T{};
+		FromJSON(center, json.at("Center"));
+		FromJSON(axis, json.at("Axis"));
+		::FromJSON(radius, json.at("Radius"));
+		::FromJSON(height, json.at("Height"));
+		cylinder = Cylinder<T>::FromCenterAndRadiusAndAxisAndHeight(center, Radius<T>(radius), axis, height);
 	}
 
 	void FromJSON(EntityID& entityID, const nlohmann::json& json);

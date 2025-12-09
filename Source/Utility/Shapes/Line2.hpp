@@ -32,6 +32,7 @@ namespace Simple
 	};
 
 	using Line2f = Line2<float>;
+	using Line2d = Line2<double>;
 
 	template<typename T>
 	constexpr Line2<T>::Line2(const Point2<T>& point, const UnitVector2<T>& direction)

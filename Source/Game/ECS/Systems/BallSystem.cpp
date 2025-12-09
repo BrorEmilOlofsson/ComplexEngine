@@ -29,7 +29,7 @@ static void CreateBall(Simple::ECS& ecs)
 
 	const Simple::Circumferencef circumference(0.7f);
 	const Simple::Radiusf ballRadius = Simple::ToRadius(circumference);
-	const Simple::Spheref ballSphere = Spheref::FromCenterAndRadius(startPoint, ballRadius.Value());
+	const Simple::Spheref ballSphere = Spheref::FromCenterAndRadius(startPoint, Radiusf(ballRadius.Value()));
 
 	physicsComponent.physicsObject.SetShape(ballSphere);
 	transformComponent.transform.SetPosition(ballSphere.GetCenter());
@@ -47,7 +47,7 @@ static EntityID CreateBar(Simple::ECS& ecs)
 
 	constexpr Radiusf barRadius = Simple::ToRadius(Diameterf(0.12f));
 
-	constexpr Simple::Cylinderf barShape(Point3f(0, barHeight, 0), barRadius.Value(), Simple::UnitVector3f::Right(), barWidth);
+	constexpr Simple::Cylinderf barShape = Cylinderf::FromCenterAndRadiusAndAxisAndHeight(Point3f(0, barHeight, 0), barRadius, Simple::UnitVector3f::Right(), barWidth);
 
 	physicsComponent.physicsObject.SetColor(Simple::Colors::Aqua);
 	physicsComponent.physicsObject.SetType(Simple::Physics::ePhysicsObjectType::Static);
@@ -66,7 +66,7 @@ static EntityID CreatePost(Simple::ECS& ecs)
 
 	constexpr Radiusf postRadius = Simple::ToRadius(Simple::Diameterf(0.12f));
 
-	constexpr Simple::Cylinderf postShape(Point3f(0, 0, 0), postRadius.Value(), Simple::UnitVector3f::Up(), barHeight);
+	constexpr Simple::Cylinderf postShape = Cylinderf::FromCenterAndRadiusAndAxisAndHeight(Point3f(0, 0, 0), postRadius, Simple::UnitVector3f::Up(), barHeight);
 
 	physicsComponent.physicsObject.SetColor(Simple::Colors::Aqua);
 	physicsComponent.physicsObject.SetType(Simple::Physics::ePhysicsObjectType::Static);

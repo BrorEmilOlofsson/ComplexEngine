@@ -3,6 +3,7 @@
 #include "Utility/MeshData.hpp"
 #include <string>
 #include <filesystem>
+#include <ranges>
 
 #ifdef _WIN32
 
@@ -19,7 +20,8 @@ namespace Simple
 		AABB3f boundingBox;
 		for (const auto& meshData : meshDatas)
 		{
-			const auto meshBoundingBox = CreateAABB3FromPoints(meshData.vertices, [](const Vertex& vertex) { return vertex.position; });
+            auto positionRange = meshData.vertices | std::views::transform([](const Vertex& vertex) { return vertex.position; });
+			const auto meshBoundingBox = CreateAABB3FromPoints(positionRange);
 			boundingBox = MinMax(boundingBox, meshBoundingBox);
 		}
 		return boundingBox;

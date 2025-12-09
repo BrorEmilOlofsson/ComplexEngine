@@ -14,8 +14,8 @@ namespace Simple
 		, mMeshData(meshData)
 		, mVertexBuffer(device, mMeshData.vertices.data(), static_cast<unsigned int>(sizeof(Vertex) * mMeshData.vertices.size()))
 	{
-
-		mBoundingBox = CreateAABB3FromPoints(mMeshData.vertices, [](const Vertex& vertex) { return vertex.position; });
+        auto positionRange = mMeshData.vertices | std::views::transform([](const Vertex& vertex) { return vertex.position; });
+		mBoundingBox = CreateAABB3FromPoints(positionRange);
 		mIndexBuffer = DX11Factory::CreateIndexBuffer(device, mMeshData.indices.data(), sizeof(unsigned int) * static_cast<unsigned int>(mMeshData.indices.size()));
 
 		mName = meshName;

@@ -28,13 +28,13 @@ static void UpdateVelocity(Simple::Physics::PhysicsObject& obj, Simple::Transfor
 	{
 		constexpr float groundLevel = 0;
 		constexpr float dampingFactor = 0.8f;
-		if (sphere->GetCenter().y - sphere->GetRadius() < groundLevel)
+		if (sphere->GetCenter().y - sphere->GetRadius().Value() < groundLevel)
 		{
 			// Reverse the y-component of the velocity and apply damping
 			obj.SetVelocity(Simple::Physics::Velocityf(Simple::Vector3f(obj.GetVelocity().Value().x, -obj.GetVelocity().Value().y * dampingFactor, obj.GetVelocity().Value().z)));
 			obj.SetCurve(obj.GetCurve() * dampingFactor);
 
-			const Simple::Point3f newPos(aTransform.GetPosition().x, groundLevel + sphere->GetRadius(), aTransform.GetPosition().z);
+			const Simple::Point3f newPos(aTransform.GetPosition().x, groundLevel + sphere->GetRadius().Value(), aTransform.GetPosition().z);
 			// Correct the position to avoid sinking into the ground
 			sphere->SetCenter(newPos);
 			aTransform.SetPosition(newPos);

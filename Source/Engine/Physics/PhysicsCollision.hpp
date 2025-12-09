@@ -37,7 +37,7 @@ namespace Simple
 			}
 			const UnitVector3f normal = GetUnitVector(sphere1.GetCenter(), sphere2.GetCenter());
 
-			const float overlap = (sphere1.GetRadius() + sphere2.GetRadius()) - Sqrt(distanceSquared);
+			const float overlap = (sphere1.GetRadius().Value() + sphere2.GetRadius().Value()) - Sqrt(distanceSquared);
 
 			// Push them apart based on mass ratio (to prevent overlap)
 			const Massf totalMass = aData1.myMass + aData2.myMass;

@@ -214,7 +214,7 @@ namespace Simple
 			{
 				c = Colors::White;
 			}
-			renderList.AddSphere(DrawSphere(Spheref::FromCenterAndRadius(globalBoneMatrices[i].GetTranslation(), 0.1f), c), false);
+			renderList.AddSphere(DrawSphere(Spheref::FromCenterAndRadius(globalBoneMatrices[i].GetTranslation(), Radiusf(0.1f)), c), false);
 		}
 
 		for (size_t i = 0; i < 3; ++i)

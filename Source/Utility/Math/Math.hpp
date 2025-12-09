@@ -28,6 +28,12 @@ namespace Simple
 	}
 
 	template<typename T>
+	[[nodiscard]] constexpr T Cube(const T& value) noexcept
+	{
+		return value * value * value;
+    }
+
+	template<typename T>
 	[[nodiscard]] constexpr auto Sqrt(const T& value) noexcept
 	{
 		return std::sqrt(value);

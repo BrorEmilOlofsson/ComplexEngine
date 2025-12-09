@@ -38,6 +38,7 @@ namespace Simple
 		constexpr void AddLines(const std::span<const DrawLine> lines);
 		constexpr void AddSphere(const DrawSphere& sphere, const bool wired = true);
 		constexpr void AddBoundingBox(const DrawBoundingBox& boundingBox, const bool wired = true);
+		constexpr void AddBoundingBox(const AABB3f& boundingBox, const Color& color, const bool wired = true);
 		constexpr void AddPlane(const Planef& plane, const Color& color);
 		constexpr void AddArrow(const DrawArrow& arrow);
 		constexpr void AddCylinder(const Cylinderf& cylinder, const Color& color);
@@ -178,6 +179,11 @@ namespace Simple
 		{
 			mBoundingBoxes.push_back(boundingBox);
 		}
+	}
+
+	constexpr void RenderList::AddBoundingBox(const AABB3f& boundingBox, const Color& color, const bool wired)
+	{
+        AddBoundingBox(DrawBoundingBox{ .boundingBox = boundingBox, .color = color }, wired);
 	}
 
 	constexpr void RenderList::AddPlane(const Planef& plane, const Color& color)

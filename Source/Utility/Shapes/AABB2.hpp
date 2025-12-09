@@ -21,6 +21,7 @@ namespace Simple
 	using AABB2 = Bounds<Point2<T>, AABB2BoundsChecker>;
 
 	using AABB2f = AABB2<float>;
+	using AABB2d = AABB2<double>;
 	using AABB2i32 = AABB2<int32_t>;
 	using AABB2ui32 = AABB2<uint32_t>;
     using AABB2i64 = AABB2<int64_t>;
@@ -34,9 +35,11 @@ namespace Simple
 		return AABB2<T>::FromMinAndMax(Point2<T>(aabb.GetMin()), Point2<T>(aabb.GetMax()));
 	}
 
-	template<typename T>
-	constexpr AABB2<T> CreateAABB2FromPoints(std::span<const Point2<T>> points)
+	template<std::ranges::range R>
+	[[nodiscard]] constexpr auto CreateAABB2FromPoints(const R& points)
 	{
+		using T = typename std::remove_cvref_t<decltype(points[0])>::value_type;
+
 		Point2<T> min(std::numeric_limits<T>::max(), std::numeric_limits<T>::max());
 		Point2<T> max(std::numeric_limits<T>::lowest(), std::numeric_limits<T>::lowest());
 

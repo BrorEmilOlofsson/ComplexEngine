@@ -9,6 +9,7 @@
 #include "Utility/RGBColor.hpp"
 #include "Utility/Shapes/AABB2.hpp"
 #include "Utility/Shapes/AABB3.hpp"
+#include "Utility/Shapes/Cylinder.hpp"
 #include "Utility/Shapes/Ray3.hpp"
 #include "Engine/ECS/EntityID.hpp"
 #include "Engine/Reflection/DataTypeID.hpp"
@@ -42,6 +43,7 @@ namespace Simple
 	ViewAndEditResult ViewAndEditValue(char& value, const std::string& blackboard);
 	ViewAndEditResult ViewAndEditValue(bool& value, const std::string& variableName);
 	ViewAndEditResult ViewAndEditValue(int& value, const std::string& variableName);
+	ViewAndEditResult ViewAndEditValue(float& value, const std::string& variableName, float speed, float min, float max);
 	ViewAndEditResult ViewAndEditValue(float& value, const std::string& variableName);
 	ViewAndEditResult ViewAndEditValue(std::string& value, const std::string& variableName);
 
@@ -97,6 +99,52 @@ namespace Simple
 			}
 		}
 
+		return viewAndEditResult;
+	}
+
+	template<typename T>
+    ViewAndEditResult ViewAndEditValue(Cylinder<T>& cylinder, const Blackboard& blackboard)
+	{
+		ViewAndEditResult viewAndEditResult;
+		{
+			T height = cylinder.GetHeight();
+			ViewAndEditResult heightViewAndEditResult = ViewAndEditValue(height, "Height");
+			viewAndEditResult |= heightViewAndEditResult;
+			if (heightViewAndEditResult.isEdited)
+			{
+				cylinder.SetHeight(height);
+			}
+		}
+		{
+			T radius = cylinder.GetRadius().Value();
+			ViewAndEditResult radiusViewAndEditResult = ViewAndEditValue(radius, "Radius", 0.01f, 0.01f, FLT_MAX);
+			viewAndEditResult |= radiusViewAndEditResult;
+			if (radiusViewAndEditResult.isEdited)
+			{
+				cylinder.SetRadius(Radius<T>(radius));
+			}
+		}
+		{
+			Point3<T> center = cylinder.GetCenter();
+			ViewAndEditResult centerViewAndEditResult = ViewAndEditValue(center, "Center");
+			viewAndEditResult |= centerViewAndEditResult;
+			if (centerViewAndEditResult.isEdited)
+			{
+				cylinder.SetCenter(center);
+			}
+
+		}
+		{
+			UnitVector3<T> axis = cylinder.GetAxis();
+            Blackboard axisBlackboard = blackboard;
+            axisBlackboard.Insert<Key_VariableName>("Axis");
+			ViewAndEditResult axisViewAndEditResult = ViewAndEditValue(axis, blackboard);
+			viewAndEditResult |= axisViewAndEditResult;
+			if (axisViewAndEditResult.isEdited)
+			{
+				cylinder.SetAxis(axis);
+			}
+		}
 		return viewAndEditResult;
 	}
 

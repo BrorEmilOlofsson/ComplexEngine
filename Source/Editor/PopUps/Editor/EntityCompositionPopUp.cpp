@@ -49,7 +49,7 @@ namespace Simple
 		const OSView os = blackboard.Get<Key_OSView>();
 		mEntityCompositionAsset->GetECS().EditorUpdate(newBlackboard);
 
-		constexpr Spheref drawSphere = Spheref::FromCenterAndRadius(Point3f(0, 0, 10), 5.f);
+		constexpr Spheref drawSphere = Spheref::FromCenterAndRadius(Point3f(0, 0, 10), Radiusf(5.f));
 		mRenderState.GetRenderList().AddSphere(DrawSphere{ drawSphere, Colors::Salmon }, true);
 
 		if (IsFocused())

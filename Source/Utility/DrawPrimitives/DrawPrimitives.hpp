@@ -17,7 +17,7 @@ namespace Simple
 
 	struct DrawSphere final
 	{
-		Spheref sphere = Spheref::FromCenterAndRadius(Point3f::Zero(), 1.f);
+		Spheref sphere = Spheref::FromCenterAndRadius(Point3f::Zero(), Radiusf(1.f));
 		Color color;
 	};
 

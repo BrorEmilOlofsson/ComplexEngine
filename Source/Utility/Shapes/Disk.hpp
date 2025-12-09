@@ -11,27 +11,28 @@ namespace Simple
 	public:
 
 		constexpr Disk() = default;
-		constexpr Disk(const Point3<T>& center, const UnitVector3<T>& normal, const T radius);
+		constexpr Disk(const Point3<T>& center, const UnitVector3<T>& normal, const Radius<T> radius);
 
 		constexpr void SetCenter(const Point3<T>& center);
 		constexpr void SetNormal(const UnitVector3<T>& normal);
-		constexpr void SetRadius(const T radius);
+		constexpr void SetRadius(const Radius<T> radius);
 
 		[[nodiscard]] constexpr const Point3<T>& GetCenter() const;
 		[[nodiscard]] constexpr const UnitVector3<T>& GetNormal() const;
-		[[nodiscard]] constexpr T GetRadius() const;
+		[[nodiscard]] constexpr Radius<T> GetRadius() const;
 
 	private:
 
 		Point3<T> mCenter;
 		UnitVector3<T> mNormal;
-		T mRadius = T{};
+		Radius<T> mRadius = T{};
 	};
 
 	using Diskf = Disk<float>;
+	using Diskd = Disk<double>;
 
 	template<typename T>
-	constexpr Disk<T>::Disk(const Point3<T>& center, const UnitVector3<T>& normal, const T radius)
+	constexpr Disk<T>::Disk(const Point3<T>& center, const UnitVector3<T>& normal, const Radius<T> radius)
 		: mCenter(center)
 		, mNormal(normal)
 		, mRadius(radius)
@@ -51,7 +52,7 @@ namespace Simple
 	}
 
 	template<typename T>
-	constexpr void Disk<T>::SetRadius(const T radius)
+	constexpr void Disk<T>::SetRadius(const Radius<T> radius)
 	{
 		mRadius = radius;
 	}
@@ -69,7 +70,7 @@ namespace Simple
 	}
 
 	template<typename T>
-	constexpr T Disk<T>::GetRadius() const
+	constexpr Radius<T> Disk<T>::GetRadius() const
 	{
 		return mRadius;
 	}

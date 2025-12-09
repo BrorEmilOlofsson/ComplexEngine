@@ -30,6 +30,7 @@ namespace Simple
 	};
 
 	using LineSegment3f = LineSegment3<float>;
+	using LineSegment3d = LineSegment3<double>;
 
 	template<typename T>
 	constexpr LineSegment3<T>::LineSegment3(const Point3<T>& startPoint, const Point3<T>& endPoint)

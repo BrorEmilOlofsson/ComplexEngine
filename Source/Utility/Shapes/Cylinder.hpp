@@ -1,6 +1,7 @@
 #pragma once
 #include "Utility/Math/Point3.hpp"
 #include "Utility/Math/UnitVector3.hpp"
+#include "Utility/Math/GeometryMath.hpp"
 
 namespace Simple
 {
@@ -11,15 +12,18 @@ namespace Simple
 	public:
 
 		constexpr Cylinder() = default;
-		constexpr Cylinder(const Point3<T>& center, const T radius, const UnitVector3<T>& axis, const T height);
+
+        [[nodiscard]] static constexpr Cylinder<T> FromCenterAndRadiusAndAxisAndHeight(const Point3<T>& center, const Radius<T> radius, const UnitVector3<T>& axis, const T height);
+
+		constexpr Cylinder(const Point3<T>& center, const Radius<T> radius, const UnitVector3<T>& axis, const T height);
 
 		constexpr void SetCenter(const Point3<T>& center);
-		constexpr void SetRadius(const T radius);
+		constexpr void SetRadius(const Radius<T> radius);
 		constexpr void SetAxis(const UnitVector3<T>& axis);
 		constexpr void SetHeight(const T height);
 
 		[[nodiscard]] constexpr const Point3<T>& GetCenter() const;
-		[[nodiscard]] constexpr T GetRadius() const;
+		[[nodiscard]] constexpr Radius<T> GetRadius() const;
 		[[nodiscard]] constexpr const UnitVector3<T>& GetAxis() const;
 		[[nodiscard]] constexpr T GetHeight() const;
 
@@ -29,15 +33,16 @@ namespace Simple
 	private:
 
 		Point3<T> mCenter;
-		T mRadius = T{ 0.5 };
-		UnitVector3<T> mAxis = UnitVector3f::Up();
+		Radius<T> mRadius = Radius<T>(0.5);
+		UnitVector3<T> mAxis = UnitVector3<T>::Up();
 		T mHeight = T{ 1 };
 	};
 
 	using Cylinderf = Cylinder<float>;
+	using Cylinderd = Cylinder<double>;
 
 	template<typename T>
-	constexpr Cylinder<T>::Cylinder(const Point3<T>& center, const T radius, const UnitVector3<T>& axis, const T height)
+	constexpr Cylinder<T>::Cylinder(const Point3<T>& center, const Radius<T> radius, const UnitVector3<T>& axis, const T height)
 		: mCenter(center)
 		, mRadius(radius)
 		, mAxis(axis)
@@ -46,13 +51,19 @@ namespace Simple
 	}
 
 	template<typename T>
+	constexpr Cylinder<T> Cylinder<T>::FromCenterAndRadiusAndAxisAndHeight(const Point3<T>& center, const Radius<T> radius, const UnitVector3<T>& axis, const T height)
+	{
+		return Cylinder<T>(center, radius, axis, height);
+    }
+
+	template<typename T>
 	constexpr void Cylinder<T>::SetCenter(const Point3<T>& center)
 	{
 		mCenter = center;
 	}
 
 	template<typename T>
-	constexpr void Cylinder<T>::SetRadius(const T radius)
+	constexpr void Cylinder<T>::SetRadius(const Radius<T> radius)
 	{
 		mRadius = radius;
 	}
@@ -76,7 +87,7 @@ namespace Simple
 	}
 
 	template<typename T>
-	constexpr T Cylinder<T>::GetRadius() const
+	constexpr Radius<T> Cylinder<T>::GetRadius() const
 	{
 		return mRadius;
 	}

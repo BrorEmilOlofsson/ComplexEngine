@@ -231,7 +231,7 @@ namespace Simple
 			{
 				RotationMatrix3f matrix = RotationMatrix3f::FromY(drawCylinder.cylinder.GetAxis());
 				Point3f position = drawCylinder.cylinder.GetLowerPoint();
-				Vector3f scale = Vector3f(drawCylinder.cylinder.GetRadius() * 2, drawCylinder.cylinder.GetHeight(), drawCylinder.cylinder.GetRadius() * 2);
+				Vector3f scale = Vector3f(drawCylinder.cylinder.GetRadius().Value() * 2, drawCylinder.cylinder.GetHeight(), drawCylinder.cylinder.GetRadius().Value() * 2);
 				return Matrix4x4f::CreateTRSMatrix(position, matrix, scale);
 			});
 
@@ -258,7 +258,8 @@ namespace Simple
 			[](const DrawSphere& sphere)
 			{
 				Matrix4x4f matrix = Matrix4x4f::Identity();
-				matrix.SetScale(Vector3f(sphere.sphere.GetRadius(), sphere.sphere.GetRadius(), sphere.sphere.GetRadius()));
+				const float radius = sphere.sphere.GetRadius().Value();
+				matrix.SetScale(Vector3f(radius, radius, radius));
 				matrix.SetTranslation(sphere.sphere.GetCenter());
 				return matrix;
 			}

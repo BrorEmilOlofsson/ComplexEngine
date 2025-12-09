@@ -33,6 +33,7 @@ namespace Simple
 	};
 
 	using Planef = Plane<float>;
+	using Planed = Plane<double>;
 
 	template<typename T>
 	constexpr Plane<T> Plane<T>::FromPoints(const Point3<T>& point0, const Point3<T>& point1, const Point3<T>& point2)
