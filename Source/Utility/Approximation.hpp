@@ -5,35 +5,53 @@
 
 namespace Simple
 {
-    template<std::floating_point T, T Epsilon>
-    struct Approximation final
+
+    template<typename T>
+    concept IsFloatingPointType = requires
+    {
+        typename ValueType<T>::type;
+        requires std::floating_point<typename ValueType<T>::type>;
+    };
+
+    template<typename T, std::floating_point U, U _Epsilon>
+    struct Approximation;
+    
+    template<std::floating_point T, T _Epsilon>
+    struct Approximation<T, T, _Epsilon> final
     {
         T value = T{};
 
-        static constexpr T epsilon = static_cast<T>(1e-5);
+        static constexpr T Epsilon = _Epsilon;
     };
 
 
-    template<std::floating_point T, T Epsilon = 1e-5>
-    [[nodiscard]] constexpr Approximation<T, Epsilon> Approx(const T& value)
+    template<IsFloatingPointType T, std::floating_point U, U _Epsilon>
+    struct Approximation<T, U, _Epsilon> final
     {
-        return Approximation<T, Epsilon>{ value };
+        T value = T{};
+        static constexpr U Epsilon = _Epsilon;
+    };
+
+    template<IsFloatingPointType T, std::floating_point U = typename ValueType<T>::type, U Epsilon = static_cast<U>(1e-5)>
+    [[nodiscard]] constexpr auto Approx(const T& value) -> Approximation<T, U, Epsilon>
+    {
+        return Approximation<T, U, Epsilon>{ value };
     }
 
-    template<std::floating_point T, T Epsilon>
-    [[nodiscard]] constexpr bool operator==(const T& a, const Approximation<T, Epsilon>& b) noexcept
+    template<typename T, std::floating_point U, U Epsilon>
+    [[nodiscard]] constexpr bool operator==(const T& a, const Approximation<T, U, Epsilon>& b) noexcept
     {
         return NearlyEqual(a, b.value, Tolerance(Epsilon));
     }
 
-    template<std::floating_point T, T Epsilon>
-    [[nodiscard]] constexpr bool operator==(const Approximation<T, Epsilon>& a, const T& b) noexcept
+    template<typename T, std::floating_point U, U Epsilon>
+    [[nodiscard]] constexpr bool operator==(const Approximation<T, U, Epsilon>& a, const T& b) noexcept
     {
         return b == a;
     }
 
-    template<std::floating_point T, T Epsilon>
-    std::ostream& operator<<(std::ostream& os, const Approximation<T, Epsilon>& approx)
+    template<typename T, std::floating_point  U, T Epsilon>
+    std::ostream& operator<<(std::ostream& os, const Approximation<T, U, Epsilon>& approx)
     {
         os << approx.value << " +- " << Epsilon;
         return os;

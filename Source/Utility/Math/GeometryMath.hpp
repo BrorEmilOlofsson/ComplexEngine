@@ -9,7 +9,7 @@ namespace Simple
 {
 
 	template<typename T>
-	using Radius = StrongAssertedTypeNew<T, PositiveOrZeroAsserter<T>, struct ST_Radius, EquatableTrait, ComparableTrait>;
+	using Radius = StrongAssertedTypeNew<T, PositiveOrZeroAsserter<T>, struct ST_Radius, EquatableTrait, ComparableTrait, ScalarMultiplicableTrait>;
 
 	using Radiusf = Radius<float>;
 	using Radiusd = Radius<double>;
@@ -21,7 +21,7 @@ namespace Simple
 	using Diameterd = Diameter<double>;
 
 	template<typename T>
-	using Circumference = StrongAssertedTypeNew<T, PositiveOrZeroAsserter<T>, struct ST_Circumference, EquatableTrait, ComparableTrait>;
+	using Circumference = StrongAssertedTypeNew<T, PositiveOrZeroAsserter<T>, struct ST_Circumference, EquatableTrait, ComparableTrait, ScalarMultiplicableTrait>;
 
 	using Circumferencef = Circumference<float>;
 	using Circumferenced = Circumference<double>;

@@ -5,14 +5,14 @@
 
 using namespace Simple;
 
-TEST_CASE("UnitVector2::default constructor", "[unitvector2]")
+TEST_CASE("UnitVector2::Default Constructor", "[UnitVector2]")
 {
 	const UnitVector2f vector;
 	REQUIRE(vector.X() == 0.0f);
 	REQUIRE(vector.Y() == 1.0f);
 }
 
-TEST_CASE("UnitVector2::parameterized constructor", "[unitvector2]")
+TEST_CASE("UnitVector2::Parameterized Constructor", "[UnitVector2]")
 {
 	{
 		// (3,4) normalizes to (0.6, 0.8)
@@ -26,7 +26,7 @@ TEST_CASE("UnitVector2::parameterized constructor", "[unitvector2]")
 	}
 }
 
-TEST_CASE("UnitVector2::Constants", "[unitvector2]")
+TEST_CASE("UnitVector2::Constants", "[UnitVector2]")
 {
 	constexpr UnitVector2f right = UnitVector2f::Right();
 	constexpr UnitVector2f up = UnitVector2f::Up();
@@ -39,7 +39,7 @@ TEST_CASE("UnitVector2::Constants", "[unitvector2]")
 	REQUIRE(down == UnitVector2f(0, -1));
 }
 
-TEST_CASE("UnitVector2::Vector2 constructor", "[unitvector2]")
+TEST_CASE("UnitVector2::Vector2 Constructor", "[UnitVector2]")
 {
 	constexpr Vector2f vec(5.f, 5.f);
 	const UnitVector2f unitVec(vec);
@@ -48,7 +48,7 @@ TEST_CASE("UnitVector2::Vector2 constructor", "[unitvector2]")
 	REQUIRE(NearlyEqual(unitVec, UnitVector2f(0.7071067f, 0.7071067f), 0.0002f));
 }
 
-TEST_CASE("UnitVector2::Setters", "[unitvector2]")
+TEST_CASE("UnitVector2::Setters", "[UnitVector2]")
 {
 	{
 		UnitVector2f vector = UnitVector2f::Up();
@@ -66,7 +66,7 @@ TEST_CASE("UnitVector2::Setters", "[unitvector2]")
 	}
 }
 
-TEST_CASE("UnitVector2::Negation Operator", "[unitvector2]")
+TEST_CASE("UnitVector2::Negation Operator", "[UnitVector2]")
 {
 	constexpr UnitVector2f vector = UnitVector2f::Right();
 	constexpr UnitVector2f negatedVector = -vector;
@@ -74,7 +74,7 @@ TEST_CASE("UnitVector2::Negation Operator", "[unitvector2]")
 	REQUIRE(negatedVector.Y() == 0.0f);
 }
 
-TEST_CASE("UnitVector2::Equality Operator", "[unitvector2]")
+TEST_CASE("UnitVector2::Equality Operator", "[UnitVector2]")
 {
 	constexpr UnitVector2f vectorA = UnitVector2f::Up();
 	constexpr UnitVector2f vectorB = UnitVector2f::Up();
@@ -83,7 +83,7 @@ TEST_CASE("UnitVector2::Equality Operator", "[unitvector2]")
 	REQUIRE_FALSE(vectorA == vectorC);
 }
 
-TEST_CASE("UnitVector2::Addition Operator UnitVector2+UnitVector2", "[unitvector2]")
+TEST_CASE("UnitVector2::Addition Operator UnitVector2+UnitVector2", "[UnitVector2]")
 {
 	constexpr UnitVector2f vectorA = UnitVector2f::Right();
 	constexpr UnitVector2f vectorB = UnitVector2f::Up();
@@ -92,7 +92,7 @@ TEST_CASE("UnitVector2::Addition Operator UnitVector2+UnitVector2", "[unitvector
 	REQUIRE(result.y == 1.0f);
 }
 
-TEST_CASE("UnitVector2::Addition Operator Vector2+UnitVector2", "[unitvector2]")
+TEST_CASE("UnitVector2::Addition Operator Vector2+UnitVector2", "[UnitVector2]")
 {
 	constexpr Vector2f vectorA(4.0f, 5.0f);
 	constexpr UnitVector2f vectorB = UnitVector2f::Up();
@@ -101,7 +101,7 @@ TEST_CASE("UnitVector2::Addition Operator Vector2+UnitVector2", "[unitvector2]")
 	REQUIRE(result.y == 6.0f);
 }
 
-TEST_CASE("UnitVector2::Addition Operator UnitVector2+Vector2", "[unitvector2]")
+TEST_CASE("UnitVector2::Addition Operator UnitVector2+Vector2", "[UnitVector2]")
 {
 	constexpr UnitVector2f vectorA = UnitVector2f::Up();
 	constexpr Vector2f vectorB(4.0f, 5.0f);
@@ -110,7 +110,7 @@ TEST_CASE("UnitVector2::Addition Operator UnitVector2+Vector2", "[unitvector2]")
 	REQUIRE(result.y == 6.0f);
 }
 
-TEST_CASE("UnitVector2::Subtraction Operator UnitVector2-UnitVector2", "[unitvector2]")
+TEST_CASE("UnitVector2::Subtraction Operator UnitVector2-UnitVector2", "[UnitVector2]")
 {
 	constexpr UnitVector2f vectorA = UnitVector2f::Right();
 	constexpr UnitVector2f vectorB = UnitVector2f::Up();
@@ -119,7 +119,7 @@ TEST_CASE("UnitVector2::Subtraction Operator UnitVector2-UnitVector2", "[unitvec
 	REQUIRE(result.y == -1.0f);
 }
 
-TEST_CASE("UnitVector2::Subtraction Operator UnitVector2-Vector2", "[unitvector2]")
+TEST_CASE("UnitVector2::Subtraction Operator UnitVector2-Vector2", "[UnitVector2]")
 {
 	constexpr UnitVector2f vectorA = UnitVector2f::Up();
 	constexpr Vector2f vectorB(1.0f, 2.0f);
@@ -128,7 +128,7 @@ TEST_CASE("UnitVector2::Subtraction Operator UnitVector2-Vector2", "[unitvector2
 	REQUIRE(result.y == -1.0f);
 }
 
-TEST_CASE("UnitVector2::Subtraction Operator Vector2-UnitVector2", "[unitvector2]")
+TEST_CASE("UnitVector2::Subtraction Operator Vector2-UnitVector2", "[UnitVector2]")
 {
 	constexpr Vector2f vectorA(4.0f, 5.0f);
 	constexpr UnitVector2f vectorB = UnitVector2f::Up();
@@ -137,7 +137,7 @@ TEST_CASE("UnitVector2::Subtraction Operator Vector2-UnitVector2", "[unitvector2
 	REQUIRE(result.y == 4.0f);
 }
 
-TEST_CASE("UnitVector2::Multiplication by Scalar", "[unitvector2]")
+TEST_CASE("UnitVector2::Multiplication by Scalar", "[UnitVector2]")
 {
 	constexpr UnitVector2f vector = UnitVector2f::Right();
 	constexpr float scalar = 3.0f;
@@ -149,7 +149,7 @@ TEST_CASE("UnitVector2::Multiplication by Scalar", "[unitvector2]")
 	REQUIRE(result2.y == 0.0f);
 }
 
-TEST_CASE("UnitVector2::Division by Scalar", "[unitvector2]")
+TEST_CASE("UnitVector2::Division by Scalar", "[UnitVector2]")
 {
 	constexpr UnitVector2f vector = UnitVector2f::Up();
 	constexpr float scalar = 2.0f;

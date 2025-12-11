@@ -90,4 +90,10 @@ namespace Simple
 	{
 		return ToDiameter(mRadius);
 	}
+
+	template<typename T>
+	[[nodiscard]] constexpr bool operator==(const Sphere<T>& a, const Sphere<T>& b) noexcept
+	{
+		return a.mCenter == b.mCenter && a.mRadius == b.mRadius;
+	}
 }

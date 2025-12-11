@@ -82,6 +82,15 @@ namespace Simple
         }
     };
 
+    template<typename T>
+    struct ScalarMultiplicableTrait : StrongTypeTrait<T, ScalarMultiplicableTrait>
+    {
+        template<typename U>
+        [[nodiscard]] constexpr T operator*(const U& scalar) const
+        {
+            return T(this->Underlying().Value() * scalar);
+        }
+    };
 
     template<typename T, typename Tag, template<typename> typename... Traits>
     class StrongTypeNew final : public Traits<StrongTypeNew<T, Tag, Traits...>>...

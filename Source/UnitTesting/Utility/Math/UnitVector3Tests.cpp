@@ -3,7 +3,7 @@
 
 using namespace Simple;
 
-TEST_CASE("UnitVector3::default constructor", "[unitvector3]")
+TEST_CASE("UnitVector3::default constructor", "[UnitVector3]")
 {
 	const UnitVector3f vector;
 	REQUIRE(vector.X() == 0.0f);
@@ -11,7 +11,7 @@ TEST_CASE("UnitVector3::default constructor", "[unitvector3]")
 	REQUIRE(vector.Z() == 1.0f);
 }
 
-TEST_CASE("UnitVector3::parameterized constructor", "[unitvector3]")
+TEST_CASE("UnitVector3::parameterized constructor", "[UnitVector3]")
 {
 	const UnitVector3f vector(0.57735f, 0.57735f, 0.57735f);
 	REQUIRE(NearlyEqual(vector.X(), 0.57735f));
@@ -19,7 +19,7 @@ TEST_CASE("UnitVector3::parameterized constructor", "[unitvector3]")
 	REQUIRE(NearlyEqual(vector.Z(), 0.57735f));
 }
 
-TEST_CASE("UnitVector3::Constants", "[unitvector3]")
+TEST_CASE("UnitVector3::Constants", "[UnitVector3]")
 {
 	constexpr UnitVector3f right = UnitVector3f::Right();
 	constexpr UnitVector3f up = UnitVector3f::Up();
@@ -35,7 +35,7 @@ TEST_CASE("UnitVector3::Constants", "[unitvector3]")
 	REQUIRE(backward == UnitVector3f(0, 0, -1));
 }
 
-TEST_CASE("UnitVector3::Vector3 constructor", "[unitvector3]")
+TEST_CASE("UnitVector3::Vector3 constructor", "[UnitVector3]")
 {
 	{
 
@@ -58,7 +58,7 @@ TEST_CASE("UnitVector3::Vector3 constructor", "[unitvector3]")
 
 }
 
-TEST_CASE("UnitVector3::Setters", "[unitvector3]")
+TEST_CASE("UnitVector3::Setters", "[UnitVector3]")
 {
 	{
 
@@ -85,7 +85,7 @@ TEST_CASE("UnitVector3::Setters", "[unitvector3]")
 	}
 }
 
-TEST_CASE("UnitVector3::Negation Operator", "[unitvector3]")
+TEST_CASE("UnitVector3::Negation Operator", "[UnitVector3]")
 {
 	constexpr UnitVector3f vector = UnitVector3f::Right();
 	constexpr UnitVector3f negatedVector = -vector;
@@ -94,7 +94,7 @@ TEST_CASE("UnitVector3::Negation Operator", "[unitvector3]")
 	REQUIRE(negatedVector.Z() == 0.0f);
 }
 
-TEST_CASE("UnitVector3::Equality Operator", "[unitvector3]")
+TEST_CASE("UnitVector3::Equality Operator", "[UnitVector3]")
 {
 	constexpr UnitVector3f vectorA = UnitVector3f::Up();
 	constexpr UnitVector3f vectorB = UnitVector3f::Up();
@@ -103,7 +103,7 @@ TEST_CASE("UnitVector3::Equality Operator", "[unitvector3]")
 	REQUIRE(vectorA != vectorC);
 }
 
-TEST_CASE("UnitVector3::Addition Operator UnitVector3+UnitVector3", "[unitvector3]")
+TEST_CASE("UnitVector3::Addition Operator UnitVector3+UnitVector3", "[UnitVector3]")
 {
 	constexpr UnitVector3f vectorA = UnitVector3f::Right();
 	constexpr UnitVector3f vectorB = UnitVector3f::Up();
@@ -113,7 +113,7 @@ TEST_CASE("UnitVector3::Addition Operator UnitVector3+UnitVector3", "[unitvector
 	REQUIRE(result.z == 0.0f);
 }
 
-TEST_CASE("UnitVector3::Addition Operator Vector3+UnitVector3", "[unitvector3]")
+TEST_CASE("UnitVector3::Addition Operator Vector3+UnitVector3", "[UnitVector3]")
 {
 	constexpr Vector3f vectorA(1.0f, 2.0f, 3.0f);
 	constexpr UnitVector3f vectorB = UnitVector3f::Forward();
@@ -123,7 +123,7 @@ TEST_CASE("UnitVector3::Addition Operator Vector3+UnitVector3", "[unitvector3]")
 	REQUIRE(result.z == 4.0f);
 }
 
-TEST_CASE("UnitVector3::Addition Operator UnitVector3+Vector3", "[unitvector3]")
+TEST_CASE("UnitVector3::Addition Operator UnitVector3+Vector3", "[UnitVector3]")
 {
 	constexpr UnitVector3f vectorA = UnitVector3f::Up();
 	constexpr Vector3f vectorB(4.0f, 5.0f, 6.0f);
@@ -133,7 +133,7 @@ TEST_CASE("UnitVector3::Addition Operator UnitVector3+Vector3", "[unitvector3]")
 	REQUIRE(result.z == 6.0f);
 }
 
-TEST_CASE("UnitVector3::Addition Assignment Operator", "[unitvector3]")
+TEST_CASE("UnitVector3::Addition Assignment Operator", "[UnitVector3]")
 {
 	Vector3f vectorA(1.0f, 1.0f, 1.0f);
 	const UnitVector3f vectorB = UnitVector3f::Right();
@@ -143,7 +143,7 @@ TEST_CASE("UnitVector3::Addition Assignment Operator", "[unitvector3]")
 	REQUIRE(vectorA.z == 1.0f);
 }
 
-TEST_CASE("UnitVector3::Subtraction Operator UnitVector3-UnitVector3", "[unitvector3]")
+TEST_CASE("UnitVector3::Subtraction Operator UnitVector3-UnitVector3", "[UnitVector3]")
 {
 	constexpr UnitVector3f vectorA = UnitVector3f::Right();
 	constexpr UnitVector3f vectorB = UnitVector3f::Up();
@@ -153,7 +153,7 @@ TEST_CASE("UnitVector3::Subtraction Operator UnitVector3-UnitVector3", "[unitvec
 	REQUIRE(result.z == 0.0f);
 }
 
-TEST_CASE("UnitVector3::Subtraction Operator UnitVector3-Vector3", "[unitvector3]")
+TEST_CASE("UnitVector3::Subtraction Operator (UnitVector3-Vector3)", "[UnitVector3]")
 {
 	constexpr UnitVector3f vectorA = UnitVector3f::Forward();
 	constexpr Vector3f vectorB(1.0f, 2.0f, 3.0f);
@@ -163,7 +163,7 @@ TEST_CASE("UnitVector3::Subtraction Operator UnitVector3-Vector3", "[unitvector3
 	REQUIRE(result.z == -2.0f);
 }
 
-TEST_CASE("UnitVector3::Subtraction Operator Vector3-UnitVector3", "[unitvector3]")
+TEST_CASE("UnitVector3::Subtraction Operator (Vector3-UnitVector3)", "[UnitVector3]")
 {
 	constexpr Vector3f vectorA(4.0f, 5.0f, 6.0f);
 	constexpr UnitVector3f vectorB = UnitVector3f::Up();
@@ -173,7 +173,7 @@ TEST_CASE("UnitVector3::Subtraction Operator Vector3-UnitVector3", "[unitvector3
 	REQUIRE(result.z == 6.0f);
 }
 
-TEST_CASE("UnitVector3::Subtraction Assignment Operator", "[unitvector3]")
+TEST_CASE("UnitVector3::Subtraction Assignment Operator", "[UnitVector3]")
 {
 	Vector3f vectorA(3.0f, 3.0f, 3.0f);
 	const UnitVector3f vectorB = UnitVector3f::Forward();
@@ -183,7 +183,7 @@ TEST_CASE("UnitVector3::Subtraction Assignment Operator", "[unitvector3]")
 	REQUIRE(vectorA.z == 2.0f);
 }
 
-TEST_CASE("UnitVector3::Multiplication by Scalar", "[unitvector3]")
+TEST_CASE("UnitVector3::Multiplication by Scalar", "[UnitVector3]")
 {
 	constexpr UnitVector3f vector = UnitVector3f::Right();
 	constexpr float scalar = 3.0f;
@@ -197,7 +197,7 @@ TEST_CASE("UnitVector3::Multiplication by Scalar", "[unitvector3]")
 	REQUIRE(result2.z == 0.0f);
 }
 
-TEST_CASE("UnitVector3::Division by Scalar", "[unitvector3]")
+TEST_CASE("UnitVector3::Division by Scalar", "[UnitVector3]")
 {
 	constexpr UnitVector3f vector = UnitVector3f::Up();
 	constexpr float scalar = 2.0f;
@@ -205,4 +205,12 @@ TEST_CASE("UnitVector3::Division by Scalar", "[unitvector3]")
 	REQUIRE(result1.x == 0.0f);
 	REQUIRE(result1.y == 0.5f);
 	REQUIRE(result1.z == 0.0f);
+}
+
+TEST_CASE("UnitVector3::NearlyEqual", "[UnitVector3]")
+{
+	constexpr UnitVector3d v1 = UnitVector3d::Up();
+	UnitVector3d v2 = UnitVector3d::Up();
+	v2.SetX(0.00001);
+	REQUIRE(NearlyEqual(v1, v2));
 }

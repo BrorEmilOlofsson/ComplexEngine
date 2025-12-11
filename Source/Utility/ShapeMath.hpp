@@ -487,11 +487,11 @@ namespace Simple
         );
     }
 
-
-    // How much of the area of AABB a is covered by the overlap with AABB b
-    template<typename Ret = float, typename T>
-    [[nodiscard]] constexpr Percent<Ret> GetOverlapPercentage(const AABB2<T>& a, const AABB2<T>& b) noexcept
+    // How much of the area of AABB a is covered by AABB b
+    template<typename T>
+    [[nodiscard]] constexpr auto GetOverlapPercentage(const AABB2<T>& a, const AABB2<T>& b)
     {
+        using Ret = std::conditional_t<std::same_as<T, double>, double, float>;
         const auto overlap = GetOverlap(a, b);
         if (!overlap.has_value())
         {
@@ -500,10 +500,11 @@ namespace Simple
         return Percent<Ret>(static_cast<Ret>(Measure(overlap.value())) / static_cast<Ret>(Measure(a)));
     }
 
-    // How much of the area of AABB a is covered by the overlap with AABB b
-    template<typename Ret = float, typename T>
-    [[nodiscard]] constexpr Percent<Ret> GetOverlapPercentage(const AABB3<T>& a, const AABB3<T>& b) noexcept
+    // How much of the volume of AABB a is covered by AABB b
+    template<typename T>
+    [[nodiscard]] constexpr auto GetOverlapPercentage(const AABB3<T>& a, const AABB3<T>& b)
     {
+        using Ret = std::conditional_t<std::same_as<T, double>, double, float>;
         const auto overlap = GetOverlap(a, b);
         if (!overlap.has_value())
         {
@@ -521,22 +522,33 @@ namespace Simple
     template<typename T>
     [[nodiscard]] constexpr T GetSurfaceArea(const SphericalCap<T>& cap) noexcept
     {
-        return static_cast<T>(2.0f * PI<T> *cap.GetSphereRadius() * cap.GetHeight());
+        return static_cast<T>(2.0f * PI<T> *cap.GetSphereRadius().Value() * cap.GetHeight().Value());
     }
 
+    enum class eSliceSphereError
+    {
+        NoIntersection,
+    };
+
+    // Slice a sphere with a plane, returning the spherical cap on the normal side of the plane
     template<typename T>
-    [[nodiscard]] constexpr SphericalCap<T> SliceSphere(const Sphere<T>& sphere, const Plane<T>& plane)
+    [[nodiscard]] constexpr std::expected<SphericalCap<T>, eSliceSphereError> SliceSphere(const Sphere<T>& sphere, const Plane<T>& plane)
     {
         const UnitVector3<T> normal = plane.GetNormal();
 
-        const T height = GetDistance(plane, sphere.GetCenter()) + sphere.GetRadius();
+        const auto distance = GetDistance(plane, sphere.GetCenter());
+        if (distance >= sphere.GetRadius().Value())
+        {
+            return std::unexpected(eSliceSphereError::NoIntersection);
+        }
 
-        return SphericalCap<T>(sphere, normal, height);
+        const T height = sphere.GetRadius().Value() - distance;
+
+        return SphericalCap<T>::FromSphereAndNormalAndHeight(sphere, normal, Height<T>(height));
     }
 
     enum class eSphereDiskFacingPointError
     {
-        None,
         PointEqualsCenter,
     };
 

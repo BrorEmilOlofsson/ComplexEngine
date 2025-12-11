@@ -6,112 +6,112 @@ using namespace Simple;
 
 TEST_CASE("ShapeMath::ToLine (LineSegment2 -> Line2)", "[ShapeMath]")
 {
-    constexpr LineSegment2f segment = LineSegment2f::FromPoints(Point2f(0.0f, 0.0f), Point2f(1.0f, 1.0f));
-    const Line2f line = ToLine(segment);
+    constexpr LineSegment2d segment = LineSegment2d::FromPoints(Point2d(0.0f, 0.0f), Point2d(1.0f, 1.0f));
+    const Line2d line = ToLine(segment);
 
-    REQUIRE(line.GetPoint() == Point2f(0.0f, 0.0f));
-    REQUIRE(NearlyEqual(line.GetDirection(), UnitVector2f(1.0f, 1.0f)));
+    REQUIRE(line.GetPoint() == Point2d(0.0f, 0.0f));
+    REQUIRE(NearlyEqual(line.GetDirection(), UnitVector2d(1.0f, 1.0f)));
 }
 
 TEST_CASE("ShapeMath::ToLine (LineSegment3 -> Line3)", "[ShapeMath]")
 {
-    constexpr LineSegment3f segment = LineSegment3f::FromPoints(Point3f(0.0f, 0.0f, 0.0f), Point3f(1.0f, 1.0f, 1.0f));
-    const Line3f line = ToLine(segment);
-    REQUIRE(line.GetPoint() == Point3f(0.0f, 0.0f, 0.0f));
-    REQUIRE(NearlyEqual(line.GetDirection(), UnitVector3f(1.0f, 1.0f, 1.0f)));
+    constexpr LineSegment3d segment = LineSegment3d::FromPoints(Point3d(0.0f, 0.0f, 0.0f), Point3d(1.0f, 1.0f, 1.0f));
+    const Line3d line = ToLine(segment);
+    REQUIRE(line.GetPoint() == Point3d(0.0f, 0.0f, 0.0f));
+    REQUIRE(line.GetDirection() == Approx(UnitVector3d(1.0f, 1.0f, 1.0f)));
 }
 
 TEST_CASE("ShapeMath::ToLineSegment (Ray2 -> LineSegment2)", "[ShapeMath]")
 {
-    constexpr Ray2f ray = Ray2f::FromOriginAndDirection(Point2f(0.0f, 0.0f), UnitVector2f::Right());
-    constexpr float distance = 5.0f;
-    const LineSegment2f segment = ToLineSegment(ray, distance);
-    REQUIRE(segment.StartPoint() == Point2f(0.0f, 0.0f));
-    REQUIRE(segment.EndPoint() == Point2f(5.0f, 0.0f));
+    constexpr Ray2d ray = Ray2d::FromOriginAndDirection(Point2d(0.0f, 0.0f), UnitVector2d::Right());
+    constexpr double distance = 5.0f;
+    const LineSegment2d segment = ToLineSegment(ray, distance);
+    REQUIRE(segment.StartPoint() == Point2d(0.0f, 0.0f));
+    REQUIRE(segment.EndPoint() == Point2d(5.0f, 0.0f));
 }
 
 TEST_CASE("ShapeMath::ToLineSegment (Ray3 -> LineSegment3)", "[ShapeMath]")
 {
-    constexpr Ray3f ray(Point3f(0.0f, 0.0f, 0.0f), UnitVector3f::Forward());
-    constexpr float distance = 5.0f;
-    const LineSegment3f segment = ToLineSegment(ray, distance);
-    REQUIRE(segment.StartPoint() == Point3f(0.0f, 0.0f, 0.0f));
-    REQUIRE(segment.EndPoint() == Point3f(0.0f, 0.0f, 5.0f));
+    constexpr Ray3d ray(Point3d(0.0f, 0.0f, 0.0f), UnitVector3d::Forward());
+    constexpr double distance = 5.0f;
+    const LineSegment3d segment = ToLineSegment(ray, distance);
+    REQUIRE(segment.StartPoint() == Point3d(0.0f, 0.0f, 0.0f));
+    REQUIRE(segment.EndPoint() == Point3d(0.0f, 0.0f, 5.0f));
 }
 
 TEST_CASE("ShapeMath::ToPlane (Triangle3 -> Plane)", "ShapeMath")
 {
-    constexpr Triangle3f triangle(Point3f(0.0f, 0.0f, 1.0f), Point3f(1.0f, 0.0f, 0.0f), Point3f(0.0f, 1.0f, 0.0f));
-    const Planef plane = ToPlane(triangle);
-    REQUIRE(plane.GetPoint() == Point3f(0.0f, 0.0f, 1.0f));
-    REQUIRE(NearlyEqual(plane.GetNormal(), UnitVector3f(1.0f, 1.0f, 1.0f)));
+    constexpr Triangle3d triangle(Point3d(0.0f, 0.0f, 1.0f), Point3d(1.0f, 0.0f, 0.0f), Point3d(0.0f, 1.0f, 0.0f));
+    const Planed plane = ToPlane(triangle);
+    REQUIRE(plane.GetPoint() == Point3d(0.0f, 0.0f, 1.0f));
+    REQUIRE(NearlyEqual(plane.GetNormal(), UnitVector3d(1.0f, 1.0f, 1.0f)));
 }
 
 TEST_CASE("ShapeMath::Remap (AABB2)", "[ShapeMath]")
 {
-    constexpr AABB2f from = AABB2f::FromMinAndMax(Point2f(0.0f, 0.0f), Point2f(10.0f, 10.0f));
-    constexpr AABB2f to = AABB2f::FromMinAndMax(Point2f(100.0f, 100.0f), Point2f(200.0f, 200.0f));
-    constexpr Point2f pointInFrom(5.0f, 5.0f);
-    const Point2f remappedPoint = Remap(pointInFrom, from, to);
-    REQUIRE(remappedPoint == Point2f(150.0f, 150.0f));
+    constexpr AABB2d from = AABB2d::FromMinAndMax(Point2d(0.0f, 0.0f), Point2d(10.0f, 10.0f));
+    constexpr AABB2d to = AABB2d::FromMinAndMax(Point2d(100.0f, 100.0f), Point2d(200.0f, 200.0f));
+    constexpr Point2d pointInFrom(5.0f, 5.0f);
+    const Point2d remappedPoint = Remap(pointInFrom, from, to);
+    REQUIRE(remappedPoint == Point2d(150.0f, 150.0f));
 }
 
 TEST_CASE("ShapeMath::Remap (AABB3)", "[ShapeMath]")
 {
-    constexpr AABB3f from = AABB3f::FromMinAndMax(Point3f(0.0f, 0.0f, 0.0f), Point3f(10.0f, 10.0f, 10.0f));
-    constexpr AABB3f to = AABB3f::FromMinAndMax(Point3f(100.0f, 100.0f, 100.0f), Point3f(200.0f, 200.0f, 200.0f));
-    constexpr Point3f pointInFrom(5.0f, 5.0f, 5.0f);
-    const Point3f remappedPoint = Remap(pointInFrom, from, to);
-    REQUIRE(remappedPoint == Point3f(150.0f, 150.0f, 150.0f));
+    constexpr AABB3d from = AABB3d::FromMinAndMax(Point3d(0.0f, 0.0f, 0.0f), Point3d(10.0f, 10.0f, 10.0f));
+    constexpr AABB3d to = AABB3d::FromMinAndMax(Point3d(100.0f, 100.0f, 100.0f), Point3d(200.0f, 200.0f, 200.0f));
+    constexpr Point3d pointInFrom(5.0f, 5.0f, 5.0f);
+    const Point3d remappedPoint = Remap(pointInFrom, from, to);
+    REQUIRE(remappedPoint == Point3d(150.0f, 150.0f, 150.0f));
 }
 
 TEST_CASE("ShapeMath::Remap0To1 (AABB2)", "[ShapeMath]")
 {
-    constexpr AABB2f from = AABB2f::FromMinAndMax(Point2f(0.0f, 0.0f), Point2f(10.0f, 10.0f));
-    constexpr Point2f pointInFrom(5.0f, 5.0f);
-    const Point2f remappedPoint = Remap0To1(pointInFrom, from);
-    REQUIRE(remappedPoint == Point2f(0.5f, 0.5f));
+    constexpr AABB2d from = AABB2d::FromMinAndMax(Point2d(0.0f, 0.0f), Point2d(10.0f, 10.0f));
+    constexpr Point2d pointInFrom(5.0f, 5.0f);
+    const Point2d remappedPoint = Remap0To1(pointInFrom, from);
+    REQUIRE(remappedPoint == Point2d(0.5f, 0.5f));
 }
 
 TEST_CASE("ShapeMath::Remap0To1 (AABB3)", "[ShapeMath]")
 {
-    constexpr AABB3f from = AABB3f::FromMinAndMax(Point3f(0.0f, 0.0f, 0.0f), Point3f(10.0f, 10.0f, 10.0f));
-    constexpr Point3f pointInFrom(5.0f, 5.0f, 5.0f);
-    const Point3f remappedPoint = Remap0To1(pointInFrom, from);
-    REQUIRE(remappedPoint == Point3f(0.5f, 0.5f, 0.5f));
+    constexpr AABB3d from = AABB3d::FromMinAndMax(Point3d(0.0f, 0.0f, 0.0f), Point3d(10.0f, 10.0f, 10.0f));
+    constexpr Point3d pointInFrom(5.0f, 5.0f, 5.0f);
+    const Point3d remappedPoint = Remap0To1(pointInFrom, from);
+    REQUIRE(remappedPoint == Point3d(0.5f, 0.5f, 0.5f));
 }
 
 TEST_CASE("ShapeMath::OffsetAABB", "[ShapeMath]")
 {
-    constexpr AABB2f aabb = AABB2f::FromMinAndMax(Point2f(1.0f, 1.0f), Point2f(3.0f, 3.0f));
-    constexpr Vector2f offset(2.0f, 2.0f);
-    constexpr AABB2f offsetAABB = OffsetAABB(aabb, offset);
-    REQUIRE(offsetAABB.GetMin() == Point2f(3.0f, 3.0f));
-    REQUIRE(offsetAABB.GetMax() == Point2f(5.0f, 5.0f));
+    constexpr AABB2d aabb = AABB2d::FromMinAndMax(Point2d(1.0f, 1.0f), Point2d(3.0f, 3.0f));
+    constexpr Vector2d offset(2.0f, 2.0f);
+    constexpr AABB2d offsetAABB = OffsetAABB(aabb, offset);
+    REQUIRE(offsetAABB.GetMin() == Point2d(3.0f, 3.0f));
+    REQUIRE(offsetAABB.GetMax() == Point2d(5.0f, 5.0f));
 }
 
 TEST_CASE("ShapeMath::ToAABB2XY", "[ShapeMath]")
 {
-    constexpr AABB3f aabb3 = AABB3f::FromMinAndMax(Point3f(1.0f, 2.0f, 3.0f), Point3f(4.0f, 5.0f, 6.0f));
-    constexpr AABB2f aabb2xy = ToAABB2XY(aabb3);
-    REQUIRE(aabb2xy.GetMin() == Point2f(1.0f, 2.0f));
-    REQUIRE(aabb2xy.GetMax() == Point2f(4.0f, 5.0f));
+    constexpr AABB3d aabb3 = AABB3d::FromMinAndMax(Point3d(1.0f, 2.0f, 3.0f), Point3d(4.0f, 5.0f, 6.0f));
+    constexpr AABB2d aabb2xy = ToAABB2XY(aabb3);
+    REQUIRE(aabb2xy.GetMin() == Point2d(1.0f, 2.0f));
+    REQUIRE(aabb2xy.GetMax() == Point2d(4.0f, 5.0f));
 }
 
 TEST_CASE("ShapeMath::ToAABB2YZ", "[ShapeMath]")
 {
-    constexpr AABB3f aabb3 = AABB3f::FromMinAndMax(Point3f(1.0f, 2.0f, 3.0f), Point3f(4.0f, 5.0f, 6.0f));
-    constexpr AABB2f aabb2yz = ToAABB2YZ(aabb3);
-    REQUIRE(aabb2yz.GetMin() == Point2f(2.0f, 3.0f));
-    REQUIRE(aabb2yz.GetMax() == Point2f(5.0f, 6.0f));
+    constexpr AABB3d aabb3 = AABB3d::FromMinAndMax(Point3d(1.0f, 2.0f, 3.0f), Point3d(4.0f, 5.0f, 6.0f));
+    constexpr AABB2d aabb2yz = ToAABB2YZ(aabb3);
+    REQUIRE(aabb2yz.GetMin() == Point2d(2.0f, 3.0f));
+    REQUIRE(aabb2yz.GetMax() == Point2d(5.0f, 6.0f));
 }
 
 TEST_CASE("ShapeMath::ToAABB2XZ", "[ShapeMath]")
 {
-    constexpr AABB3f aabb3 = AABB3f::FromMinAndMax(Point3f(1.0f, 2.0f, 3.0f), Point3f(4.0f, 5.0f, 6.0f));
-    constexpr AABB2f aabb2xz = ToAABB2XZ(aabb3);
-    REQUIRE(aabb2xz.GetMin() == Point2f(1.0f, 3.0f));
-    REQUIRE(aabb2xz.GetMax() == Point2f(4.0f, 6.0f));
+    constexpr AABB3d aabb3 = AABB3d::FromMinAndMax(Point3d(1.0f, 2.0f, 3.0f), Point3d(4.0f, 5.0f, 6.0f));
+    constexpr AABB2d aabb2xz = ToAABB2XZ(aabb3);
+    REQUIRE(aabb2xz.GetMin() == Point2d(1.0f, 3.0f));
+    REQUIRE(aabb2xz.GetMax() == Point2d(4.0f, 6.0f));
 }
 
 TEST_CASE("ShapeMath::ToAABB2 (LineSegment2)", "[ShapeMath]")
@@ -480,6 +480,31 @@ TEST_CASE("ShapeMath::GetArea (Circle)", "[ShapeMath]")
     REQUIRE(area == Approx(78.53981633974483));
 }
 
+TEST_CASE("ShapeMath::GetArea (Triangle2)", "[ShapeMath]")
+{
+    SECTION("A")
+    {
+        constexpr Triangle2f triangle(Point2f(0.0f, 0.0f), Point2f(0.0f, 1.0f), Point2f(1.0f, 1.0f));
+        constexpr float area = GetArea(triangle);
+        REQUIRE(area == 0.5f);
+    }
+
+    SECTION("B")
+    {
+        constexpr Triangle2f triangle(Point2f(0.0f, 0.0f), Point2f(-1.0f, 1.0f), Point2f(1.0f, 1.0f));
+        constexpr float area = GetArea(triangle);
+        REQUIRE(area == 1.f);
+    }
+
+    SECTION("Triangle Points on line")
+    {
+        constexpr Triangle2f triangle(Point2f(0.0f, 0.0f), Point2f(1.0f, 1.0f), Point2f(2.0f, 2.0f));
+        constexpr float area = GetArea(triangle);
+        REQUIRE(area == 0.f);
+    }
+}
+
+
 TEST_CASE("ShapeMath::GetVolume (AABB3)", "[ShapeMath]")
 {
     constexpr AABB3d aabb = AABB3d::FromMinAndMax(Point3d(0, 0, 0), Point3d(5, 5, 10));
@@ -610,109 +635,132 @@ TEST_CASE("ShapeMath::GetOverlap (AABB3)", "[ShapeMath]")
     }
 }
 
-TEST_CASE("Get Overlap Percentage AABB2")
+TEST_CASE("ShapeMath::GetOverlapPercentage (AABB2)", "[ShapeMath]")
 {
-    constexpr AABB2f a = AABB2f::FromMinAndMax(Point2f(0, 0), Point2f(5, 5));
-    constexpr AABB2f b = AABB2f::FromMinAndMax(Point2f(2.5f, 2.5f), Point2f(7, 7));
-    constexpr Percentf overlapPercentage = GetOverlapPercentage(a, b);
-    REQUIRE(overlapPercentage == Percentf(0.25f));
-}
-
-TEST_CASE("Get Overlap Percentage AABB3")
-{
-    constexpr AABB3f a = AABB3f::FromMinAndMax(Point3f(0, 0, 0), Point3f(5, 5, 5));
-    constexpr AABB3f b = AABB3f::FromMinAndMax(Point3f(2.5f, 2.5f, 2.5f), Point3f(7, 7, 7));
-    constexpr Percentf overlapPercentage = GetOverlapPercentage(a, b);
-    REQUIRE(overlapPercentage == Percentf(0.125f));
-}
-
-TEST_CASE("Get Overlap Percentage AABB2 No Overlap")
-{
-    constexpr AABB2f a = AABB2f::FromMinAndMax(Point2f(0, 0), Point2f(5, 5));
-    constexpr AABB2f b = AABB2f::FromMinAndMax(Point2f(6, 6), Point2f(10, 10));
-    constexpr Percentf overlapPercentage = GetOverlapPercentage(a, b);
-
-    REQUIRE(overlapPercentage == Percentf(0.0f));
-}
-
-TEST_CASE("Get Overlap Percentage AABB3 No Overlap")
-{
-    constexpr AABB3f a = AABB3f::FromMinAndMax(Point3f(0, 0, 0), Point3f(5, 5, 5));
-    constexpr AABB3f b = AABB3f::FromMinAndMax(Point3f(6, 6, 6), Point3f(10, 10, 10));
-    constexpr Percentf overlapPercentage = GetOverlapPercentage(a, b);
-    REQUIRE(overlapPercentage == Percentf(0.0f));
-}
-
-TEST_CASE("Get Overlap Percentage AABB2 Full Overlap")
-{
-    constexpr AABB2f a = AABB2f::FromMinAndMax(Point2f(0, 0), Point2f(5, 5));
-    constexpr AABB2f b = AABB2f::FromMinAndMax(Point2f(1, 1), Point2f(4, 4));
-    constexpr Percentf overlapPercentage = GetOverlapPercentage(a, b);
-    REQUIRE(overlapPercentage == Percentf(0.36f));
-}
-
-TEST_CASE("Get Overlap Percentage AABB3 Full Overlap")
-{
-    constexpr AABB3f a = AABB3f::FromMinAndMax(Point3f(0, 0, 0), Point3f(5, 5, 5));
-    constexpr AABB3f b = AABB3f::FromMinAndMax(Point3f(1, 1, 1), Point3f(4, 4, 4));
-    constexpr Percentf overlapPercentage = GetOverlapPercentage(a, b);
-    REQUIRE(overlapPercentage == Percentf(0.216f));
-}
-
-TEST_CASE("Get Area Triangle2")
-{
+    SECTION("Overlap")
     {
-        constexpr Triangle2f triangle(Point2f(0.0f, 0.0f), Point2f(0.0f, 1.0f), Point2f(1.0f, 1.0f));
-        constexpr float area = GetArea(triangle);
-        REQUIRE(area == 0.5f);
+
+        constexpr AABB2d a = AABB2d::FromMinAndMax(Point2d(0, 0), Point2d(5, 5));
+        constexpr AABB2d b = AABB2d::FromMinAndMax(Point2d(2.5, 2.5), Point2d(7, 7));
+        constexpr Percentd overlapPercentage = GetOverlapPercentage(a, b);
+        REQUIRE(overlapPercentage == Percentd(0.25));
     }
-
+    SECTION("No Overlap")
     {
-        constexpr Triangle2f triangle(Point2f(0.0f, 0.0f), Point2f(-1.0f, 1.0f), Point2f(1.0f, 1.0f));
-        constexpr float area = GetArea(triangle);
-        REQUIRE(area == 1.f);
+        constexpr AABB2d a = AABB2d::FromMinAndMax(Point2d(0, 0), Point2d(5, 5));
+        constexpr AABB2d b = AABB2d::FromMinAndMax(Point2d(6, 6), Point2d(10, 10));
+        constexpr Percentd overlapPercentage = GetOverlapPercentage(a, b);
+
+        REQUIRE(overlapPercentage == Percentd(0.0));
     }
-
+    SECTION("Full overlap")
     {
-        constexpr AABB3i aabb = AABB3i::FromMinAndMax(Point3i(0, 0, 0), Point3i(5, 5, 5));
-
-        const auto corners = GetCorners<int, std::vector<Point3i>>(aabb);
+        constexpr AABB2d a = AABB2d::FromMinAndMax(Point2d(0, 0), Point2d(5, 5));
+        constexpr AABB2d b = AABB2d::FromMinAndMax(Point2d(1, 1), Point2d(4, 4));
+        constexpr Percentd overlapPercentage = GetOverlapPercentage(a, b);
+        REQUIRE(overlapPercentage == Percentd(0.36));
     }
 }
 
-TEST_CASE("Get Surface Area Sphere")
+TEST_CASE("ShapeMath::GetOverlapPercentage (AABB3)", "[ShapeMath]")
 {
-    constexpr Spheref sphere = Spheref::FromCenterAndRadius(Point3f::Zero(), Radiusf(1.0f));
-    constexpr float area = GetSurfaceArea(sphere);
-    REQUIRE(Abs(area - 4.0f * PI<float>) < 0.0001f);
+    SECTION("Overlap")
+    {
+        constexpr AABB3d a = AABB3d::FromMinAndMax(Point3d(0, 0, 0), Point3d(5, 5, 5));
+        constexpr AABB3d b = AABB3d::FromMinAndMax(Point3d(2.5, 2.5, 2.5), Point3d(7, 7, 7));
+        constexpr Percentd overlapPercentage = GetOverlapPercentage(a, b);
+        REQUIRE(overlapPercentage == Percentd(0.125f));
+    }
+    SECTION("No overlap")
+    {
+        constexpr AABB3d a = AABB3d::FromMinAndMax(Point3d(0, 0, 0), Point3d(5, 5, 5));
+        constexpr AABB3d b = AABB3d::FromMinAndMax(Point3d(6, 6, 6), Point3d(10, 10, 10));
+        constexpr Percentd overlapPercentage = GetOverlapPercentage(a, b);
+        REQUIRE(overlapPercentage == Percentd(0.0));
+    }
+    SECTION("Full overlap")
+    {
+        constexpr AABB3d a = AABB3d::FromMinAndMax(Point3d(0, 0, 0), Point3d(5, 5, 5));
+        constexpr AABB3d b = AABB3d::FromMinAndMax(Point3d(1, 1, 1), Point3d(4, 4, 4));
+        const Percentd overlapPercentage = GetOverlapPercentage(a, b);
+        REQUIRE(overlapPercentage == Percentd(0.216));
+    }
 }
 
-TEST_CASE("Get Sphere Disk Facing Point")
+TEST_CASE("ShapeMath::GetSurfaceArea (Sphere)", "[ShapeMath]")
 {
-    constexpr Spheref sphere = Spheref::FromCenterAndRadius(Point3f::Zero(), Radiusf(1.0f));
-    constexpr Point3f point(0.0f, 0.0f, -5.0f);
-    const auto disk = GetSphereDiskFacingPoint(sphere, point);
-
-    REQUIRE(disk.has_value());
-
-    REQUIRE(disk->GetCenter() == Point3f(0.0f, 0.0f, -1.0f));
-    REQUIRE(disk->GetNormal() == UnitVector3f::Backward());
-    REQUIRE(disk->GetRadius() == Radiusf(1.0f));
+    constexpr Sphered sphere = Sphered::FromCenterAndRadius(Point3d::Zero(), Radiusd(3.0f));
+    constexpr double area = GetSurfaceArea(sphere);
+    REQUIRE(area == Approx(113.097335529232556));
 }
 
-TEST_CASE("Get Sphere Disk Facing Point Error")
+TEST_CASE("ShapeMath::GetSurfaceArea (SphericalCap)", "[ShapeMath]")
 {
-    constexpr Spheref sphere = Spheref::FromCenterAndRadius(Point3f::Zero(), Radiusf(1.0f));
-    constexpr Point3f point = sphere.GetCenter();
-    const auto disk = GetSphereDiskFacingPoint(sphere, point);
-    REQUIRE(!disk.has_value());
-    REQUIRE(disk.error() == eSphereDiskFacingPointError::PointEqualsCenter);
+    constexpr SphericalCapd cap = SphericalCapd::FromSphereAndNormalAndHeight(
+        Sphered::FromCenterAndRadius(Point3d::One(), Radiusd(5.0)),
+        UnitVector3d::Forward(),
+        Heightd(4.0)
+    );
+
+    const auto area = GetSurfaceArea(cap);
+    REQUIRE(area == Approx(125.66370614359172));
+
 }
 
-TEST_CASE("Get Visible Sphere Disk Facing Point")
+TEST_CASE("ShapeMath::SliceSphere", "[ShapeMath]")
 {
-    constexpr Spheref sphere = Spheref::FromCenterAndRadius(Point3f::Zero(), Radiusf(1.0f));
-    constexpr Point3f viewPosition(0.0f, 0.0f, -5.0f);
+    SECTION("Slice in half")
+    {
+        constexpr Sphered sphere = Sphered::FromCenterAndRadius(Point3d::Zero(), Radiusd(5.0));
+        constexpr Planed plane = Planed::FromPointAndNormal(Point3d(0.0f, 0.0f, 0.0f), UnitVector3d::Up());
+        const auto capResult = SliceSphere(sphere, plane);
+        REQUIRE(capResult.has_value());
+        REQUIRE(capResult->GetHeight().Value() == Approx(5.0));
+        REQUIRE(capResult->GetNormal() == UnitVector3d::Up());
+        REQUIRE(capResult->GetSphereCenter() == Point3d::Zero());
+        REQUIRE(capResult->GetSphereRadius() == Radiusd(5.0));
+    }
+    SECTION("Slice off top")
+    {
+        constexpr Sphered sphere = Sphered::FromCenterAndRadius(Point3d::Zero(), Radiusd(5.0));
+        constexpr Planed plane = Planed::FromPointAndNormal(Point3d(0.0f, 3.0f, 0.0f), UnitVector3d::Up());
+        const auto capResult = SliceSphere(sphere, plane);
+        REQUIRE(capResult.has_value());
+        REQUIRE(capResult->GetHeight().Value() == Approx(2.0));
+        REQUIRE(capResult->GetNormal() == UnitVector3d::Up());
+        REQUIRE(capResult->GetSphereCenter() == Point3d::Zero());
+        REQUIRE(capResult->GetSphereRadius() == Radiusd(5.0));
+    }
+}
+
+TEST_CASE("ShapeMath::GetSphereDiskFacingPoint", "[ShapeMath]")
+{
+    SECTION("Working")
+    {
+        constexpr Sphered sphere = Sphered::FromCenterAndRadius(Point3d::Zero(), Radiusd(1.0f));
+        constexpr Point3d point(0.0f, 0.0f, -5.0f);
+        const auto disk = GetSphereDiskFacingPoint(sphere, point);
+
+        REQUIRE(disk.has_value());
+
+        REQUIRE(disk->GetCenter() == Point3d(0.0f, 0.0f, -1.0f));
+        REQUIRE(disk->GetNormal() == UnitVector3d::Backward());
+        REQUIRE(disk->GetRadius() == Radiusd(1.0f));
+    }
+    SECTION("Error")
+    {
+        constexpr Sphered sphere = Sphered::FromCenterAndRadius(Point3d::Zero(), Radiusd(1.0f));
+        constexpr Point3d point = sphere.GetCenter();
+        const auto disk = GetSphereDiskFacingPoint(sphere, point);
+        REQUIRE(!disk.has_value());
+        REQUIRE(disk.error() == eSphereDiskFacingPointError::PointEqualsCenter);
+    }
+}
+
+TEST_CASE("ShapeMath::GetVisibleSphereDiskFacingPoint", "[ShapeMath]")
+{
+    constexpr Sphered sphere = Sphered::FromCenterAndRadius(Point3d::Zero(), Radiusd(1.0f));
+    constexpr Point3d viewPosition(0.0f, 0.0f, -5.0f);
     const auto disk = GetVisibleSphereDiskFacingPoint(sphere, viewPosition);
     REQUIRE(disk.has_value());
 }
@@ -724,4 +772,11 @@ TEST_CASE("Get Percentage Visible")
     constexpr Point3f viewPosition(0.0f, 0.0f, -5.0f);
 
     constexpr auto percentageVisible = GetPercentageAreaVisible(sphere, viewPosition);*/
+}
+
+TEST_CASE("ShapeMath::Scale (Sphere)", "[ShapeMath]")
+{
+    Sphered sphere = Sphered::FromCenterAndRadius(Point3d(3, 3, 3), Radiusd(5.0));
+    Scale(sphere, 5.0);
+    REQUIRE(sphere == Sphered::FromCenterAndRadius(Point3d(3, 3, 3), Radiusd(25.0)));
 }

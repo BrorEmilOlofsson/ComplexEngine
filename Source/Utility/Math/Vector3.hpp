@@ -3,6 +3,7 @@
 #include <array>
 #include <iostream>
 #include "Utility/Math/Math.hpp"
+#include "Utility/ValueType.hpp"
 
 namespace Simple
 {
@@ -36,6 +37,9 @@ namespace Simple
     using Vector3ui64 = Vector3<uint64_t>;
     using Vector3i = Vector3i32;
     using Vector3ui = Vector3ui32;
+
+	template<typename T>
+	struct ValueType<Vector3<T>> : std::type_identity<T> {};
 
 	template<typename T>
 	constexpr Vector3<T>::Vector3(const T& x, const T& y, const T& z) noexcept
