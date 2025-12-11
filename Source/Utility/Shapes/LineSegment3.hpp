@@ -68,4 +68,10 @@ namespace Simple
 	{
 		return mEndPoint;
 	}
+
+	template<typename T>
+	[[nodiscard]] constexpr bool operator==(const LineSegment3<T>& a, const LineSegment3<T>& b) noexcept
+	{
+		return a.StartPoint() == b.StartPoint() && a.EndPoint() == b.EndPoint();
+    }
 }

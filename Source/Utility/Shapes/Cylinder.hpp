@@ -115,4 +115,13 @@ namespace Simple
 	{
 		return mCenter + mAxis * (mHeight / T{ 2 });
 	}
+
+	template<typename T>
+	[[nodiscard]] constexpr bool operator==(const Cylinder<T>& a, const Cylinder<T>& b) noexcept
+	{
+		return a.GetCenter() == b.GetCenter()
+			&& a.GetRadius() == b.GetRadius()
+			&& a.GetAxis() == b.GetAxis()
+			&& a.GetHeight() == b.GetHeight();
+    }
 }

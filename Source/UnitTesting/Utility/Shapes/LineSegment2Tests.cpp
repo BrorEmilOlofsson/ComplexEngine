@@ -35,3 +35,12 @@ TEST_CASE("LineSegment2::EndPoint", "[LineSegment2]")
     REQUIRE(lineSegment.StartPoint() == Point2d::Zero());
     REQUIRE(lineSegment.EndPoint() == Point2d(4.0, 4.0));
 }
+
+TEST_CASE("LineSegment2::Equality Operator", "[LineSegment2]")
+{
+    const LineSegment2d lineSegment1 = LineSegment2d::FromPoints(Point2d(1.0, 2.0), Point2d(3.0, 4.0));
+    const LineSegment2d lineSegment2 = LineSegment2d::FromPoints(Point2d(1.0, 2.0), Point2d(3.0, 4.0));
+    const LineSegment2d lineSegment3 = LineSegment2d::FromPoints(Point2d(0.0, 0.0), Point2d(3.0, 4.0));
+    REQUIRE(lineSegment1 == lineSegment2);
+    REQUIRE_FALSE(lineSegment1 == lineSegment3);
+}

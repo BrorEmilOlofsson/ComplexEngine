@@ -63,3 +63,12 @@ TEST_CASE("Cylinder::Setters", "[Cylinder]")
     REQUIRE(cylinder.GetAxis() == newAxis);
     REQUIRE(cylinder.GetHeight() == newHeight);
 }
+
+TEST_CASE("Cylinder::Equality Operator", "[Cylinder]")
+{
+    Cylinderd cylinder1 = Cylinderd::FromCenterAndRadiusAndAxisAndHeight(Point3d(1.0, 2.0, 3.0), Radiusd(4.0), UnitVector3d::Up(), 5.0);
+    Cylinderd cylinder2 = Cylinderd::FromCenterAndRadiusAndAxisAndHeight(Point3d(1.0, 2.0, 3.0), Radiusd(4.0), UnitVector3d::Up(), 5.0);
+    Cylinderd cylinder3 = Cylinderd::FromCenterAndRadiusAndAxisAndHeight(Point3d(0.0, 0.0, 0.0), Radiusd(4.0), UnitVector3d::Up(), 5.0);
+    REQUIRE(cylinder1 == cylinder2);
+    REQUIRE_FALSE(cylinder1 == cylinder3);
+}

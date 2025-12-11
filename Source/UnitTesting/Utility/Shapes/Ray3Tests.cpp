@@ -58,3 +58,12 @@ TEST_CASE("Ray3::GetPointAtDistance", "[Ray3]")
     const Point3d pointAtDistance2 = ray.GetPointAtDistance(2.0);
     REQUIRE(pointAtDistance2 == Point3d(1.0, 1.0, 3.0));
 }
+
+TEST_CASE("Ray3::Equality Operator", "[Ray3]")
+{
+    const Ray3d ray1 = Ray3d::FromOriginAndDirection(Point3d(0.0, 0.0, 0.0), UnitVector3d::Forward());
+    const Ray3d ray2 = Ray3d::FromOriginAndDirection(Point3d(0.0, 0.0, 0.0), UnitVector3d::Forward());
+    const Ray3d ray3 = Ray3d::FromOriginAndDirection(Point3d(1.0, 0.0, 0.0), UnitVector3d::Forward());
+    REQUIRE(ray1 == ray2);
+    REQUIRE_FALSE(ray1 == ray3);
+}

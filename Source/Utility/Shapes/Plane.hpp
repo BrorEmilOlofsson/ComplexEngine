@@ -80,4 +80,10 @@ namespace Simple
 	{
 		mNormal = normal;
 	}
+
+	template<typename T>
+	[[nodiscard]] constexpr bool operator==(const Plane<T>& a, const Plane<T>& b) noexcept
+	{
+		return a.GetPoint() == b.GetPoint() && a.GetNormal() == b.GetNormal();
+    }
 }

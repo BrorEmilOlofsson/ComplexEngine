@@ -5,56 +5,65 @@ using namespace Simple;
 
 TEST_CASE("Sphere::Default Constructor", "[Sphere]")
 {
-    Spheref sphere;
+    Sphered sphere;
 
-    REQUIRE(sphere.GetCenter() == Point3f::Zero());
-    REQUIRE(sphere.GetRadius()  == Radiusf(0.0f));
+    REQUIRE(sphere.GetCenter() == Point3d::Zero());
+    REQUIRE(sphere.GetRadius()  == Radiusd(0.0f));
 }
 
 TEST_CASE("Sphere::FromCenterAndRadius", "[Sphere]")
 {
-    Point3f center(1.0f, 2.0f, 3.0f);
-    Radiusf radius(5.0f);
-    Spheref sphere = Spheref::FromCenterAndRadius(center, radius);
+    Point3d center(1.0f, 2.0f, 3.0f);
+    Radiusd radius(5.0f);
+    Sphered sphere = Sphered::FromCenterAndRadius(center, radius);
     REQUIRE(sphere.GetCenter() == center);
     REQUIRE(sphere.GetRadius()  == radius);
 }
 
 TEST_CASE("Sphere::FromCenter", "[Sphere]")
 {
-    Point3f center(1.0f, 2.0f, 3.0f);
-    Spheref sphere = Spheref::FromCenter(center);
+    Point3d center(1.0f, 2.0f, 3.0f);
+    Sphered sphere = Sphered::FromCenter(center);
     REQUIRE(sphere.GetCenter() == center);
-    REQUIRE(sphere.GetRadius()  == Radiusf(0.0f));
+    REQUIRE(sphere.GetRadius()  == Radiusd(0.0f));
 }
 
 TEST_CASE("Sphere::FromRadius", "[Sphere]")
 {
-    Radiusf radius(5.0f);
-    Spheref sphere = Spheref::FromRadius(radius);
-    REQUIRE(sphere.GetCenter() == Point3f::Zero());
+    Radiusd radius(5.0f);
+    Sphered sphere = Sphered::FromRadius(radius);
+    REQUIRE(sphere.GetCenter() == Point3d::Zero());
     REQUIRE(sphere.GetRadius()  == radius);
 }
 
 TEST_CASE("Sphere::SetCenter", "[Sphere]")
 {
-    Spheref sphere;
-    Point3f center(1.0f, 2.0f, 3.0f);
+    Sphered sphere;
+    Point3d center(1.0f, 2.0f, 3.0f);
     sphere.SetCenter(center);
     REQUIRE(sphere.GetCenter() == center);
 }
 
 TEST_CASE("Sphere::SetRadius", "[Sphere]")
 {
-    Spheref sphere;
-    Radiusf radius(5.0f);
+    Sphered sphere;
+    Radiusd radius(5.0f);
     sphere.SetRadius(radius);
     REQUIRE(sphere.GetRadius() == radius);
 }
 
 TEST_CASE("Sphere::GetDiameter", "[Sphere]")
 {
-    Radiusf radius(5.0f);
-    Spheref sphere = Spheref::FromRadius(radius);
-    REQUIRE(sphere.GetDiameter() == Diameterf(10.0f));
+    Radiusd radius(5.0f);
+    Sphered sphere = Sphered::FromRadius(radius);
+    REQUIRE(sphere.GetDiameter() == Diameterd(10.0f));
+}
+
+TEST_CASE("Sphere::Equality Operator", "[Sphere]")
+{
+    Sphered sphere1 = Sphered::FromCenterAndRadius(Point3d(1.0f, 2.0f, 3.0f), Radiusd(5.0f));
+    Sphered sphere2 = Sphered::FromCenterAndRadius(Point3d(1.0f, 2.0f, 3.0f), Radiusd(5.0f));
+    Sphered sphere3 = Sphered::FromCenterAndRadius(Point3d(4.0f, 5.0f, 6.0f), Radiusd(5.0f));
+    REQUIRE(sphere1 == sphere2);
+    REQUIRE_FALSE(sphere1 == sphere3);
 }

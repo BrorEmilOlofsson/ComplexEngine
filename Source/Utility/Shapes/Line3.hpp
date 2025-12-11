@@ -83,4 +83,10 @@ namespace Simple
 	{
 		return mDirection;
 	}
+
+	template<typename T>
+	[[nodiscard]] constexpr bool operator==(const Line3<T>& a, const Line3<T>& b) noexcept
+	{
+		return a.GetPoint() == a.GetPoint() && a.GetDirection() == b.GetDirection();
+    }
 }

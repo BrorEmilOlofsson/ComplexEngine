@@ -15,19 +15,19 @@ namespace Simple
 		[[nodiscard]] static constexpr Ray2<T> FromOriginAndDirection(const Point2<T>& origin, const UnitVector2<T>& direction);
         [[nodiscard]] static constexpr Ray2<T> FromOriginAndPoint(const Point2<T>& origin, const Point2<T>& point);
 
-		constexpr const Point2<T>& GetOrigin() const;
-		constexpr const UnitVector2<T>& GetDirection() const;
+		[[nodiscard]] constexpr const Point2<T>& GetOrigin() const;
+		[[nodiscard]] constexpr const UnitVector2<T>& GetDirection() const;
 
 		constexpr void SetOrigin(const Point2<T>& origin);
 		constexpr void SetDirection(const UnitVector2<T>& direction);
 
-		constexpr Point2<T> GetPointAtDistance(const T& distance) const;
+		[[nodiscard]] constexpr Point2<T> GetPointAtDistance(const T& distance) const;
 
 	private:
 
 		constexpr Ray2(const Point2<T>& origin, const UnitVector2<T>& direction);
 		
-	public:
+	private:
 
 		Point2<T> mOrigin;
 		UnitVector2<T> mDirection = UnitVector2d::Right();
@@ -84,4 +84,10 @@ namespace Simple
 	{
 		return mOrigin + mDirection * distance;
 	}
+
+    template<typename T>
+	[[nodiscard]] constexpr bool operator==(const Ray2<T>& a, const Ray2<T>& b) noexcept
+	{
+		return a.GetOrigin() == b.GetOrigin() && a.GetDirection() == b.GetDirection();
+    }
 }

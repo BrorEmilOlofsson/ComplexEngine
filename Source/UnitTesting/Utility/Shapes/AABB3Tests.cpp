@@ -119,7 +119,7 @@ TEST_CASE("AABB3::CreateAABB3FromPoints (Range)", "[AABB3]")
     REQUIRE(aabb.GetMax() == Point3d(4.0f, 5.0f, 6.f));
 }
 
-TEST_CASE("AABB3FKF")
+TEST_CASE("AABB3::CreateAABB3FromPoints (Transform Range)", "[AABB3]")
 {
     struct TestVertex
     {

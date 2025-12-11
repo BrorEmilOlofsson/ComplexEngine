@@ -16,34 +16,14 @@ namespace Simple
         [[nodiscard]] static constexpr Circle<T> FromCenter(const Point2<T>& center);
         [[nodiscard]] static constexpr Circle<T> FromRadius(const Radius<T>& radius);
 
-        [[nodiscard]] constexpr const Point2<T>& GetCenter() const
-        {
-            return mCenter;
-        }
-        [[nodiscard]] constexpr const Radius<T>& GetRadius() const
-        {
-            return mRadius;
-        }
+        [[nodiscard]] constexpr const Point2<T>& GetCenter() const;
+        [[nodiscard]] constexpr const Radius<T>& GetRadius() const;
 
-        constexpr void SetCenter(const Point2<T>& center)
-        {
-            mCenter = center;
-        }
+        constexpr void SetCenter(const Point2<T>& center);
+        constexpr void SetRadius(const Radius<T>& radius);
 
-        constexpr void SetRadius(const Radius<T>& radius)
-        {
-            mRadius = radius;
-        }
-
-        [[nodiscard]] constexpr Diameter<T> GetDiameter() const
-        {
-            return ToDiameter(mRadius);
-        }
-
-        [[nodiscard]] constexpr Circumference<T> GetCircumference() const
-        {
-            return ToCircumference(mRadius);
-        }
+        [[nodiscard]] constexpr Diameter<T> GetDiameter() const;
+        [[nodiscard]] constexpr Circumference<T> GetCircumference() const;
 
     private:
 
@@ -81,5 +61,47 @@ namespace Simple
     constexpr Circle<T> Circle<T>::FromRadius(const Radius<T>& radius)
     {
         return Circle<T>(Point2<T>::Zero(), radius);
+    }
+
+    template<typename T>
+    [[nodiscard]] constexpr const Point2<T>& Circle<T>::GetCenter() const
+    {
+        return mCenter;
+    }
+
+    template<typename T>
+    [[nodiscard]] constexpr const Radius<T>& Circle<T>::GetRadius() const
+    {
+        return mRadius;
+    }
+
+    template<typename T>
+    constexpr void Circle<T>::SetCenter(const Point2<T>& center)
+    {
+        mCenter = center;
+    }
+
+    template<typename T>
+    constexpr void Circle<T>::SetRadius(const Radius<T>& radius)
+    {
+        mRadius = radius;
+    }
+
+    template<typename T>
+    [[nodiscard]] constexpr Diameter<T> Circle<T>::GetDiameter() const
+    {
+        return ToDiameter(mRadius);
+    }
+
+    template<typename T>
+    [[nodiscard]] constexpr Circumference<T> Circle<T>::GetCircumference() const
+    {
+        return ToCircumference(mRadius);
+    }
+
+    template<typename T>
+    [[nodiscard]] constexpr bool operator==(const Circle<T>& a, const Circle<T>& b) noexcept
+    {
+        return (a.GetCenter() == b.GetCenter()) && (a.GetRadius() == b.GetRadius());
     }
 }
