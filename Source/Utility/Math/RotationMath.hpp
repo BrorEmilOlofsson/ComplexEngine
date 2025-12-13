@@ -209,6 +209,12 @@ namespace Simple
 	}
 
 	template<typename T>
+	[[nodiscard]] constexpr Matrix3x3<T> ToWorldSpace(const Matrix3x3<T>& local, const Matrix3x3<T>& world)
+	{
+		return local * world;
+    }
+
+	template<typename T>
 	[[nodiscard]] constexpr Matrix4x4<T> CreateRotationMatrix(const Rotator<T>& rotator)
 	{
 		Matrix4x4<T> rotationMatrix = Matrix4x4<T>::Identity();

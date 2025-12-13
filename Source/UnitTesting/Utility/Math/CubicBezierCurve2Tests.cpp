@@ -1,13 +1,13 @@
 #include <External/Catch2/catch_amalgamated.hpp>
-#include "Utility/Math/Curve2.hpp"
+#include "Utility/Math/CubicBezierCurve2.hpp"
 
 using namespace Simple;
 
-TEST_CASE("Curve2::AddAnchorPoint", "[Curve2]")
+TEST_CASE("CubicBezierCurve2::AddAnchorPoint", "[CubicBezierCurve2]")
 {
     SECTION("Adding first anchor point")
     {
-        Curve2d curve;
+        CubicBezierCurve2d curve;
         Point2d p1{ 5.0f, 5.0f };
         curve.AddAnchorPoint(p1);
         REQUIRE(curve.GetPoints().size() == 1);
@@ -15,7 +15,7 @@ TEST_CASE("Curve2::AddAnchorPoint", "[Curve2]")
     }
     SECTION("Adding second anchor point")
     {
-        Curve2d curve;
+        CubicBezierCurve2d curve;
         Point2d p1{ 0.0f, 0.0f };
         Point2d p2{ 4.0f, 4.0f };
         curve.AddAnchorPoint(p1);
@@ -28,7 +28,7 @@ TEST_CASE("Curve2::AddAnchorPoint", "[Curve2]")
     }
     SECTION("Adding third anchor point")
     {
-        Curve2d curve;
+        CubicBezierCurve2d curve;
         Point2d p1{ 0.0f, 0.0f };
         Point2d p2{ 4.0f, 4.0f };
         Point2d p3{ 8.0f, 0.0f };

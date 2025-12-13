@@ -6,26 +6,16 @@
 namespace Simple
 {
 
-	AudioSettingsPopUp::AudioSettingsPopUp(const std::string& name)
-		: PopUp(name)
-		, mMusicIsActive(false)
+	void ShowAudioSettings(bool& isWindowActive)
 	{
-	}
-
-	void AudioSettingsPopUp::Init()
-	{
-		/*if (mMusicIsActive)
+		if (!isWindowActive)
 		{
-			GetAudioManager().PlayMusic(GetAudioManager().GetMainMusicName());
-		}*/
-	}
-
-	void AudioSettingsPopUp::Render(const Blackboard& blackboard)
-	{
-		AudioManager& audioManager = blackboard.Get<Key_AudioManager>();
-		if (ImGui::Begin(mImGuiName.c_str(), &mIsActive))
+			return;
+        }
+		if (ImGui::Begin("Audio Settings", &isWindowActive))
 		{
 
+			/*AudioManager& audioManager = blackboard.Get<Key_AudioManager>();
 			const std::string musicName = audioManager.GetMainMusicName();
 
 			if (ImGui::Checkbox(std::string("Play Music").append(mImGuiTag).c_str(), &mMusicIsActive))
@@ -80,9 +70,9 @@ namespace Simple
 			if (ImGui::DragFloat("Music Volume##SettingWindow", &musicVolume, 0.01f, 0.0f, 1.0f))
 			{
 				audioManager.ChangeMusicVolume(musicVolume);
-			}
+			}*/
 		}
 
 		ImGui::End();
-	}
+    }
 }

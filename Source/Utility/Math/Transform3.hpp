@@ -14,9 +14,10 @@ namespace Simple
 	public:
 
 		constexpr Transform3() = default;
-		constexpr explicit Transform3(const Point3f& position);
-		constexpr Transform3(const Point3f& position, const Rotatorf& rotation, const Vector3f& scale);
-		constexpr explicit Transform3(const Matrix4x4f& matrix);
+
+		[[nodiscard]] static constexpr Transform3 FromPosition(const Point3f& position);
+        [[nodiscard]] static constexpr Transform3 FromPositionRotationScale(const Point3f& position, const RotationMatrix3f& rotation, const Vector3f& scale);
+        [[nodiscard]] static constexpr Transform3 FromMatrix(const Matrix4x4f& matrix);
 
 	public:
 
@@ -42,27 +43,40 @@ namespace Simple
 
 	private:
 
+		constexpr explicit Transform3(const Matrix4x4f& matrix);
+
+	private:
+
 		Matrix4x4f mMatrix;
 	};
 
 	using Transform = Transform3;
 
-	constexpr Transform3::Transform3(const Point3f& position)
-	{
-		SetPosition(position);
-	}
-
-	constexpr Transform3::Transform3(const Point3f& position, const Rotatorf& rotation, const Vector3f& scale)
-	{
-		SetScale(scale);
-		SetRotation(rotation);
-		SetPosition(position);
-	}
-
 	constexpr Transform3::Transform3(const Matrix4x4f& matrix)
 		: mMatrix(matrix)
 	{
 	}
+
+	constexpr Transform3 Transform3::FromPosition(const Point3f& position)
+	{
+		Transform3 transform;
+		transform.SetPosition(position);
+        return transform;
+	}
+
+	constexpr Transform3 Transform3::FromPositionRotationScale(const Point3f& position, const RotationMatrix3f& rotation, const Vector3f& scale)
+	{
+		Transform3 transform;
+		transform.SetScale(scale);
+		transform.SetRotation(rotation);
+		transform.SetPosition(position);
+        return transform;
+	}
+
+	constexpr Transform3 Transform3::FromMatrix(const Matrix4x4f& matrix)
+	{
+		return Transform3(matrix);
+    }
 
 	constexpr void Transform3::SetPosition(const Point3f& position)
 	{

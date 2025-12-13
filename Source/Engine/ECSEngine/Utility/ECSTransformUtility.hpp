@@ -35,7 +35,7 @@ namespace Simple
 		{
 			if (hierarchyComponent->parent != InvalidEntityID)
 			{
-				return Transform(ToLocalSpace(worldTransform.GetMatrix(), GetWorldTransform(ecs, hierarchyComponent->parent).GetMatrix()));
+				return Transform::FromMatrix(ToLocalSpace(worldTransform.GetMatrix(), GetWorldTransform(ecs, hierarchyComponent->parent).GetMatrix()));
 			}
 		}
 

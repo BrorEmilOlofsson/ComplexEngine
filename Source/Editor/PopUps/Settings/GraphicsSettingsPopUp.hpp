@@ -5,31 +5,25 @@
 #include "Utility/ManualTimer.hpp"
 #include <vector>
 #include <string>
+#include <optional>
 
 namespace Simple
 {
 
-	class GraphicsSettingsPopUp final : public PopUp
+	inline auto GetRasterizerStateNames()
 	{
-	public:
+		std::array<std::string_view, static_cast<std::size_t>(eRasterizerState::Count)> names;
+		ForEachEnum<eRasterizerState>([&names](EnumIterator<eRasterizerState> iterator)
+			{
+				names[static_cast<unsigned int>(iterator.value)] = iterator.name;
+			});
 
-		GraphicsSettingsPopUp(const std::string& aName);
+		return names;
+	}
 
-		void Init() override;
-		void UpdateInternal(const Blackboard& blackboard) override;
-		void Render(const Blackboard& blackboard) override;
-
-	private:
-
-		void InitRasterizerStatesStrings();
-		void UpdateCursorSettings();
-		//void UpdateAndFetchCurrentMonitorResolution();
-		//void UpdateAndFetchFPSCapStrings();
-		void UpdateAndFetchCurrentCursorSettings();
-
-	private:
-
-		std::array<std::string_view, static_cast<int>(eRasterizerState::Count)> mRasterizerStatesConstChar;
+	struct GraphicsSettingsData
+	{
+		std::array<std::string_view, static_cast<std::size_t>(eRasterizerState::Count)> mRasterizerStateNames = GetRasterizerStateNames();
 
 		std::vector<std::string> mCursorNames;
 		std::vector<Vector2ui> mWindowSizes;
@@ -43,8 +37,12 @@ namespace Simple
 		int mSelectedRasterizerState = 0;
 		int mSelectedCursor = 0;
 		bool mConsoleIsOpen = true;
-		
-		ManualTimerf mShowFpsTimer;
+
+		ManualTimerf mShowFpsTimer = ManualTimerf(std::chrono::duration<float>(0.5));
 		float mPreviousFPS = 0.f;
+
 	};
+
+    void ShowGraphicsSettings(GraphicsSettingsData& settings, bool& isWindowActive, const Blackboard& blackboard);
+
 }

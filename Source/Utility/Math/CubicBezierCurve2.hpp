@@ -1,18 +1,33 @@
 #pragma once
 #include <vector>
+#include <optional>
 #include "Utility/Math/Point2.hpp"
 
 namespace Simple
 {
 
     template<typename T>
-    class Curve2 final
+    class CubicBezierCurve2 final
     {
     public:
 
-        constexpr Curve2() = default;
+        constexpr CubicBezierCurve2() = default;
 
         [[nodiscard]] const std::vector<Point2<T>>& GetPoints() const noexcept;
+        [[nodiscard]] constexpr std::array<Point2<T>, 4> GetControlPointsAt(std::size_t index) const;
+        [[nodiscard]] std::size_t GetNumSegments() const noexcept
+        {
+            if (mPoints.size() < 4)
+            {
+                return 0;
+            }
+            return (mPoints.size() - 1) / 3;
+        }
+
+        [[nodiscard]] uint32_t GetPointIndex(uint32_t segmentIndex, uint32_t pointIndex) const noexcept
+        {
+            return segmentIndex * 3 + pointIndex;
+        }
 
         void AddAnchorPoint(const Point2<T>& point) noexcept;
 
@@ -23,22 +38,39 @@ namespace Simple
             mPoints = points;
         }
 
+        void SetPointAt(std::size_t index, const Point2<T>& point) noexcept
+        {
+            mPoints[index] = point;
+        }
+
+        void SetPointAt(std::size_t segmentIndex, uint32_t pointIndex, const Point2<T>& point) noexcept
+        {
+            SetPointAt(GetPointIndex(segmentIndex, pointIndex), point);
+        }
+
     private:
 
         std::vector<Point2<T>> mPoints;
     };
 
-    using Curve2f = Curve2<float>;
-    using Curve2d = Curve2<double>;
+    using CubicBezierCurve2f = CubicBezierCurve2<float>;
+    using CubicBezierCurve2d = CubicBezierCurve2<double>;
 
     template<typename T>
-    [[nodiscard]] const std::vector<Point2<T>>& Curve2<T>::GetPoints() const noexcept
+    const std::vector<Point2<T>>& CubicBezierCurve2<T>::GetPoints() const noexcept
     {
         return mPoints;
     }
 
     template<typename T>
-    void Curve2<T>::AddAnchorPoint(const Point2<T>& point) noexcept
+    constexpr std::array<Point2<T>, 4> CubicBezierCurve2<T>::GetControlPointsAt(std::size_t index) const
+    {
+        const std::size_t startIdx = index * 3;
+        return std::array<Point2<T>, 4>{ mPoints[startIdx], mPoints[startIdx + 1], mPoints[startIdx + 2], mPoints[startIdx + 3] };
+    }
+
+    template<typename T>
+    void CubicBezierCurve2<T>::AddAnchorPoint(const Point2<T>& point) noexcept
     {
         if (mPoints.empty())
         {
@@ -67,7 +99,7 @@ namespace Simple
     }
 
     template<typename T>
-    void Curve2<T>::Clear()
+    void CubicBezierCurve2<T>::Clear()
     {
         mPoints.clear();
     }

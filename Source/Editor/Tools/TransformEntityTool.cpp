@@ -86,7 +86,7 @@ namespace Simple
 
 		if (isManipulatingEntityTransform)
 		{
-			const Transform localTransform = GetLocalTransform(ecs, selectedEntityID, Transform(objectMatrix));
+			const Transform localTransform = GetLocalTransform(ecs, selectedEntityID, Transform::FromMatrix(objectMatrix));
 
 			switch (operation)
 			{

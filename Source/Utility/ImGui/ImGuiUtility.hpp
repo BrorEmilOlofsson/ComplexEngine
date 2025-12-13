@@ -37,6 +37,11 @@ namespace Simple
 		return ImVec4{ color.r, color.g, color.b, color.a };
 	}
 
+	[[nodiscard]] inline ImU32 ToImGuiColor(const Color& color)
+	{
+		return ImGui::ColorConvertFloat4ToU32(ToImVec4(color));
+    }
+
 	template<typename T>
 	[[nodiscard]] constexpr std::string GetStringID()
 	{
