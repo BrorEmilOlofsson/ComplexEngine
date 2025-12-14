@@ -1,5 +1,5 @@
 #include "Editor/Precompiled/EditorPch.hpp"
-#include "GraphicsSettingsPopUp.hpp"
+#include "GraphicsSettingsWindow.hpp"
 #include "Engine/Utility/BlackboardKeys.hpp"
 #include "Utility/Math/Vector2.hpp"
 #include "Graphics/GraphicsSettings.hpp"
@@ -185,7 +185,7 @@ namespace Simple
 		ImGui::End();
 	}
 
-	void ShowGraphicsSettings(GraphicsSettingsData& settings, bool& isWindowActive, const Blackboard& blackboard)
+	void ShowGraphicsSettingsWindow(GraphicsSettingsData& settings, bool& isWindowActive, const Blackboard& blackboard)
 	{
 		const float deltaTime = blackboard.Get<Key_DeltaTime>();
 		settings.mShowFpsTimer.Update(std::chrono::duration<float>(deltaTime));

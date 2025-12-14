@@ -1,6 +1,7 @@
 #pragma once
 #include "Utility/Math/Vector2.hpp"
 #include "Utility/Math/Math.hpp"
+#include "Utility/ValueType.hpp"
 #include <iostream>
 
 namespace Simple
@@ -52,6 +53,12 @@ namespace Simple
 
 	using UnitVector2f = UnitVector2<float>;
 	using UnitVector2d = UnitVector2<double>;
+
+	template<typename T>
+	struct ValueType<UnitVector2<T>>
+	{
+		using type = T;
+    };
 
 	template<typename T>
 	constexpr UnitVector2<T>::UnitVector2(const T& x, const T& y)
@@ -199,8 +206,9 @@ namespace Simple
 	}
 
 	template<typename T>
-	[[nodiscard]] constexpr bool NearlyEqual(const UnitVector2<T>& a, const UnitVector2<T>& b, const T& tolerance = static_cast<T>(0.0001)) noexcept
+	[[nodiscard]] constexpr bool NearlyEqual(const UnitVector2<T>& a, const UnitVector2<T>& b, const Tolerance<T>& tolerance = Tolerance<T>(static_cast<T>(1e-5))) noexcept
 	{
-		return (Abs(a.X() - b.X()) < tolerance) && (Abs(a.Y() - b.Y()) < tolerance);
+        return NearlyEqual(a.X(), b.X(), tolerance) 
+			&& NearlyEqual(a.Y(), b.Y(), tolerance);
 	}
 }

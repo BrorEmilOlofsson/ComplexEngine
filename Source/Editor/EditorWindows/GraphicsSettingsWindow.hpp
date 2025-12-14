@@ -43,6 +43,6 @@ namespace Simple
 
 	};
 
-    void ShowGraphicsSettings(GraphicsSettingsData& settings, bool& isWindowActive, const Blackboard& blackboard);
+    void ShowGraphicsSettingsWindow(GraphicsSettingsData& settings, bool& isWindowActive, const Blackboard& blackboard);
 
 }

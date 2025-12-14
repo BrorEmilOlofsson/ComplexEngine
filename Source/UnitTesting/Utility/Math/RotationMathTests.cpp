@@ -4,73 +4,6 @@
 
 using namespace Simple;
 
-//TEST_CASE("RotationMath::CreateMatrixFromXY", "[RotationMath]")
-//{
-//	{
-//		constexpr UnitVector3f x = UnitVector3f::Right();
-//		constexpr UnitVector3f y = UnitVector3f::Up();
-//
-//		const Matrix4x4f matrix = CreateMatrixFromXY(x, y);
-//		const UnitVector3f z = matrix.GetForward();
-//		REQUIRE(NearlyEqual(z, UnitVector3f::Forward()));
-//	}
-//}
-//
-//TEST_CASE("RotationMath::CreateMatrixFromXZ", "[RotationMath]")
-//{
-//	constexpr UnitVector3f x = UnitVector3f::Right();
-//	constexpr UnitVector3f z = UnitVector3f::Forward();
-//	const Matrix4x4f matrix = CreateMatrixFromXZ(x, z);
-//	const UnitVector3f y = matrix.GetUp();
-//	REQUIRE(NearlyEqual(y, UnitVector3f::Up()));
-//}
-//
-//TEST_CASE("RotationMath::CreateMatrixFromYX", "[RotationMath]")
-//{
-//	{
-//		constexpr UnitVector3f y = UnitVector3f::Up();
-//		constexpr UnitVector3f x = UnitVector3f::Right();
-//
-//		const Matrix4x4f matrix = CreateMatrixFromYX(y, x);
-//		const UnitVector3f z = matrix.GetForward();
-//		REQUIRE(NearlyEqual(z, UnitVector3f::Forward()));
-//	}
-//}
-//
-//TEST_CASE("RotationMath::CreateMatrixFromYZ", "[RotationMath]")
-//{
-//	{
-//		constexpr UnitVector3f y = UnitVector3f::Up();
-//		constexpr UnitVector3f z = UnitVector3f::Forward();
-//
-//		const Matrix4x4f matrix = CreateMatrixFromYZ(y, z);
-//		const UnitVector3f x = matrix.GetRight();
-//		REQUIRE(NearlyEqual(x, UnitVector3f::Right()));
-//	}
-//}
-//
-//TEST_CASE("RotationMath::CreateMatrixFromZX", "[RotationMath]")
-//{
-//	{
-//		constexpr UnitVector3f z = UnitVector3f::Forward();
-//		constexpr UnitVector3f x = UnitVector3f::Right();
-//		const Matrix4x4f matrix = CreateMatrixFromZX(z, x);
-//		const UnitVector3f y = matrix.GetUp();
-//		REQUIRE(NearlyEqual(y, UnitVector3f::Up()));
-//	}
-//}
-//
-//TEST_CASE("RotationMath::CreateMatrixFromZY", "[RotationMath]")
-//{
-//	{
-//		constexpr UnitVector3f z = UnitVector3f::Forward();
-//		constexpr UnitVector3f y = UnitVector3f::Up();
-//		const Matrix4x4f matrix = CreateMatrixFromZY(z, y);
-//		const UnitVector3f x = matrix.GetRight();
-//		REQUIRE(NearlyEqual(x, UnitVector3f::Right()));
-//	}
-//}
-
 
 TEST_CASE("Rotation matrix")
 {
@@ -97,7 +30,7 @@ TEST_CASE("Rotation matrix")
 	}
 }
 
-TEST_CASE("ToWorldSpace")
+TEST_CASE("RotationMath::ToWorldSpace (Matrix4x4)", "[RotationMath]")
 {
 	{
 		Matrix4x4f parentMatrix;

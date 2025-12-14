@@ -5,36 +5,10 @@
 #include <filesystem>
 #include <vector>
 #include <unordered_set>
+#include <ranges>
 
 namespace Simple
 {
-	template<typename T>
-	constexpr std::vector<T> ReturnDifferenceBetweenVectors(const std::vector<T>& a, const std::vector<T>& b)
-	{
-		const std::unordered_set<T> setVec1(a.begin(), a.end());
-		const std::unordered_set<T> setVec2(b.begin(), b.end());
-
-		std::vector<T> missingElements;
-
-		for (const auto& str : a)
-		{
-			if (setVec2.find(str) == setVec2.end())
-			{
-				missingElements.push_back(str);
-			}
-		}
-
-		for (const auto& str : b)
-		{
-			if (setVec1.find(str) == setVec1.end())
-			{
-				missingElements.push_back(str);
-			}
-		}
-
-		return missingElements;
-	}
-
 
 	template<typename T>
 	constexpr std::vector<std::vector<T>> SplitVector(const std::vector<T>& vector, const size_t subSize)

@@ -6,27 +6,21 @@
 #include "Editor/Core/Tabs/MenuTabWindow.hpp"
 #include "Editor/Core/Tabs/MenuTabDefault.hpp"
 
-#include "Editor/PopUps/Help/CameraControlsGuidePopUp.hpp"
-#include "Editor/PopUps/Settings/CameraSettingsPopUp.hpp"
-#include "Editor/PopUps/Settings/AudioSettingsPopUp.hpp"
-#include "Editor/PopUps/Settings/GraphicsSettingsPopUp.hpp"
+#include "Editor/EditorWindows/CameraSettingsWindow.hpp"
+#include "Editor/EditorWindows/GraphicsSettingsWindow.hpp"
+#include "Editor/EditorWindows/CurveEditorWindow.hpp"
 
-#include "Editor/PopUps/Editor/SceneHierarchyPopUp.hpp"
-#include "Editor/PopUps/Editor/SceneInspectorPopUp.hpp"
 #include "Editor/PopUps/Editor/AssetBrowserPopUp.hpp"
 #include "Editor/PopUps/Editor/SceneWindowPopUp.hpp"
 #include "Editor/PopUps/Editor/EntityCompositionPopUp.hpp"
 #include "Editor/FlyScript/NodeScriptingWindow.hpp"
-#include "Editor/EditorWindows/CurveEditorWindow.hpp"
 
 #include "Editor/Functions/SceneFileFunctions.hpp"
 #include "Editor/Functions/EditorCallbackFunctions.hpp"
 
 #include "Utility/File/FileUtility.hpp"
-#include "Engine/Camera/CameraMovement.hpp"
 #include "Engine/Engine.hpp"
 #include "Engine/Utility/BlackboardKeys.hpp"
-#include "Editor/Functions/EditorFunctions.hpp"
 
 namespace Simple
 {
@@ -256,8 +250,8 @@ namespace Simple
             }
         }
 
-        ShowCameraSettings(mFreeFlyCameraSettings, mIsCameraSettingsPopUpActive);
-        ShowGraphicsSettings(mGraphicsSettingsData, mIsGraphicsSettingsPopUpActive, editorBlackboard);
+        ShowCameraSettingsWindow(mFreeFlyCameraSettings, mIsCameraSettingsPopUpActive);
+        ShowGraphicsSettingsWindow(mGraphicsSettingsData, mIsGraphicsSettingsPopUpActive, editorBlackboard);
         static CubicBezierCurve2f demoCurve;
         static bool curveEditorActive = true;
         ShowCurveWindow(demoCurve, curveEditorActive, editorBlackboard);

@@ -6,7 +6,7 @@
 #include "Engine/ECS/ECS.hpp"
 #include "Editor/ImGui/ImGuiStyleManager.hpp"
 #include "Editor/EditorSceneSettings.hpp"
-#include "Editor/PopUps/Settings/GraphicsSettingsPopUp.hpp"
+#include "Editor/EditorWindows/GraphicsSettingsWindow.hpp"
 #include <vector>
 #include <memory>
 

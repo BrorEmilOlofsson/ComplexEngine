@@ -1,7 +1,8 @@
 #pragma once
 #include <vector>
 #include <concepts>
-#include <stdexcept>
+#include <type_traits>
+#include "Utility/ValueType.hpp"
 #include "Utility/Assert.hpp"
 #include "Utility/Math/DynamicVector.hpp"
 #include "Utility/Math/DynamicUnitVector.hpp"
@@ -83,6 +84,9 @@ namespace Simple
 
 	using DynamicPointf = DynamicPoint<float>;
 	using DynamicPointd = DynamicPoint<double>;
+
+	template<typename T>
+	struct ValueType<DynamicPoint<T>> : std::type_identity<T> {};
 
 	template<typename T>
 	[[nodiscard]] constexpr bool operator==(const DynamicPoint<T>& a, const DynamicPoint<T>& b) noexcept

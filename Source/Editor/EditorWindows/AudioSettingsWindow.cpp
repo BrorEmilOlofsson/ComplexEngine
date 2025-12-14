@@ -1,12 +1,12 @@
 #include "Editor/Precompiled/EditorPch.hpp"
-#include "Editor/PopUps/Settings/AudioSettingsPopUp.hpp"
+#include "AudioSettingsWindow.hpp"
 #include "Engine/Audio/AudioManager.hpp"
 #include "Engine/Utility/BlackboardKeys.hpp"
 
 namespace Simple
 {
 
-	void ShowAudioSettings(bool& isWindowActive)
+	void ShowAudioSettingsWindow(bool& isWindowActive)
 	{
 		if (!isWindowActive)
 		{

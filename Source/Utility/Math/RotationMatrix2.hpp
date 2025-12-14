@@ -21,7 +21,7 @@ namespace Simple
         [[nodiscard]] constexpr const UnitVector2<T>& GetRight() const noexcept;
         [[nodiscard]] constexpr const UnitVector2<T>& GetUp() const noexcept;
 
-        [[nodiscard]] constexpr T& operator[](const unsigned int index) const noexcept;
+        [[nodiscard]] constexpr const T& operator[](const unsigned int index) const noexcept;
 
     private:
 
@@ -50,14 +50,14 @@ namespace Simple
     }
 
     template<typename T>
-    constexpr RotationMatrix2<T> FromX(const UnitVector2<T>& xAxis)
+    constexpr RotationMatrix2<T> RotationMatrix2<T>::FromX(const UnitVector2<T>& xAxis)
     {
         const UnitVector2<T> yAxis(-xAxis.Y(), xAxis.X());
         return RotationMatrix2<T>(xAxis, yAxis);
     }
 
     template<typename T>
-    constexpr RotationMatrix2<T> FromY(const UnitVector2<T>& yAxis)
+    constexpr RotationMatrix2<T> RotationMatrix2<T>::FromY(const UnitVector2<T>& yAxis)
     {
         const UnitVector2<T> xAxis(yAxis.Y(), -yAxis.X());
         return RotationMatrix2<T>(xAxis, yAxis);
@@ -76,7 +76,7 @@ namespace Simple
     }
 
     template<typename T>
-    constexpr T& RotationMatrix2<T>::operator[](const unsigned int index) const noexcept
+    constexpr const T& RotationMatrix2<T>::operator[](const unsigned int index) const noexcept
     {
         static_assert(sizeof(RotationMatrix2<T>) == sizeof(T) * 2 * 2);
         return reinterpret_cast<const T*>(this)[index];
@@ -85,12 +85,24 @@ namespace Simple
     template<typename T>
     [[nodiscard]] constexpr Vector2<T> operator*(const Vector2<T>& vector, const RotationMatrix2<T>& matrix) noexcept
     {
-        const UnitVector2<T> right = matrix.GetRight();
-        const UnitVector2<T> up = matrix.GetUp();
+        const UnitVector2<T>& right = matrix.GetRight();
+        const UnitVector2<T>& up = matrix.GetUp();
         return Vector2<T>
             (
                 vector.x * right.X() + vector.y * up.X(),
                 vector.x * right.Y() + vector.y * up.Y()
+            );
+    }
+
+    template<typename T>
+    [[nodiscard]] constexpr UnitVector2<T> operator*(const UnitVector2<T>& vector, const RotationMatrix2<T>& matrix) noexcept
+    {
+        const UnitVector2<T>& right = matrix.GetRight();
+        const UnitVector2<T>& up = matrix.GetUp();
+        return UnitVector2<T>
+            (
+                vector.X() * right.X() + vector.Y() * up.X(),
+                vector.X() * right.Y() + vector.Y() * up.Y()
             );
     }
 

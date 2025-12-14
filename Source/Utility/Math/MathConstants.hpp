@@ -10,9 +10,9 @@ namespace Simple
 	template<std::floating_point T>
 	constexpr T NAPIER = T{ 2.71828 };
 
-	template<typename T>
+	template<std::floating_point T>
 	constexpr T DEG_TO_RAD = PI<T> / static_cast<T>(180.0);
 
-	template<typename T>
+	template<std::floating_point T>
 	constexpr T RAD_TO_DEG = (static_cast<T>(180.0) / PI<T>);
 }

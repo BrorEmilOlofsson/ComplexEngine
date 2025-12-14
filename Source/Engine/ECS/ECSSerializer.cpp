@@ -3,6 +3,8 @@
 #include "Engine/ECS/EntityComposition.hpp"
 #include "Engine/Reflection/DataTypeRegistry.hpp"
 #include <fstream>
+#include <ranges>
+#include <algorithm>
 
 namespace Simple
 {
@@ -61,15 +63,12 @@ namespace Simple
 			allPropertyKeys.emplace_back(keyName.name);
 		}
 
-		const std::vector<std::string> missingKeys = ReturnDifferenceBetweenVectors(itemKeys, allPropertyKeys);
+		auto missingKeys = itemKeys | std::views::filter([&allPropertyKeys](const std::string& str) -> bool { return std::ranges::find(allPropertyKeys, str) == allPropertyKeys.end(); });
 		nlohmann::json allProperties = memberJson;
 
-		for (size_t h = 0; h < missingKeys.size(); ++h)
+		for (auto& missingKey : missingKeys)
 		{
-			if (allProperties.contains(missingKeys[h]))
-			{
-				allProperties.erase(missingKeys[h]);
-			}
+			allProperties.erase(missingKey);
 		}
 
 		memberJson = allProperties;

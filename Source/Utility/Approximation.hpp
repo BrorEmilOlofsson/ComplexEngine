@@ -2,6 +2,7 @@
 #include <concepts>
 #include <iostream>
 #include "Utility/Math/Math.hpp"
+#include "Utility/ValueType.hpp"
 
 namespace Simple
 {
