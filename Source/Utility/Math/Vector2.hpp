@@ -3,6 +3,8 @@
 #include <iostream>
 #include <format>
 
+#include "Utility/Assert.hpp"
+
 namespace Simple
 {
 	template<typename T>
@@ -105,10 +107,18 @@ namespace Simple
 		};
 	}
 
-	template<typename T>
-	[[nodiscard]] constexpr Vector2<T> operator/(const Vector2<T>& vector, const T& scalar)
+	template<typename T, typename U>
+	[[nodiscard]] constexpr Vector2<T> operator/(const Vector2<T>& vector, const U& scalar)
 	{
-		return Vector2<T>(vector.x / scalar, vector.y / scalar);
+		if constexpr (std::integral<U>)
+		{
+			if (scalar == 0)
+			{
+                ASSERT(false && "Division by zero in Vector2 operator/.");
+			}
+		}
+		const T inverse = static_cast<T>(1) / static_cast<T>(scalar);
+		return Vector2<T>(vector.x * inverse, vector.y * inverse);
 	}
 
 	template<typename T>

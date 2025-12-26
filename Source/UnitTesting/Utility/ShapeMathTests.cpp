@@ -130,6 +130,41 @@ TEST_CASE("ShapeMath::ToAABB3 (LineSegment3)", "[ShapeMath]")
     REQUIRE(aabb3.GetMax() == Point3d(4.0f, 5.0f, 6.0f));
 }
 
+TEST_CASE("ShapeMath::GetWidth (AABB2)", "[ShapeMath]")
+{
+    constexpr AABB2d aabb = AABB2d::FromMinAndMax(Point2d(1.0f, 2.0f), Point2d(4.0f, 5.0f));
+    constexpr double width = GetWidth(aabb);
+    REQUIRE(width == 3.0f);
+}
+
+TEST_CASE("ShapeMath::GetHeight (AABB2)", "[ShapeMath]")
+{
+    constexpr AABB2d aabb = AABB2d::FromMinAndMax(Point2d(1.0f, 2.0f), Point2d(4.0f, 5.0f));
+    constexpr double height = GetHeight(aabb);
+    REQUIRE(height == 3.0f);
+}
+
+TEST_CASE("ShapeMath::GetWidth (AABB3)", "[ShapeMath]")
+{
+    constexpr AABB3d aabb = AABB3d::FromMinAndMax(Point3d(1.0f, 2.0f, 3.0f), Point3d(4.0f, 5.0f, 6.0f));
+    constexpr double width = GetWidth(aabb);
+    REQUIRE(width == 3.0f);
+}
+
+TEST_CASE("ShapeMath::GetHeight (AABB3)", "[ShapeMath]")
+{
+    constexpr AABB3d aabb = AABB3d::FromMinAndMax(Point3d(1.0f, 2.0f, 3.0f), Point3d(4.0f, 5.0f, 6.0f));
+    constexpr double height = GetHeight(aabb);
+    REQUIRE(height == 3.0f);
+}
+
+TEST_CASE("ShapeMath::GetDepth (AABB3)", "[ShapeMath]")
+{
+    constexpr AABB3d aabb = AABB3d::FromMinAndMax(Point3d(1.0f, 2.0f, 3.0f), Point3d(4.0f, 5.0f, 6.0f));
+    constexpr double depth = GetDepth(aabb);
+    REQUIRE(depth == 3.0f);
+}
+
 TEST_CASE("ShapeMath::GetPlaneXPos", "[ShapeMath]")
 {
     SECTION("Plane with non-zero X normal")
@@ -208,6 +243,14 @@ TEST_CASE("ShapeMath::GetEdgeNormals", "[ShapeMath]")
     REQUIRE(a[0] == UnitVector3d(-1.0f, 0.0f, 0.0f));
     REQUIRE(a[1] == UnitVector3d(0.0f, 1.0f, 0.0f));
     REQUIRE(NearlyEqual(a[2], UnitVector3d(1.f, -1.f, 0.f)));
+}
+
+TEST_CASE("ShapeMath::GetCircumscribedCircle", "[ShapeMath]")
+{
+    constexpr Triangle2d triangle(Point2d(0.0f, 0.0f), Point2d(4.0f, 0.0f), Point2d(0.0f, 3.0f));
+    const Circled circumscribedCircle = GetCircumscribedCircle(triangle);
+    REQUIRE(circumscribedCircle.GetCenter() == Point2d(2.0f, 1.5f));
+    REQUIRE(circumscribedCircle.GetRadius().Value() == Approx(2.5));
 }
 
 TEST_CASE("ShapeMath::GetLength (LineSegment2)", "[ShapeMath]")

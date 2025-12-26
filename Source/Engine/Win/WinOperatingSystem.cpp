@@ -35,6 +35,7 @@ namespace Simple
 	Win_OperatingSystem::Win_OperatingSystem(HINSTANCE instanceHandle, std::wstring className)
 		: mInstanceHandle(instanceHandle)
 		, mWindowClass(std::make_unique<Win_WindowClass>(instanceHandle, className, HandleMsgSetup))
+        , mGraphicsFoundationNew(mGraphicsFoundation)
 	{
 	}
 
@@ -44,6 +45,7 @@ namespace Simple
 		, mWindows(std::move(other.mWindows))
 		, mStyle(std::move(other.mStyle))
 		, mGraphicsFoundation(std::move(other.mGraphicsFoundation))
+        , mGraphicsFoundationNew(std::move(other.mGraphicsFoundationNew))
 		, mAssetManager(std::move(other.mAssetManager))
 		, mGraphicsSettings(std::move(other.mGraphicsSettings))
 	{

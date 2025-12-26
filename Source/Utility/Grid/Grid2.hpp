@@ -2,6 +2,7 @@
 #include "Utility/Grid/Grid.hpp"
 #include "Utility/Shapes/AABB2.hpp"
 #include "Utility/Grid/PrimitiveGrid2.hpp"
+#include <ranges>
 
 namespace Simple
 {
@@ -33,6 +34,12 @@ namespace Simple
 
 		return Point2i(xIndex, yIndex);
 	}
+
+	[[nodiscard]] constexpr int GetGridIndexByPosition(const Point2f& position, const Point2f& min, const Vector2f& cellSize, const Vector2f& offset, const Vector2ui& gridSize)
+	{
+		const Point2i coords = GetGridCoordinatesByPosition(position, min, cellSize, offset);
+		return GetIndexByCoordinates(coords, gridSize);
+    }
 
 	template<std::ranges::range Range>
 	[[nodiscard]] constexpr decltype(auto) GetElementByCoordinates(Range& range, const Point2ui& coords, const Vector2ui& gridSize)

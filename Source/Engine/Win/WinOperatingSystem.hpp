@@ -3,6 +3,7 @@
 #include "Engine/Win/WinWindow.hpp"
 #include "Graphics/DX11/DX11Foundation.hpp"
 #include "Engine/OperatingSystem/WindowHandle.hpp"
+#include "Graphics/GraphicsFoundation.hpp"
 #include <string>
 #include <memory>
 
@@ -66,6 +67,7 @@ namespace Simple
 
 		HINSTANCE mInstanceHandle;
 		std::unique_ptr<Win_WindowClass> mWindowClass;
+		GraphicsFoundation mGraphicsFoundationNew;
 		DX11Foundation mGraphicsFoundation;
 		std::vector<std::unique_ptr<Win_Window>> mWindows;
 		Win_Style mStyle;

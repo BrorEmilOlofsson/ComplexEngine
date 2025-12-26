@@ -115,6 +115,36 @@ namespace Simple
     }
 
     template<typename T>
+    [[nodiscard]] constexpr T GetWidth(const AABB2<T>& aabb) noexcept
+    {
+        return aabb.GetMax().x - aabb.GetMin().x;
+    }
+
+    template<typename T>
+    [[nodiscard]] constexpr T GetHeight(const AABB2<T>& aabb) noexcept
+    {
+        return aabb.GetMax().y - aabb.GetMin().y;
+    }
+
+    template<typename T>
+    [[nodiscard]] constexpr T GetWidth(const AABB3<T>& aabb) noexcept
+    {
+        return aabb.GetMax().x - aabb.GetMin().x;
+    }
+
+    template<typename T>
+    [[nodiscard]] constexpr T GetHeight(const AABB3<T>& aabb) noexcept
+    {
+        return aabb.GetMax().y - aabb.GetMin().y;
+    }
+
+    template<typename T>
+    [[nodiscard]] constexpr T GetDepth(const AABB3<T>& aabb) noexcept
+    {
+        return aabb.GetMax().z - aabb.GetMin().z;
+    }
+
+    template<typename T>
     [[nodiscard]] constexpr std::optional<T> GetPlaneXPos(const Plane<T>& plane, const T& yPos, const T& zPos)
     {
         const Point3<T>& point = plane.GetPoint();
@@ -184,6 +214,24 @@ namespace Simple
             GetPerpendicularVector(UnitVector3<T>(p2 - p1), normal),
             GetPerpendicularVector(UnitVector3<T>(p0 - p2), normal),
         };
+    }
+
+    template<typename T>
+    [[nodiscard]] constexpr Circle<T> GetCircumscribedCircle(const Triangle2<T>& triangle)
+    {
+        const Point2<T>& A = triangle.GetPoint0();
+        const Point2<T>& B = triangle.GetPoint1();
+        const Point2<T>& C = triangle.GetPoint2();
+        const T D = 2 * (A.x * (B.y - C.y) + B.x * (C.y - A.y) + C.x * (A.y - B.y));
+        const T Ux = ((Square(A.x) + Square(A.y)) * (B.y - C.y) +
+                      (Square(B.x) + Square(B.y)) * (C.y - A.y) +
+                      (Square(C.x) + Square(C.y)) * (A.y - B.y)) / D;
+        const T Uy = ((Square(A.x) + Square(A.y)) * (C.x - B.x) +
+                      (Square(B.x) + Square(B.y)) * (A.x - C.x) +
+                      (Square(C.x) + Square(C.y)) * (B.x - A.x)) / D;
+        const Point2<T> center(Ux, Uy);
+        const T radius = Distance(center, A);
+        return Circle<T>::FromCenterAndRadius(center, Radius<T>(radius));
     }
 
     template<typename T>

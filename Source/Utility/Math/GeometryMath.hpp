@@ -3,6 +3,7 @@
 #include "Utility/Math/Math.hpp"
 #include "Utility/StrongType.hpp"
 #include "Utility/Clamper.hpp"
+#include "Utility/ValueType.hpp"
 #include <type_traits>
 
 namespace Simple
@@ -13,6 +14,9 @@ namespace Simple
 
 	using Radiusf = Radius<float>;
 	using Radiusd = Radius<double>;
+
+	template<typename T>
+    struct ValueType<Radius<T>> : std::type_identity<T> {};
 
 	template<typename T>
 	using Diameter = StrongAssertedTypeNew<T, PositiveOrZeroAsserter<T>, struct ST_Diameter, EquatableTrait, ComparableTrait>;
