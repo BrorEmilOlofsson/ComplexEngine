@@ -9,7 +9,7 @@ namespace Simple
 {
 	static LRESULT HandleMsgMain(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
-		Win_OperatingSystem* const operatingSystem = reinterpret_cast<Win_OperatingSystem*>(GetWindowLongPtrW(hwnd, GWLP_USERDATA));
+		Win_OperatingSystem* const operatingSystem = reinterpret_cast<Win_OperatingSystem*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 		if (operatingSystem == nullptr)
 		{
 			return 0;
@@ -23,13 +23,11 @@ namespace Simple
 		{
 			const CREATESTRUCTW* const create = reinterpret_cast<const CREATESTRUCTW*>(lParam);
 			Win_OperatingSystem* const operatingSystem = static_cast<Win_OperatingSystem*>(create->lpCreateParams);
-			SetWindowLongPtrW(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(operatingSystem));
-			SetWindowLongPtrW(hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(HandleMsgMain));
-
-			//return operatingSystem->HandleMessage(hwnd, msg, wParam, lParam);
+			SetWindowLongPtr(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(operatingSystem));
+			SetWindowLongPtr(hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(HandleMsgMain));
 		}
 
-		return DefWindowProcW(hwnd, msg, wParam, lParam);
+		return DefWindowProc(hwnd, msg, wParam, lParam);
 	}
 
 	Win_OperatingSystem::Win_OperatingSystem(HINSTANCE instanceHandle, std::wstring className)
@@ -51,7 +49,7 @@ namespace Simple
 	{
 		for (auto& window : mWindows)
 		{
-			SetWindowLongPtrW(window->GetHandle(), GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
+			SetWindowLongPtr(window->GetHandle(), GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 		}
 	}
 

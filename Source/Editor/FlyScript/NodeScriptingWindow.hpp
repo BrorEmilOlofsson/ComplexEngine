@@ -39,7 +39,7 @@ namespace Simple
 	{
 	public:
 
-		NodeScriptingWindow(const std::string& name);
+		NodeScriptingWindow();
 
 		NodeGraphContext& GetNodeContext();
 		const NodeGraphContext& GetNodeContext() const;

@@ -25,7 +25,7 @@
 namespace Simple
 {
 
-    template<DerivedFromPopUpWindow T, typename ... Args>
+    /*template<DerivedFromPopUpWindow T, typename ... Args>
     inline std::shared_ptr<T> AddPopUpWindow(auto& popUpWindows, const std::string& name, Args&& ... args)
     {
         const std::string tag = std::string("##") + ConvertTypeIndexNameToPrettyName(typeid(T).name());
@@ -35,7 +35,7 @@ namespace Simple
 
         popUpWindows.push_back(window);
         return window;
-    }
+    }*/
 
     template<DerivedFromMainMenuTabBase T>
     inline T& AddMenuTab(auto& mainMenuTabs, const std::string& name)
@@ -50,12 +50,12 @@ namespace Simple
         return ref;
     }
 
-    static void SetUpDefaultLayout(std::vector<std::shared_ptr<PopUp>>& popUpWindows,
+    static void SetUpDefaultLayout(
         std::vector<std::unique_ptr<MainMenuTabBase>>& mainMenuTabs,
         Engine& engine,
-        EntityCompositionPopUp*& p,
         bool& isCameraSettingsPopUpActive,
-        bool& isGraphicsSettingsPopUpActive)
+        bool& isGraphicsSettingsPopUpActive
+        /*SceneWindowPopUp& sceneWindowPopUp*/)
     {
         MenuTabDefault& sceneTab = AddMenuTab<MenuTabDefault>(mainMenuTabs, "Scene");
         MenuTabWindow& windowsTab = AddMenuTab<MenuTabWindow>(mainMenuTabs, "Windows");
@@ -81,20 +81,20 @@ namespace Simple
             });
 
         MenuItemPopUp* editorPopUpButton = windowsTab.AddPopUp("Editor");
-        MenuItemPopUp* nodeScriptingPopUpButton = windowsTab.AddPopUp("NodeScript");
+        //MenuItemPopUp* nodeScriptingPopUpButton = windowsTab.AddPopUp("NodeScript");
 
-        std::shared_ptr<NodeScriptingWindow> nodeScriptingPopUp = AddPopUpWindow<NodeScriptingWindow>(popUpWindows, "NodeScripting Window");
+        //std::shared_ptr<NodeScriptingWindow> nodeScriptingPopUp = AddPopUpWindow<NodeScriptingWindow>(popUpWindows, "NodeScripting Window");
 
         //std::shared_ptr<GraphicsSettingsPopUp> graphicsSettingPopUp = AddPopUpWindow<GraphicsSettingsPopUp>(popUpWindows, "Graphics Settings");
-        std::shared_ptr<AssetBrowserPopUp> assetBrowserPopUp2 = AddPopUpWindow<AssetBrowserPopUp>(popUpWindows, "Asset Browser", nodeScriptingPopUp.get(), &windowsTab, nodeScriptingPopUpButton);
-        std::shared_ptr<SceneWindowPopUp> sceneWindowPopUp = AddPopUpWindow<SceneWindowPopUp>(popUpWindows, "Scene");
-        std::shared_ptr<EntityCompositionPopUp> entityCompositionPopUp = AddPopUpWindow<EntityCompositionPopUp>(
+        //std::shared_ptr<AssetBrowserPopUp> assetBrowserPopUp2 = AddPopUpWindow<AssetBrowserPopUp>(popUpWindows, "Asset Browser", &windowsTab, nodeScriptingPopUpButton);
+        //std::shared_ptr<SceneWindowPopUp> sceneWindowPopUp = AddPopUpWindow<SceneWindowPopUp>(popUpWindows);
+        /*std::shared_ptr<EntityCompositionPopUp> entityCompositionPopUp = AddPopUpWindow<EntityCompositionPopUp>(
             popUpWindows,
             "",
             engine.GetOperatingSystem().CreateRenderContext(engine.GetMainWindow().GetClientSize())
-        );
+        );*/
 
-        p = entityCompositionPopUp.get();
+        //p = entityCompositionPopUp.get();
 
         {
             const std::vector<std::filesystem::path> scenePaths = FileUtility::GetPathsFromDirectory(std::filesystem::absolute(SIMPLE_DIR_SCENES));
@@ -119,11 +119,16 @@ namespace Simple
                 isGraphicsSettingsPopUpActive = !isGraphicsSettingsPopUpActive;
             });
 
-        editorPopUpButton->AddCallback(EditorCallbacks::SetPopUpActive(assetBrowserPopUp2, &editorPopUpButton->GetIsActiveRef()));
-        editorPopUpButton->AddCallback(EditorCallbacks::SetPopUpActive(sceneWindowPopUp, &editorPopUpButton->GetIsActiveRef()));
-        editorPopUpButton->AddCallback(EditorCallbacks::SetPopUpActive(entityCompositionPopUp, &editorPopUpButton->GetIsActiveRef()));
+        //editorPopUpButton->AddCallback(EditorCallbacks::SetPopUpActive(assetBrowserPopUp2, &editorPopUpButton->GetIsActiveRef()));
+        //editorPopUpButton->AddCallback(EditorCallbacks::SetPopUpActive(sceneWindowPopUp, &editorPopUpButton->GetIsActiveRef()));
+        //editorPopUpButton->AddCallback(EditorCallbacks::SetPopUpActive(entityCompositionPopUp, &editorPopUpButton->GetIsActiveRef()));
+       /* bool* isEditorPopUpButtonIsActive = &editorPopUpButton->GetIsActiveRef();
+        editorPopUpButton->AddCallback([&sceneWindowPopUp, isEditorPopUpButtonIsActive]()
+            {
+                sceneWindowPopUp.IsActive() = *isEditorPopUpButtonIsActive;
+            });*/
 
-        nodeScriptingPopUpButton->AddCallback(EditorCallbacks::SetPopUpActive(nodeScriptingPopUp, &nodeScriptingPopUpButton->GetIsActiveRef()));
+        //nodeScriptingPopUpButton->AddCallback(EditorCallbacks::SetPopUpActive(nodeScriptingPopUp, &nodeScriptingPopUpButton->GetIsActiveRef()));
 
         { //TO-DO(v11.4.5): Temp should be refactor
             editorPopUpButton->SetIsActive(true);
@@ -140,7 +145,16 @@ namespace Simple
 
     void Editor::Init()
     {
-        SetUpDefaultLayout(mPopUpWindows, mMainMenuTabs, *mEngine, mEntityCompositionPopUp, mIsCameraSettingsPopUpActive, mIsGraphicsSettingsPopUpActive);
+        SetUpDefaultLayout(
+            mMainMenuTabs, *
+            mEngine,
+            mIsCameraSettingsPopUpActive, 
+            mIsGraphicsSettingsPopUpActive
+            //mSceneWindow
+        );
+
+        mEntityCompositionWindow = std::make_unique<EntityCompositionPopUp>(
+            mEngine->GetOperatingSystem().CreateRenderContext(mEngine->GetMainWindow().GetClientSize()));
 
         for (auto& menuTab : mMainMenuTabs)
         {
@@ -152,41 +166,58 @@ namespace Simple
             window->Init();
         }
 
+        mNodeScriptingWindow.Init();
+
         mEngine->GetSceneManager().AddOnScenePostLoadFunction([this](Scene& scene)
             {
+                mSceneWindow.OnSceneLoaded(scene);
                 for (auto& popup : mPopUpWindows)
                 {
                     popup->OnSceneLoaded(scene);
                 }
+
+                mNodeScriptingWindow.OnSceneLoaded(scene);
             });
 
         mImGuiStyleManager.Init();
+    }
+
+    void HandleWindowResizing(const InputState& input, const WindowView& windowView)
+    {
+        if (input.IsKeyPressed(eInputKey::F5))
+        {
+            windowView.ToggleFullScreen();
+        }
+        if (input.IsKeyPressed(eInputKey::F6))
+        {
+            windowView.SetSize(Vector2ui(720, 405), false);
+        }
+    }
+
+    void HandleCommandInputs(const InputState& input, EditorCommandTracker& commandTracker)
+    {
+        if (input.IsKeyHeld(eInputKey::Ctrl))
+        {
+            if (input.IsKeyPressed(eInputKey::Z))
+            {
+                commandTracker.UndoCommand();
+            }
+            else if (input.IsKeyPressed(eInputKey::Y))
+            {
+                commandTracker.RedoCommand();
+            }
+        }
     }
 
     void Editor::Update()
     {
         PROFILER_FUNCTION(profiler::colors::Amber300);
         const InputState& input = mEngine->GetInputState();
-        if (input.IsKeyPressed(eInputKey::F5))
-        {
-            mEngine->GetMainWindow().ToggleFullScreen();
-        }
-        if (input.IsKeyPressed(eInputKey::F6))
-        {
-            mEngine->GetMainWindow().SetSize(Vector2ui(720, 405), false);
-        }
 
-        if (input.IsKeyHeld(eInputKey::Ctrl))
-        {
-            if (input.IsKeyPressed(eInputKey::Z))
-            {
-                mCommandTracker.UndoCommand();
-            }
-            else if (input.IsKeyPressed(eInputKey::Y))
-            {
-                mCommandTracker.RedoCommand();
-            }
-        }
+
+        HandleWindowResizing(input, mEngine->GetMainWindow());
+        HandleCommandInputs(input, mCommandTracker);
+        
 
         Blackboard editorBlackboard;
         editorBlackboard.Insert<Key_IsPlaying>(mEngine->GetSceneManager().IsPlaying());
@@ -205,12 +236,17 @@ namespace Simple
         editorBlackboard.Insert<Key_FreeFlyCameraSettings>(mFreeFlyCameraSettings);
         editorBlackboard.Insert<Key_EditorSceneSettings>(mEditorSceneSettings);
         editorBlackboard.Insert<Key_ShowUnitVectorInScene>(mEditorSceneSettings.showUnitVectorInScene);
-        editorBlackboard.Insert<Key_EntityCompositionPopUp>(*mEntityCompositionPopUp);
+        editorBlackboard.Insert<Key_EntityCompositionPopUp>(*mEntityCompositionWindow);
+        editorBlackboard.Insert<Key_NodeScriptingWindow>(mNodeScriptingWindow);
 
         for (const std::shared_ptr<PopUp> popUp : mPopUpWindows)
         {
             popUp->Update(editorBlackboard);
         }
+
+        mSceneWindow.UpdateInternal(editorBlackboard);
+        mAssetBrowserWindow.Update(editorBlackboard);
+        mEntityCompositionWindow->Update(editorBlackboard);
     }
 
     void Editor::Render()
@@ -234,8 +270,9 @@ namespace Simple
         editorBlackboard.Insert<Key_EditorSceneSettings>(mEditorSceneSettings);
         editorBlackboard.Insert<Key_ShowUnitVectorInScene>(mEditorSceneSettings.showUnitVectorInScene);
         editorBlackboard.Insert<Key_OperatingSystem>(mEngine->GetOperatingSystem());
-        editorBlackboard.Insert<Key_EntityCompositionPopUp>(*mEntityCompositionPopUp);
+        editorBlackboard.Insert<Key_EntityCompositionPopUp>(*mEntityCompositionWindow);
         editorBlackboard.Insert<Key_FreeFlyCameraSettings>(mFreeFlyCameraSettings);
+        editorBlackboard.Insert<Key_NodeScriptingWindow>(mNodeScriptingWindow);
 
         for (auto& tab : mMainMenuTabs)
         {
@@ -252,6 +289,10 @@ namespace Simple
 
         ShowCameraSettingsWindow(mFreeFlyCameraSettings, mIsCameraSettingsPopUpActive);
         ShowGraphicsSettingsWindow(mGraphicsSettingsData, mIsGraphicsSettingsPopUpActive, editorBlackboard);
+        mSceneWindow.Render(editorBlackboard);
+        mAssetBrowserWindow.Render(editorBlackboard);
+        mEntityCompositionWindow->Render(editorBlackboard);
+        mNodeScriptingWindow.Render(editorBlackboard);
         static CubicBezierCurve2f demoCurve;
         static bool curveEditorActive = true;
         ShowCurveWindow(demoCurve, curveEditorActive, editorBlackboard);
@@ -263,6 +304,8 @@ namespace Simple
         {
             window->OnSceneBeginPlay(scene);
         }
+
+        mSceneWindow.OnSceneBeginPlay(scene);
     }
 
     void Editor::OnSceneEndPlay(Scene& scene)
@@ -271,5 +314,7 @@ namespace Simple
         {
             window->OnSceneEndPlay(scene);
         }
+
+        mSceneWindow.OnSceneEndPlay(scene);
     }
 }

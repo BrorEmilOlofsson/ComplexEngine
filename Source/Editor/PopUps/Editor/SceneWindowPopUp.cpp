@@ -13,335 +13,347 @@
 #include "Engine/Utility/DebugShapes.hpp"
 #include "Utility/Asset/AssetManager.hpp"
 #include "Utility/ShapeMath.hpp"
+#include "Utility/Algorithm.hpp"
 #include <External/AwsomeFontIcons/IconFontDefines.h>
 
 namespace Simple
 {
 
-	static void ShowSceneData(SceneManager& sceneManager)
-	{
-		if (ImGui::Begin("Scene Data"))
-		{
-			Navmesh& navmesh = sceneManager.GetCurrentScene().GetNavmesh();
+    static void ShowSceneData(SceneManager& sceneManager)
+    {
+        if (ImGui::Begin("Scene Data"))
+        {
+            Navmesh& navmesh = sceneManager.GetCurrentScene().GetNavmesh();
 
-			ImGui::Text("Drag Navmesh Here");
-			auto objAsset = ObjectTarget<AssetPath_OBJ>();
-			if (objAsset)
-			{
-				const std::filesystem::path navmeshPath = std::filesystem::path(objAsset->Value().view());
-				navmesh = Navmesh(NavmeshLoader::LoadMesh(navmeshPath));
-				sceneManager.GetCurrentScene().SetNavmeshPath(navmeshPath);
-			}
+            ImGui::Text("Drag Navmesh Here");
+            auto objAsset = ObjectTarget<AssetPath_OBJ>();
+            if (objAsset)
+            {
+                const std::filesystem::path navmeshPath = std::filesystem::path(objAsset->Value().view());
+                navmesh = Navmesh(NavmeshLoader::LoadMesh(navmeshPath));
+                sceneManager.GetCurrentScene().SetNavmeshPath(navmeshPath);
+            }
 
-			SceneSettings& sceneSettings = sceneManager.GetSettings();
-			NavmeshRenderSettings& navmeshRenderSettings = sceneSettings.navmeshRenderSettings;
+            SceneSettings& sceneSettings = sceneManager.GetSettings();
+            NavmeshRenderSettings& navmeshRenderSettings = sceneSettings.navmeshRenderSettings;
 
-			if (ImGui::Button("Toggle Navmesh Render"))
-			{
-				const bool newRenderState = !navmeshRenderSettings.renderLines;
-				navmeshRenderSettings.renderLines = newRenderState;
-				navmeshRenderSettings.renderNodeIndices = newRenderState;
-				navmeshRenderSettings.renderVertexIndices = newRenderState;
-				navmeshRenderSettings.renderNodeGrid = newRenderState;
-			}
-			ImGui::Checkbox("Render Navmesh Lines", &navmeshRenderSettings.renderLines);
-			ImGui::Checkbox("Render Navmesh Node Indices", &navmeshRenderSettings.renderNodeIndices);
-			ImGui::Checkbox("Render Navmesh Vertex Indices", &navmeshRenderSettings.renderVertexIndices);
-			ImGui::Checkbox("Render Node Grid", &navmeshRenderSettings.renderNodeGrid);
-		}
-		ImGui::End();
-	}
+            if (ImGui::Button("Toggle Navmesh Render"))
+            {
+                const bool newRenderState = !navmeshRenderSettings.renderLines;
+                navmeshRenderSettings.renderLines = newRenderState;
+                navmeshRenderSettings.renderNodeIndices = newRenderState;
+                navmeshRenderSettings.renderVertexIndices = newRenderState;
+                navmeshRenderSettings.renderNodeGrid = newRenderState;
+            }
+            ImGui::Checkbox("Render Navmesh Lines", &navmeshRenderSettings.renderLines);
+            ImGui::Checkbox("Render Navmesh Node Indices", &navmeshRenderSettings.renderNodeIndices);
+            ImGui::Checkbox("Render Navmesh Vertex Indices", &navmeshRenderSettings.renderVertexIndices);
+            ImGui::Checkbox("Render Node Grid", &navmeshRenderSettings.renderNodeGrid);
+        }
+        ImGui::End();
+    }
 
-	static void RenderOrientationCube(const Camera& camera)
-	{
-		Matrix4x4f view = camera.GetViewMatrix();
+    static void RenderOrientationCube(const Camera& camera)
+    {
+        Matrix4x4f view = camera.GetViewMatrix();
 
-		constexpr float cubeSize = 64.0f;
+        constexpr float cubeSize = 64.0f;
 
-		const ImVec2 windowPos = ImGui::GetWindowPos();
-		const ImVec2 windowSize = ImGui::GetWindowSize();
+        const ImVec2 windowPos = ImGui::GetWindowPos();
+        const ImVec2 windowSize = ImGui::GetWindowSize();
 
-		const ImVec2 cubePos = ImVec2(
-			windowPos.x + windowSize.x - cubeSize - 10.0f,
-			windowPos.y + windowSize.y - cubeSize - 10.0f
-		);
+        const ImVec2 cubePos = ImVec2(
+            windowPos.x + windowSize.x - cubeSize - 10.0f,
+            windowPos.y + windowSize.y - cubeSize - 10.0f
+        );
 
-		ImGuizmo::ViewManipulate(view.GetDataPtr(), 16, cubePos, ImVec2(cubeSize, cubeSize), 0);
-	}
+        ImGuizmo::ViewManipulate(view.GetDataPtr(), 16, cubePos, ImVec2(cubeSize, cubeSize), 0);
+    }
 
-	static void RenderPlayButton(Editor& editor, SceneManager& sceneManager)
-	{
-		ImGuiStyleManager& imguiStyleManager = editor.GetImGuiStyleManager();
-		if (ImGui::BeginMainMenuBar())
-		{
-			const float distanceFromStart = ImGui::GetWindowWidth() - ImGui::GetContentRegionAvail().x;
+    static void RenderPlayButton(Editor& editor, SceneManager& sceneManager)
+    {
+        ImGuiStyleManager& imguiStyleManager = editor.GetImGuiStyleManager();
+        if (ImGui::BeginMainMenuBar())
+        {
+            const float distanceFromStart = ImGui::GetWindowWidth() - ImGui::GetContentRegionAvail().x;
 
-			ImGui::Dummy(ImVec2(-distanceFromStart + ImGui::GetWindowWidth() * 0.5f - 38.0f, 0));
+            ImGui::Dummy(ImVec2(-distanceFromStart + ImGui::GetWindowWidth() * 0.5f - 38.0f, 0));
 
-			const bool isPlaying = sceneManager.IsPlaying();
-			const char* playIcon = isPlaying ? ICON_FA_PAUSE : ICON_FA_PLAY;
+            const bool isPlaying = sceneManager.IsPlaying();
+            const char* playIcon = isPlaying ? ICON_FA_PAUSE : ICON_FA_PLAY;
 
-			if (isPlaying)
-			{
-				imguiStyleManager.SetEditorMode(eImGuiEditorMode::Playing);
-			}
-			else
-			{
-				imguiStyleManager.SetEditorMode(eImGuiEditorMode::Default);
-			}
+            if (isPlaying)
+            {
+                imguiStyleManager.SetEditorMode(eImGuiEditorMode::Playing);
+            }
+            else
+            {
+                imguiStyleManager.SetEditorMode(eImGuiEditorMode::Default);
+            }
 
-			if (isPlaying)
-			{
-				ImGui::PushStyleColor(ImGuiCol_Button, ImColor(1.0f, 0.0f, 0.0f, 1.0f).Value);
-				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor(0.6f, 0.0f, 0.0f, 1.0f).Value);
-			}
+            if (isPlaying)
+            {
+                ImGui::PushStyleColor(ImGuiCol_Button, ImColor(1.0f, 0.0f, 0.0f, 1.0f).Value);
+                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImColor(0.6f, 0.0f, 0.0f, 1.0f).Value);
+            }
 
-			if (ImGui::Button(playIcon))
-			{
-				const bool startPlaying = !isPlaying;
+            if (ImGui::Button(playIcon))
+            {
+                const bool startPlaying = !isPlaying;
 
-				if (startPlaying)
-				{
-					sceneManager.BeginPlay();
-					editor.OnSceneBeginPlay(sceneManager.GetCurrentScene());
-				}
-				else
-				{
-					editor.OnSceneEndPlay(sceneManager.GetCurrentScene());
-					sceneManager.EndPlay();
-				}
-			}
+                if (startPlaying)
+                {
+                    sceneManager.BeginPlay();
+                    editor.OnSceneBeginPlay(sceneManager.GetCurrentScene());
+                }
+                else
+                {
+                    editor.OnSceneEndPlay(sceneManager.GetCurrentScene());
+                    sceneManager.EndPlay();
+                }
+            }
 
-			if (isPlaying)
-			{
-				ImGui::PopStyleColor(2);
-			}
+            if (isPlaying)
+            {
+                ImGui::PopStyleColor(2);
+            }
 
-			ImGui::EndMainMenuBar();
-		}
-	}
-
-
-	static void CheckForEntityCompositionDrops(ECS& ecs, AssetManager& assetManager, std::vector<EntityID>& rootEntities, EntityID& selectedEntity, EditorCommandTracker& commandTracker)
-	{
-		if (ImGui::BeginDragDropTarget())
-		{
-			if (const ImGuiPayload* data = ImGui::AcceptDragDropPayload("Asset"))
-			{
-				const std::filesystem::path path = std::filesystem::path(reinterpret_cast<const char*>(data->Data));
-				if (path.extension() == ".ecomp")
-				{
-					commandTracker.BeginComposite("Instantiate Entity Composition + Select Root");
-
-					const EntityID rootEntity = InstantiateEntityComposition(
-						ecs,
-						assetManager.GetEntityComposition(path),
-						rootEntities,
-						commandTracker
-					);
-
-					SelectEntity(rootEntity, selectedEntity, commandTracker);
-
-					commandTracker.EndComposite();
-				}
-			}
-			ImGui::EndDragDropTarget();
-		}
-	}
+            ImGui::EndMainMenuBar();
+        }
+    }
 
 
-	SceneWindowPopUp::SceneWindowPopUp(const std::string& name)
-		: PopUp(name)
-		, mHierarchyPopUp("Hierarchy")
-		, mInspectorPopUp("Inspector", &mHierarchyPopUp, &mCamera)
-	{
-		mCamera.SetRotation(Rotatorf(Degreesf(25), Degreesf(0), Degreesf(0)));
-		mCamera.SetPosition(Point3f(1, 9, -12));
-	}
+    static void CheckForEntityCompositionDrops(ECS& ecs, AssetManager& assetManager, std::vector<EntityID>& rootEntities, EntityID& selectedEntity, EditorCommandTracker& commandTracker)
+    {
+        if (ImGui::BeginDragDropTarget())
+        {
+            if (const ImGuiPayload* data = ImGui::AcceptDragDropPayload("Asset"))
+            {
+                const std::filesystem::path path = std::filesystem::path(reinterpret_cast<const char*>(data->Data));
+                if (path.extension() == ".ecomp")
+                {
+                    commandTracker.BeginComposite("Instantiate Entity Composition + Select Root");
 
-	void SceneWindowPopUp::UpdateInternal(const Blackboard& blackboard)
-	{
-		if (blackboard.Get<Key_IsPlaying>())
-		{
-			return;
-		}
+                    const EntityID rootEntity = InstantiateEntityComposition(
+                        ecs,
+                        assetManager.GetEntityComposition(path),
+                        rootEntities,
+                        commandTracker
+                    );
 
-		const WindowView windowView = blackboard.Get<Key_WindowView>();
-		const InputState& input = blackboard.Get<Key_InputState>();
-		const float deltaTime = blackboard.Get<Key_DeltaTime>();
-		OSView os = blackboard.Get<Key_OSView>();
-		EditorCommandTracker& commandTracker = blackboard.Get<Key_CommandTracker>();
-		FreeFlyCameraSettings& cameraSettings = blackboard.Get<Key_FreeFlyCameraSettings>();
-		if (IsFocused())
-		{
-			UpdateEditorCamera(mCamera, cameraSettings, deltaTime, windowView, input, os);
-		}
-		SceneManager& sceneManager = blackboard.Get<Key_SceneManager>();
+                    SelectEntity(rootEntity, selectedEntity, commandTracker);
 
-		RenderState& sceneRenderState = sceneManager.GetCurrentScene().GetRenderState();
-		const EditorSceneSettings& editorSceneSettings = blackboard.Get<Key_EditorSceneSettings>();
-		if (editorSceneSettings.showGrid)
-		{
-			const PrimitiveGrid3 grid
-			{
-				.minPos = Point3f::Zero(),
-				.gridSize = Vector3ui(500, 0, 500),
-				.cellSize = Vector3f(10, 0, 10),
-				.offset = Vector3f(250.f, 0.f, 250.f),
-			};
-			RenderGrid3(grid, Colors::Gray, sceneRenderState.GetRenderList());
-		}
-
-		if (ImGui::Begin(mImGuiName.c_str()))
-		{
-			AABB2i renderRect = GetImGuiRenderRect();
-			sceneRenderState.SetRenderRect(renderRect);
-			mCamera.SetResolution(Vector2ui(renderRect.GetExtent()));
-
-			if (input.IsKeyPressed(eInputKey::LMB))
-			{
-				const Point2i mouseScreenPos = os.GetCursorScreenPosition();
-				if (IsInsideRenderRect(mouseScreenPos, sceneRenderState.GetRenderRect().value()))
-				{
-					const Point2i mappedPos = MapToRenderRect(mouseScreenPos, sceneRenderState.GetRenderRect().value());
-
-					const uint32_t id = sceneRenderState.GetRenderContext()->GetObjectIDAt(mappedPos);
-
-					const EntityID entityID{ id };
-					if (entityID != InvalidEntityID)
-					{
-						SelectEntity(entityID, mHierarchyPopUp.GetSelectedEntityID(), commandTracker);
-					}
-				}
-			}
-		}
-		ImGui::End();
-
-		sceneRenderState.SetCamera(mCamera);
-
-	}
-
-	void SceneWindowPopUp::Render(const Blackboard& blackboard)
-	{
-		PROFILER_FUNCTION(profiler::colors::Yellow900);
-
-		SceneManager& sceneManager = blackboard.Get<Key_SceneManager>();
-		Blackboard newBlackboard = blackboard;
-		newBlackboard.Insert<Key_CurrentRenderState>(sceneManager.GetCurrentScene().GetRenderState());
-		EditorCommandTracker& commandTracker = blackboard.Get<Key_CommandTracker>();
-		const InputState& input = blackboard.Get<Key_InputState>();
-		const OSView os = blackboard.Get<Key_OSView>();
-		AssetManager& assetManager = blackboard.Get<Key_AssetManager>();
-		EditorSceneSettings& editorSceneSettings = blackboard.Get<Key_EditorSceneSettings>();
-
-		const WindowView windowView = blackboard.Get<Key_WindowView>();
-		void* sceneTextureID = sceneManager.GetCurrentScene().GetRenderState().GetRenderContext()->GetOutputSRV();
-		RenderState& sceneRenderState = sceneManager.GetCurrentScene().GetRenderState();
-		mHierarchyPopUp.Render(newBlackboard);
-		mInspectorPopUp.Render(newBlackboard);
-
-		if (input.IsKeyPressed(eInputKey::F))
-		{
-			TeleportCameraToEntity(sceneManager.GetCurrentScene().GetECS(), mHierarchyPopUp.GetSelectedEntityID(), mCamera, false);
-		}
-
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 3));
-
-		if (ImGui::Begin(mImGuiName.c_str(), &mIsActive, ImGuiWindowFlags_NoScrollbar))
-		{
+                    commandTracker.EndComposite();
+                }
+            }
+            ImGui::EndDragDropTarget();
+        }
+    }
 
 
-			RenderOrientationCube(mCamera);
+    SceneWindowPopUp::SceneWindowPopUp()
+        : mHierarchyPopUp("Hierarchy")
+        , mInspectorPopUp("Inspector", &mHierarchyPopUp, &mCamera)
+    {
+        mCamera.SetRotation(Rotatorf(Degreesf(25), Degreesf(0), Degreesf(0)));
+        mCamera.SetPosition(Point3f(1, 9, -12));
+    }
 
-			const AABB2i renderRect = RenderImage(sceneTextureID);
-			//assert(renderRect == sceneRenderState.GetRenderRect().value());
+    void SceneWindowPopUp::UpdateInternal(const Blackboard& blackboard)
+    {
+        const bool isOpen = ImGui::Begin(WindowName, nullptr, ImGuiWindowFlags_NoScrollbar);
+        const bool isFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
+        AABB2i renderRect = GetImGuiRenderRect();
+        if (renderRect.GetExtent().x == 0 || renderRect.GetExtent().y == 0)
+        {
+            renderRect = AABB2i::FromDefaultAndExtent(Vector2i(100, 100));
+        }
+        ImGui::End();
 
-			CheckForEntityCompositionDrops(
-				sceneManager.GetCurrentScene().GetECS(),
-				assetManager,
-				mHierarchyPopUp.GetRootEntities(),
-				mHierarchyPopUp.GetSelectedEntityID(),
-				commandTracker
-			);
+        if (blackboard.Get<Key_IsPlaying>())
+        {
+            return;
+        }
 
-			mTransformEntityTool.ShowEntityImGuizmo(
-				sceneManager.GetCurrentScene().GetECS(),
-				mHierarchyPopUp.GetSelectedEntityID(),
-				editorSceneSettings.transformMode,
-				sceneRenderState.GetRenderRect().value(),
-				editorSceneSettings.useSnap,
-				editorSceneSettings.snapValue,
-				mCamera,
-				input,
-				os,
-				commandTracker
-			);
+        const WindowView windowView = blackboard.Get<Key_WindowView>();
+        const InputState& input = blackboard.Get<Key_InputState>();
+        const float deltaTime = blackboard.Get<Key_DeltaTime>();
+        OSView os = blackboard.Get<Key_OSView>();
+        EditorCommandTracker& commandTracker = blackboard.Get<Key_CommandTracker>();
+        FreeFlyCameraSettings& cameraSettings = blackboard.Get<Key_FreeFlyCameraSettings>();
+        
+        SceneManager& sceneManager = blackboard.Get<Key_SceneManager>();
 
-			ImGui::PopStyleVar();
-			ImGui::PopStyleVar();
-			ShowSceneSettingsPopUp(editorSceneSettings);
-
-			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 3));
-		}
-
-		ImGui::End();
-		ImGui::PopStyleVar();
-		ImGui::PopStyleVar();
-
-		if (ImGui::Begin("Deferred Render Targets"))
-		{
-
-			// Actual size of render target
-			ImVec2 size = ToImVec2(sceneRenderState.GetRenderRect()->GetExtent());
-			const ImVec2 available = ImGui::GetContentRegionAvail();
-			constexpr int columns = 3;
-			float m = (available.x / columns) / size.x;
-			size *= m;
-			auto srvs = sceneRenderState.GetRenderContext()->GetGBufferSRVs();
-
-			assert(srvs.size() == 5);
-
-			constexpr const char* srvNames[5] = { "Albedo", "Normal", "Material", "Position", "ObjectID" };
-
-			ImGui::Columns(columns);
-			for (std::size_t i = 0; i < srvs.size(); i++)
-			{
-				ImGui::Text("RT: %s", srvNames[i]);
-				ImGui::Image(srvs[i], size);
-				ImGui::NextColumn();
-			}
-
-			ImGui::Columns(1);
-
-		}
-
-		ImGui::End();
+        RenderState& sceneRenderState = sceneManager.GetCurrentScene().GetRenderState();
+        const EditorSceneSettings& editorSceneSettings = blackboard.Get<Key_EditorSceneSettings>();
 
 
-		if (ImGui::Begin(mImGuiName.c_str(), &mIsActive, ImGuiWindowFlags_NoScrollbar))
-		{
-			RenderPlayButton(blackboard.Get<Key_Editor>(), sceneManager);
-		}
+        if (isOpen)
+        {
+            if (isFocused)
+            {
+                UpdateEditorCamera(mCamera, cameraSettings, deltaTime, windowView, input, os);
+            }
 
-		ImGui::End();
+            if (editorSceneSettings.showGrid)
+            {
+                const PrimitiveGrid3 grid
+                {
+                    .minPos = Point3f::Zero(),
+                    .gridSize = Vector3ui(500, 0, 500),
+                    .cellSize = Vector3f(10, 0, 10),
+                    .offset = Vector3f(250.f, 0.f, 250.f),
+                };
+                RenderGrid3(grid, Colors::Gray, sceneRenderState.GetRenderList());
+            }
 
-		ShowSceneData(sceneManager);
-	}
 
-	void SceneWindowPopUp::OnSceneLoaded(Scene& scene)
-	{
-		mHierarchyPopUp.OnSceneLoaded(scene);
-	}
+            sceneRenderState.SetRenderRect(renderRect);
+            mCamera.SetResolution(Vector2ui(renderRect.GetExtent()));
 
-	void SceneWindowPopUp::OnSceneBeginPlay(Scene& scene)
-	{
-		mHierarchyPopUp.OnSceneBeginPlay(scene);
-	}
+            if (input.IsKeyPressed(eInputKey::LMB))
+            {
+                const Point2i mouseScreenPos = os.GetCursorScreenPosition();
+                if (IsInsideRenderRect(mouseScreenPos, sceneRenderState.GetRenderRect().value()))
+                {
+                    const Point2i mappedPos = MapToRenderRect(mouseScreenPos, sceneRenderState.GetRenderRect().value());
 
-	void SceneWindowPopUp::OnSceneEndPlay(Scene& scene)
-	{
-		mHierarchyPopUp.OnSceneEndPlay(scene);
-	}
+                    const uint32_t id = sceneRenderState.GetRenderContext()->GetObjectIDAt(mappedPos);
+
+                    const EntityID entityID{ id };
+                    if (entityID != InvalidEntityID)
+                    {
+                        SelectEntity(entityID, mHierarchyPopUp.GetSelectedEntityID(), commandTracker);
+                    }
+                }
+            }
+
+            if (input.IsKeyPressed(eInputKey::F))
+            {
+                TeleportCameraToEntity(sceneManager.GetCurrentScene().GetECS(), mHierarchyPopUp.GetSelectedEntityID(), mCamera, false);
+            }
+
+        }
+
+        sceneRenderState.SetCamera(mCamera);
+    }
+
+    void SceneWindowPopUp::Render(const Blackboard& blackboard)
+    {
+        PROFILER_FUNCTION(profiler::colors::Yellow900);
+
+        SceneManager& sceneManager = blackboard.Get<Key_SceneManager>();
+        Blackboard newBlackboard = blackboard;
+        newBlackboard.Insert<Key_CurrentRenderState>(sceneManager.GetCurrentScene().GetRenderState());
+        EditorCommandTracker& commandTracker = blackboard.Get<Key_CommandTracker>();
+        const InputState& input = blackboard.Get<Key_InputState>();
+        const OSView os = blackboard.Get<Key_OSView>();
+        AssetManager& assetManager = blackboard.Get<Key_AssetManager>();
+        EditorSceneSettings& editorSceneSettings = blackboard.Get<Key_EditorSceneSettings>();
+
+        const WindowView windowView = blackboard.Get<Key_WindowView>();
+        void* sceneTextureID = sceneManager.GetCurrentScene().GetRenderState().GetRenderContext()->GetOutputSRV();
+        RenderState& sceneRenderState = sceneManager.GetCurrentScene().GetRenderState();
+        mHierarchyPopUp.Render(newBlackboard);
+        mInspectorPopUp.Render(newBlackboard);
+
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 3));
+
+        if (ImGui::Begin(WindowName, nullptr, ImGuiWindowFlags_NoScrollbar))
+        {
+
+
+            RenderOrientationCube(mCamera);
+
+            const AABB2i renderRect = RenderImage(sceneTextureID);
+            //assert(renderRect == sceneRenderState.GetRenderRect().value());
+
+            CheckForEntityCompositionDrops(
+                sceneManager.GetCurrentScene().GetECS(),
+                assetManager,
+                mHierarchyPopUp.GetRootEntities(),
+                mHierarchyPopUp.GetSelectedEntityID(),
+                commandTracker
+            );
+
+            mTransformEntityTool.ShowEntityImGuizmo(
+                sceneManager.GetCurrentScene().GetECS(),
+                mHierarchyPopUp.GetSelectedEntityID(),
+                editorSceneSettings.transformMode,
+                sceneRenderState.GetRenderRect().value(),
+                editorSceneSettings.useSnap,
+                editorSceneSettings.snapValue,
+                mCamera,
+                input,
+                os,
+                commandTracker
+            );
+
+            ImGui::PopStyleVar();
+            ImGui::PopStyleVar();
+            ShowSceneSettingsPopUp(editorSceneSettings);
+
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+            ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 3));
+        }
+
+        ImGui::End();
+        ImGui::PopStyleVar();
+        ImGui::PopStyleVar();
+
+        if (ImGui::Begin("Deferred Render Targets"))
+        {
+
+            // Actual size of render target
+            ImVec2 size = ToImVec2(sceneRenderState.GetRenderRect()->GetExtent());
+            const ImVec2 available = ImGui::GetContentRegionAvail();
+            constexpr int columns = 3;
+            float m = (available.x / columns) / size.x;
+            size *= m;
+            auto srvs = sceneRenderState.GetRenderContext()->GetGBufferSRVs();
+
+            assert(srvs.size() == 5);
+
+            constexpr const char* srvNames[5] = { "Albedo", "Normal", "Material", "Position", "ObjectID" };
+
+            ImGui::Columns(columns);
+            for (std::size_t i = 0; i < srvs.size(); i++)
+            {
+                ImGui::Text("RT: %s", srvNames[i]);
+                ImGui::Image(srvs[i], size);
+                ImGui::NextColumn();
+            }
+
+            ImGui::Columns(1);
+
+        }
+
+        ImGui::End();
+
+
+        if (ImGui::Begin("Scene", nullptr, ImGuiWindowFlags_NoScrollbar))
+        {
+            RenderPlayButton(blackboard.Get<Key_Editor>(), sceneManager);
+        }
+
+        ImGui::End();
+
+        ShowSceneData(sceneManager);
+    }
+
+    void SceneWindowPopUp::OnSceneLoaded(Scene& scene)
+    {
+        mHierarchyPopUp.OnSceneLoaded(scene);
+    }
+
+    void SceneWindowPopUp::OnSceneBeginPlay(Scene& scene)
+    {
+        mHierarchyPopUp.OnSceneBeginPlay(scene);
+    }
+
+    void SceneWindowPopUp::OnSceneEndPlay(Scene& scene)
+    {
+        mHierarchyPopUp.OnSceneEndPlay(scene);
+    }
 }

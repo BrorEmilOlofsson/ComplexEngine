@@ -112,11 +112,11 @@ namespace Simple
 			{
 				if (it != end(mMap))
 				{
-					return std::make_optional(caster(it->second));
+					return std::make_optional(std::any_cast<Type>(it->second));
 				}
 				else
 				{
-					return std::nullopt;
+					return std::optional<Type>(std::nullopt);
 				}
 			}
 		}

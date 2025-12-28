@@ -10,14 +10,14 @@
 
 namespace Simple
 {
-	class EntityCompositionPopUp final : public PopUp
+	class EntityCompositionPopUp final
 	{
 	public:
 
-		explicit EntityCompositionPopUp(const std::string& name, RenderContext&& renderContext);
+		explicit EntityCompositionPopUp(RenderContext&& renderContext);
 
-		void UpdateInternal(const Blackboard& blackboard) override;
-		void Render(const Blackboard& blackboard) override;
+		void Update(const Blackboard& blackboard);
+		void Render(const Blackboard& blackboard);
 
 		EntityCompositionAssetHandle GetCompositionAsset()
 		{
@@ -36,5 +36,7 @@ namespace Simple
 		Camera mCamera;
 		RenderState mRenderState;
 		TransformEntityTool mTransformEntityTool;
+		bool mIsOpen = false;
+		static constexpr const char* PopUpName = "Entity Composition Viewer";
 	};
 }

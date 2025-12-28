@@ -1,4 +1,7 @@
 #pragma once
+#include <vector>
+#include <memory>
+
 #include "Editor/Core/PopUp.hpp"
 #include "Editor/Core/Base/MenuItemTabBase.hpp"
 #include "Editor/Command/Core/EditorCommandTracker.hpp"
@@ -7,8 +10,10 @@
 #include "Editor/ImGui/ImGuiStyleManager.hpp"
 #include "Editor/EditorSceneSettings.hpp"
 #include "Editor/EditorWindows/GraphicsSettingsWindow.hpp"
-#include <vector>
-#include <memory>
+#include "Editor/FlyScript/NodeScriptingWindow.hpp"
+#include "Editor/PopUps/Editor/SceneWindowPopUp.hpp"
+#include "Editor/PopUps/Editor/AssetBrowserPopUp.hpp"
+#include "Editor/PopUps/Editor/EntityCompositionPopUp.hpp"
 
 namespace Simple
 {
@@ -38,9 +43,12 @@ namespace Simple
 		ImGuiStyleManager mImGuiStyleManager;
 		FreeFlyCameraSettings mFreeFlyCameraSettings;
 		EditorSceneSettings mEditorSceneSettings;
-		EntityCompositionPopUp* mEntityCompositionPopUp = nullptr;
         bool mIsCameraSettingsPopUpActive = false;
         bool mIsGraphicsSettingsPopUpActive = false;
         GraphicsSettingsData mGraphicsSettingsData = { };
+		NodeScriptingWindow mNodeScriptingWindow;
+		SceneWindowPopUp mSceneWindow;
+		AssetBrowserPopUp mAssetBrowserWindow;
+        std::unique_ptr<EntityCompositionPopUp> mEntityCompositionWindow;
 	};
 }

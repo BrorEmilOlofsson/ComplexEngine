@@ -11,4 +11,5 @@ namespace Simple
 	using Key_FreeFlyCameraSettings = BlackboardKey<struct FreeFlyCameraSettings&, "FreeFlyCameraSettings">;
 	using Key_EditorSceneSettings = BlackboardKey<struct EditorSceneSettings&, "EditorSceneSettings">;
 	using Key_EntityCompositionPopUp = BlackboardKey<class EntityCompositionPopUp&, "EntityComposition">;
+    using Key_NodeScriptingWindow = BlackboardKey<class NodeScriptingWindow&, "NodeScriptingWindow">;
 }

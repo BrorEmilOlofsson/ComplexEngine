@@ -380,11 +380,8 @@ namespace Simple
 		ImGui::End();
 	}
 
-	AssetBrowserPopUp::AssetBrowserPopUp(const std::string& name, NodeScriptingWindow* nodeScriptWindow, MenuTabWindow* nodeScriptParentTab, MenuItemPopUp* nodeScriptButton)
-		: PopUp(name)
-		, mNodeScriptingWindow(nodeScriptWindow)
-		, mNodeScriptParentTab(nodeScriptParentTab)
-		, mNodeScriptButton(nodeScriptButton)
+	AssetBrowserPopUp::AssetBrowserPopUp()
+		: PopUp("Asset Browser")
 		, mCanOpenPopup(false)
 	{
 	}
@@ -395,12 +392,13 @@ namespace Simple
 		AssetManager& assetManager = blackboard.Get<Key_AssetManager>();
 		DataTypeRegistry& dataTypeRegistry = blackboard.Get<Key_DataTypeRegistry>();
 		EntityCompositionPopUp& entityCompositionPopUp = blackboard.Get<Key_EntityCompositionPopUp>();
+        NodeScriptingWindow& nodeScriptingWindow = blackboard.Get<Key_NodeScriptingWindow>();
 		const DrawFilesInFolderData data
 		{
 			sceneManager,
 			assetManager,
 			dataTypeRegistry,
-			*mNodeScriptingWindow,
+			nodeScriptingWindow,
 			*mNodeScriptParentTab,
 			*mNodeScriptButton,
 			entityCompositionPopUp,

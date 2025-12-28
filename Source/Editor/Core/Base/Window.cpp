@@ -6,7 +6,7 @@ namespace Simple
 {
 	Window::Window(const std::string& name, const std::string& tag)
 		: mName(name)
-		, mIsActive(true)
+		//, mIsActive(true)
 		, mIsFocus(false)
 	{
 		mImGuiTag = "##" + Simple::ConvertTypeIndexNameToPrettyName(tag);

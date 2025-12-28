@@ -13,8 +13,8 @@
 namespace Simple
 {
 
-	NodeScriptingWindow::NodeScriptingWindow(const std::string& name)
-		: PopUp(name)
+	NodeScriptingWindow::NodeScriptingWindow()
+		: PopUp("Node Scripting")
 		, mClassWindow(*this)
 		, mCustomEventWindow(*this)
 		, mFunctionSettingsWindow(*this)
@@ -127,7 +127,7 @@ namespace Simple
 	{
 		PROFILER_FUNCTION(profiler::colors::Amber600);
 
-		if (ImGui::Begin("TestEditorWindow"))
+		/*if (ImGui::Begin("TestEditorWindow"))
 		{
 
 			ax::NodeEditor::Begin("TestEditor");
@@ -144,7 +144,7 @@ namespace Simple
 			ax::NodeEditor::EndNode();
 			ax::NodeEditor::End();
 		}
-		ImGui::End();
+		ImGui::End();*/
 
 		ImGuiBegin b("Node Scripting");
 

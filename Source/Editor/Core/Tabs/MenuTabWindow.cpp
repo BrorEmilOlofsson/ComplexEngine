@@ -25,19 +25,6 @@ namespace Simple
 					if (ImGui::MenuItem(currentButton->GetName().c_str(), nullptr, &currentButton->GetIsActiveRef()))
 					{
 						currentButton->Invoke();
-
-						for (size_t i = 0; i < mButtons.size(); ++i)
-						{
-							if (i != currentButtonIndex)
-							{
-								auto& otherButton = mButtons[i];
-
-								otherButton->SetIsActive(false);
-								otherButton->Invoke();
-							}
-						}
-
-						break;
 					}
 				}
 

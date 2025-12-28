@@ -291,6 +291,10 @@ namespace Simple
 
 	constexpr void Camera::SetResolution(const Vector2ui& resolution)
 	{
+		if (resolution.x == 0 || resolution.y == 0)
+		{
+            ASSERT(false && "Resolution components must be non-zero.");
+		}
 		if (mCameraType == eCameraType::Perspective)
 		{
 			UpdateProjection(resolution);
