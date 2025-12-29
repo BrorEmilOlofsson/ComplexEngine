@@ -78,12 +78,9 @@ namespace Simple
 		MessageBoxA(handle, exception.what(), "Standard Exception", MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND);
 	}
 
-	Win_Window::Win_Window(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, std::shared_ptr<AssetManager> assetManager,
-		std::shared_ptr<GraphicsSettings> graphicsSettings, std::weak_ptr<DX11DepthStencilViewManager> dsvManager, std::weak_ptr<DX11SamplerState> samplerState,
-		const Vector2ui& windowSize, const std::wstring& name, const Win_WindowClass& windowClass, void* operatingSystem, bool instantiateImGui)
+	Win_Window::Win_Window(const Vector2ui& windowSize, const std::wstring& name, const Win_WindowClass& windowClass, void* operatingSystem)
 		: mHandle(CreateWindowImpl(GetAdjustedWindowRect(GetDefaultClientRect(windowSize), DEFAULT_WINDOW_STYLE),
 			windowClass.GetInstance(), name, std::wstring(windowClass.GetName()), DEFAULT_WINDOW_STYLE, operatingSystem))
-		, mGraphicsWindow(device, context, this, assetManager, graphicsSettings, dsvManager, samplerState, instantiateImGui)
 	{
 		RegisterMouse(mHandle);
 
@@ -188,17 +185,20 @@ namespace Simple
 
 		if (mFrameBuffer.hasResized)
 		{
-			mGraphicsWindow.OnWindowResize();
+			mGraphicsWindowView->OnResize();
+			//mGraphicsWindow.OnWindowResize();
 		}
 
-		mGraphicsWindow.BeginFrame();
+		mGraphicsWindowView->BeginFrame();
+		//mGraphicsWindow.BeginFrame();
 	}
 
 	void Win_Window::EndFrame(RenderContext* renderContext)
 	{
 		try
 		{
-			mGraphicsWindow.EndFrame(renderContext);
+			mGraphicsWindowView->EndFrame(renderContext);
+			//mGraphicsWindow.EndFrame(renderContext);
 		}
 		catch (const WinException& exception)
 		{

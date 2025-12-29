@@ -47,9 +47,10 @@ static void ResolveCollision(Simple::Physics::PhysicsObject& aPhysicsObject1, Si
 {
 	Simple::Physics::PhysicsObjectData data1 = { aPhysicsObject1.GetVelocity(), aPhysicsObject1.GetMass(), aPhysicsObject1.GetType() };
 	Simple::Physics::PhysicsObjectData data2 = { aPhysicsObject2.GetVelocity(), aPhysicsObject2.GetMass(), aPhysicsObject2.GetType() };
+	data1;
+	data2;
 
-
-	const bool didCollide = std::visit(
+	/*const bool didCollide = std::visit(
 		[&data1, &data2](auto& shape1, auto& shape2)
 		{
 			if (!DetectCollision(shape1, shape2))
@@ -68,7 +69,7 @@ static void ResolveCollision(Simple::Physics::PhysicsObject& aPhysicsObject1, Si
 		aPhysicsObject2.SetVelocity(data2.myVelocity);
 		aPhysicsObject1.SetCurve(0);
 		aPhysicsObject2.SetCurve(0);
-	}
+	}*/
 
 }
 

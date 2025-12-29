@@ -1,4 +1,5 @@
 #pragma once
+#include "Graphics/DX11/DX11Window.hpp"
 #include "Utility/Asset/AssetLoader.hpp"
 #include "Utility/Asset/AssetManager.hpp"
 #include "Graphics/DX11/RenderTarget/DX11RenderTargetManager.hpp"
@@ -10,6 +11,8 @@
 #include "Utility/SystemTimer.hpp"
 #include "Utility/GraphicsBufferData.hpp"
 #include "Graphics/GraphicsSettings.hpp"
+#include "Engine/OperatingSystem/WindowView.hpp"
+#include "Graphics/GraphicsWindowView.hpp"
 
 #ifdef _WIN32
 
@@ -19,89 +22,108 @@
 namespace Simple
 {
 
-	class DX11Foundation final
-	{
-	public:
+    class DX11Foundation final
+    {
+    public:
 
-		DX11Foundation();
+        DX11Foundation();
 
-		DX11Foundation(const DX11Foundation&) = delete;
-		DX11Foundation& operator=(const DX11Foundation&) = delete;
+        DX11Foundation(const DX11Foundation&) = delete;
+        DX11Foundation& operator=(const DX11Foundation&) = delete;
 
-		DX11Foundation(DX11Foundation&&) = default;
-		DX11Foundation& operator=(DX11Foundation&&) = default;
+        DX11Foundation(DX11Foundation&&) = default;
+        DX11Foundation& operator=(DX11Foundation&&) = default;
 
-		Microsoft::WRL::ComPtr<ID3D11Device> GetDevice()
-		{
-			return mDeviceAndContext.first;
-		}
+        Microsoft::WRL::ComPtr<ID3D11Device> GetDevice()
+        {
+            return mDeviceAndContext.first;
+        }
 
-		Microsoft::WRL::ComPtr<ID3D11DeviceContext> GetContext()
-		{
-			return mDeviceAndContext.second;
-		}
+        Microsoft::WRL::ComPtr<ID3D11DeviceContext> GetContext()
+        {
+            return mDeviceAndContext.second;
+        }
 
-		void BeginFrame(const GraphicsBufferData& bufferData);
-		void EndFrame();
-		void Init();
-		void Shutdown();
+        void BeginFrame(const GraphicsBufferData& bufferData);
+        void EndFrame();
+        void Init();
+        void Shutdown();
 
-		void Render(RenderState& renderState);
+        void Render(RenderState& renderState);
 
-		[[nodiscard]] void SetAssetLoaders(AssetLoader& assetLoader) const;
+        GraphicsWindowView MakeWindow(WindowView windowView)
+        {
+            const uint32_t windowID = mCurrentWindowID++;
+            mWindows.emplace(windowID, DX11Window(
+                GetDevice(),
+                GetContext(),
+                windowView,
+                mAssetManager,
+                mGraphicsSettings,
+                mDepthStencilViewManager,
+                mSamplerState,
+                mWindows.empty() // instantiate ImGui only for the first window
+            ));
+            DX11Window& window = mWindows.at(windowID);
+            return GraphicsWindowView(window);
+        }
 
-		[[nodiscard]] std::function<void(AssetManager&)> GetDefaultAssetLoader();
+        [[nodiscard]] void SetAssetLoaders(AssetLoader& assetLoader) const;
 
-		void SetAssetManager(std::shared_ptr<AssetManager> assetManager)
-		{
-			mAssetManager = std::move(assetManager);
-			SetAssetLoaders(mAssetManager->GetAssetLoader());
-			mAssetManager->SetDefaultLoader(GetDefaultAssetLoader());
-		}
+        [[nodiscard]] std::function<void(AssetManager&)> GetDefaultAssetLoader();
 
-		void SetGraphicsSettings(std::shared_ptr<GraphicsSettings> graphicsSettings)
-		{
-			mGraphicsSettings = std::move(graphicsSettings);
-		}
+        void SetAssetManager(std::shared_ptr<AssetManager> assetManager)
+        {
+            mAssetManager = std::move(assetManager);
+            SetAssetLoaders(mAssetManager->GetAssetLoader());
+            mAssetManager->SetDefaultLoader(GetDefaultAssetLoader());
+        }
 
-		RenderTargetView CreateRenderTarget(const Vector2ui& size)
-		{
-			return mRenderTargetManager.Create(size);
-		}
+        void SetGraphicsSettings(std::shared_ptr<GraphicsSettings> graphicsSettings)
+        {
+            mGraphicsSettings = std::move(graphicsSettings);
+        }
 
-		DepthStencilViewHandle CreateDepthStencilView(const Vector2ui& size)
-		{
-			return mDepthStencilViewManager->Create(size);
-		}
+        RenderTargetView CreateRenderTarget(const Vector2ui& size)
+        {
+            return mRenderTargetManager.Create(size);
+        }
 
-		[[nodiscard]] RenderContext CreateRenderContext(const Vector2ui& size);
+        DepthStencilViewHandle CreateDepthStencilView(const Vector2ui& size)
+        {
+            return mDepthStencilViewManager->Create(size);
+        }
 
-		[[nodiscard]] std::shared_ptr<DX11DepthStencilViewManager> GetDepthStencilViewManager()
-		{
-			return mDepthStencilViewManager;
-		}
+        [[nodiscard]] RenderContext CreateRenderContext(const Vector2ui& size);
 
-		[[nodiscard]] std::shared_ptr<DX11SamplerState> GetSamplerState()
-		{
-			return mSamplerState;
-		}
+        [[nodiscard]] std::shared_ptr<DX11DepthStencilViewManager> GetDepthStencilViewManager()
+        {
+            return mDepthStencilViewManager;
+        }
 
-	private:
+        [[nodiscard]] std::shared_ptr<DX11SamplerState> GetSamplerState()
+        {
+            return mSamplerState;
+        }
 
-		std::pair<Microsoft::WRL::ComPtr<ID3D11Device>, Microsoft::WRL::ComPtr<ID3D11DeviceContext>> mDeviceAndContext;
+    private:
 
-		DX11ImGuiFoundation mImGui;
-		DX11ConstantBufferManager mConstantBufferManager;
-		DX11Renderer mRenderer;
-		DX11RenderTargetManager mRenderTargetManager;
-		std::shared_ptr<DX11DepthStencilViewManager> mDepthStencilViewManager;
-		std::shared_ptr<DX11SamplerState> mSamplerState;
-		std::shared_ptr<AssetManager> mAssetManager;
-		std::shared_ptr<GraphicsSettings> mGraphicsSettings;
+        std::pair<Microsoft::WRL::ComPtr<ID3D11Device>, Microsoft::WRL::ComPtr<ID3D11DeviceContext>> mDeviceAndContext;
 
-		SystemTimerf mFrameTimer;
-		SystemTimerd mTotalTimer;
-	};
+        DX11ImGuiFoundation mImGui;
+        DX11ConstantBufferManager mConstantBufferManager;
+        DX11Renderer mRenderer;
+        DX11RenderTargetManager mRenderTargetManager;
+        std::shared_ptr<DX11DepthStencilViewManager> mDepthStencilViewManager;
+        std::shared_ptr<DX11SamplerState> mSamplerState;
+        std::shared_ptr<AssetManager> mAssetManager;
+        std::shared_ptr<GraphicsSettings> mGraphicsSettings;
+        std::unordered_map<uint32_t, DX11Window> mWindows;
+        uint32_t mCurrentWindowID = 0;
+
+        SystemTimerf mFrameTimer;
+        SystemTimerd mTotalTimer;
+    };
 }
 
 #endif

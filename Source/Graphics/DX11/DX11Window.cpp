@@ -22,22 +22,6 @@
 namespace Simple
 {
 
-	void LoadSettingsFromJson(bool& vSync)
-	{
-		const std::filesystem::path filename = std::filesystem::absolute(SIMPLE_SETTINGS_GAME);
-
-		std::ifstream file(filename);
-		if (!file.is_open())
-		{
-			return;
-		}
-
-		const nlohmann::json json = nlohmann::json::parse(file);
-		file.close();
-
-		vSync = json["Game_Settings"]["VSync"];
-	}
-
 	std::optional<DX11ImGuiWindow> CreateImGuiWindow(const bool instantiate, HWND handle)
 	{
 		if (instantiate)
@@ -49,16 +33,16 @@ namespace Simple
 	}
 
 	DX11Window::DX11Window(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context,
-		Win_Window* window, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<GraphicsSettings> graphicsSettings,
+		WindowView windowView, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<GraphicsSettings> graphicsSettings,
 		std::weak_ptr<DX11DepthStencilViewManager> dsvManager, std::weak_ptr<DX11SamplerState> samplerState, bool instantiateImGui)
 		: mDevice(device)
 		, mContext(context)
-		, mSwapChain(DX11Factory::CreateSwapChain(window->GetHandle(), window->GetClientSize(), device))
-		, mWindow(window)
+		, mSwapChain(DX11Factory::CreateSwapChain(static_cast<HWND>(windowView.GetHandle()), windowView.GetClientSize(), device))
+		, mWindowView(std::move(windowView))
 		, mAssetManager(assetManager)
 		, mGraphicsSettings(graphicsSettings)
-		, mBackBuffer(context, device, *DX11Factory::GetBackBuffer(*mSwapChain.Get()).Get(), window->GetClientSize(), false)
-		, mImGuiWindow(CreateImGuiWindow(instantiateImGui, window->GetHandle()))
+		, mBackBuffer(context, device, *DX11Factory::GetBackBuffer(*mSwapChain.Get()).Get(), windowView.GetClientSize(), false)
+		, mImGuiWindow(CreateImGuiWindow(instantiateImGui, static_cast<HWND>(windowView.GetHandle())))
 		, mDepthStencilViewManager(dsvManager)
 		, mSamplerState(std::move(samplerState))
 	{
@@ -66,10 +50,8 @@ namespace Simple
 
 	void DX11Window::Init()
 	{
-		LoadSettingsFromJson(mGraphicsSettings.lock()->vSync);
-
 		{
-			const Vector2ui windowSize = mWindow->GetClientSize();
+			const Vector2ui windowSize = mWindowView.GetClientSize();
 
 			const D3D11_VIEWPORT viewport = DX11Factory::CreateViewport(windowSize);
 
@@ -78,7 +60,7 @@ namespace Simple
 			mRasterizerState = DX11Factory::CreateRasterizerState_BackfaceCulling(*mDevice.Get());
 		}
 
-		mDepthStencilViewHandle = mDepthStencilViewManager.lock()->Create(mWindow->GetClientSize());
+		mDepthStencilViewHandle = mDepthStencilViewManager.lock()->Create(mWindowView.GetClientSize());
 
 		mContext->RSSetState(mRasterizerState.Get());
 	}
@@ -117,9 +99,9 @@ namespace Simple
 	{
 	}
 
-	void DX11Window::OnWindowResize()
+	void DX11Window::OnResize()
 	{
-		const Vector2ui windowSize = mWindow->GetClientSize();
+		const Vector2ui windowSize = mWindowView.GetClientSize();
 
 		if (windowSize.x == 0 || windowSize.y == 0)
 		{
@@ -147,7 +129,7 @@ namespace Simple
 	{
 		mBackBuffer.Set(mDepthStencilViewManager.lock()->Get(mDepthStencilViewHandle).Get());
 
-		auto viewport = DX11Factory::CreateViewport(mWindow->GetClientSize());
+		auto viewport = DX11Factory::CreateViewport(mWindowView.GetClientSize());
 
 		mContext->RSSetViewports(1, &viewport);
 	}

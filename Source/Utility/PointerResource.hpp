@@ -49,6 +49,7 @@ namespace Simple
 		}
 
 	private:
+
 		[[no_unique_address]] Allocator mAllocator = Allocator{};
 		[[no_unique_address]] Deallocator mDeallocator = Deallocator{};
 		ResourceType mResource = ResourceType{};

@@ -33,17 +33,17 @@ namespace Simple
 	Win_OperatingSystem::Win_OperatingSystem(HINSTANCE instanceHandle, std::wstring className)
 		: mInstanceHandle(instanceHandle)
 		, mWindowClass(std::make_unique<Win_WindowClass>(instanceHandle, className, HandleMsgSetup))
-        , mGraphicsFoundationNew(mGraphicsFoundation)
+        , mGraphicsFoundationNew(DX11Foundation())
 	{
 	}
 
 	Win_OperatingSystem::Win_OperatingSystem(Win_OperatingSystem&& other)
 		: mInstanceHandle(std::move(other.mInstanceHandle))
 		, mWindowClass(std::move(other.mWindowClass))
+        , mGraphicsFoundationNew(std::move(other.mGraphicsFoundationNew))
+		//, mGraphicsFoundation(std::move(other.mGraphicsFoundation))
 		, mWindows(std::move(other.mWindows))
 		, mStyle(std::move(other.mStyle))
-		, mGraphicsFoundation(std::move(other.mGraphicsFoundation))
-        , mGraphicsFoundationNew(std::move(other.mGraphicsFoundationNew))
 		, mAssetManager(std::move(other.mAssetManager))
 		, mGraphicsSettings(std::move(other.mGraphicsSettings))
 	{
@@ -56,28 +56,33 @@ namespace Simple
 	void Win_OperatingSystem::SetAssetManager(std::shared_ptr<AssetManager> assetManager)
 	{
 		mAssetManager = std::move(assetManager);
-		mGraphicsFoundation.SetAssetManager(mAssetManager);
+		mGraphicsFoundationNew.SetAssetManager(mAssetManager);
+		//mGraphicsFoundation.SetAssetManager(mAssetManager);
 	}
 
 	void Win_OperatingSystem::SetGraphicsSettings(std::shared_ptr<GraphicsSettings> graphicsSettings)
 	{
 		mGraphicsSettings = graphicsSettings;
-		mGraphicsFoundation.SetGraphicsSettings(graphicsSettings);
+		mGraphicsFoundationNew.SetGraphicsSettings(graphicsSettings);
+		//mGraphicsFoundation.SetGraphicsSettings(graphicsSettings);
 	}
 
 	void Win_OperatingSystem::Init()
 	{
-		mGraphicsFoundation.Init();
+		mGraphicsFoundationNew.Init();
+		//mGraphicsFoundation.Init();
 	}
 
 	void Win_OperatingSystem::Shutdown()
 	{
-		mGraphicsFoundation.Shutdown();
+		mGraphicsFoundationNew.Shutdown();
+		//mGraphicsFoundation.Shutdown();
 	}
 
 	void Win_OperatingSystem::BeginFrame(const GraphicsBufferData& data)
 	{
-		mGraphicsFoundation.BeginFrame(data);
+		mGraphicsFoundationNew.BeginFrame(data);
+		//mGraphicsFoundation.BeginFrame(data);
 		for (auto& window : mWindows)
 		{
 			window->BeginFrame();
@@ -90,7 +95,8 @@ namespace Simple
 		{
 			window->GetGraphicsWindow().BindBackBuffer();
 		}
-		mGraphicsFoundation.EndFrame();
+		mGraphicsFoundationNew.EndFrame();
+		//mGraphicsFoundation.EndFrame();
 		for (auto& window : mWindows)
 		{
 			window->EndFrame(renderContext);
@@ -104,33 +110,38 @@ namespace Simple
 
 	void Win_OperatingSystem::Render(RenderState& renderState)
 	{
-		mGraphicsFoundation.Render(renderState);
+		mGraphicsFoundationNew.Render(renderState);
+		//mGraphicsFoundation.Render(renderState);
 	}
 
-	unsigned int Win_OperatingSystem::MakeWindow(Vector2ui size, std::wstring title)
+	uint32_t Win_OperatingSystem::MakeWindow(Vector2ui size, std::wstring title)
 	{
 		try
 		{
+
+
 			auto window = std::make_unique<Win_Window>(
-				mGraphicsFoundation.GetDevice(),
+				/*mGraphicsFoundation.GetDevice(),
 				mGraphicsFoundation.GetContext(),
 				mAssetManager,
 				mGraphicsSettings,
 				mGraphicsFoundation.GetDepthStencilViewManager(),
-				mGraphicsFoundation.GetSamplerState(),
+				mGraphicsFoundation.GetSamplerState(),*/
 				size,
 				title,
 				*mWindowClass,
-				this,
-				mWindows.empty()
+				this//,
+				//mWindows.empty()
 			);
+			GraphicsWindowView windowView = mGraphicsFoundationNew.MakeWindow(WindowView(*window));
+			window->SetGraphicsWindowView(windowView);
 			SetWindowLongPtr(window->GetHandle(), GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 
 
 			window->GetGraphicsWindow().Init();
 
 			mWindows.push_back(std::move(window));
-			return static_cast<unsigned int>(mWindows.size() - 1);
+			return static_cast<uint32_t>(mWindows.size() - 1);
 		}
 		catch (const WinException& exception)
 		{
@@ -140,7 +151,7 @@ namespace Simple
 			}
 		}
 
-		return std::numeric_limits<unsigned int>::max();
+		return std::numeric_limits<uint32_t>::max();
 	}
 
 	LRESULT Win_OperatingSystem::HandleMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)

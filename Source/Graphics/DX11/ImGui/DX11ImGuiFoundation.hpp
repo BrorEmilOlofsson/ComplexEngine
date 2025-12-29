@@ -1,6 +1,7 @@
 #pragma once
 #include <External/imgui/imgui.h>
 #include "Utility/PointerResource.hpp"
+#include "Utility/FunctionResource.hpp"
 
 #ifdef _WIN32
 
@@ -23,53 +24,6 @@ namespace Simple
 		{
 			ImGui::DestroyContext(context);
 		}
-	};
-
-	template<typename Initializer, typename Deinitializer>
-	class FunctionResource final
-	{
-	public:
-
-		template<typename... Args>
-		FunctionResource(Initializer initializer = Initializer{}, Deinitializer deinitializer = Deinitializer{}, Args&&... initializerArgs)
-			: mInitializer(initializer)
-			, mDeinitializer(deinitializer)
-		{
-			mInitializer(std::forward<Args>(initializerArgs)...);
-		}
-
-		~FunctionResource()
-		{
-			if (!mHasBeenMoved)
-			{
-				mDeinitializer();
-			}
-		}
-
-		FunctionResource(const FunctionResource&) = delete;
-		FunctionResource& operator=(const FunctionResource&) = delete;
-
-		FunctionResource(FunctionResource&& other) noexcept
-			: mInitializer(std::move(other.mInitializer))
-			, mDeinitializer(std::move(other.mDeinitializer))
-			, mHasBeenMoved(std::exchange(other.mHasBeenMoved, true))
-		{
-		}
-
-		FunctionResource& operator=(FunctionResource&& other) noexcept
-		{
-			mInitializer = std::move(mInitializer);
-			mDeinitializer = std::move(mDeinitializer);
-			mHasBeenMoved = std::exchange(other.mHasBeenMoved, true);
-
-			return *this;
-		}
-
-	private:
-
-		[[no_unique_address]] Initializer mInitializer = Initializer{};
-		[[no_unique_address]] Deinitializer mDeinitializer = Deinitializer{};
-		bool mHasBeenMoved = false;
 	};
 
 	struct ImGuiInitializer
@@ -103,7 +57,11 @@ namespace Simple
 	public:
 
 		DX11ImGuiFoundation(ID3D11Device* device, ID3D11DeviceContext* context);
-		//~DX11ImGuiFoundation();
+
+		DX11ImGuiFoundation(const DX11ImGuiFoundation&) = delete;
+        DX11ImGuiFoundation& operator=(const DX11ImGuiFoundation&) = delete;
+        DX11ImGuiFoundation(DX11ImGuiFoundation&&) = default;
+        DX11ImGuiFoundation& operator=(DX11ImGuiFoundation&&) = default;
 
 		void BeginFrame();
 		void EndFrame();

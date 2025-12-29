@@ -5,16 +5,8 @@
 namespace Simple
 {
 	DX11ImGuiWindow::DX11ImGuiWindow(HWND hwnd)
+		: mResource(Make(hwnd))
 	{
-		if (!ImGui_ImplWin32_Init(hwnd))
-		{
-			throw std::exception("Could not initialize imgui win32");
-		}
-	}
-
-	DX11ImGuiWindow::~DX11ImGuiWindow()
-	{
-		ImGui_ImplWin32_Shutdown();
 	}
 	
 }

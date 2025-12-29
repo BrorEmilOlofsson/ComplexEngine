@@ -53,7 +53,7 @@ namespace Simple
 
 		template<typename T>
 		explicit WindowView(T& window)
-			: mWindow(&window)
+			: mWindow(std::addressof(window))
 			, mOperations(std::type_identity<T>{})
 			, mConstOperations(std::type_identity<T>{})
 		{

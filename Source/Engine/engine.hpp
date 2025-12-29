@@ -48,6 +48,8 @@ namespace Simple
 		[[nodiscard]] GraphicsSettings& GetGraphicsSettings() { return *mGraphicsSettings; }
 		[[nodiscard]] class DataTypeRegistry& GetDataTypeRegistry();
 		[[nodiscard]] const class DataTypeRegistry& GetDataTypeRegistry() const;
+		[[nodiscard]] GraphicsFoundation& GetGraphicsFoundation();
+        [[nodiscard]] const GraphicsFoundation& GetGraphicsFoundation() const;
 		void SetShouldExit(bool shouldExit = true);
 		void SetCurrentDropPath(const std::filesystem::path& path);
 

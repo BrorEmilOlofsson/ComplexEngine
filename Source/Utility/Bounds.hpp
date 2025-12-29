@@ -1,12 +1,13 @@
 #pragma once
-#include <cassert>
+#include <functional>
+#include <type_traits>
 #include "Utility/Assert.hpp"
 
 namespace Simple
 {
 
 	template<typename BoundsChecker, typename T>
-	constexpr void AssertBounds(const T& min, const T& max)
+	constexpr void AssertBounds([[maybe_unused]] const T& min, [[maybe_unused]] const T& max)
 	{
 		ASSERT(BoundsChecker{}(min, max));
 	}

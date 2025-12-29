@@ -54,21 +54,30 @@ namespace Simple
 		unsigned int MakeWindow(Vector2ui size, std::wstring title);
 		LRESULT HandleMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-		[[nodiscard]] DX11Foundation& GetGraphicsFoundation() noexcept
+		/*[[nodiscard]] DX11Foundation& GetGraphicsFoundation() noexcept
 		{
 			return mGraphicsFoundation;
 		}
 		[[nodiscard]] const DX11Foundation& GetGraphicsFoundation() const noexcept
 		{
 			return mGraphicsFoundation;
+		}*/
+
+		[[nodiscard]] GraphicsFoundation& GetGraphicsFoundation() noexcept
+		{
+			return mGraphicsFoundationNew;
+		}
+		[[nodiscard]] const GraphicsFoundation& GetGraphicsFoundation() const noexcept
+		{
+			return mGraphicsFoundationNew;
 		}
 
 	private:
 
-		HINSTANCE mInstanceHandle;
+		HINSTANCE mInstanceHandle = HINSTANCE{};
 		std::unique_ptr<Win_WindowClass> mWindowClass;
 		GraphicsFoundation mGraphicsFoundationNew;
-		DX11Foundation mGraphicsFoundation;
+		//DX11Foundation mGraphicsFoundation;
 		std::vector<std::unique_ptr<Win_Window>> mWindows;
 		Win_Style mStyle;
 		std::shared_ptr<AssetManager> mAssetManager;
@@ -125,7 +134,17 @@ namespace Simple
 		return WindowHandle(os.MakeWindow(size, title));
 	}
 
-	[[nodiscard]] inline RenderTargetView OSCreateRenderTarget(Win_OperatingSystem& os, const Vector2ui& size)
+	[[nodiscard]] inline GraphicsFoundation& OSGetGraphicsFoundation(Win_OperatingSystem& os)
+	{
+		return os.GetGraphicsFoundation();
+	}
+
+	[[nodiscard]] inline const GraphicsFoundation& OSGetGraphicsFoundation(const Win_OperatingSystem& os)
+	{
+		return os.GetGraphicsFoundation();
+    }
+
+	/*[[nodiscard]] inline RenderTargetView OSCreateRenderTarget(Win_OperatingSystem& os, const Vector2ui& size)
 	{
 		return os.GetGraphicsFoundation().CreateRenderTarget(size);
 	}
@@ -138,7 +157,7 @@ namespace Simple
 	[[nodiscard]] inline RenderContext OSCreateRenderContext(Win_OperatingSystem& os, const Vector2ui& size)
 	{
 		return os.GetGraphicsFoundation().CreateRenderContext(size);
-	}
+	}*/
 
 	inline void OSSetAssetManager(Win_OperatingSystem& os, std::shared_ptr<AssetManager> assetManager)
 	{

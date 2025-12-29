@@ -5,6 +5,7 @@
 #include "Engine/OperatingSystem/WindowFrameBuffer.hpp"
 #include "Graphics/DX11/DX11Window.hpp"
 #include "Utility/Asset/AssetLoader.hpp"
+#include "Graphics/GraphicsWindowView.hpp"
 #include <memory>
 #include <string>
 
@@ -21,8 +22,12 @@ namespace Simple
 	{
 	public:
 
-		Win_Window(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, std::shared_ptr<AssetManager> assetManager,
-			std::shared_ptr<GraphicsSettings> graphicsSettings, std::weak_ptr<DX11DepthStencilViewManager> dsvManager, std::weak_ptr<DX11SamplerState> samplerState, const Vector2ui& windowSize, const std::wstring& name, const Win_WindowClass& windowClass, void* operatingSystem, bool instantiateImGui);
+		Win_Window(
+			const Vector2ui& windowSize, 
+			const std::wstring& name, 
+			const Win_WindowClass& windowClass, 
+			void* operatingSystem
+		);
 		~Win_Window();
 
 		Win_Window(const Win_Window&) = delete;
@@ -74,19 +79,26 @@ namespace Simple
 
 		[[nodiscard]] Vector2ui GetClientSize() const noexcept;
 
-		[[nodiscard]] DX11Window& GetGraphicsWindow() noexcept
+		[[nodiscard]] GraphicsWindowView& GetGraphicsWindow() noexcept
 		{
-			return mGraphicsWindow;
+			return *mGraphicsWindowView;
 		}
-		[[nodiscard]] const DX11Window& GetGraphicsWindow() const noexcept
+
+		[[nodiscard]] const GraphicsWindowView& GetGraphicsWindow() const noexcept
 		{
-			return mGraphicsWindow;
+			return *mGraphicsWindowView;
 		}
+
+		void SetGraphicsWindowView(GraphicsWindowView& window)
+		{
+			mGraphicsWindowView = std::make_unique<GraphicsWindowView>(window);
+		}
+
 	private:
 		
 		HWND mHandle{};
 		Win_InputProcessor mInputProcessor;
-		DX11Window mGraphicsWindow;
+        std::unique_ptr<GraphicsWindowView> mGraphicsWindowView;
 
 		WindowFrameBuffer mFrameBuffer;
 
@@ -115,16 +127,6 @@ namespace Simple
 	{
 		window.EndFrame(renderContext);
 	}
-
-	/*inline void Window_Update(Win_Window& window, RenderList& renderList)
-	{
-		window.Update(renderList);
-	}*/
-
-	/*inline void Window_Render(Win_Window& window, const RenderState& renderState)
-	{
-		window.Render(renderState);
-	}*/
 
 	inline void Window_SetSize(Win_Window& window, Vector2ui size, const bool fullScreen)
 	{

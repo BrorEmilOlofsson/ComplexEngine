@@ -49,15 +49,15 @@ namespace Simple
 		return mConcept->GetOS();
 	}
 
-	RenderTargetView OperatingSystem::CreateRenderTarget(const Vector2ui& size)
+	GraphicsFoundation& OperatingSystem::GetGraphicsFoundation()
 	{
-		return mConcept->CreateRenderTarget(size);
+		return mConcept->GetGraphicsFoundation();
 	}
 
-	DepthStencilViewHandle OperatingSystem::CreateDepthStencilView(const Vector2ui& size)
+	const GraphicsFoundation& OperatingSystem::GetGraphicsFoundation() const
 	{
-		return mConcept->CreateDepthStencilView(size);
-	}
+		return mConcept->GetGraphicsFoundation();
+    }
 
 	void OperatingSystem::LoadCursors(const std::filesystem::path& path)
 	{

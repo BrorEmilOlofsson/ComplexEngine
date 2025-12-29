@@ -56,6 +56,22 @@ namespace Simple
 		DataTypeRegistry::Destroy();
 	}
 
+	void LoadGraphicsSettings(bool& vSync)
+	{
+		const std::filesystem::path filename = std::filesystem::absolute(SIMPLE_SETTINGS_GAME);
+
+		std::ifstream file(filename);
+		if (!file.is_open())
+		{
+			return;
+		}
+
+		const nlohmann::json json = nlohmann::json::parse(file);
+		file.close();
+
+		vSync = json["Game_Settings"]["VSync"];
+	}
+
 	void Engine::Init()
 	{
 		ECSRegistry::Get().SetBlackboard(mBlackboard);
@@ -78,6 +94,7 @@ namespace Simple
 
 		CheckAndCopySettingsFiles();
 		LoadSettingsFromJson();
+		LoadGraphicsSettings(mGraphicsSettings->vSync);
 		mOperatingSystem.LoadCursors(std::string(Directory::Assets) + std::string("Cursors"));
 
 		mOperatingSystem.GetWindow(mMainWindow).Show();
@@ -87,7 +104,8 @@ namespace Simple
 	{
 		mSceneManager.Init(mBlackboard);
 
-		RenderContext r = mOperatingSystem.CreateRenderContext(mOperatingSystem.GetWindow(mMainWindow).GetClientSize());
+        RenderContext r = mOperatingSystem.GetGraphicsFoundation().CreateRenderContext(mOperatingSystem.GetWindow(mMainWindow).GetClientSize());
+		//RenderContext r = mOperatingSystem.CreateRenderContext(mOperatingSystem.GetWindow(mMainWindow).GetClientSize());
 		mSceneManager.GetCurrentScene().GetRenderState().SetRenderContext(std::move(r));
 	}
 
@@ -192,6 +210,16 @@ namespace Simple
 	const DataTypeRegistry& Engine::GetDataTypeRegistry() const
 	{
 		return DataTypeRegistry::GetInstance();
+	}
+
+	GraphicsFoundation& Engine::GetGraphicsFoundation()
+	{
+		return mOperatingSystem.GetGraphicsFoundation();
+    }
+
+	const GraphicsFoundation& Engine::GetGraphicsFoundation() const
+	{
+        return mOperatingSystem.GetGraphicsFoundation();
 	}
 
 	void Engine::SetShouldExit(bool shouldExit)

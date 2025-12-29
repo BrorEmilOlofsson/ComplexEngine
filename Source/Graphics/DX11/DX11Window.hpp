@@ -1,4 +1,10 @@
 #pragma once
+#include <unordered_map>
+#include <memory>
+#include <array>
+#include <string>
+#include <vector>
+
 #include "Graphics/GraphicsDeclarations.hpp"
 #include "Graphics/DX11/Renderer/DX11Renderer.hpp"
 #include "Graphics/GraphicsSettings.hpp"
@@ -9,11 +15,8 @@
 #include "Graphics/DX11/DX11DepthStencilViewManager.hpp"
 #include "Utility/Asset/AssetLoader.hpp"
 #include "Utility/SystemTimer.hpp"
-#include <unordered_map>
-#include <memory>
-#include <array>
-#include <string>
-#include <vector>
+#include "Engine/OperatingSystem/WindowView.hpp"
+
 
 #ifdef _WIN32
 
@@ -32,8 +35,13 @@ namespace Simple
 	public:
 
 		DX11Window(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context,
-			Win_Window* window, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<GraphicsSettings> graphicsSettings, 
+			WindowView windowView, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<GraphicsSettings> graphicsSettings, 
 			std::weak_ptr<DX11DepthStencilViewManager> dsvManager, std::weak_ptr<DX11SamplerState> samplerState, bool instantiateImGui);
+
+        DX11Window(const DX11Window&) = delete;
+        DX11Window& operator=(const DX11Window&) = delete;
+        DX11Window(DX11Window&&) = default;
+        DX11Window& operator=(DX11Window&&) = default;
 
 		void Init();
 
@@ -41,7 +49,7 @@ namespace Simple
 		void EndFrame(RenderContext* renderContext);
 		void PrepareFrame();
 
-		void OnWindowResize();
+		void OnResize();
 
 		void BindBackBuffer();
 
@@ -51,7 +59,7 @@ namespace Simple
 		Microsoft::WRL::ComPtr<ID3D11Device> mDevice;
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext> mContext;
 		Microsoft::WRL::ComPtr<IDXGISwapChain> mSwapChain;
-		Win_Window* mWindow = nullptr;
+		WindowView mWindowView;
 		DX11RenderTarget mBackBuffer;
 		Microsoft::WRL::ComPtr<ID3D11RasterizerState> mRasterizerState;
 		DepthStencilViewHandle mDepthStencilViewHandle;

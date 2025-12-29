@@ -154,7 +154,8 @@ namespace Simple
         );
 
         mEntityCompositionWindow = std::make_unique<EntityCompositionPopUp>(
-            mEngine->GetOperatingSystem().CreateRenderContext(mEngine->GetMainWindow().GetClientSize()));
+            mEngine->GetOperatingSystem().GetGraphicsFoundation().CreateRenderContext(mEngine->GetMainWindow().GetClientSize())
+        );
 
         for (auto& menuTab : mMainMenuTabs)
         {

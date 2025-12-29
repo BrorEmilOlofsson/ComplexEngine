@@ -6,10 +6,8 @@
 #include "Utility/Asset/AssetManager.hpp"
 #include "Graphics/GraphicsSettings.hpp"
 #include "Utility/GraphicsBufferData.hpp"
-#include "Graphics/RenderTarget/RenderTargetView.hpp"
-#include "Graphics/DepthBuffer/DepthStencilViewHandle.hpp"
+#include "Graphics/GraphicsFoundation.hpp"
 #include "Graphics/RenderState.hpp"
-#include <exception>
 
 namespace Simple
 {
@@ -36,13 +34,8 @@ namespace Simple
 		[[nodiscard]] WindowView GetWindow(WindowHandle windowHandle);
 		[[nodiscard]] CWindowView GetWindow(WindowHandle windowHandle) const;
 		[[nodiscard]] OSView GetOS();
-		[[nodiscard]] RenderTargetView CreateRenderTarget(const Vector2ui& size);
-		[[nodiscard]] DepthStencilViewHandle CreateDepthStencilView(const Vector2ui& size);
-
-		[[nodiscard]] RenderContext CreateRenderContext(const Vector2ui size)
-		{
-			return mConcept->CreateRenderContext(size);
-		}
+        [[nodiscard]] GraphicsFoundation& GetGraphicsFoundation();
+        [[nodiscard]] const GraphicsFoundation& GetGraphicsFoundation() const;
 
 		void LoadCursors(const std::filesystem::path& path);
 
@@ -80,9 +73,8 @@ namespace Simple
 			virtual CWindowView GetCWindow(WindowHandle windowHandle) const = 0;
 			virtual OSView GetOS() = 0;
 			virtual WindowHandle MakeWindow(Vector2ui size, std::wstring title) = 0;
-			virtual RenderTargetView CreateRenderTarget(const Vector2ui& size) = 0;
-			virtual DepthStencilViewHandle CreateDepthStencilView(const Vector2ui& size) = 0;
-			virtual RenderContext CreateRenderContext(const Vector2ui& size) = 0;
+            virtual GraphicsFoundation& GetGraphicsFoundation() = 0;
+            virtual const GraphicsFoundation& GetGraphicsFoundation() const = 0;
 			virtual void SetAssetManager(std::shared_ptr<AssetManager> assetManager) = 0;
 			virtual void SetGraphicsSettings(std::shared_ptr<GraphicsSettings> graphicsSettings) = 0;
 		};
@@ -149,20 +141,15 @@ namespace Simple
 				return OSCreateWindow(mObject, size, title);
 			}
 
-			RenderTargetView CreateRenderTarget(const Vector2ui& size) override
+			GraphicsFoundation& GetGraphicsFoundation() override
 			{
-				return OSCreateRenderTarget(mObject, size);
+				return OSGetGraphicsFoundation(mObject);
 			}
 
-			DepthStencilViewHandle CreateDepthStencilView(const Vector2ui& size) override
+			const GraphicsFoundation& GetGraphicsFoundation() const override
 			{
-				return OSCreateDepthStencilView(mObject, size);
-			}
-
-			RenderContext CreateRenderContext(const Vector2ui& size) override
-			{
-				return OSCreateRenderContext(mObject, size);
-			}
+				return OSGetGraphicsFoundation(mObject);
+            }
 
 			void SetAssetManager(std::shared_ptr<AssetManager> assetManager) override
 			{
