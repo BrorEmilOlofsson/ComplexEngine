@@ -1,4 +1,7 @@
 #pragma once
+#include <filesystem>
+#include <string>
+
 #include "../FlyDefines.hpp"
 #include "FlyVariableProxy.hpp"
 #include "FlyFunctionProxy.hpp"
@@ -17,29 +20,29 @@ namespace FLY_NAMESPACE
 	public:
 
 		ClassProxy() = default;
-		explicit ClassProxy(ClassID aClassID);
+		explicit ClassProxy(ClassID classID);
 		
 		[[nodiscard]] std::string_view GetName() const;
 		[[nodiscard]] DataTypeProxy GetTargetDataType() const;
 
 		[[nodiscard]] NodeGraphProxy GetEventGraph() const;
 
-		[[nodiscard]] std::vector<VariableProxy> GetVariables(bool aIncludeDestroyed = false) const;
+		[[nodiscard]] std::vector<VariableProxy> GetVariables(bool includeDestroyed = false) const;
 		[[nodiscard]] std::vector<FunctionProxy> GetFunctions() const;
 
-		VariableProxy CreateVariable(GenericDataTypeProxy aDataType, std::string_view aName, CommandTracker* aCommandTracker);
+		VariableProxy CreateVariable(GenericDataTypeProxy dataType, std::string name, CommandTracker* commandTracker);
 		ClassInstanceProxy CreateClassInstance();
-		FunctionProxy CreateMemberFunction(std::string_view aName);
+		FunctionProxy CreateMemberFunction(std::string name);
 
 		[[nodiscard]] ClassID GetID() const;
 
-		void SetName(std::string_view aName, CommandTracker* aCommandTracker);
+		void SetName(std::string name, CommandTracker* commandTracker);
 
-		void Save(std::string_view aSavePath) const;
+		void Save(const std::filesystem::path& savePath) const;
 
-		explicit operator bool() const;
+		[[nodiscard]] explicit operator bool() const;
 
-		friend bool operator==(const ClassProxy& a, const ClassProxy& b);
+		friend bool operator==(const ClassProxy& lhs, const ClassProxy& rhs);
 
 	private:
 

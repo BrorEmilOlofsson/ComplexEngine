@@ -32,9 +32,9 @@ namespace FLY_NAMESPACE
 	void LoadAllFlyFiles(const std::filesystem::path& filePath);
 	void SaveCustomEvents(const std::filesystem::path& filePath);
 
-	GenericDataTypeProxy CreateStruct(std::string_view name, const std::filesystem::path& savePath);
-	ClassProxy CreateClass(GenericDataTypeProxy targetProxy, std::string_view name, const std::filesystem::path& savePath);
-	ClassProxy CreateClassWithoutTarget(std::string_view name, const std::filesystem::path& savePath);
+	GenericDataTypeProxy CreateStruct(std::string name, const std::filesystem::path& savePath);
+	ClassProxy CreateClass(GenericDataTypeProxy targetProxy, std::string name, const std::filesystem::path& savePath);
+	ClassProxy CreateClassWithoutTarget(std::string name, const std::filesystem::path& savePath);
 
 	[[nodiscard]] GenericDataTypeProxy FindDataTypeByName(std::string_view name);
 	[[nodiscard]] ClassProxy FindClassByName(std::string_view name);
@@ -45,8 +45,8 @@ namespace FLY_NAMESPACE
 	void CreateCopyBuffer(std::span<NodeID> nodeIDs, NodeGraphProxy copiedFromNodeGraph);
 	void PasteCopyBuffer(NodeGraphProxy targetNodeGraphProxy, Vec2 position, CommandTracker* commandTracker);
 
-	CustomEventProxy CreateCustomEvent(std::string_view name);
-	FunctionProxy CreateGlobalFunction(std::string_view name);
+	CustomEventProxy CreateCustomEvent(std::string name);
+	FunctionProxy CreateGlobalFunction(std::string name);
 
 	void BeginFrame(CommandTracker* commandTracker);
 	[[nodiscard]] bool& IsDebugging();

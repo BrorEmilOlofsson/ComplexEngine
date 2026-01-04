@@ -218,40 +218,40 @@ namespace FLY_NAMESPACE
 		return false;
 	}
 
-	std::tuple<Flow, int, Flow> ForLoop(InternalExecutionContextPtr context, Flow, int aStartIndex, int aEndIndex, int aIncrement, eComparatorType aComparatorType)
+	std::tuple<Flow, int, Flow> ForLoop(InternalExecutionContextPtr context, Flow, int startIndex, int endIndex, int increment, eComparatorType comparatorType)
 	{
-		NodeExecutionQueue* previousNodeExecutionQueue = context->mNodeExecutionQueue;
-		const NodeExecutionData nodeExecutionData = context->mNodeData;
-		const Node& node = nodeExecutionData.mNodeRef.GetNodeGraph().GetNode(nodeExecutionData.mNodeRef.GetNodeID());
+		NodeExecutionQueue* previousNodeExecutionQueue = context->nodeExecutionQueue;
+		const NodeExecutionData nodeExecutionData = context->nodeData;
+		const Node& node = nodeExecutionData.nodeRef.GetNodeGraph().GetNode(nodeExecutionData.nodeRef.GetNodeID());
 
-		for (int i = aStartIndex; Compare(i, aEndIndex, aComparatorType); i += aIncrement)
+		for (int i = startIndex; Compare(i, endIndex, comparatorType); i += increment)
 		{
-			NodeExecutionQueue executionQueue(*context->mNodeExecutor);
+			NodeExecutionQueue executionQueue(context->nodeExecutor);
 
-			context->mNodeExecutionQueue = &executionQueue;
+			context->nodeExecutionQueue = &executionQueue;
 
 			SetOutputValues(std::tuple{ Flow(true), i }, node.GetOutputPins(), *context);
 
 			executionQueue.Execute();
 
-			context->mNodeData = nodeExecutionData;
+			context->nodeData = nodeExecutionData;
 
 		}
 
-		context->mNodeExecutionQueue = previousNodeExecutionQueue;
+		context->nodeExecutionQueue = previousNodeExecutionQueue;
 
 		return { Flow(false), 0, Flow(true) };
 	}
 
 	struct FlipFlopNodeData
 	{
-		bool myState = true;
+		bool state = true;
 	};
 
-	std::tuple<Flow, Flow> FlipFlop(NodeState<FlipFlopNodeData> aData, Flow)
+	std::tuple<Flow, Flow> FlipFlop(NodeState<FlipFlopNodeData> data, Flow)
 	{
-		aData.mValue.myState = !aData.mValue.myState;
-		return { Flow(!aData.mValue.myState), Flow(aData.mValue.myState) };
+		data.mValue.state = !data.mValue.state;
+		return { Flow(!data.mValue.state), Flow(data.mValue.state) };
 	}
 
 	struct DelayNodeData
@@ -259,21 +259,21 @@ namespace FLY_NAMESPACE
 		float time = 0.f;
 	};
 
-	Flow Delay(InternalExecutionContextPtr context, NodeState<DelayNodeData> aState, Flow, float aDuration, bool aResetOnFlow)
+	Flow Delay(InternalExecutionContextPtr context, NodeState<DelayNodeData> state, Flow, float duration, bool resetOnFlow)
 	{
-		if (context->mNodeData.mTriggerReason == eNodeTriggerReason::Flow)
+		if (context->nodeData.triggerReason == eNodeTriggerReason::Flow)
 		{
-			if (aResetOnFlow)
+			if (resetOnFlow)
 			{
-				aState.mValue.time = 0.f;
+				state.mValue.time = 0.f;
 			}
-			context->mClass->mEventGraph.BindNodeToEvent(context->mNodeData.mNodeRef.GetNodeID());
+			context->flyClass->mEventGraph.BindNodeToEvent(context->nodeData.nodeRef.GetNodeID());
 		}
-		aState.mValue.time += context->mExecutionContext->mDeltaTime;
-		if (aState.mValue.time > aDuration)
+		state.mValue.time += context->executionContext->mDeltaTime;
+		if (state.mValue.time > duration)
 		{
-			aState.mValue.time = 0.f;
-			context->mClass->mEventGraph.UnbindNodeFromEvent(context->mNodeData.mNodeRef.GetNodeID());
+			state.mValue.time = 0.f;
+			context->flyClass->mEventGraph.UnbindNodeFromEvent(context->nodeData.nodeRef.GetNodeID());
 			return Flow(true);
 		}
 		return Flow(false);

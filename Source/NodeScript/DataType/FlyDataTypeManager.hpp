@@ -464,23 +464,23 @@ namespace FLY_NAMESPACE
 
 		[[nodiscard]] bool IsRegistered(DataTypeID aDataTypeID) const;
 
-		void SetDataTypeColor(GenericDataTypeID aDataTypeID, const Color& aColor);
-		void SetDefaultColor(const Color& aColor);
+		void SetDataTypeColor(GenericDataTypeID dataTypeID, const Color& color);
+		void SetDefaultColor(const Color& color);
 
 		[[nodiscard]] Color GetDefaultColor() const;
 
 		template<typename T>
-		void Register(const TypeParameters& aTypeParameters);
+		void Register(const TypeParameters& typeParameters);
 
 		template<typename T>
 		DataTypeID CreateDataTypeDuplication();
 
-		DataTypeID CreateStruct(std::string_view aName);
+		DataTypeID CreateStruct(std::string name);
 
-		ClassID CreateClass(DataTypeID aTargetID, std::string_view aName);
-		[[nodiscard]] Class& GetClass(ClassID aClassID);
-		[[nodiscard]] const Class& GetClass(ClassID aClassID) const;
-		[[nodiscard]] ClassID GetClassIDByName(std::string_view aName) const;
+		ClassID CreateClass(DataTypeID aTargetID, std::string name);
+		[[nodiscard]] Class& GetClass(ClassID classID);
+		[[nodiscard]] const Class& GetClass(ClassID classID) const;
+		[[nodiscard]] ClassID GetClassIDByName(std::string_view name) const;
 		[[nodiscard]] const std::vector<HeapObject<Class>>& GetClasses() const;
 
 	private:
@@ -657,19 +657,19 @@ namespace FLY_NAMESPACE
 	}
 
 	template<size_t BufferCapacity>
-	inline void* DataTypeManager::AllocateData(const DataTypeID aDataTypeID, MemoryArena<BufferCapacity>& aArena, const void* const aDefaultValue) const
+	inline void* DataTypeManager::AllocateData(const DataTypeID dataTypeID, MemoryArena<BufferCapacity>& arena, const void* const defaultValue) const
 	{
-		if (const DataType* dataType = Find(aDataTypeID))
+		if (const DataType* dataType = Find(dataTypeID))
 		{
 			auto inplaceAllocateFunction = dataType->GetInterface().GetInplaceAllocateFunction();
 			if (inplaceAllocateFunction)
 			{
-				void* dataPtr = aArena.AllocateSize(dataType->GetSize());
-				inplaceAllocateFunction(dataPtr, aDefaultValue);
+				void* dataPtr = arena.AllocateSizeAligned(dataType->GetSize(), dataType->GetAlignment());
+				inplaceAllocateFunction(dataPtr, defaultValue);
 
 				if (HasNotFlag(dataType->GetTypeTraits(), eDataTypeTrait::TriviallyCopyable))
 				{
-					aArena.RegisterMemoryObject(dataPtr, aDataTypeID);
+					arena.RegisterMemoryObject(dataPtr, dataTypeID);
 				}
 
 				return dataPtr;

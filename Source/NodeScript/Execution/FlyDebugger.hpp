@@ -11,14 +11,14 @@ namespace FLY_NAMESPACE
 
 		explicit operator bool() const
 		{
-			return static_cast<bool>(mNodeExecutionData.mNodeRef);
+			return static_cast<bool>(mNodeExecutionData.nodeRef);
 		}
 	};
 
 	struct LinkRef
 	{
-		NodeGraphVariantHandle mNodeGraphVariantHandle;
-		LinkID mLinkID = InvalidID<LinkID>();
+		NodeGraphVariantHandle nodeGraphVariantHandle;
+		LinkID linkID = InvalidID<LinkID>();
 	};
 
 	class Debugger final
@@ -28,12 +28,12 @@ namespace FLY_NAMESPACE
 
 
 
-		void AddBreakpoint(const NodeRef& aNodeRef)
+		void AddBreakpoint(const NodeRef& nodeRef)
 		{
-			mBreakpoint.mNodeExecutionData.mNodeRef = aNodeRef;
+			mBreakpoint.mNodeExecutionData.nodeRef = nodeRef;	
 		}
 
-		void AddTraversedLink(LinkID aLinkID, const NodeGraphVariantHandle& aNodeGraph);
+		void AddTraversedLink(LinkID linkID, const NodeGraphVariantHandle& nodeGraph);
 
 		void ClearTraversedLinks();
 

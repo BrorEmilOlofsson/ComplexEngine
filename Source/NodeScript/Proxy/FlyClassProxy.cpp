@@ -74,9 +74,9 @@ namespace FLY_NAMESPACE
 		return functionProxys;
 	}
 
-	VariableProxy ClassProxy::CreateVariable(const GenericDataTypeProxy aDataType, const std::string_view aName, CommandTracker* const aCommandTracker)
+	VariableProxy ClassProxy::CreateVariable(const GenericDataTypeProxy dataType, std::string name, CommandTracker* const commandTracker)
 	{
-		const VarID varID = Internal::CreateVariable(GetClass().mVariableContainer, aDataType.GetID(), aName, aCommandTracker);
+		const VarID varID = Internal::CreateVariable(GetClass().mVariableContainer, dataType.GetID(), std::move(name), commandTracker);
 		return VariableProxy(varID, *this);
 	}
 
@@ -85,9 +85,9 @@ namespace FLY_NAMESPACE
 		return ClassInstanceProxy(Internal::CreateClassInstance(mClassID));
 	}
 
-	FunctionProxy ClassProxy::CreateMemberFunction(const std::string_view aName)
+	FunctionProxy ClassProxy::CreateMemberFunction(std::string name)
 	{
-		const FunctionID id = Internal::CreateFunction(aName);
+		const FunctionID id = Internal::CreateFunction(std::move(name));
 		GetClass().BindFunction(id);
 
 		return FunctionProxy(id);
@@ -98,14 +98,14 @@ namespace FLY_NAMESPACE
 		return mClassID;
 	}
 
-	void ClassProxy::SetName(std::string_view aName, CommandTracker* const aCommandTracker)
+	void ClassProxy::SetName(std::string name, CommandTracker* const commandTracker)
 	{
-		Internal::SetClassName(mClassID, aName, aCommandTracker);
+		Internal::SetClassName(mClassID, std::move(name), commandTracker);
 	}
 
-	void ClassProxy::Save(const std::string_view aSavePath) const
+	void ClassProxy::Save(const std::filesystem::path& savePath) const
 	{
-		Internal::SaveClass(GetClass(), aSavePath);
+		Internal::SaveClass(GetClass(), savePath);
 	}
 
 	ClassProxy::operator bool() const
@@ -113,9 +113,9 @@ namespace FLY_NAMESPACE
 		return mClassID != InvalidID<ClassID>();
 	}
 
-	bool operator==(const ClassProxy& a, const ClassProxy& b)
+	bool operator==(const ClassProxy& lhs, const ClassProxy& rhs)
 	{
-		return a.mClassID == b.mClassID;
+		return lhs.mClassID == rhs.mClassID;
 	}
 
 	Class& ClassProxy::GetClass() const

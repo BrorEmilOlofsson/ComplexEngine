@@ -13,19 +13,19 @@ namespace FLY_NAMESPACE
 	{
 	public:
 		StructProxy() = default;
-		StructProxy(StructID aStructID);
+		StructProxy(StructID structID);
 
 
 		[[nodiscard]] std::string_view GetName() const;
 		[[nodiscard]] StructID GetID() const;
-		[[nodiscard]] std::vector<VariableProxy> GetMemberVariables(bool aIncludeDestroyed = false) const;
+		[[nodiscard]] std::vector<VariableProxy> GetMemberVariables(bool includeDestroyed = false) const;
 
-		VariableProxy CreateVariable(const GenericDataTypeProxy& aDataTypeProxy, std::string_view aName, CommandTracker* const aCommandTracker);
-		void SetName(std::string_view aName, CommandTracker* aCommandTracker);
+		VariableProxy CreateVariable(const GenericDataTypeProxy& dataTypeProxy, std::string name, CommandTracker* const commandTracker);
+		void SetName(std::string name, CommandTracker* commandTracker);
 
 		explicit operator bool() const;
 
-		friend bool operator==(const StructProxy& a, const StructProxy& b);
+		friend bool operator==(const StructProxy& lhs, const StructProxy& rhs);
 
 	private:
 

@@ -3,16 +3,16 @@
 
 namespace FLY_NAMESPACE
 {
-	TraitID TraitManager::CreateTrait(std::string_view aName)
+	TraitID TraitManager::CreateTrait(std::string name)
 	{
 		const TraitID id{ mTraits.size() };
-		mTraits.emplace_back(aName);
+		mTraits.emplace_back(std::move(name));
 		return id;
 	}
 
-	TraitID TraitManager::CreateTrait(std::string_view aName, const DataTypeID aDataTypeID)
+	TraitID TraitManager::CreateTrait(std::string name, const DataTypeID aDataTypeID)
 	{
-		const TraitID id = CreateTrait(aName);
+		const TraitID id = CreateTrait(std::move(name));
 		mTraitIDsByDataTypeID[aDataTypeID] = id;
 		return id;
 	}

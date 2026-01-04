@@ -24,14 +24,14 @@ namespace FLY_NAMESPACE
 		NodeGraph& operator=(NodeGraph&&) noexcept = default;
 
 
-		[[nodiscard]] Node& GetNode(NodeID aNodeID)
+		[[nodiscard]] Node& GetNode(NodeID nodeID)
 		{
-			return mNodes[aNodeID];
+			return mNodes[nodeID];
 		}
 
-		[[nodiscard]] const Node& GetNode(NodeID aNodeID) const
+		[[nodiscard]] const Node& GetNode(NodeID nodeID) const
 		{
-			return mNodes[aNodeID];
+			return mNodes[nodeID];
 		}
 		
 		[[nodiscard]] size_t GetNodeCount() const
@@ -49,21 +49,21 @@ namespace FLY_NAMESPACE
 			return NodeID{ static_cast<NodeID::value_type>(GetNodeCount()) };
 		}
 
-		NodeID AddNode(Node aNode)
+		NodeID AddNode(Node node)
 		{
 			NodeID id = GetCurrentNodeID();
-			mNodes.push_back(std::move(aNode));
+			mNodes.push_back(std::move(node));
 			return id;
 		}
 
-		[[nodiscard]] Pin& GetPin(PinID aPinID)
+		[[nodiscard]] Pin& GetPin(PinID pinID)
 		{
-			return mPins[aPinID];
+			return mPins[pinID];
 		}
 
-		[[nodiscard]] const Pin& GetPin(PinID aPinID) const
+		[[nodiscard]] const Pin& GetPin(PinID pinID) const
 		{
-			return mPins[aPinID];
+			return mPins[pinID];
 		}
 
 		[[nodiscard]] size_t GetPinCount() const
@@ -71,21 +71,21 @@ namespace FLY_NAMESPACE
 			return mPins.size();
 		}
 
-		[[nodiscard]] PinID AddPin(Pin aPin)
+		[[nodiscard]] PinID AddPin(Pin pin)
 		{
 			PinID id{ static_cast<PinID::value_type>(mPins.size()) };
-			mPins.push_back(std::move(aPin));
+			mPins.push_back(std::move(pin));
 			return id;
 		}
 
-		[[nodiscard]] Link& GetLink(LinkID aLinkID)
+		[[nodiscard]] Link& GetLink(LinkID linkID)
 		{
-			return mLinks[aLinkID];
+			return mLinks[linkID];
 		}
 
-		[[nodiscard]] const Link& GetLink(LinkID aLinkID) const
+		[[nodiscard]] const Link& GetLink(LinkID linkID) const
 		{
-			return mLinks[aLinkID];
+			return mLinks[linkID];
 		}
 
 		[[nodiscard]] const std::vector<Link>& GetLinks() const
@@ -98,10 +98,10 @@ namespace FLY_NAMESPACE
 			return mLinks.size();
 		}
 
-		[[nodiscard]] LinkID AddLink(Link aLink)
+		[[nodiscard]] LinkID AddLink(Link link)
 		{
 			const LinkID id{ static_cast<LinkID::value_type>(mLinks.size()) };
-			mLinks.push_back(std::move(aLink));
+			mLinks.push_back(std::move(link));
 			return id;
 		}
 

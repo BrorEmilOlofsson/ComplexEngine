@@ -333,14 +333,14 @@ namespace FLY_NAMESPACE
 	template<typename T, typename... Types>
 	concept ContainsType = (std::same_as<T, std::decay_t<Types>> || ...);
 
-	template<typename Find, size_t Index>
-	constexpr size_t GetIndexOfTypeFromArgsImpl()
+	template<typename Find, std::size_t Index>
+	consteval std::size_t FindFirstOfTypeFromArgsImpl()
 	{
-		return InvalidID<size_t>();
+		return InvalidIndex<std::size_t>();
 	}
 
-	template<typename Find, size_t Index, typename Current, typename... Rest>
-	constexpr size_t GetIndexOfTypeFromArgsImpl()
+	template<typename Find, std::size_t Index, typename Current, typename... Rest>
+	consteval std::size_t FindFirstOfTypeFromArgsImpl()
 	{
 		if constexpr (std::same_as<Find, Current>)
 		{
@@ -348,53 +348,52 @@ namespace FLY_NAMESPACE
 		}
 		else
 		{
-			return GetIndexOfTypeFromArgsImpl<Find, Index + 1, Rest...>();
+			return FindFirstOfTypeFromArgsImpl<Find, Index + 1, Rest...>();
 		}
 	}
 
 	template<typename Find, typename... Args>
-	constexpr size_t GetIndexOfTypeFromArgs()
+	consteval std::size_t FindFirstOfTypeFromArgs()
 	{
-		return GetIndexOfTypeFromArgsImpl<Find, 0, Args...>();
+		return FindFirstOfTypeFromArgsImpl<Find, 0, Args...>();
 	}
 
 	template<typename T, typename First, typename... Rest>
-	constexpr decltype(auto) Extract_Impl(First&& aFirst, [[maybe_unused]] Rest&&... aRest)
+	constexpr decltype(auto) Extract_Impl(First&& first, [[maybe_unused]] Rest&&... rest)
 	{
 		if constexpr (std::same_as<T, std::decay_t<First>>)
 		{
-			return std::forward<First>(aFirst);
+			return std::forward<First>(first);
 		}
 		else
 		{
-			return Extract_Impl<T>(std::forward<Rest>(aRest)...);
+			return Extract_Impl<T>(std::forward<Rest>(rest)...);
 		}
 	}
 
 	template<typename T>
-	constexpr decltype(auto) Extract_Impl()
+	[[nodiscard]] constexpr decltype(auto) Extract_Impl()
 	{
 		//static_assert(false);
 		return T{};
 	}
 
 	template<typename T, typename... Types> requires ContainsType<T, Types...>
-	constexpr decltype(auto) Extract(Types&&... aTypes)
+	[[nodiscard]] constexpr decltype(auto) Extract(Types&&... types)
 	{
-		return Extract_Impl<T, Types...>(std::forward<Types>(aTypes)...);
+		return Extract_Impl<T, Types...>(std::forward<Types>(types)...);
 	}
 
-
 	template<typename T, typename... Types>
-	constexpr decltype(auto) TryExtract(const T& aDefaultValue, [[maybe_unused]] Types&&... aTypes)
+	[[nodiscard]] constexpr decltype(auto) TryExtract(const T& defaultValue, [[maybe_unused]] Types&&... types)
 	{
 		if constexpr (ContainsType<T, Types...>)
 		{
-			return Extract_Impl<T, Types...>(std::forward<Types>(aTypes)...);
+			return Extract_Impl<T, Types...>(std::forward<Types>(types)...);
 		}
 		else
 		{
-			return aDefaultValue;
+			return defaultValue;
 		}
 	}
 
@@ -415,15 +414,15 @@ namespace FLY_NAMESPACE
 	concept ContainsTemplateType = (SameAsTemplate<Types, TemplateType> || ...);
 
 	template<template<typename> typename T, typename First, typename... Rest>
-	constexpr decltype(auto) ExtractTemplate(First&& aFirst, [[maybe_unused]] Rest&&... aRest)
+	constexpr decltype(auto) ExtractTemplate(First&& first, [[maybe_unused]] Rest&&... rest)
 	{
 		if constexpr (SameAsTemplate<First, T>)
 		{
-			return std::forward<First>(aFirst);
+			return std::forward<First>(first);
 		}
 		else
 		{
-			return ExtractTemplate<T>(std::forward<Rest>(aRest)...);
+			return ExtractTemplate<T>(std::forward<Rest>(rest)...);
 		}
 	}
 
@@ -485,13 +484,13 @@ namespace FLY_NAMESPACE
 		Copyable<T>;
 
 	template<typename Type, typename... Types>
-	constexpr bool PackContains()
+	[[nodiscard]] constexpr bool PackContains()
 	{
 		return std::_Is_any_of_v<Type, Types...>;
 	}
 
 	template<typename ClassType, typename PropertyType>
-	constexpr size_t GetByteOffset(PropertyType ClassType::* aProperty)
+	[[nodiscard]] constexpr size_t GetByteOffset(PropertyType ClassType::* aProperty)
 	{
 		constexpr ClassType* a = nullptr;
 		return (size_t) & reinterpret_cast<const char&>(a->*aProperty);

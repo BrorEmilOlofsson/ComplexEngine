@@ -1,7 +1,11 @@
 #pragma once
-#include "../FlyDefines.hpp"
-#include <External/nlohmann/json.hpp>
 #include <functional>
+
+#include <External/nlohmann/json.hpp>
+
+#include "../FlyDefines.hpp"
+#include "../Utilities/FlyFunctional.hpp"
+#include "../Pin/FlySetPinValueFunctions.hpp"
 
 namespace FLY_NAMESPACE
 {

@@ -53,26 +53,26 @@ namespace FLY_NAMESPACE
 		return mFunctionID;
 	}
 
-	void FunctionProxy::SetName(const std::string_view aName, [[maybe_unused]] CommandTracker* const aCommandTracker)
+	void FunctionProxy::SetName(std::string name, [[maybe_unused]] CommandTracker* const commandTracker)
 	{
 		Function& function = Internal::GetNodeTypeManager().GetFunction(mFunctionID);
 
-		function.SetName(std::string(aName));
+		function.SetName(std::move(name));
 	}
 
-	void FunctionProxy::AddPin(GenericDataTypeProxy aDataTypeProxy, eIODirection aIODirection, std::string_view aName, CommandTracker* aCommandTracker)
+	void FunctionProxy::AddPin(GenericDataTypeProxy aDataTypeProxy, eIODirection aIODirection, std::string name, CommandTracker* commandTracker)
 	{
-		Internal::AddPinTypeToFunction(mFunctionID, aDataTypeProxy.GetID(), aIODirection, aName, aCommandTracker);
+		Internal::AddPinTypeToFunction(mFunctionID, aDataTypeProxy.GetID(), aIODirection, std::move(name), commandTracker);
 	}
 
-	void FunctionProxy::SetPinNameAtIndex(std::string_view aName, size_t aIndex, eIODirection aIODirection, CommandTracker* aCommandTracker)
+	void FunctionProxy::SetPinNameAtIndex(std::string name, size_t index, eIODirection ioDirection, CommandTracker* commandTracker)
 	{
-		Internal::SetPinNameAtIndexFunction(mFunctionID, aName, aIndex, aIODirection, aCommandTracker);
+		Internal::SetPinNameAtIndexFunction(mFunctionID, std::move(name), index, ioDirection, commandTracker);
 	}
 
-	void FunctionProxy::SetPinDataTypeAtIndex(GenericDataTypeProxy aDataTypeProxy, size_t aIndex, eIODirection aIODirection, CommandTracker* aCommandTracker)
+	void FunctionProxy::SetPinDataTypeAtIndex(GenericDataTypeProxy aDataTypeProxy, size_t aIndex, eIODirection ioDirection, CommandTracker* commandTracker)
 	{
-		Internal::SetPinDataTypeAtIndexFunction(mFunctionID, aDataTypeProxy.GetID(), aIndex, aIODirection, aCommandTracker);
+		Internal::SetPinDataTypeAtIndexFunction(mFunctionID, aDataTypeProxy.GetID(), aIndex, ioDirection, commandTracker);
 	}
 
 	FunctionProxy::operator bool() const
@@ -80,9 +80,9 @@ namespace FLY_NAMESPACE
 		return mFunctionID != InvalidID<FunctionID>();
 	}
 
-	bool operator==(const FunctionProxy& a, const FunctionProxy& b)
+	bool operator==(const FunctionProxy& lhs, const FunctionProxy& rhs)
 	{
-		return a.mFunctionID == b.mFunctionID;
+		return lhs.mFunctionID == rhs.mFunctionID;
 	}
 
 	Function& FunctionProxy::GetFunction()

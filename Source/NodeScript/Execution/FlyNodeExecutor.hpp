@@ -14,9 +14,7 @@ namespace FLY_NAMESPACE
 	{
 	public:
 
-		NodeExecutor();
-
-		void Initialize(MemoryPool& aMemoryPool);
+		NodeExecutor(DataTypeManager& dataTypeManager, NodeTypeManager& nodeTypeManager, PinTypeManager& pinTypeManager, TraitManager& traitManager, MemoryPool& foundationMemoryPool);
 
 		void ExecuteNode(const NodeExecutionData& aNodeExecutionData);
 		

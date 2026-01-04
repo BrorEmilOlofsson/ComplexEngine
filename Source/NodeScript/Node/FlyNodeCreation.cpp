@@ -1,4 +1,4 @@
-#include "FlyNodeCreator.hpp"
+#include "FlyNodeCreation.hpp"
 
 namespace FLY_NAMESPACE
 {
@@ -35,18 +35,18 @@ namespace FLY_NAMESPACE
 			};
 	}*/
 
-	void CopyPinValueFromPin(const InternalExecutionContext& context, const PinID aDestinationPinID, NodeGraph& aDestinationNodeGraph, const PinID aSourcePinID, const NodeGraph& aSourceNodeGraph)
+	void CopyPinValueFromPin(const InternalExecutionContext& context, const PinID destinationPinID, NodeGraph& destinationNodeGraph, const PinID sourcePinID, const NodeGraph& sourceNodeGraph)
 	{
-		const Pin& destinationPin = aDestinationNodeGraph.GetPin(aDestinationPinID);
+		const Pin& destinationPin = destinationNodeGraph.GetPin(destinationPinID);
 
-		const PinType& outputPinType = context.mPinTypeManager->GetPinType(destinationPin.GetTypeID());
+		const PinType& outputPinType = context.pinTypeManager.GetPinType(destinationPin.GetTypeID());
 
 		outputPinType.GetSetPinValueFromPinFunction().Invoke(SetPinValueFromPinData
 			{
-				.mWriteToPinNodeGraph = &aDestinationNodeGraph,
-				.mReadFromPinNodeGraph = &aSourceNodeGraph,
-				.mWriteToPinID = aDestinationPinID,
-				.mReadFromPinID = aSourcePinID,
+				.mWriteToPinNodeGraph = &destinationNodeGraph,
+				.mReadFromPinNodeGraph = &sourceNodeGraph,
+				.mWriteToPinID = destinationPinID,
+				.mReadFromPinID = sourcePinID,
 			}, context);
 	}
 }

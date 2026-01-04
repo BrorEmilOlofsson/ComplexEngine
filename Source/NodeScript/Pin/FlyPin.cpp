@@ -3,26 +3,26 @@
 namespace FLY_NAMESPACE
 {
 
-	Pin::Pin(const PinTypeID aTypeID, const NonOwningPtr<void> aDataPtr, const NodeID aNodeID)
-		: mTypeID(aTypeID)
-		, mDataPtr(aDataPtr.Get())
-		, mNodeID(aNodeID)
+	Pin::Pin(const PinTypeID typeID, const NonOwningPtr<void> dataPtr, const NodeID nodeID)
+		: mTypeID(typeID)
+		, mDataPtr(dataPtr.Get())
+		, mNodeID(nodeID)
 	{
 	}
 
-	void Pin::SetDataPtr(NonOwningPtr<void> aDataPtr)
+	void Pin::SetDataPtr(NonOwningPtr<void> dataPtr)
 	{
-		mDataPtr = aDataPtr.Get();
+		mDataPtr = dataPtr.Get();
 	}
 
-	void Pin::SetSplitPinIDs(std::vector<PinID> aPinIDs)
+	void Pin::SetSplitPinIDs(std::vector<PinID> pinIDs)
 	{
-		mSplitPinIDs = std::move(aPinIDs);
+		mSplitPinIDs = std::move(pinIDs);
 	}
 
-	void Pin::SetParentPinID(const PinID aPinID)
+	void Pin::SetParentPinID(const PinID pinID)
 	{
-		mParentPinID = aPinID;
+		mParentPinID = pinID;
 	}
 
 	PinID Pin::GetParentPinID() const
@@ -30,9 +30,9 @@ namespace FLY_NAMESPACE
 		return mParentPinID;
 	}
 
-	void Pin::SetIsSplit(bool aIsSplit)
+	void Pin::SetIsSplit(bool isSplit)
 	{
-		mIsSplit = aIsSplit;
+		mIsSplit = isSplit;
 	}
 
 	bool Pin::IsSplit() const
@@ -40,13 +40,13 @@ namespace FLY_NAMESPACE
 		return mIsSplit;
 	}
 
-	void Pin::AddConnectedPin(const PinID aPinID)
+	void Pin::AddConnectedPin(const PinID pinID)
 	{
-		mConnectedPinIDs.push_back(aPinID);
+		mConnectedPinIDs.push_back(pinID);
 	}
 
-	void Pin::RemoveConnectedPin(const PinID aPinID)
+	void Pin::RemoveConnectedPin(const PinID pinID)
 	{
-		std::erase(mConnectedPinIDs, aPinID);
+		std::erase(mConnectedPinIDs, pinID);
 	}
 }

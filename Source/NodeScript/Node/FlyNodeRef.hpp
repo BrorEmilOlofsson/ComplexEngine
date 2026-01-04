@@ -12,45 +12,41 @@ namespace FLY_NAMESPACE
 		NodeGraph* mNodeGraph = nullptr;
 	};
 
-	inline bool operator==(const NodeGraphRef& a, const NodeGraphRef& b)
+	[[nodiscard]] constexpr bool operator==(const NodeGraphRef& a, const NodeGraphRef& b)
 	{
 		return a.mNodeGraph == b.mNodeGraph;
 	}
 
-	inline bool operator!=(const NodeGraphRef& a, const NodeGraphRef& b)
+	[[nodiscard]] constexpr bool operator<(const NodeGraphRef& lhs, const NodeGraphRef& rhs)
 	{
-		return !(a == b);
-	}
-
-	inline bool operator<(const NodeGraphRef& a, const NodeGraphRef& b)
-	{
-		return a.mNodeGraph < b.mNodeGraph;
+		return lhs.mNodeGraph < rhs.mNodeGraph;
 	}
 
 	struct NodeRef final
 	{
 		NodeRef() = default;
 
-		NodeRef(NodeID aNodeID, NodeGraph& aNodeGraph)
-			: mNodeGraph(&aNodeGraph)
-			, mNodeID(aNodeID)
+		NodeRef(NodeID nodeID, NodeGraph& nodeGraph)
+			: mNodeGraph(&nodeGraph)
+			, mNodeID(nodeID)
 
 		{
 		}
-		NodeGraph& GetNodeGraph() const
+
+		[[nodiscard]] constexpr NodeGraph& GetNodeGraph() const
 		{
 			return *mNodeGraph;
 		}
 
-		NodeID GetNodeID() const
+		[[nodiscard]] constexpr NodeID GetNodeID() const
 		{
 			return mNodeID;
 		}
 
-		friend bool operator==(const NodeRef& a, const NodeRef& b);
-		friend bool operator<(const NodeRef& a, const NodeRef& b);
+		friend constexpr bool operator==(const NodeRef& lhs, const NodeRef& rhs);
+		friend constexpr bool operator<(const NodeRef& lhs, const NodeRef& rhs);
 
-		explicit operator bool() const
+		[[nodiscard]] constexpr explicit operator bool() const
 		{
 			return mNodeID != InvalidID<NodeID>();
 		}
@@ -62,36 +58,31 @@ namespace FLY_NAMESPACE
 	};
 
 
-	NodeRef CreateContextualNodeRef(NodeID aNodeID, NodeGraph& aNodeGraph);
+	NodeRef CreateContextualNodeRef(NodeID nodeID, NodeGraph& nodeGraph);
 
-	inline bool operator==(const NodeRef& a, const NodeRef& b)
+	constexpr bool operator==(const NodeRef& lhs, const NodeRef& rhs)
 	{
-		return a.mNodeGraph == b.mNodeGraph && a.mNodeID == b.mNodeID;
+		return lhs.mNodeGraph == rhs.mNodeGraph && lhs.mNodeID == rhs.mNodeID;
 	}
 
-	inline bool operator!=(const NodeRef& a, const NodeRef& b)
+	constexpr bool operator<(const NodeRef& lhs, const NodeRef& rhs)
 	{
-		return !(a == b);
-	}
-
-	inline bool operator<(const NodeRef& a, const NodeRef& b)
-	{
-		if (a.mNodeGraph == b.mNodeGraph)
+		if (lhs.mNodeGraph == rhs.mNodeGraph)
 		{
-			return a.mNodeID < b.mNodeID;
+			return lhs.mNodeID < rhs.mNodeID;
 		}
-		return a.mNodeGraph < b.mNodeGraph;
+		return lhs.mNodeGraph < rhs.mNodeGraph;
 	}
 
 	struct NodeRefHasher final
 	{
 
 #ifdef FLY_DEBUG
-		size_t operator()(const NodeRef& aNodeRef) const;
+		size_t operator()(const NodeRef& nodeRef) const;
 #else 
-		size_t operator()(const NodeRef& aNodeRef) const
+		size_t operator()(const NodeRef& nodeRef) const
 		{
-			return reinterpret_cast<size_t>(&aNodeRef.GetNodeGraph()) + static_cast<size_t>(aNodeRef.GetNodeID());
+			return reinterpret_cast<size_t>(&nodeRef.GetNodeGraph()) + static_cast<size_t>(nodeRef.GetNodeID());
 		}
 #endif
 
@@ -103,33 +94,33 @@ namespace FLY_NAMESPACE
 	public:
 
 		GlobalNodeRef() = default;
-		GlobalNodeRef(NodeID aNodeID, NodeGraph& aNodeGraph, Class& aClass)
-			: mClass(&aClass)
-			, mNodeGraph(&aNodeGraph)
-			, mNodeID(aNodeID)
+		GlobalNodeRef(NodeID nodeID, NodeGraph& nodeGraph, Class& flyClass)
+			: mClass(&flyClass)
+			, mNodeGraph(&nodeGraph)
+			, mNodeID(nodeID)
 		{
 
 		}
 
-		GlobalNodeRef(NodeID aNodeID, NodeGraph& aNodeGraph)
+		GlobalNodeRef(NodeID nodeID, NodeGraph& nodeGraph)
 			: mClass(nullptr)
-			, mNodeGraph(&aNodeGraph)
-			, mNodeID(aNodeID)
+			, mNodeGraph(&nodeGraph)
+			, mNodeID(nodeID)
 		{
 
 		}
 
-		Class& GetClass() const
+		constexpr Class& GetClass() const
 		{
 			return *mClass;
 		}
 
-		NodeGraph& GetNodeGraph() const
+		constexpr NodeGraph& GetNodeGraph() const
 		{
 			return *mNodeGraph;
 		}
 
-		NodeID GetNodeID() const
+		constexpr NodeID GetNodeID() const
 		{
 			return mNodeID;
 		}
@@ -140,19 +131,19 @@ namespace FLY_NAMESPACE
 		NodeID mNodeID = InvalidID<NodeID>();
 	};
 
-	GlobalNodeRef CreateGlobalNodeRef(const NodeRef& aNodeRef, Class& aClass);
-	GlobalNodeRef CreateGlobalNodeRef(NodeID aNodeID, NodeGraph& aNodeGraph, Class& aClass);
+	GlobalNodeRef CreateGlobalNodeRef(const NodeRef& nodeRef, Class& flyClass);
+	GlobalNodeRef CreateGlobalNodeRef(NodeID nodeID, NodeGraph& nodeGraph, Class& flyClass);
 
-	inline bool operator==(const GlobalNodeRef& a, const GlobalNodeRef& b)
+	[[nodiscard]] constexpr bool operator==(const GlobalNodeRef& lhs, const GlobalNodeRef& rhs)
 	{
-		return &a.GetNodeGraph() == &b.GetNodeGraph() && a.GetNodeID() == b.GetNodeID();
+		return &lhs.GetNodeGraph() == &rhs.GetNodeGraph() && lhs.GetNodeID() == rhs.GetNodeID();
 	}
 
 	struct GlobalNodeRefHasher final
 	{
-		size_t operator()(const GlobalNodeRef& aNodeRef) const
+		size_t operator()(const GlobalNodeRef& nodeRef) const
 		{
-			return reinterpret_cast<size_t>(&aNodeRef.GetNodeGraph()) + static_cast<size_t>(aNodeRef.GetNodeID());
+			return reinterpret_cast<size_t>(&nodeRef.GetNodeGraph()) + static_cast<size_t>(nodeRef.GetNodeID());
 		}
 
 	};
@@ -162,33 +153,33 @@ namespace FLY_NAMESPACE
 	public:
 
 		GlobalNodeRefConst() = default;
-		GlobalNodeRefConst(NodeID aNodeID, const NodeGraph& aNodeGraph, const Class& aClass)
-			: mClass(&aClass)
-			, mNodeGraph(&aNodeGraph)
-			, mNodeID(aNodeID)
+		GlobalNodeRefConst(NodeID nodeID, const NodeGraph& nodeGraph, const Class& flyClass)
+			: mClass(&flyClass)
+			, mNodeGraph(&nodeGraph)
+			, mNodeID(nodeID)
 		{
 
 		}
 
-		GlobalNodeRefConst(const GlobalNodeRef& aNodeRef)
-			: mClass(&aNodeRef.GetClass())
-			, mNodeGraph(&aNodeRef.GetNodeGraph())
-			, mNodeID(aNodeRef.GetNodeID())
+		GlobalNodeRefConst(const GlobalNodeRef& nodeRef)
+			: mClass(&nodeRef.GetClass())
+			, mNodeGraph(&nodeRef.GetNodeGraph())
+			, mNodeID(nodeRef.GetNodeID())
 		{
 
 		}
 
-		const Class& GetClass() const
+		[[nodiscard]] constexpr const Class& GetClass() const
 		{
 			return *mClass;
 		}
 
-		const NodeGraph& GetNodeGraph() const
+		[[nodiscard]] constexpr const NodeGraph& GetNodeGraph() const
 		{
 			return *mNodeGraph;
 		}
 
-		NodeID GetNodeID() const
+		[[nodiscard]] constexpr NodeID GetNodeID() const
 		{
 			return mNodeID;
 		}
@@ -199,18 +190,18 @@ namespace FLY_NAMESPACE
 		NodeID mNodeID = InvalidID<NodeID>();
 	};
 
-	GlobalNodeRefConst CreateGlobalNodeRef(NodeID aNodeID, const NodeGraph& aNodeGraph, const Class& aClass);
+	GlobalNodeRefConst CreateGlobalNodeRef(NodeID nodeID, const NodeGraph& nodeGraph, const Class& flyClass);
 
-	inline bool operator==(const GlobalNodeRefConst& a, const GlobalNodeRefConst& b)
+	[[nodiscard]] constexpr bool operator==(const GlobalNodeRefConst& lhs, const GlobalNodeRefConst& rhs)
 	{
-		return &a.GetNodeGraph() == &b.GetNodeGraph() && a.GetNodeID() == b.GetNodeID();
+		return &lhs.GetNodeGraph() == &rhs.GetNodeGraph() && lhs.GetNodeID() == rhs.GetNodeID();
 	}
 
 	struct GlobalNodeRefConstHasher final
 	{
-		size_t operator()(const GlobalNodeRef& aNodeRef) const
+		size_t operator()(const GlobalNodeRef& nodeRef) const
 		{
-			return reinterpret_cast<size_t>(&aNodeRef.GetNodeGraph()) + static_cast<size_t>(aNodeRef.GetNodeID());
+			return reinterpret_cast<size_t>(&nodeRef.GetNodeGraph()) + static_cast<size_t>(nodeRef.GetNodeID());
 		}
 
 	};

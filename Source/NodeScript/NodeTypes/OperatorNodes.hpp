@@ -156,59 +156,59 @@ namespace FLY_NAMESPACE
 		return static_cast<CastTo>(aValue);
 	}
 
-	template<Decayed T, eNodeOperatorTrait OperatorTrait>
+	template<Decayed T, eNodeOperatorType OperatorTrait>
 	constexpr inline bool HasOperator()
 	{
 		switch (OperatorTrait)
 		{
-		case eNodeOperatorTrait::None:
+		case eNodeOperatorType::None:
 			break;
-		case eNodeOperatorTrait::Equal:
+		case eNodeOperatorType::Equal:
 			return HasOperator_EqualTo<T>;
 			break;
-		case eNodeOperatorTrait::NotEqual:
+		case eNodeOperatorType::NotEqual:
 			return HasOperator_NotEqualTo<T>;
 			break;
-		case eNodeOperatorTrait::Greater:
+		case eNodeOperatorType::Greater:
 			return HasOperator_Greater<T>;
 			break;
-		case eNodeOperatorTrait::Less:
+		case eNodeOperatorType::Less:
 			return HasOperator_Less<T>;
 			break;
-		case eNodeOperatorTrait::GreaterEqual:
+		case eNodeOperatorType::GreaterEqual:
 			return HasOperator_GreaterEqual<T>;
 			break;
-		case eNodeOperatorTrait::LessEqual:
+		case eNodeOperatorType::LessEqual:
 			return HasOperator_LessEqual<T>;
 			break;
-		case eNodeOperatorTrait::And:
+		case eNodeOperatorType::And:
 			return HasOperator_And<T>;
 			break;
-		case eNodeOperatorTrait::Or:
+		case eNodeOperatorType::Or:
 			return HasOperator_Or<T>;
 			break;
-		case eNodeOperatorTrait::Not:
+		case eNodeOperatorType::Not:
 			return HasOperator_Not<T>;
 			break;
-		case eNodeOperatorTrait::Print:
+		case eNodeOperatorType::Print:
 			return HasOperator_Print<T>;
 			break;
-		case eNodeOperatorTrait::Add:
+		case eNodeOperatorType::Add:
 			return HasOperator_Add<T>;
 			break;
-		case eNodeOperatorTrait::Subtract:
+		case eNodeOperatorType::Subtract:
 			return HasOperator_Subtract<T>;
 			break;
-		case eNodeOperatorTrait::Multiply:
+		case eNodeOperatorType::Multiply:
 			return HasOperator_Multiply<T>;
 			break;
-		case eNodeOperatorTrait::Divide:
+		case eNodeOperatorType::Divide:
 			return HasOperator_Divide<T>;
 			break;
-		case eNodeOperatorTrait::Modulo:
+		case eNodeOperatorType::Modulo:
 			return HasOperator_Modulo<T>;
 			break;
-		case eNodeOperatorTrait::IncrementPrefix:
+		case eNodeOperatorType::IncrementPrefix:
 			return HasOperator_IncrementPrefix<T>;
 			break;
 		default:
@@ -217,81 +217,81 @@ namespace FLY_NAMESPACE
 		return false;
 	}
 
-	template<Decayed T, eNodeOperatorTrait OperatorTrait>
+	template<Decayed T, eNodeOperatorType OperatorTrait>
 	constexpr inline auto GetFunctionByOperator()
 	{
-		if constexpr (OperatorTrait == eNodeOperatorTrait::Equal)
+		if constexpr (OperatorTrait == eNodeOperatorType::Equal)
 		{
 			return OperatorNodes::EqualTo<T>;
 		}
-		else if constexpr (OperatorTrait == eNodeOperatorTrait::NotEqual)
+		else if constexpr (OperatorTrait == eNodeOperatorType::NotEqual)
 		{
 			return OperatorNodes::NotEqualTo<T>;
 		}
-		else if constexpr (OperatorTrait == eNodeOperatorTrait::Greater)
+		else if constexpr (OperatorTrait == eNodeOperatorType::Greater)
 		{
 			return OperatorNodes::Greater<T>;
 		}
-		else if constexpr (OperatorTrait == eNodeOperatorTrait::Less)
+		else if constexpr (OperatorTrait == eNodeOperatorType::Less)
 		{
 			return OperatorNodes::Less<T>;
 		}
-		else if constexpr (OperatorTrait == eNodeOperatorTrait::GreaterEqual)
+		else if constexpr (OperatorTrait == eNodeOperatorType::GreaterEqual)
 		{
 			return OperatorNodes::GreaterEqual<T>;
 		}
-		else if constexpr (OperatorTrait == eNodeOperatorTrait::LessEqual)
+		else if constexpr (OperatorTrait == eNodeOperatorType::LessEqual)
 		{
 			return OperatorNodes::LessEqual<T>;
 		}
 
-		else if constexpr (OperatorTrait == eNodeOperatorTrait::And)
+		else if constexpr (OperatorTrait == eNodeOperatorType::And)
 		{
 			return OperatorNodes::And<T>;
 		}
-		else if constexpr (OperatorTrait == eNodeOperatorTrait::Or)
+		else if constexpr (OperatorTrait == eNodeOperatorType::Or)
 		{
 			return OperatorNodes::Or<T>;
 		}
-		else if constexpr (OperatorTrait == eNodeOperatorTrait::Not)
+		else if constexpr (OperatorTrait == eNodeOperatorType::Not)
 		{
 			return OperatorNodes::Not<T>;
 		}
 
 
-		else if constexpr (OperatorTrait == eNodeOperatorTrait::Print)
+		else if constexpr (OperatorTrait == eNodeOperatorType::Print)
 		{
 			return OperatorNodes::Print<T>;
 		}
 
 
-		else if constexpr (OperatorTrait == eNodeOperatorTrait::Add)
+		else if constexpr (OperatorTrait == eNodeOperatorType::Add)
 		{
 			return OperatorNodes::Add<T>;
 		}
-		else if constexpr (OperatorTrait == eNodeOperatorTrait::Subtract)
+		else if constexpr (OperatorTrait == eNodeOperatorType::Subtract)
 		{
 			return OperatorNodes::Substract<T>;
 		}
-		else if constexpr (OperatorTrait == eNodeOperatorTrait::Multiply)
+		else if constexpr (OperatorTrait == eNodeOperatorType::Multiply)
 		{
 			return OperatorNodes::Multiply<T>;
 		}
-		else if constexpr (OperatorTrait == eNodeOperatorTrait::Divide)
+		else if constexpr (OperatorTrait == eNodeOperatorType::Divide)
 		{
 			return OperatorNodes::Divide<T>;
 		}
-		else if constexpr (OperatorTrait == eNodeOperatorTrait::Modulo)
+		else if constexpr (OperatorTrait == eNodeOperatorType::Modulo)
 		{
 			return OperatorNodes::Modulo<T>;
 		}
 
-		else if constexpr (OperatorTrait == eNodeOperatorTrait::IncrementPrefix)
+		else if constexpr (OperatorTrait == eNodeOperatorType::IncrementPrefix)
 		{
 			return OperatorNodes::IncrementPrefix<T>;
 		}
 
-		else if constexpr (OperatorTrait == eNodeOperatorTrait::DecrementPrefix)
+		else if constexpr (OperatorTrait == eNodeOperatorType::DecrementPrefix)
 		{
 			return OperatorNodes::DecrementPrefix<T>();
 		}
@@ -309,8 +309,8 @@ namespace FLY_NAMESPACE
 	constexpr void RegisterSystemNodeType(FuncPtr<OutputType, InputTypes...>, NodeCreationData&& = NodeCreationData());*/
 
 
-	template<Decayed T, eNodeOperatorTrait OperatorTrait, eNodeTrait ExtraTraits = eNodeTrait::None>
-	constexpr inline void RegisterOperatorNode(std::string aDefaultNodeName)
+	template<Decayed T, eNodeOperatorType OperatorType, eNodeTrait ExtraTraits = eNodeTrait::None>
+	constexpr inline void RegisterOperatorNode(std::string defaultNodeName)
 	{
 
 		const DataTypeID dataTypeID = GetDataTypeID<T>();
@@ -320,61 +320,61 @@ namespace FLY_NAMESPACE
 			const std::string& customTypeName = Internal::GetDataTypeManager().Find(dataTypeID)->Name();
 			if (!customTypeName.empty())
 			{
-				aDefaultNodeName += " (" + customTypeName + ")";
+				defaultNodeName += " (" + customTypeName + ")";
 			}
 			else
 			{
 				const std::string typeName = typeid(T).name();
-				aDefaultNodeName += " (" + typeName + ")";
+				defaultNodeName += " (" + typeName + ")";
 			}
 		}
 
 		constexpr eNodeTrait Traits = (std::same_as<T, Wildcard> ? eNodeTrait::None : eNodeTrait::Operator) | ExtraTraits;
 
-		auto operatorFunc = GetFunctionByOperator<T, OperatorTrait>();
+		auto operatorFunc = GetFunctionByOperator<T, OperatorType>();
 
-		const NodeTypeID nodeTypeID = RegisterSystemNodeType<Traits>(operatorFunc, NodeCreationData{ .mName = aDefaultNodeName, .mOperatorTrait = OperatorTrait });
+		const NodeTypeID nodeTypeID = RegisterSystemNodeType<Traits>(operatorFunc, NodeCreationData{ .mName = defaultNodeName, .mOperatorType = OperatorType });
 
-		Internal::GetNodeTypeManager().SetOperatorNodeTypeID(dataTypeID, OperatorTrait, nodeTypeID);
+		Internal::GetNodeTypeManager().SetOperatorNodeTypeID(dataTypeID, OperatorType, nodeTypeID);
 	}
 
-	template<Decayed T, eNodeOperatorTrait OperatorTrait, eNodeOperatorTrait RegisteredTraits, eNodeTrait ExtraTraits = eNodeTrait::None>
-	constexpr inline void TryRegisterOperatorNode(const std::string& aDefaultNodeName)
+	template<Decayed T, eNodeOperatorType OperatorType, eNodeOperatorType RegisteredTraits, eNodeTrait ExtraTraits = eNodeTrait::None>
+	constexpr inline void TryRegisterOperatorNode(const std::string& defaultNodeName)
 	{
-		if constexpr (HasFlag(OperatorTrait, RegisteredTraits))
+		if constexpr (HasFlag(OperatorType, RegisteredTraits))
 		{
-			if constexpr (HasOperator<T, OperatorTrait>())
+			if constexpr (HasOperator<T, OperatorType>())
 			{
-				RegisterOperatorNode<T, OperatorTrait, ExtraTraits>(aDefaultNodeName);
+				RegisterOperatorNode<T, OperatorType, ExtraTraits>(defaultNodeName);
 			}
 		}
 
 	}
 
-	template<Decayed T, eNodeOperatorTrait RegisteredTraits>
+	template<Decayed T, eNodeOperatorType RegisteredTraits>
 	inline void RegisterOperatorNodeTypes()
 	{
-		TryRegisterOperatorNode<T, eNodeOperatorTrait::Equal, RegisteredTraits>("Operators/Compare/Equal To");
-		TryRegisterOperatorNode<T, eNodeOperatorTrait::NotEqual, RegisteredTraits>("Operators/Compare/Not Equal To");
-		TryRegisterOperatorNode<T, eNodeOperatorTrait::Greater, RegisteredTraits>("Operators/Compare/Greater Than");
-		TryRegisterOperatorNode<T, eNodeOperatorTrait::Less, RegisteredTraits>("Operators/Compare/Less Than");
-		TryRegisterOperatorNode<T, eNodeOperatorTrait::GreaterEqual, RegisteredTraits>("Operators/Compare/Greater Or Equal To");
-		TryRegisterOperatorNode<T, eNodeOperatorTrait::LessEqual, RegisteredTraits>("Operators/Compare/Less Or Equal To");
+		TryRegisterOperatorNode<T, eNodeOperatorType::Equal, RegisteredTraits>("Operators/Compare/Equal To");
+		TryRegisterOperatorNode<T, eNodeOperatorType::NotEqual, RegisteredTraits>("Operators/Compare/Not Equal To");
+		TryRegisterOperatorNode<T, eNodeOperatorType::Greater, RegisteredTraits>("Operators/Compare/Greater Than");
+		TryRegisterOperatorNode<T, eNodeOperatorType::Less, RegisteredTraits>("Operators/Compare/Less Than");
+		TryRegisterOperatorNode<T, eNodeOperatorType::GreaterEqual, RegisteredTraits>("Operators/Compare/Greater Or Equal To");
+		TryRegisterOperatorNode<T, eNodeOperatorType::LessEqual, RegisteredTraits>("Operators/Compare/Less Or Equal To");
 
-		TryRegisterOperatorNode<T, eNodeOperatorTrait::And, RegisteredTraits>("Operators/Logical/And");
-		TryRegisterOperatorNode<T, eNodeOperatorTrait::Or, RegisteredTraits>("Operators/Logical/Or");
-		TryRegisterOperatorNode<T, eNodeOperatorTrait::Not, RegisteredTraits>("Operators/Logical/Not");
+		TryRegisterOperatorNode<T, eNodeOperatorType::And, RegisteredTraits>("Operators/Logical/And");
+		TryRegisterOperatorNode<T, eNodeOperatorType::Or, RegisteredTraits>("Operators/Logical/Or");
+		TryRegisterOperatorNode<T, eNodeOperatorType::Not, RegisteredTraits>("Operators/Logical/Not");
 
-		TryRegisterOperatorNode<T, eNodeOperatorTrait::Print, RegisteredTraits, eNodeTrait::HasImplicitFlow>("Operators/Print");
+		TryRegisterOperatorNode<T, eNodeOperatorType::Print, RegisteredTraits, eNodeTrait::HasImplicitFlow>("Operators/Print");
 
-		TryRegisterOperatorNode<T, eNodeOperatorTrait::Add, RegisteredTraits>("Operators/Math/Add");
-		TryRegisterOperatorNode<T, eNodeOperatorTrait::Subtract, RegisteredTraits>("Operators/Math/Subtract");
-		TryRegisterOperatorNode<T, eNodeOperatorTrait::Multiply, RegisteredTraits>("Operators/Math/Multiply");
-		TryRegisterOperatorNode<T, eNodeOperatorTrait::Divide, RegisteredTraits>("Operators/Math/Divide");
-		TryRegisterOperatorNode<T, eNodeOperatorTrait::Modulo, RegisteredTraits>("Operators/Math/Modulo");
+		TryRegisterOperatorNode<T, eNodeOperatorType::Add, RegisteredTraits>("Operators/Math/Add");
+		TryRegisterOperatorNode<T, eNodeOperatorType::Subtract, RegisteredTraits>("Operators/Math/Subtract");
+		TryRegisterOperatorNode<T, eNodeOperatorType::Multiply, RegisteredTraits>("Operators/Math/Multiply");
+		TryRegisterOperatorNode<T, eNodeOperatorType::Divide, RegisteredTraits>("Operators/Math/Divide");
+		TryRegisterOperatorNode<T, eNodeOperatorType::Modulo, RegisteredTraits>("Operators/Math/Modulo");
 
-		TryRegisterOperatorNode<T, eNodeOperatorTrait::IncrementPrefix, RegisteredTraits, eNodeTrait::HasImplicitFlow>("Operators/Math/Increment");
-		TryRegisterOperatorNode<T, eNodeOperatorTrait::DecrementPrefix, RegisteredTraits, eNodeTrait::HasImplicitFlow>("Operators/Math/Decrement");
+		TryRegisterOperatorNode<T, eNodeOperatorType::IncrementPrefix, RegisteredTraits, eNodeTrait::HasImplicitFlow>("Operators/Math/Increment");
+		TryRegisterOperatorNode<T, eNodeOperatorType::DecrementPrefix, RegisteredTraits, eNodeTrait::HasImplicitFlow>("Operators/Math/Decrement");
 
 	}
 }

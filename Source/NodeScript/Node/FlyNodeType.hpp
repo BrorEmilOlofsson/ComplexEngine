@@ -1,41 +1,56 @@
 #pragma once
-#include "../FlyDefines.hpp"
-#include "FlyNodeTrait.hpp"
-#include "FlyNodeRef.hpp"
 #include <vector>
 #include <string>
 #include <any>
 
+#include "../FlyDefines.hpp"
+#include "FlyNodeTrait.hpp"
+#include "FlyNodeRef.hpp"
+#include "../Utilities/FlyFunctional.hpp"
+
 namespace FLY_NAMESPACE
 {
+
+	class Node;
+	class NodeGraph;
+	struct InternalExecutionContext;
+	struct NodeExecutionData;
+	class MemoryPool;
+	class NodeType;
+    struct NodeCreationContext;
+
+	using CreateNodeFunction = FunctionWrapper<Node(const NodeID nodeID, const NodeTypeID nodeTypeID, NodeGraph& nodeGraph, const NodeCreationContext& creationContext), struct CreateNodeParam>;
+	using ExecuteNodeFunction = FunctionWrapper<void(const NodeExecutionData& nodeExecutionData, InternalExecutionContext& context), struct ExecuteNodeParam>;
+	using FastExecuteNodeFunction = FunctionWrapper<void(InternalExecutionContext& context, const MemoryPool& foundationMemoryPool, const NodeType& nodeType, const void* mainInput, const void* inputTuple, void* outputValue), struct FastExecuteNodeParam>;
+
 
 	class NodeType final
 	{
 	public:
 
-		NodeType(std::string aName, CreateNodeFunction aCreateFunction, ExecuteNodeFunction aExecuteFunction, FastExecuteNodeFunction aFastExecuteFunction,
-			eNodeTrait aTraits, EventID aEventID, DataTypeID aOwnerDataTypeID, std::vector<PinTypeID> inputPinTypeIDs, std::vector<PinTypeID> aOutputPinTypeIDs,
-			MemoryPoolID aFunctionMemoryID, DataTypeID aNodeStateDataTypeID, TraitID aTraitID, eNodeOperatorTrait aNodeOperatorTrait);
+		NodeType(std::string name, CreateNodeFunction createFunction, ExecuteNodeFunction executeFunction, FastExecuteNodeFunction fastExecuteFunction,
+			eNodeTrait traits, EventID eventID, DataTypeID ownerDataTypeID, std::vector<PinTypeID> inputPinTypeIDs, std::vector<PinTypeID> outputPinTypeIDs,
+			MemoryPoolID functionMemoryID, DataTypeID nodeStateDataTypeID, TraitID traitID, eNodeOperatorType nodeOperatorType);
 
 		[[nodiscard]] const std::string& GetName() const;
-		[[nodiscard]] CreateNodeFunction GetCreateFunction() const;
-		[[nodiscard]] ExecuteNodeFunction GetExecuteFunction() const;
-		[[nodiscard]] FastExecuteNodeFunction GetFastExecuteFunction() const;
-		[[nodiscard]] eNodeTrait GetTraits() const;
-		[[nodiscard]] EventID GetEventID() const;
-		[[nodiscard]] DataTypeID GetOwnerDataTypeID() const;
-		[[nodiscard]] std::vector<PinTypeID>& GetInputPinTypeIDs();
-		[[nodiscard]] const std::vector<PinTypeID>& GetInputPinTypeIDs() const;
-		[[nodiscard]] std::vector<PinTypeID>& GetOutputPinTypeIDs();
-		[[nodiscard]] const std::vector<PinTypeID>& GetOutputPinTypeIDs() const;
-		[[nodiscard]] MemoryPoolID GetFunctionMemoryID() const;
-		[[nodiscard]] DataTypeID GetNodeStateDataTypeID() const;
-		[[nodiscard]] TraitID GetTraitID() const;
+		[[nodiscard]] constexpr CreateNodeFunction GetCreateFunction() const;
+		[[nodiscard]] constexpr ExecuteNodeFunction GetExecuteFunction() const;
+		[[nodiscard]] constexpr FastExecuteNodeFunction GetFastExecuteFunction() const;
+		[[nodiscard]] constexpr eNodeTrait GetTraits() const;
+		[[nodiscard]] constexpr EventID GetEventID() const;
+		[[nodiscard]] constexpr DataTypeID GetOwnerDataTypeID() const;
+		[[nodiscard]] constexpr std::vector<PinTypeID>& GetInputPinTypeIDs();
+		[[nodiscard]] constexpr const std::vector<PinTypeID>& GetInputPinTypeIDs() const;
+		[[nodiscard]] constexpr std::vector<PinTypeID>& GetOutputPinTypeIDs();
+		[[nodiscard]] constexpr const std::vector<PinTypeID>& GetOutputPinTypeIDs() const;
+		[[nodiscard]] constexpr MemoryPoolID GetFunctionMemoryID() const;
+		[[nodiscard]] constexpr DataTypeID GetNodeStateDataTypeID() const;
+		[[nodiscard]] constexpr TraitID GetTraitID() const;
 		[[nodiscard]] std::vector<NodeRef>& GetNodeRefs();
 		[[nodiscard]] const std::vector<NodeRef>& GetNodeRefs() const;
-		[[nodiscard]] eNodeOperatorTrait GetOperatorTrait() const;
+		[[nodiscard]] constexpr eNodeOperatorType GetOperatorType() const;
 
-		void SetName(std::string aName);
+		void SetName(std::string name);
 
 	private:
 
@@ -52,77 +67,77 @@ namespace FLY_NAMESPACE
 		DataTypeID mNodeStateDataTypeID;
 		TraitID mTraitID;
 		std::vector<NodeRef> mNodeRefs;
-		eNodeOperatorTrait mOperatorTrait = eNodeOperatorTrait::None;
+		eNodeOperatorType mOperatorType = eNodeOperatorType::None;
 	};
 
-	inline CreateNodeFunction NodeType::GetCreateFunction() const
+	constexpr CreateNodeFunction NodeType::GetCreateFunction() const
 	{
 		return mCreateFunction;
 	}
 
-	inline ExecuteNodeFunction NodeType::GetExecuteFunction() const
+	constexpr ExecuteNodeFunction NodeType::GetExecuteFunction() const
 	{
 		return mExecuteFunction;
 	}
 
-	inline FastExecuteNodeFunction NodeType::GetFastExecuteFunction() const
+	constexpr FastExecuteNodeFunction NodeType::GetFastExecuteFunction() const
 	{
 		return mFastExecuteFunction;
 	}
 
-	inline eNodeTrait NodeType::GetTraits() const
+	constexpr eNodeTrait NodeType::GetTraits() const
 	{
 		return mTraits;
 	}
 
-	inline EventID NodeType::GetEventID() const
+	constexpr EventID NodeType::GetEventID() const
 	{
 		return mEventID;
 	}
 
-	inline DataTypeID NodeType::GetOwnerDataTypeID() const
+	constexpr DataTypeID NodeType::GetOwnerDataTypeID() const
 	{
 		return mOwnerDataTypeID;
 	}
 
-	inline std::vector<PinTypeID>& NodeType::GetInputPinTypeIDs()
+	constexpr std::vector<PinTypeID>& NodeType::GetInputPinTypeIDs()
 	{
 		return mInputPinTypeIDs;
 	}
 
-	inline const std::vector<PinTypeID>& NodeType::GetInputPinTypeIDs() const
+	constexpr const std::vector<PinTypeID>& NodeType::GetInputPinTypeIDs() const
 	{
 		return mInputPinTypeIDs;
 	}
 
-	inline std::vector<PinTypeID>& NodeType::GetOutputPinTypeIDs()
+	constexpr std::vector<PinTypeID>& NodeType::GetOutputPinTypeIDs()
 	{
 		return mOutputPinTypeIDs;
 	}
 
-	inline const std::vector<PinTypeID>& NodeType::GetOutputPinTypeIDs() const
+	constexpr const std::vector<PinTypeID>& NodeType::GetOutputPinTypeIDs() const
 	{
 		return mOutputPinTypeIDs;
 	}
 
-	inline MemoryPoolID NodeType::GetFunctionMemoryID() const
+	constexpr MemoryPoolID NodeType::GetFunctionMemoryID() const
 	{
 		return mFunctionMemoryID;
 	}
 
-	inline DataTypeID NodeType::GetNodeStateDataTypeID() const
+	constexpr DataTypeID NodeType::GetNodeStateDataTypeID() const
 	{
 		return mNodeStateDataTypeID;
 	}
 
-	inline TraitID NodeType::GetTraitID() const
+	constexpr TraitID NodeType::GetTraitID() const
 	{
 		return mTraitID;
 	}
 
-	inline eNodeOperatorTrait NodeType::GetOperatorTrait() const
+	constexpr eNodeOperatorType NodeType::GetOperatorType() const
 	{
-		return mOperatorTrait;
+		return mOperatorType;
 	}
 
 	struct NodeTypeDesc final

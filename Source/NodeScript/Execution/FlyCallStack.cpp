@@ -3,17 +3,10 @@
 
 namespace FLY_NAMESPACE
 {
-	CallStack::CallStack()
-	{
-	}
 
-	CallStack::~CallStack()
+	void CallStack::Push(const NodeRef& nodeRef)
 	{
-	}
-
-	void CallStack::Push(const NodeRef& aNodeRef)
-	{
-		mCallStack.push(aNodeRef);
+		mCallStack.push(nodeRef);
 	}
 
 

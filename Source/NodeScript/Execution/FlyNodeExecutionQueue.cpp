@@ -3,8 +3,8 @@
 
 namespace FLY_NAMESPACE
 {
-	NodeExecutionQueue::NodeExecutionQueue(NodeExecutor& aNodeExecutor)
-		: mNodeExecutor(&aNodeExecutor)
+	NodeExecutionQueue::NodeExecutionQueue(NodeExecutor& nodeExecutor)
+		: mNodeExecutor(&nodeExecutor)
 	{
 	}
 

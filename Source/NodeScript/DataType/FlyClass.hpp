@@ -15,7 +15,7 @@ namespace FLY_NAMESPACE
 	{
 	public:
 
-		Class(DataTypeID aTargetID = GetDataTypeID<None>(), const std::string& aName = "Default Class");
+		Class(DataTypeID targetID = GetDataTypeID<None>(), const std::string& name = "Default Class");
 		~Class();
 
 		Class(const Class&) = delete;
@@ -23,7 +23,7 @@ namespace FLY_NAMESPACE
 		Class& operator=(const Class&) = delete;
 		Class& operator=(Class&&) = delete;
 
-		void BindFunction(FunctionID aFunctionID);
+		void BindFunction(FunctionID functionID);
 		const std::vector<FunctionID>& GetMemberFunctionIDs() const;
 
 	public:

@@ -7,7 +7,6 @@
 namespace FLY_NAMESPACE
 {
 
-
 	enum class eNodeTriggerReason : uint8_t
 	{
 		Flow,
@@ -17,18 +16,18 @@ namespace FLY_NAMESPACE
 
 	struct NodeExecutionData final
 	{
-		NodeRef mNodeRef;
-		eNodeTriggerReason mTriggerReason = eNodeTriggerReason::Flow;
+		NodeRef nodeRef;
+		eNodeTriggerReason triggerReason = eNodeTriggerReason::Flow;
 	};
 
-	inline bool operator==(const NodeExecutionData& a, const NodeExecutionData& b)
+	constexpr bool operator==(const NodeExecutionData& lhs, const NodeExecutionData& rhs)
 	{
-		return a.mNodeRef == b.mNodeRef;
+		return lhs.nodeRef == rhs.nodeRef;
 	}
 
-	inline bool operator<(const NodeExecutionData& a, const NodeExecutionData& b)
+	constexpr bool operator<(const NodeExecutionData& lhs, const NodeExecutionData& rhs)
 	{
-		return a.mNodeRef < b.mNodeRef;
+		return lhs.nodeRef < rhs.nodeRef;
 	}
 
 	class Class;
@@ -46,28 +45,28 @@ namespace FLY_NAMESPACE
 
 	struct InternalExecutionContext final
 	{
-		Class* mClass = nullptr;
-		const ExecutionContextBase* mExecutionContext = nullptr;
-		NodeExecutionData mNodeData;
-		NodeGraphVariantHandle mNodeGraphVariantHandle;
-		NodeExecutionQueue* mNodeExecutionQueue = nullptr;
-		void* mTarget = nullptr;
-		ClassInstance* mClassInstance = nullptr;
-		NodeGraphInstance* mNodeGraphInstance = nullptr;
-		NodeExecutor* mNodeExecutor = nullptr;
-		NodeTypeManager* mNodeTypeManager = nullptr;
-		PinTypeManager* mPinTypeManager = nullptr;
-		DataTypeManager* mDataTypeManager = nullptr;
-		TraitManager* mTraitManager = nullptr;
-		MemoryPool* mFoundationMemoryPool = nullptr;
+		Class* flyClass = nullptr;
+		const ExecutionContextBase* executionContext;
+		NodeExecutionData nodeData;
+		NodeGraphVariantHandle nodeGraphVariantHandle;
+		NodeExecutionQueue* nodeExecutionQueue = nullptr;
+		void* target = nullptr;
+		ClassInstance* classInstance = nullptr;
+		NodeGraphInstance* nodeGraphInstance = nullptr;
+		NodeExecutor& nodeExecutor;
+		NodeTypeManager& nodeTypeManager;
+		PinTypeManager& pinTypeManager;
+		DataTypeManager& dataTypeManager;
+		TraitManager& traitManager;
+		MemoryPool& foundationMemoryPool;
 	};
 }
 
 template<>
 struct std::hash<FLY_NAMESPACE::NodeExecutionData>
 {
-	std::size_t operator()(const FLY_NAMESPACE::NodeExecutionData& aValue) const
+	std::size_t operator()(const FLY_NAMESPACE::NodeExecutionData& value) const
 	{
-		return static_cast<size_t>(aValue.mNodeRef.GetNodeID());
+		return static_cast<std::size_t>(value.nodeRef.GetNodeID());
 	}
 };

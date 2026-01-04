@@ -13,26 +13,26 @@ namespace FLY_NAMESPACE
 	public:
 
 		FunctionProxy() = default;
-		explicit FunctionProxy(FunctionID aFunctionID);
+		explicit FunctionProxy(FunctionID functionID);
 
-		const std::string& GetName() const;
-		NodeProxy GetInputNode() const;
-		NodeProxy GetOutputNode() const;
-		NodeTypeProxy GetCallerNodeType() const;
-		NodeTypeProxy GetInputNodeType() const;
-		NodeTypeProxy GetOutputNodeType() const;
-		NodeGraphProxy GetNodeGraph();
+		[[nodiscard]] const std::string& GetName() const;
+		[[nodiscard]] NodeProxy GetInputNode() const;
+		[[nodiscard]] NodeProxy GetOutputNode() const;
+		[[nodiscard]] NodeTypeProxy GetCallerNodeType() const;
+		[[nodiscard]] NodeTypeProxy GetInputNodeType() const;
+		[[nodiscard]] NodeTypeProxy GetOutputNodeType() const;
+		[[nodiscard]] NodeGraphProxy GetNodeGraph();
 
-		FunctionID GetID() const;
+		[[nodiscard]] FunctionID GetID() const;
 
-		void SetName(std::string_view aName, CommandTracker* aCommandTracker);
-		void AddPin(GenericDataTypeProxy aDataType, eIODirection aIODirection, std::string_view aName, CommandTracker* aCommandTracker);
-		void SetPinNameAtIndex(std::string_view aName, size_t aIndex, eIODirection aIODirection, CommandTracker* aCommandTracker);
-		void SetPinDataTypeAtIndex(GenericDataTypeProxy aDataType, size_t aIndex, eIODirection aIODirection, CommandTracker* aCommandTracker);
+		void SetName(std::string name, CommandTracker* commandTracker);
+		void AddPin(GenericDataTypeProxy dataType, eIODirection ioDirection, std::string name, CommandTracker* commandTracker);
+		void SetPinNameAtIndex(std::string name, size_t index, eIODirection ioDirection, CommandTracker* commandTracker);
+		void SetPinDataTypeAtIndex(GenericDataTypeProxy dataType, size_t index, eIODirection ioDirection, CommandTracker* commandTracker);
 
-		explicit operator bool() const;
+		[[nodiscard]] explicit operator bool() const;
 
-		friend bool operator==(const FunctionProxy& a, const FunctionProxy& b);
+		[[nodiscard]] friend bool operator==(const FunctionProxy& lhs, const FunctionProxy& rhs);
 
 	private:
 

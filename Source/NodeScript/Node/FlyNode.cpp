@@ -2,18 +2,19 @@
 
 namespace FLY_NAMESPACE
 {
-	Node::Node(const NodeTypeID aTypeID, const std::vector<PinID>& inputPins, const std::vector<PinID>& aOutputPins)
-		: mTypeID(aTypeID)
+	Node::Node(const NodeTypeID typeID, const std::vector<PinID>& inputPins, const std::vector<PinID>& outputPins, const void* inputTuplePtr)
+		: mTypeID(typeID)
 		, mInputPins(inputPins)
-		, mOutputPins(aOutputPins)
+		, mOutputPins(outputPins)
 		, mSplitInputPins(mInputPins)
 		, mSplitOutputPins(mOutputPins)
+        , mInputTuplePtr(inputTuplePtr)
 	{
 	}
 
-	void Node::SetPosition(const Vec2 aPosition)
+	void Node::SetPosition(const Vec2 position)
 	{
-		mPosition = aPosition;
+		mPosition = position;
 	}
 
 	Vec2 Node::GetPosition() const
@@ -26,8 +27,8 @@ namespace FLY_NAMESPACE
 		return mIsDestroyed;
 	}
 
-	void Node::SetIsDestroyed(bool aIsDestroyed)
+	void Node::SetIsDestroyed(bool isDestroyed)
 	{
-		mIsDestroyed = aIsDestroyed;
+		mIsDestroyed = isDestroyed;
 	}
 }

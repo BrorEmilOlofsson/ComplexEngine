@@ -8,25 +8,27 @@ namespace FLY_NAMESPACE
 	{
 		None = 0,
 		Invalid = 1 << 0,
-		Getter = 1 << 1,
-		Setter = 1 << 2,
-		Operator = 1 << 3,
-		Wildcard = 1 << 4,
-		TemplateSpec = 1 << 5,
+		CPPGenerated = 1 << 1,
+		EditorGenerated = 1 << 2,
+		Getter = 1 << 3,
+		Setter = 1 << 4,
+		Operator = 1 << 5,
+		Wildcard = 1 << 6,
+		TemplateSpec = 1 << 7,
 		Template = Wildcard | TemplateSpec,
-		CustomEvent = 1 << 6,
-		HasFlow = 1 << 7,
-		HasImplicitFlow = 1 << 8,
-		TakesExecutionContext = 1 << 9,
-		TakesInternalExecutionContext = 1 << 10,
-		Target = 1 << 11,
-		Trait = 1 << 12,
+		CustomEvent = 1 << 8,
+		HasFlow = 1 << 9,
+		HasImplicitFlow = 1 << 10,
+		TakesExecutionContext = 1 << 11,
+		TakesInternalExecutionContext = 1 << 12,
+		Target = 1 << 13,
+		Trait = 1 << 14,
 		NonTrivial = Invalid | Getter | Setter | Operator | TemplateSpec | CustomEvent | Target,
 		Accessor = Getter | Setter,
 		All = ~None
 	};
 
-	enum class eNodeOperatorTrait : unsigned int
+	enum class eNodeOperatorType : unsigned int
 	{
 		None = 0,
 		Equal = 1 << 0,

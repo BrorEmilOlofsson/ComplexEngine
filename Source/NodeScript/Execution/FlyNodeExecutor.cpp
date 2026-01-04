@@ -8,48 +8,53 @@
 namespace FLY_NAMESPACE
 {
 
-	NodeExecutor::NodeExecutor()
+	InternalExecutionContext CreateInternalExecutionContext(DataTypeManager& dataTypeManager, NodeTypeManager& nodeTypeManager, PinTypeManager& pinTypeManager, TraitManager& traitManager, MemoryPool& foundationMemoryPool, NodeExecutor& nodeExecutor)
 	{
-		mExecutionContext.mNodeExecutor = this;
+		InternalExecutionContext context
+		{
+			.nodeExecutor = nodeExecutor,
+            .nodeTypeManager = nodeTypeManager,
+            .pinTypeManager = pinTypeManager,
+            .dataTypeManager = dataTypeManager,
+			.traitManager = traitManager,
+            .foundationMemoryPool = foundationMemoryPool
+		};
+		return context;
+    }
+
+	NodeExecutor::NodeExecutor(DataTypeManager& dataTypeManager, NodeTypeManager& nodeTypeManager, PinTypeManager& pinTypeManager, TraitManager& traitManager, MemoryPool& foundationMemoryPool)
+        : mExecutionContext(CreateInternalExecutionContext(dataTypeManager, nodeTypeManager, pinTypeManager, traitManager, foundationMemoryPool, *this))
+	{
 	}
 
-	void NodeExecutor::Initialize(MemoryPool& aMemoryPool)
+	void NodeExecutor::ExecuteNode(const NodeExecutionData& nodeExecutionData)
 	{
-		mExecutionContext.mNodeTypeManager = &Internal::GetNodeTypeManager();
-		mExecutionContext.mPinTypeManager = &Internal::GetPinTypeManager();
-		mExecutionContext.mDataTypeManager = &Internal::GetDataTypeManager();
-		mExecutionContext.mTraitManager = &Internal::GetTraitManager();
-		mExecutionContext.mFoundationMemoryPool = &aMemoryPool;
+		const Node& node = nodeExecutionData.nodeRef.GetNodeGraph().GetNode(nodeExecutionData.nodeRef.GetNodeID());
+		const NodeType& nodeType = mExecutionContext.nodeTypeManager.GetNodeType(node.GetTypeID());
+		nodeType.GetExecuteFunction().Invoke(nodeExecutionData, mExecutionContext);
 	}
 
-	void NodeExecutor::ExecuteNode(const NodeExecutionData& aNodeExecutionData)
+	void NodeExecutor::ExecuteEvent(const EventID eventID, ClassInstance& classInstance, void* const target, const ExecutionContextBase& executionContext)
 	{
-		const Node& node = aNodeExecutionData.mNodeRef.GetNodeGraph().GetNode(aNodeExecutionData.mNodeRef.GetNodeID());
-		const NodeType& nodeType = Internal::GetNodeTypeManager().GetNodeType(node.GetTypeID());
-		nodeType.GetExecuteFunction().Invoke(aNodeExecutionData, mExecutionContext);
-	}
-
-	void NodeExecutor::ExecuteEvent(const EventID aEventID, ClassInstance& aClassInstance, void* const aTarget, const ExecutionContextBase& anExecutionContext)
-	{
-		Class& c = Internal::GetClassByID(aClassInstance.mClassID);
-		mExecutionContext.mClass = &c;
-		mExecutionContext.mExecutionContext = &anExecutionContext;
-		mExecutionContext.mClassInstance = &aClassInstance;
-		mExecutionContext.mNodeGraphInstance = &aClassInstance.mEventGraphInstance;
-		mExecutionContext.mTarget = aTarget;
-		mExecutionContext.mNodeGraphVariantHandle = &c.mEventGraph;
+		Class& c = Internal::GetClassByID(classInstance.mClassID);
+		mExecutionContext.flyClass = &c;
+		mExecutionContext.executionContext = &executionContext;
+		mExecutionContext.classInstance = &classInstance;
+		mExecutionContext.nodeGraphInstance = &classInstance.mEventGraphInstance;
+		mExecutionContext.target = target;
+		mExecutionContext.nodeGraphVariantHandle = &c.mEventGraph;
 
 
 
 #ifdef FLY_DEBUG
-		if (aTarget == nullptr)
+		if (target == nullptr)
 		{
 			assert(c.mTargetID == GetDataTypeID<None*>());
 		}
 #endif
 
 		EventGraph& eventGraph = c.mEventGraph;
-		auto nodeIDs = eventGraph.GetNodeIDsByEventID(aEventID);
+		auto nodeIDs = eventGraph.GetNodeIDsByEventID(eventID);
 
 
 		if (!nodeIDs)
@@ -60,12 +65,12 @@ namespace FLY_NAMESPACE
 
 		NodeExecutionQueue nodeExecutionQueue(*this);
 
-		mExecutionContext.mNodeExecutionQueue = &nodeExecutionQueue;
+		mExecutionContext.nodeExecutionQueue = &nodeExecutionQueue;
 
 		for (const NodeID nodeID : nodeIDs.value())
 		{
-			nodeExecutionQueue.Push(NodeExecutionData{ .mNodeRef = NodeRef{ nodeID, eventGraph.GetNodeGraph() },
-				.mTriggerReason = eNodeTriggerReason::Event });
+			nodeExecutionQueue.Push(NodeExecutionData{ .nodeRef = NodeRef{ nodeID, eventGraph.GetNodeGraph() },
+				.triggerReason = eNodeTriggerReason::Event });
 		}
 
 		nodeExecutionQueue.Execute();

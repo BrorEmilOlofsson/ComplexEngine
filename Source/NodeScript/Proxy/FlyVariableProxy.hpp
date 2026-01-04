@@ -15,10 +15,10 @@ namespace FLY_NAMESPACE
 	public:
 
 		VariableProxy() = default;
-		VariableProxy(VarID aVarID, const ClassProxy& aClass);
-		VariableProxy(VarID aVarID, const StructProxy& aStruct);
-		VariableProxy(VarID aVarID, const DataTypeProxy& aDataType);
-		VariableProxy(VarID aVarID, const GenericDataTypeProxy& aGenericDataType);
+		VariableProxy(VarID varID, const ClassProxy& flyClass);
+		VariableProxy(VarID varID, const StructProxy& flyStruct);
+		VariableProxy(VarID varID, const DataTypeProxy& dataType);
+		VariableProxy(VarID varID, const GenericDataTypeProxy& genericDataType);
 
 		[[nodiscard]] std::string_view GetName() const;
 		[[nodiscard]] GenericDataTypeID GetDataTypeID() const;
@@ -26,10 +26,10 @@ namespace FLY_NAMESPACE
 		[[nodiscard]] VarID GetID() const;
 		[[nodiscard]] size_t GetByteOffset() const;
 
-		void SetName(std::string_view aName, CommandTracker* aCommandTracker);
-		void Destroy(CommandTracker* aCommandTracker);
-		void ViewAndEditDefaultValue(CommandTracker* aCommandTracker);
-		void SetDataType(GenericDataTypeProxy aDataTypeProxy, CommandTracker* aCommandTracker);
+		void SetName(std::string name, CommandTracker* commandTracker);
+		void Destroy(CommandTracker* commandTracker);
+		void ViewAndEditDefaultValue(CommandTracker* commandTracker);
+		void SetDataType(GenericDataTypeProxy dataTypeProxy, CommandTracker* commandTracker);
 
 		explicit operator bool() const;
 

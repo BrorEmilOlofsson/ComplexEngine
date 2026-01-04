@@ -8,6 +8,8 @@
 namespace FLY_NAMESPACE
 {
 
+	class NodeType;
+
 	class NodeTypeProxy final
 	{
 	public:

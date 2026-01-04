@@ -4,9 +4,9 @@
 namespace FLY_NAMESPACE
 {
 
-	Class::Class(const DataTypeID aTargetID, const std::string& aName)
-		: mTargetID(aTargetID)
-		, mName(aName)
+	Class::Class(const DataTypeID targetID, const std::string& name)
+		: mTargetID(targetID)
+		, mName(name)
 	{
 	}
 
@@ -14,9 +14,9 @@ namespace FLY_NAMESPACE
 	{
 	}
 
-	void Class::BindFunction(FunctionID aFunctionID)
+	void Class::BindFunction(FunctionID functionID)
 	{
-		mMemberFunctionIDs.push_back(aFunctionID);
+		mMemberFunctionIDs.push_back(functionID);
 	}
 
 	const std::vector<FunctionID>& Class::GetMemberFunctionIDs() const

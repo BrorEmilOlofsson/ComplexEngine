@@ -3,9 +3,9 @@
 namespace FLY_NAMESPACE
 {
 
-	void Debugger::AddTraversedLink(LinkID aLinkID, const NodeGraphVariantHandle& aNodeGraph)
+	void Debugger::AddTraversedLink(LinkID linkID, const NodeGraphVariantHandle& nodeGraph)
 	{
-		mTraversedLinks.push_back(LinkRef{ .mNodeGraphVariantHandle = aNodeGraph, .mLinkID = aLinkID });
+		mTraversedLinks.push_back(LinkRef{ .nodeGraphVariantHandle = nodeGraph, .linkID = linkID });
 	}
 
 	void Debugger::ClearTraversedLinks()

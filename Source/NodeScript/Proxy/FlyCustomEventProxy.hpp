@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 #include "../FlyDefines.hpp"
 #include "../CustomEvent/FlyCustomEvent.hpp"
 #include "FlyNodeTypeProxy.hpp"
@@ -14,22 +15,22 @@ namespace FLY_NAMESPACE
 	{
 	public:
 
-		explicit CustomEventProxy(CustomEventID aID);
+		explicit CustomEventProxy(CustomEventID id);
 
 
-		NodeTypeProxy GetCallerNodeType() const;
-		NodeTypeProxy GetExecutorNodeType() const;
-		CustomEventID GetID() const;
+		[[nodiscard]] NodeTypeProxy GetCallerNodeType() const;
+		[[nodiscard]] NodeTypeProxy GetExecutorNodeType() const;
+		[[nodiscard]] CustomEventID GetID() const;
 
-		void SetName(std::string_view aName, CommandTracker* aCommandTracker);
-		void AddPin(GenericDataTypeProxy aDataTypeProxy, std::string_view aName, CommandTracker* aCommandTracker);
-		void SetPinNameAtIndex(std::string_view aName, size_t aIndex, CommandTracker* aCommandTracker);
-		void SetPinDataTypeAtIndex(GenericDataTypeProxy aDataTypeProxy, size_t aIndex, CommandTracker* aCommandTracker);
-		void DeletePinAtIndex(size_t aIndex, CommandTracker* aCommandTracker);
+		void SetName(std::string name, CommandTracker* commandTracker);
+		void AddPin(GenericDataTypeProxy dataTypeProxy, std::string name, CommandTracker* commandTracker);
+		void SetPinNameAtIndex(std::string name, std::size_t index, CommandTracker* commandTracker);
+		void SetPinDataTypeAtIndex(GenericDataTypeProxy dataTypeProxy, std::size_t index, CommandTracker* commandTracker);
+		void DeletePinAtIndex(std::size_t index, CommandTracker* commandTracker);
 
-		explicit operator bool() const;
+		[[nodiscard]] explicit operator bool() const;
 
-		friend bool operator==(const CustomEventProxy& a, const CustomEventProxy& b);
+		friend bool operator==(const CustomEventProxy& lhs, const CustomEventProxy& rhs);
 
 	private:
 

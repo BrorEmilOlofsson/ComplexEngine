@@ -21,60 +21,60 @@ namespace FLY_NAMESPACE
 		NodeTypeManager();
 		~NodeTypeManager();
 
-		NodeTypeID Register(NodeType aNodeType);
+		NodeTypeID Register(NodeType nodeType);
 
-		void SetGetterNodeTypeID(DataTypeID aDataTypeID, NodeTypeID aNodeTypeID);
-		void SetSetterNodeTypeID(DataTypeID aDataTypeID, NodeTypeID aNodeTypeID);
+		void SetGetterNodeTypeID(DataTypeID dataTypeID, NodeTypeID nodeType);
+		void SetSetterNodeTypeID(DataTypeID dataTypeID, NodeTypeID nodeType);
 
-		void SetOperatorNodeTypeID(DataTypeID aDataTypeID, eNodeOperatorTrait aOperatorTrait, NodeTypeID aNodeTypeID);
-		void MapNodeTypeIDToTrait(TraitID aTraitID, DataTypeID aDataTypeID, NodeTypeID aNodeTypeID);
+		void SetOperatorNodeTypeID(DataTypeID dataTypeID, eNodeOperatorType operatorType, NodeTypeID nodeTypeID);
+		void MapNodeTypeIDToTrait(TraitID traitID, DataTypeID dataTypeID, NodeTypeID nodeTypeID);
 
-		Node CreateGetterNode(NodeGraph& aNodeGraph, NodeID aNodeID, DataTypeID aDataTypeID);
-		Node CreateSetterNode(NodeGraph& aNodeGraph, NodeID aNodeID, DataTypeID aDataTypeID);
-		Node CreateTraitNode(NodeGraph& aNodeGraph, NodeID aNodeID, TraitID aTraitID, DataTypeID aDataTypeID);
-		Node CreateOperatorNode(NodeGraph& aNodeGraph, NodeID aNodeID, eNodeOperatorTrait aOperatorTrait, DataTypeID aDataTypeID);
+		Node CreateGetterNode(NodeGraph& nodeGraph, NodeID nodeID, DataTypeID dataTypeID, const NodeCreationContext& creationContext);
+		Node CreateSetterNode(NodeGraph& nodeGraph, NodeID nodeID, DataTypeID dataTypeID, const  NodeCreationContext& creationContext);
+		Node CreateTraitNode(NodeGraph& nodeGraph, NodeID nodeID, TraitID aTraitID, DataTypeID dataTypeID, const NodeCreationContext& creationContext);
+		Node CreateOperatorNode(NodeGraph& nodeGraph, NodeID nodeID, eNodeOperatorType operatorType, DataTypeID dataTypeID, const NodeCreationContext& creationContext);
 
-		Node CreateNode(NodeGraph& aNodeGraph, NodeID aNodeID, NodeTypeID aNodeTypeID);
+		Node CreateNode(NodeGraph& nodeGraph, NodeID nodeID, NodeTypeID nodeTypeID, const NodeCreationContext& creationContext);
 
-		[[nodiscard]] bool CanCreateOperatorNode(eNodeOperatorTrait aTrait, DataTypeID aDataTypeID);
-		[[nodiscard]] bool CanCreateNodeByTrait(TraitID aTraitID, DataTypeID aDataTypeID);
+		[[nodiscard]] bool CanCreateOperatorNode(eNodeOperatorType operatorType, DataTypeID dataTypeID);
+		[[nodiscard]] bool CanCreateNodeByTrait(TraitID traitID, DataTypeID dataTypeID);
 
-		[[nodiscard]] NodeType& GetNodeType(const NodeTypeID aNodeTypeID)
+		[[nodiscard]] constexpr NodeType& GetNodeType(const NodeTypeID nodeTypeID)
 		{
-			return mNodeTypes[aNodeTypeID];
+			return mNodeTypes[nodeTypeID];
 		}
 
-		[[nodiscard]] const NodeType& GetNodeType(const NodeTypeID aNodeTypeID) const
+		[[nodiscard]] constexpr const NodeType& GetNodeType(const NodeTypeID nodeTypeID) const
 		{
-			return mNodeTypes[aNodeTypeID];
+			return mNodeTypes[nodeTypeID];
 		}
 
 		[[nodiscard]] const std::vector<NodeType>& GetNodeTypes();
 
-		[[nodiscard]] CustomEvent& GetCustomEvent(CustomEventID aID);
-		[[nodiscard]] const CustomEvent& GetCustomEvent(CustomEventID aID) const;
+		[[nodiscard]] CustomEvent& GetCustomEvent(CustomEventID id);
+		[[nodiscard]] const CustomEvent& GetCustomEvent(CustomEventID id) const;
 		[[nodiscard]] std::vector<CustomEvent>& GetCustomEvents();
 		[[nodiscard]] const std::vector<CustomEvent>& GetCustomEvents() const;
 
-		[[nodiscard]] CustomEventID GetCustomEventID(NodeTypeID aNodeTypeID) const;
+		[[nodiscard]] CustomEventID GetCustomEventID(NodeTypeID nodeTypeID) const;
 
-		[[nodiscard]] Function& GetFunction(FunctionID aFunctionID);
-		[[nodiscard]] const Function& GetFunction(FunctionID aFunctionID) const;
+		[[nodiscard]] Function& GetFunction(FunctionID functionID);
+		[[nodiscard]] const Function& GetFunction(FunctionID functionID) const;
 		[[nodiscard]] const std::vector<HeapObject<Function>>& GetFunctions();
-		[[nodiscard]] FunctionID GetFunctionID(NodeTypeID aNodeTypeID) const;
+		[[nodiscard]] FunctionID GetFunctionID(NodeTypeID nodeTypeID) const;
 
-		[[nodiscard]] NodeTypeID GetTypeID(std::string_view aName);
+		[[nodiscard]] NodeTypeID GetTypeID(std::string_view name);
 
-		[[nodiscard]] const std::string& GetFullName(NodeTypeID aNodeTypeID) const;
-		[[nodiscard]] std::string GetShortName(NodeTypeID aNodeTypeID) const;
-		[[nodiscard]] std::string GetNameDirectory(NodeTypeID aNodeTypeID) const;
+		[[nodiscard]] const std::string& GetFullName(NodeTypeID nodeTypeID) const;
+		[[nodiscard]] std::string GetShortName(NodeTypeID nodeTypeID) const;
+		[[nodiscard]] std::string GetNameDirectory(NodeTypeID nodeTypeID) const;
 
-		CustomEventID CreateCustomEvent(std::string_view aName);
-		FunctionID CreateFunction(std::string_view aName);
+		CustomEventID CreateCustomEvent(std::string name);
+		FunctionID CreateFunction(std::string name);
 
-		[[nodiscard]] const std::unordered_map<DataTypeID, NodeTypeID>& GetTemplateMapByOperator(eNodeOperatorTrait aOperatorTrait) const;
-		[[nodiscard]] const std::unordered_map<DataTypeID, NodeTypeID>& GetMapByTrait(TraitID aTraitID) const;
-		[[nodiscard]] NodeTypeID GetNodeTypeIDByTraitAndDataType(TraitID aTraitID, DataTypeID aDataTypeID) const;
+		[[nodiscard]] const std::unordered_map<DataTypeID, NodeTypeID>& GetTemplateMapByOperator(eNodeOperatorType operatorType) const;
+		[[nodiscard]] const std::unordered_map<DataTypeID, NodeTypeID>& GetMapByTrait(TraitID traitID) const;
+		[[nodiscard]] NodeTypeID GetNodeTypeIDByTraitAndDataType(TraitID traitID, DataTypeID dataTypeID) const;
 
 		void Assert();
 
@@ -91,7 +91,7 @@ namespace FLY_NAMESPACE
 		std::unordered_multimap<NodeTypeID, FunctionID> mToFunctionID;
 		std::unordered_map<DataTypeID, NodeTypeID> mGetterNodeTypeIDs;
 		std::unordered_map<DataTypeID, NodeTypeID> mSetterNodeTypeIDs;
-		std::unordered_map<eNodeOperatorTrait, std::unordered_map<DataTypeID, NodeTypeID>> mTemplateNodeTypeIDMap;
+		std::unordered_map<eNodeOperatorType, std::unordered_map<DataTypeID, NodeTypeID>> mTemplateNodeTypeIDMap;
 		std::unordered_map<TraitID, std::unordered_map<DataTypeID, NodeTypeID>> mTraitToNodeTypeIDMap;
 	};
 }

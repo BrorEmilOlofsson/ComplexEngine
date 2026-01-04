@@ -1,4 +1,5 @@
 #pragma once
+#include <type_traits>
 #include "../FlyDefines.hpp"
 
 namespace FLY_NAMESPACE
@@ -15,58 +16,60 @@ namespace FLY_NAMESPACE
 
 		ReferenceWrapper() = default;
 
-		ReferenceWrapper(Ref aRef)
-			: myPtr(&aRef)
+		ReferenceWrapper(Ref ref)
+			: mPtr(&ref)
 		{
 		}
 
-		ReferenceWrapper& operator=(T&& aValue)
+		ReferenceWrapper& operator=(T& value)
 		{
-			Set(aValue);
+			Set(value);
 
 			return *this;
 		}
 
 		constexpr operator Ref() const noexcept
 		{
-			return *myPtr;
+			return *mPtr;
 		}
 
 		[[nodiscard]] constexpr const T& Get() const noexcept
 		{
-			return *myPtr;
+			return *mPtr;
 		}
 
 		[[nodiscard]] constexpr T& Get() noexcept
 		{
-			return *myPtr;
+			return *mPtr;
 		}
 
 		[[nodiscard]] constexpr T*& GetPtr() noexcept
 		{
-			return myPtr;
+			return mPtr;
 		}
 
 		[[nodiscard]] constexpr const T*& GetPtr() const noexcept
 		{
-			return myPtr;
+			return mPtr;
 		}
 
-		constexpr void Set(Ref aValue)
+		constexpr void Set(Ref value)
 		{
-			myPtr = &aValue;
+			mPtr = &value;
 		}
 
 	private:
-		Ptr myPtr{};
+
+		Ptr mPtr{};
 
 	public:
+
 		template<typename... Types>
-		constexpr auto operator()(Types&&... _Args) const
-			noexcept(noexcept(std::invoke(*myPtr, static_cast<Types&&>(_Args)...)))
-			-> decltype(std::invoke(*myPtr, static_cast<Types&&>(_Args)...))
+		constexpr auto operator()(Types&&... args) const
+			noexcept(noexcept(std::invoke(*mPtr, static_cast<Types&&>(args)...)))
+			-> decltype(std::invoke(*mPtr, static_cast<Types&&>(args)...))
 		{
-			return std::invoke(*myPtr, static_cast<Types&&>(_Args)...);
+			return std::invoke(*mPtr, static_cast<Types&&>(args)...);
 		}
 	};
 }

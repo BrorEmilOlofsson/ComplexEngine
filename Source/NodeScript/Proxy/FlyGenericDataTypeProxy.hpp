@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 #include "../FlyDefines.hpp"
 #include "FlyVariableProxy.hpp"
 #include "../DataType/FlyGenericDataType.hpp"
@@ -15,10 +16,10 @@ namespace FLY_NAMESPACE
 	public:
 
 		GenericDataTypeProxy() = default;
-		explicit GenericDataTypeProxy(GenericDataTypeID aDataTypeID);
-		explicit GenericDataTypeProxy(const DataTypeProxy& aDataType);
-		explicit GenericDataTypeProxy(DataTypeID aDataTypeID);
-		explicit GenericDataTypeProxy(ClassID aClassID);
+		explicit GenericDataTypeProxy(GenericDataTypeID dataTypeID);
+		explicit GenericDataTypeProxy(const DataTypeProxy& dataType);
+		explicit GenericDataTypeProxy(DataTypeID dataTypeID);
+		explicit GenericDataTypeProxy(ClassID classID);
 
 		[[nodiscard]] GenericDataTypeID GetID() const;
 
@@ -34,12 +35,12 @@ namespace FLY_NAMESPACE
 		[[nodiscard]] bool IsViewable() const;
 		[[nodiscard]] std::vector<VariableProxy> GetMemberVariables() const;
 
-		void SetColor(const Color& aColor);
-		VariableProxy CreateMemberVariable(GenericDataTypeProxy aDataTypeProxy, std::string_view aName, CommandTracker* const aCommandTracker);
+		void SetColor(const Color& color);
+		VariableProxy CreateMemberVariable(GenericDataTypeProxy dataTypeProxy, std::string name, CommandTracker* const commandTracker);
 
 		[[nodiscard]] explicit operator bool() const;
 
-		[[nodiscard]] bool operator==(const GenericDataTypeProxy& aOther) const;
+		friend bool operator==(const GenericDataTypeProxy& lhs, const GenericDataTypeProxy& rhs);
 
 	private:
 

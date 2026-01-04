@@ -8,6 +8,7 @@
 #include "../Node/FlyNodeTypeManager.hpp"
 #include "../Pin/FlyPinTypeManager.hpp"
 #include "../Trait/FlyTraitManager.hpp"
+#include "../Execution/FlyNodeExecutor.hpp"
 #include "../Memory/FlyHeapObject.hpp"
 #include <memory>
 #include <string_view>
@@ -20,19 +21,19 @@ namespace FLY_NAMESPACE
 	{
 		struct FoundationProxy
 		{
-			FoundationProxy(Foundation*& aFoundationPtr)
-				: myInstancePtr(aFoundationPtr)
+			FoundationProxy(Foundation*& foundationPtr)
+				: mInstancePtr(foundationPtr)
 			{
-				aFoundationPtr = new Foundation();
+				foundationPtr = new Foundation();
 			}
 
 			~FoundationProxy()
 			{
-				delete myInstancePtr;
-				myInstancePtr = nullptr;
+				delete mInstancePtr;
+				mInstancePtr = nullptr;
 			}
 
-			Foundation*& myInstancePtr;
+			Foundation*& mInstancePtr;
 		};
 
 	public:
@@ -83,7 +84,7 @@ namespace FLY_NAMESPACE
 		DataTypeManager mDataTypeManager;
 		TraitManager mTraitManager;
 
-		HeapObject<NodeExecutor> mNodeExecutor;
+		NodeExecutor mNodeExecutor;
 		EventGraph mNodeGraphCopy;
 
 	public:

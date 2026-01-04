@@ -11,7 +11,7 @@ namespace FLY_NAMESPACE
 	{
 	public:
 
-		template<typename T, eNodeOperatorTrait Operators = eNodeOperatorTrait::All, bool Container = false>
+		template<typename T, eNodeOperatorType Operators = eNodeOperatorType::All, bool Container = false>
 		static void Register(const TypeParameters& aTypeParameters);
 
 		template<typename ClassType, typename MemberType>
@@ -19,7 +19,7 @@ namespace FLY_NAMESPACE
 
 	};
 
-	template<typename T, eNodeOperatorTrait Operators, bool Container>
+	template<typename T, eNodeOperatorType Operators, bool Container>
 	inline void DataTypeRegistry::Register(const TypeParameters& aTypeParameters)
 	{
 		DataTypeManager& dataTypeManager = Internal::GetDataTypeManager();
@@ -69,7 +69,7 @@ namespace FLY_NAMESPACE
 					containerTypeParams.mIsTargetable = false;
 					containerTypeParams.mRegisterPointer = true;
 
-					Register<VectorType, eNodeOperatorTrait::None, true>(containerTypeParams);
+					Register<VectorType, eNodeOperatorType::None, true>(containerTypeParams);
 
 
 					RegisterSystemNodeType(ForEachNode<VectorType>, NodeCreationData{ .mName = "Execution/For Each " + typeName });
@@ -109,11 +109,11 @@ namespace FLY_NAMESPACE
 	struct RegisterType final
 	{
 
-		template<typename T, eNodeOperatorTrait Operators, typename... Traits>
-		constexpr static RegisterType ValueType_Impl(const std::string& aName, [[maybe_unused]] Traits&&... aTraits)
+		template<typename T, eNodeOperatorType Operators, typename... Traits>
+		constexpr static RegisterType ValueType_Impl(const std::string& aName, [[maybe_unused]] Traits&&... traits)
 		{
-			const Color color = TryExtract(Internal::GetDataTypeManager().GetDefaultColor(), std::forward<Traits>(aTraits)...);
-			const CustomName customName = TryExtract(CustomName{ aName }, std::forward<Traits>(aTraits)...);
+			const Color color = TryExtract(Internal::GetDataTypeManager().GetDefaultColor(), std::forward<Traits>(traits)...);
+			const CustomName customName = TryExtract(CustomName{ aName }, std::forward<Traits>(traits)...);
 
 			TypeParameters typeParameters;
 			typeParameters.mName = customName.mName;
@@ -127,24 +127,24 @@ namespace FLY_NAMESPACE
 		}
 
 		template<typename T, typename... Traits>
-		constexpr static RegisterType ValueType(const char* aName, Traits&&... aTraits)
+		constexpr static RegisterType ValueType(const char* name, Traits&&... traits)
 		{
-			return ValueType_Impl<T, eNodeOperatorTrait::All, Traits...>(aName, std::forward<Traits>(aTraits)...);
+			return ValueType_Impl<T, eNodeOperatorType::All, Traits...>(name, std::forward<Traits>(traits)...);
 		}
 
-		template<typename T, eNodeOperatorTrait Operators, typename... Traits>
-		constexpr static RegisterType ValueType(const char* aName, Traits&&... aTraits)
+		template<typename T, eNodeOperatorType Operators, typename... Traits>
+		constexpr static RegisterType ValueType(const char* name, Traits&&... traits)
 		{
-			return ValueType_Impl<T, Operators, Traits...>(aName, std::forward<Traits>(aTraits)...);
+			return ValueType_Impl<T, Operators, Traits...>(name, std::forward<Traits>(traits)...);
 		}
 
-		template<typename T, eNodeOperatorTrait Operators, typename... Traits>
-		constexpr static RegisterType PointerType_Impl(const char* aName, [[maybe_unused]] Traits&&... aTraits)
+		template<typename T, eNodeOperatorType Operators, typename... Traits>
+		constexpr static RegisterType PointerType_Impl(const char* name, [[maybe_unused]] Traits&&... traits)
 		{
 			const bool isTargetable = !ContainsType<NonTargetable, Traits...>;
 
-			const Color color = TryExtract(Internal::GetDataTypeManager().GetDefaultColor(), std::forward<Traits>(aTraits)...);
-			const CustomName customName = TryExtract(CustomName{ aName }, std::forward<Traits>(aTraits)...);
+			const Color color = TryExtract(Internal::GetDataTypeManager().GetDefaultColor(), std::forward<Traits>(traits)...);
+			const CustomName customName = TryExtract(CustomName{ name }, std::forward<Traits>(traits)...);
 
 			TypeParameters typeParameters;
 			typeParameters.mName = customName.mName;
@@ -158,15 +158,15 @@ namespace FLY_NAMESPACE
 		}
 
 		template<typename T, typename... Traits>
-		constexpr static RegisterType PointerType(const char* aName, Traits&&... aTraits)
+		constexpr static RegisterType PointerType(const char* name, Traits&&... traits)
 		{
-			return PointerType_Impl<T, eNodeOperatorTrait::None, Traits...>(aName, std::forward<Traits>(aTraits)...);
+			return PointerType_Impl<T, eNodeOperatorType::None, Traits...>(name, std::forward<Traits>(traits)...);
 		}
 
-		template<typename T, eNodeOperatorTrait Operators, typename... Traits>
-		constexpr static RegisterType PointerType(const char* aName, Traits&&... aTraits)
+		template<typename T, eNodeOperatorType Operators, typename... Traits>
+		constexpr static RegisterType PointerType(const char* name, Traits&&... traits)
 		{
-			return PointerType_Impl<T, Operators, Traits...>(aName, std::forward<Traits>(aTraits)...);
+			return PointerType_Impl<T, Operators, Traits...>(name, std::forward<Traits>(traits)...);
 		}
 	};
 

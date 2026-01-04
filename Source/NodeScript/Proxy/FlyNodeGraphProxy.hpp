@@ -44,9 +44,9 @@ namespace FLY_NAMESPACE
 		explicit NodeGraphProxy(NodeGraphVariantHandle&& aNodeGraphVariant);
 		explicit NodeGraphProxy(const NodeGraphVariantHandle& aNodeGraphVariant);
 		
-		[[nodiscard]] NodeProxyIteratorService IterateNodes(Predicate<NodeProxy> aFilterPredicate) const;
-		[[nodiscard]] NodeProxyIteratorService IterateNodes(bool aIncludeDestroyed = false) const;
-		[[nodiscard]] LinkProxyIteratorService IterateLinks(bool aIncludeDestroyed = false) const;
+		[[nodiscard]] NodeProxyIteratorService IterateNodes(Predicate<NodeProxy> filterPredicate) const;
+		[[nodiscard]] NodeProxyIteratorService IterateNodes(bool includeDestroyed = false) const;
+		[[nodiscard]] LinkProxyIteratorService IterateLinks(bool includeDestroyed = false) const;
 
 		[[nodiscard]] NodeGraph& GetNodeGraph();
 		[[nodiscard]] const NodeGraph& GetNodeGraph() const;
@@ -55,27 +55,27 @@ namespace FLY_NAMESPACE
 
 		[[nodiscard]] std::vector<PinProxy> GetNonConnectedInputPins() const;
 		[[nodiscard]] std::vector<PinProxy> GetNonConnectedOutputPins() const;
-		[[nodiscard]] std::vector<PinProxy> GetNonConnectedPinsByIODirection(eIODirection aIODirection) const;
-		[[nodiscard]] std::vector<PinProxy> GetNonConnectedPinsByIODirectionAndDataType(eIODirection aIODirection, GenericDataTypeProxy aDataTypeProxy) const;
-		[[nodiscard]] std::vector<PinProxy> GetNonConnectedPinsByIODirectionAndRelatedDataTypes(eIODirection aIODirection, GenericDataTypeProxy aDataTypeProxy) const;
+		[[nodiscard]] std::vector<PinProxy> GetNonConnectedPinsByIODirection(eIODirection ioDirection) const;
+		[[nodiscard]] std::vector<PinProxy> GetNonConnectedPinsByIODirectionAndDataType(eIODirection ioDirection, GenericDataTypeProxy dataTypeProxy) const;
+		[[nodiscard]] std::vector<PinProxy> GetNonConnectedPinsByIODirectionAndRelatedDataTypes(eIODirection ioDirection, GenericDataTypeProxy dataTypeProxy) const;
 
-		NodeProxy CreateNode(const NodeTypeProxy& aNodeTypeProxy, Vec2 aPosition = Vec2(), CommandTracker* aCommandTracker = nullptr);
-		NodeProxy CreateNode(std::string_view aName, Vec2 aPosition = Vec2(), CommandTracker* aCommandTracker = nullptr, bool aCreateIfNameNotFound = true);
-		NodeProxy CreateNodeAutoLink(NodeTypeProxy aNodeTypeProxy, PinID aConnection, Vec2 aPosition = Vec2(), CommandTracker* aCommandTracker = nullptr);
-		//NodeProxy CreateGetterNode(VariableProxy aVariableProxy, Vec2 aPosition = Vec2(), CommandTracker* aCommandTracker = nullptr);
-		//NodeProxy CreateSetterNode(VariableProxy aVariableProxy, Vec2 aPosition = Vec2(), CommandTracker* aCommandTracker = nullptr);
+		NodeProxy CreateNode(const NodeTypeProxy& nodeType, Vec2 position = Vec2(), CommandTracker* commandTracker = nullptr);
+		NodeProxy CreateNode(std::string name, Vec2 position = Vec2(), CommandTracker* commandTracker = nullptr, bool createIfNameNotFound = true);
+		NodeProxy CreateNodeAutoLink(NodeTypeProxy nodeTypeProxy, PinID connection, Vec2 position = Vec2(), CommandTracker* commandTracker = nullptr);
+		//NodeProxy CreateGetterNode(VariableProxy aVariableProxy, Vec2 position = Vec2(), CommandTracker* commandTracker = nullptr);
+		//NodeProxy CreateSetterNode(VariableProxy aVariableProxy, Vec2 position = Vec2(), CommandTracker* commandTracker = nullptr);
 
-		void DestroySelection(std::span<NodeID> aNodeIDs, std::span<LinkID> aLinkIDs, CommandTracker* aCommandTracker);
-		LinkProxy TryCreateLink(PinProxy aPin1, PinProxy aPin2, CommandTracker* aCommandTracker);
+		void DestroySelection(std::span<NodeID> nodeIDs, std::span<LinkID> linkIDs, CommandTracker* commandTracker);
+		LinkProxy TryCreateLink(PinProxy pin1, PinProxy pin2, CommandTracker* commandTracker);
 
-		void CommitNodeDrag(const std::unordered_map<NodeID, NodeDragData>& aNodeDragData, CommandTracker* aCommandTracker);
+		void CommitNodeDrag(const std::unordered_map<NodeID, NodeDragData>& nodeDragData, CommandTracker* commandTracker);
 
-		void ReplaceTemplateNode(NodeProxy aReplaceNode, DataTypeProxy aDataType, CommandTracker* aCommandTracker);
-		void ReplaceTemplateNode(PinProxy aReplacePin, DataTypeProxy aDataType, CommandTracker* aCommandTracker);
+		void ReplaceTemplateNode(NodeProxy replaceNode, DataTypeProxy dataType, CommandTracker* commandTracker);
+		void ReplaceTemplateNode(PinProxy replacePin, DataTypeProxy dataType, CommandTracker* commandTracker);
 
 		[[nodiscard]] const NodeGraphVariantHandle& GetVariant() const;
 
-		friend bool operator==(const NodeGraphProxy& a, const NodeGraphProxy& b);
+		friend bool operator==(const NodeGraphProxy& lhs, const NodeGraphProxy& rhs);
 
 		explicit operator bool() const;
 

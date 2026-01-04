@@ -742,7 +742,7 @@ namespace FLY_NAMESPACE
 		return mDefaultColor;
 	}
 
-	DataTypeID DataTypeManager::CreateStruct(const std::string_view aName)
+	DataTypeID DataTypeManager::CreateStruct(std::string name)
 	{
 		DataType dataType;
 
@@ -759,16 +759,16 @@ namespace FLY_NAMESPACE
 		}
 
 		auto pair = mDataTypes.emplace(mDataTypeIDCounter, *structInstanceDataType);
-		pair.first->second.Name() = std::string(aName);
+		pair.first->second.Name() = std::move(name);
 		const DataTypeID dataTypeID = mDataTypeIDCounter;
 		mDataTypeIDCounter++;
 		return dataTypeID;
 	}
 
-	ClassID DataTypeManager::CreateClass(const DataTypeID aTargetID, const std::string_view aName)
+	ClassID DataTypeManager::CreateClass(const DataTypeID targetID, std::string name)
 	{
 		ClassID id{ mClasses.size() };
-		mClasses.emplace_back(HeapObject<Class>(aTargetID, std::string(aName)));
+		mClasses.emplace_back(HeapObject<Class>(targetID, std::move(name)));
 		return id;
 	}
 

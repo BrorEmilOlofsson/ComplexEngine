@@ -9,22 +9,22 @@ namespace FLY_NAMESPACE
 	{
 	public:
 
-		Pin(PinTypeID aTypeID, NonOwningPtr<void> aDataPtr, NodeID aNodeID);
+		Pin(PinTypeID typeID, NonOwningPtr<void> dataPtr, NodeID nodeID);
 
-		[[nodiscard]] PinTypeID GetTypeID() const;
-		void SetDataPtr(NonOwningPtr<void> aDataPtr);
-		[[nodiscard]] OwningPtr<void> GetDataPtr() const;
-		[[nodiscard]] const std::vector<PinID>& GetConnectedPinIDs() const;
-		void SetSplitPinIDs(std::vector<PinID> aPinIDs);
-		[[nodiscard]] const std::vector<PinID>& GetSplitPinIDs() const;
-		[[nodiscard]] NodeID GetNodeID() const;
-		void SetParentPinID(PinID aPinID);
+		[[nodiscard]] constexpr PinTypeID GetTypeID() const;
+		void SetDataPtr(NonOwningPtr<void> dataPtr);
+		[[nodiscard]] constexpr OwningPtr<void> GetDataPtr() const;
+		[[nodiscard]] constexpr const std::vector<PinID>& GetConnectedPinIDs() const;
+		void SetSplitPinIDs(std::vector<PinID> pinIDs);
+		[[nodiscard]] constexpr const std::vector<PinID>& GetSplitPinIDs() const;
+		[[nodiscard]] constexpr NodeID GetNodeID() const;
+		void SetParentPinID(PinID pinID);
 		[[nodiscard]] PinID GetParentPinID() const;
-		void SetIsSplit(bool aIsSplit);
+		void SetIsSplit(bool isSplit);
 		[[nodiscard]] bool IsSplit() const;
 
-		void AddConnectedPin(PinID aPinID);
-		void RemoveConnectedPin(PinID aPinID);
+		void AddConnectedPin(PinID pinID);
+		void RemoveConnectedPin(PinID pinID);
 
 	private:
 
@@ -37,27 +37,27 @@ namespace FLY_NAMESPACE
 		bool mIsSplit = false;
 	};
 
-	inline PinTypeID Pin::GetTypeID() const
+	constexpr PinTypeID Pin::GetTypeID() const
 	{
 		return mTypeID;
 	}
 
-	inline OwningPtr<void> Pin::GetDataPtr() const
+	constexpr OwningPtr<void> Pin::GetDataPtr() const
 	{
 		return mDataPtr;
 	}
 
-	inline const std::vector<PinID>& Pin::GetConnectedPinIDs() const
+	constexpr const std::vector<PinID>& Pin::GetConnectedPinIDs() const
 	{
 		return mConnectedPinIDs;
 	}
 
-	inline const std::vector<PinID>& Pin::GetSplitPinIDs() const
+	constexpr const std::vector<PinID>& Pin::GetSplitPinIDs() const
 	{
 		return mSplitPinIDs;
 	}
 
-	inline NodeID Pin::GetNodeID() const
+	constexpr NodeID Pin::GetNodeID() const
 	{
 		return mNodeID;
 	}

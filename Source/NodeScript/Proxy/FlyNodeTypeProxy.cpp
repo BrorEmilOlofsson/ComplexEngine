@@ -60,7 +60,7 @@ namespace FLY_NAMESPACE
 		{
 
 
-			auto& dataTypes = Internal::GetNodeTypeManager().GetTemplateMapByOperator(GetNodeType().GetOperatorTrait());
+			auto& dataTypes = Internal::GetNodeTypeManager().GetTemplateMapByOperator(GetNodeType().GetOperatorType());
 			dataTypeProxys.reserve(dataTypes.size());
 			for (auto& [dataTypeID, nodeTypeID] : dataTypes)
 			{

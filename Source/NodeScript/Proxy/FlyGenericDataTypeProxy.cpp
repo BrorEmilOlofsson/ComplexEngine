@@ -104,7 +104,7 @@ namespace FLY_NAMESPACE
 		Internal::GetDataTypeManager().SetDataTypeColor(mDataTypeID, aColor);
 	}
 
-	VariableProxy GenericDataTypeProxy::CreateMemberVariable(GenericDataTypeProxy aDataTypeProxy, std::string_view aName, CommandTracker* const aCommandTracker)
+	VariableProxy GenericDataTypeProxy::CreateMemberVariable(GenericDataTypeProxy dataTypeProxy, std::string name, CommandTracker* const commandTracker)
 	{
 		/*VariableContainer& varContainer = std::visit(Visitor{
 			[](const DataTypeID aDataTypeID) -> VariableContainer&
@@ -116,7 +116,7 @@ namespace FLY_NAMESPACE
 				return Internal::GetDataTypeManager().Find(aClassID)->mVariableContainer;
 			}
 			}, mDataTypeID.mID);*/
-		VarID varID = Internal::CreateVariable(GetID(), aDataTypeProxy.GetID(), aName, aCommandTracker);
+		VarID varID = Internal::CreateVariable(GetID(), dataTypeProxy.GetID(), std::move(name), commandTracker);
 		return VariableProxy(varID, *this);
 	}
 
@@ -125,9 +125,9 @@ namespace FLY_NAMESPACE
 		return mDataTypeID != InvalidID<GenericDataTypeID>();
 	}
 
-	bool GenericDataTypeProxy::operator==(const GenericDataTypeProxy& aOther) const
+	bool operator==(const GenericDataTypeProxy& lhs, const GenericDataTypeProxy& rhs)
 	{
-		return mDataTypeID == aOther.mDataTypeID;
+		return lhs.mDataTypeID == rhs.mDataTypeID;
 	}
 
 	DataType* GenericDataTypeProxy::GetDataType() const

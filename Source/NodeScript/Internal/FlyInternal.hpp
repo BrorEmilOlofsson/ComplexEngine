@@ -18,6 +18,7 @@
 namespace FLY_NAMESPACE
 {
 
+	class Node;
 	class Struct;
 	class Class;
 	class CommandTracker;
@@ -34,6 +35,7 @@ namespace FLY_NAMESPACE
 	class TraitManager;
 	class DataType;
 	class Trait;
+	struct NodeCreationContext;
 	
 	template<size_t> class MemoryArena;
 	class MemoryPool;
@@ -56,130 +58,130 @@ namespace FLY_NAMESPACE
 		[[nodiscard]] MemoryPool& GetMemoryPool();
 		[[nodiscard]] EventGraph& GetNodeGraphCopy();
 
-		[[nodiscard]] NodeGraph& GetNodeGraph(const NodeGraphVariantHandle& aNodeGraphVariantHandle);
-		[[nodiscard]] const Pin& GetPin(PinID aPinID, const NodeGraph& aNodeGraph);
-		[[nodiscard]] Pin& GetPin(PinID aPinID, NodeGraph& aNodeGraph);
-		[[nodiscard]] const PinType& GetPinType(PinID aPinID, const NodeGraph& aNodeGraph);
+		[[nodiscard]] NodeGraph& GetNodeGraph(const NodeGraphVariantHandle& nodeGraphVariantHandle);
+		[[nodiscard]] const Pin& GetPin(PinID pinID, const NodeGraph& nodeGraph);
+		[[nodiscard]] Pin& GetPin(PinID pinID, NodeGraph& nodeGraph);
+		[[nodiscard]] const PinType& GetPinType(PinID pinID, const NodeGraph& nodeGraph);
 		[[nodiscard]] const PinType& GetPinType(const Pin& aPin);
 		[[nodiscard]] const PinType& GetPinType(PinTypeID aPinTypeID);
-		[[nodiscard]] Node& GetNode(NodeID aNodeID, NodeGraph& aNodeGraph);
-		[[nodiscard]] const Node& GetNode(NodeID aNodeID, const NodeGraph& aNodeGraph);
-		[[nodiscard]] const NodeType& GetNodeType(const Node& aNode);
-		[[nodiscard]] const NodeType& GetNodeType(NodeID aNodeID, const NodeGraph& aNodeGraph);
-		[[nodiscard]] NodeType& GetNodeType(NodeTypeID aNodeTypeID);
-		[[nodiscard]] const DataType* GetDataTypeByID(DataTypeID aDataTypeID);
-		[[nodiscard]] const DataType* GetDataTypeByID(GenericDataTypeID aDataTypeID);
-		[[nodiscard]] Class& GetClassByID(ClassID aClassID);
-		[[nodiscard]] Trait& GetTraitByID(TraitID aTraitID);
+		[[nodiscard]] Node& GetNode(NodeID nodeID, NodeGraph& nodeGraph);
+		[[nodiscard]] const Node& GetNode(NodeID nodeID, const NodeGraph& nodeGraph);
+		[[nodiscard]] const NodeType& GetNodeType(const Node& node);
+		[[nodiscard]] const NodeType& GetNodeType(NodeID nodeID, const NodeGraph& nodeGraph);
+		[[nodiscard]] NodeType& GetNodeType(NodeTypeID nodeTypeID);
+		[[nodiscard]] const DataType* GetDataTypeByID(DataTypeID dataTypeID);
+		[[nodiscard]] const DataType* GetDataTypeByID(GenericDataTypeID dataTypeID);
+		[[nodiscard]] Class& GetClassByID(ClassID flyClassID);
+		[[nodiscard]] Trait& GetTraitByID(TraitID traitID);
 
 		void InitializeSubPins();
 
-		[[nodiscard]] DataTypeID CreateStruct(std::string_view aName);
-		//void SetStructName(StructID aStructID, std::string_view aName, CommandTracker* aCommandTracker);
+		[[nodiscard]] DataTypeID CreateStruct(std::string name);
+		//void SetStructName(StructID aStructID, std::string_view name, CommandTracker* commandTracker);
 
-		[[nodiscard]] ClassID CreateClass(GenericDataTypeID aTargetID, std::string_view aName);
-		void SetClassName(ClassID aClassID, std::string_view aName, CommandTracker* aCommandTracker);
-		[[nodiscard]] ClassInstance& CreateClassInstance(ClassID aClassID);
-		void DestroyClassInstance(ClassInstance& aClassInstance);
+		[[nodiscard]] ClassID CreateClass(GenericDataTypeID targetID, std::string name);
+		void SetClassName(ClassID flyClassID, std::string name, CommandTracker* commandTracker);
+		[[nodiscard]] ClassInstance& CreateClassInstance(ClassID flyClassID);
+		void DestroyClassInstance(ClassInstance& flyClassInstance);
 
-		[[nodiscard]] TraitID CreateTrait(std::string_view aName);
-		void CreateTraitImplementation(DataTypeID aDataTypeID, TraitID aTraitID);
+		[[nodiscard]] TraitID CreateTrait(std::string name);
+		void CreateTraitImplementation(DataTypeID dataTypeID, TraitID traitID);
 
-		[[nodiscard]] CustomEventID CreateCustomEvent(std::string_view aName);
-		[[nodiscard]] FunctionID CreateFunction(std::string_view aName);
-		[[nodiscard]] NodeID CreateNode(const NodeGraphVariantHandle& aNodeGraphVariant, NodeTypeID aNodeTypeID, Vec2 aPosition = Vec2(), CommandTracker* aCommandTracker = nullptr);
-		[[nodiscard]] std::optional<NodeID> CreateNode(const NodeGraphVariantHandle& aNodeGraphVariant, std::string_view aName, Vec2 aPosition, bool aCreateIfNameNotFound, CommandTracker* aCommandTracker);
-		[[nodiscard]] NodeID CreateNodeAutoLink(const NodeGraphVariantHandle& aNodeGraphVariant, NodeTypeID aNodeTypeID, PinID aConnectingPinID, Vec2 aPosition = Vec2(), CommandTracker* aCommandTracker = nullptr);
-		[[nodiscard]] NodeID CreateGetterNode(NodeGraph& aNodeGraph, VarID aVarID, Class& aClass, DataTypeID aDataTypeID, Vec2 aPosition, CommandTracker* aCommandTracker);
-		[[nodiscard]] NodeID CreateSetterNode(NodeGraph& aNodeGraph, VarID aVarID, Class& aClass, DataTypeID aDataTypeID, Vec2 aPosition, CommandTracker* aCommandTracker);
-		[[nodiscard]] NodeID CreateOperatorNode(NodeGraph& aNodeGraph, eNodeOperatorTrait aOperatorTrait, DataTypeID aDataTypeID, CommandTracker* aCommandTracker);
+		[[nodiscard]] CustomEventID CreateCustomEvent(std::string name);
+		[[nodiscard]] FunctionID CreateFunction(std::string name);
+		[[nodiscard]] NodeID CreateNode(const NodeGraphVariantHandle& nodeGraphVariant, NodeTypeID nodeTypeID, Vec2 position = Vec2(), CommandTracker* commandTracker = nullptr);
+		[[nodiscard]] std::optional<NodeID> CreateNode(const NodeGraphVariantHandle& nodeGraphVariant, std::string name, Vec2 position, bool createIfNameNotFound, CommandTracker* commandTracker);
+		[[nodiscard]] NodeID CreateNodeAutoLink(const NodeGraphVariantHandle& nodeGraphVariant, NodeTypeID nodeTypeID, PinID aConnectingPinID, Vec2 position = Vec2(), CommandTracker* commandTracker = nullptr);
+		[[nodiscard]] NodeID CreateGetterNode(NodeGraph& nodeGraph, VarID varID, Class& flyClass, DataTypeID dataTypeID, Vec2 position, CommandTracker* commandTracker);
+		[[nodiscard]] NodeID CreateSetterNode(NodeGraph& nodeGraph, VarID varID, Class& flyClass, DataTypeID dataTypeID, Vec2 position, CommandTracker* commandTracker);
+		[[nodiscard]] NodeID CreateOperatorNode(NodeGraph& nodeGraph, eNodeOperatorType operatorType, DataTypeID dataTypeID, CommandTracker* commandTracker);
 
-		void AddNode(NodeGraph& aNodeGraph, Node&& aNode, NodeID aNodeID, CommandTracker* aCommandTracker);
+		void AddNode(NodeGraph& nodeGraph, Node&& node, NodeID nodeID, CommandTracker* commandTracker);
 
-		void DestroyNode(NodeGraph& aNodeGraph, NodeID aNodeID, CommandTracker* aCommandTracker);
-		void DestroyNodes(std::span<NodeRef> aNodeRefs, CommandTracker* aCommandTracker);
-		void DestroyNodes(std::span<GlobalNodeRef> aNodeRefs, CommandTracker* aCommandTracker);
-		void DestroyNodes(std::span<NodeID> aNodeIDs, NodeGraph& aNodeGraph, CommandTracker* aCommandTracker);
-		void DestroyLinks(std::span<LinkID> aLinkIDs, NodeGraph& aNodeGraph, CommandTracker* aCommandTracker);
-		void DestroySelection(std::span<NodeID> aNodeIDs, std::span<LinkID> aLinkIDs, NodeGraph& aNodeGraph, CommandTracker* aCommandTracker);
+		void DestroyNode(NodeGraph& nodeGraph, NodeID nodeID, CommandTracker* commandTracker);
+		void DestroyNodes(std::span<NodeRef> nodeRefs, CommandTracker* commandTracker);
+		void DestroyNodes(std::span<GlobalNodeRef> nodeRefs, CommandTracker* commandTracker);
+		void DestroyNodes(std::span<NodeID> nodeIDs, NodeGraph& nodeGraph, CommandTracker* commandTracker);
+		void DestroyLinks(std::span<LinkID> linkIDs, NodeGraph& nodeGraph, CommandTracker* commandTracker);
+		void DestroySelection(std::span<NodeID> nodeIDs, std::span<LinkID> linkIDs, NodeGraph& nodeGraph, CommandTracker* commandTracker);
 
-		void SetNodePosition(NodeID aNodeID, Vec2 aPosition, NodeGraph& aNodeGraph, CommandTracker* aCommandTracker);
-		void SetNodePosition(NodeID aNodeID, Vec2 aPosition, Vec2 aOldPosition, NodeGraph& aNodeGraph, CommandTracker* aCommandTracker);
-		void CommitNodeDrag(const std::unordered_map<NodeID, NodeDragData>& aNodeDragData, NodeGraph& aNodeGraph, CommandTracker* const aCommandTracker);
+		void SetNodePosition(NodeID nodeID, Vec2 position, NodeGraph& nodeGraph, CommandTracker* commandTracker);
+		void SetNodePosition(NodeID nodeID, Vec2 position, Vec2 oldPosition, NodeGraph& nodeGraph, CommandTracker* commandTracker);
+		void CommitNodeDrag(const std::unordered_map<NodeID, NodeDragData>& nodeDragData, NodeGraph& nodeGraph, CommandTracker* const commandTracker);
 
-		[[nodiscard]] std::vector<PinID> CreateInputPins(NodeGraph& aNodeGraph, NodeID aNodeID, NodeTypeID aNodeTypeID, size_t aStartIndex = 0);
-		[[nodiscard]] std::vector<PinID> CreateOutputPins(NodeGraph& aNodeGraph, NodeID, NodeTypeID aNodeTypeID, size_t aStartIndex);
+		[[nodiscard]] std::vector<PinID> CreateInputPins(NodeGraph& nodeGraph, NodeID nodeID, NodeTypeID nodeTypeID, const NodeCreationContext& creationContext, size_t startIndex = 0);
+		[[nodiscard]] std::vector<PinID> CreateOutputPins(NodeGraph& nodeGraph, NodeID, NodeTypeID nodeTypeID, const NodeCreationContext& creationContext, size_t startIndex);
 
-		[[nodiscard]] PinID CreatePin(NodeGraph& aNodeGraph, NodeID aNodeID, PinTypeID aPinTypeID);
-		[[nodiscard]] PinID CreatePin(NodeGraph& aNodeGraph, NodeID aNodeID, PinTypeID aPinTypeID, void* aDataPtr);
+		[[nodiscard]] PinID CreatePin(NodeGraph& nodeGraph, NodeID nodeID, PinTypeID pinTypeID, const NodeCreationContext& creationContext);
+		[[nodiscard]] PinID CreatePin(NodeGraph& nodeGraph, NodeID nodeID, PinTypeID pinTypeID, void* dataPtr, const NodeCreationContext& creationContext);
 
-		void ViewAndEditPinGeneric(PinID aPinID, NodeGraph& aNodeGraph, CommandTracker* aCommandTracker);
-		//void ViewAndEditPin(PinID aPinID, NodeGraph& aNodeGraph, CommandTracker* aCommandTracker);
-		void ViewPinGeneric(PinID aPinID, const NodeGraph& aNodeGraph);
-		//void ViewPin(PinID aPinID, const NodeGraph& aNodeGraph);
-		void SplitPin(PinID aPinID, NodeGraph& aNodeGraph, CommandTracker* aCommandTracker);
-		void RecombinePin(PinID aPinID, NodeGraph& aNodeGraph, CommandTracker* aCommandTracker);
+		void ViewAndEditPinGeneric(PinID pinID, NodeGraph& nodeGraph, CommandTracker* commandTracker);
+		//void ViewAndEditPin(PinID pinID, NodeGraph& nodeGraph, CommandTracker* commandTracker);
+		void ViewPinGeneric(PinID pinID, const NodeGraph& nodeGraph);
+		//void ViewPin(PinID pinID, const NodeGraph& nodeGraph);
+		void SplitPin(PinID pinID, NodeGraph& nodeGraph, CommandTracker* commandTracker);
+		void RecombinePin(PinID pinID, NodeGraph& nodeGraph, CommandTracker* commandTracker);
 
-		void BeginFrame(CommandTracker* aCommandTracker);
+		void BeginFrame(CommandTracker* commandTracker);
 
-		bool IsNodeReplacable(NodeGraph& aNodeGraph, NodeID aNodeID);
+		bool IsNodeReplacable(NodeGraph& nodeGraph, NodeID nodeID);
 
-		LinkID TryCreateLink(NodeGraph& aNodeGraph, PinID aPinID1, PinID aPinID2, CommandTracker* aCommandTracker);
-		LinkID CreateLinkGeneric(NodeGraph& aNodeGraph, PinID inputPinID, PinID aOutputPinID, CommandTracker* aCommandTracker);
-		LinkID CreateLink(NodeGraph& aNodeGraph, PinID inputPinID, PinID aOutputPinID, CommandTracker* aCommandTracker);
-		void DestroyLink(NodeGraph& aNodeGraph, LinkID aLinkID, CommandTracker* aCommandTracker);
-		void DestroyLinksByPin(NodeGraph& aNodeGraph, PinID aPinID, CommandTracker* aCommandTracker);
+		LinkID TryCreateLink(NodeGraph& nodeGraph, PinID pinID1, PinID pinID2, CommandTracker* commandTracker);
+		LinkID CreateLinkGeneric(NodeGraph& nodeGraph, PinID inputPinID, PinID outputPinID, CommandTracker* commandTracker);
+		LinkID CreateLink(NodeGraph& nodeGraph, PinID inputPinID, PinID outputPinID, CommandTracker* commandTracker);
+		void DestroyLink(NodeGraph& nodeGraph, LinkID linkID, CommandTracker* commandTracker);
+		void DestroyLinksByPin(NodeGraph& nodeGraph, PinID pinID, CommandTracker* commandTracker);
 
-		VarID CreateVariable(GenericDataTypeID aParentDataTypeID, GenericDataTypeID aDataTypeID, std::string_view aName, CommandTracker* aCommandTracker);
-		VarID CreateVariable(VariableContainer& aVariableContainer, GenericDataTypeID aDataTypeID, std::string_view aName, CommandTracker* aCommandTracker);
-		void SetVariableDataType(VarID aVarID, VariableContainer& aVariableContainer, GenericDataTypeID aDataTypeID, CommandTracker* aCommandTracker);
-		void SetVariableName(VarID aVarID, VariableContainer& aVariableContainer, std::string_view aName, CommandTracker* aCommandTracker);
-		void DestroyVariable(VarID aVarID, VariableContainer& aVariableContainer, CommandTracker* aCommandTracker);
-		//void DestroyVariableNodes(VarID aVarID, VariableContainer& aVariableContainer, CommandTracker* aCommandTracker);
-		void ViewAndEditVariableDefaultValue(VarID aVarID, VariableContainer& aVariableContainer, CommandTracker* aCommandTracker);
+		VarID CreateVariable(GenericDataTypeID parentDataTypeID, GenericDataTypeID dataTypeID, std::string name, CommandTracker* commandTracker);
+		VarID CreateVariable(VariableContainer& variableContainer, GenericDataTypeID dataTypeID, std::string name, CommandTracker* commandTracker);
+		void SetVariableDataType(VarID varID, VariableContainer& variableContainer, GenericDataTypeID dataTypeID, CommandTracker* commandTracker);
+		void SetVariableName(VarID varID, VariableContainer& variableContainer, std::string name, CommandTracker* commandTracker);
+		void DestroyVariable(VarID varID, VariableContainer& variableContainer, CommandTracker* commandTracker);
+		//void DestroyVariableNodes(VarID varID, VariableContainer& variableContainer, CommandTracker* commandTracker);
+		void ViewAndEditVariableDefaultValue(VarID varID, VariableContainer& variableContainer, CommandTracker* commandTracker);
 
-		void ViewAndEditClassInstanceVariableDefaultValue(ClassInstance& aClassInstance, CommandTracker* aCommandTracker);
+		void ViewAndEditClassInstanceVariableDefaultValue(ClassInstance& flyClassInstance, CommandTracker* commandTracker);
 
-		void BindVariable(Class& aClass, const NodeRef& aNodeRef, VarID aVarID, CommandTracker* aCommandTracker);
-		void UnbindVariable(Class& aClass, const NodeRef& aNodeRef, CommandTracker* aCommandTracker);
+		void BindVariable(Class& flyClass, const NodeRef& nodeRef, VarID varID, CommandTracker* commandTracker);
+		void UnbindVariable(Class& flyClass, const NodeRef& nodeRef, CommandTracker* commandTracker);
 
-		void SetPinTypeName(PinTypeID aPinTypeID, std::string_view aName);
-		PinTypeID AddPinTypeToNodeType(NodeTypeID aNodeTypeID, GenericDataTypeID aDataTypeID, eIODirection aIODirection, std::string_view aPinName);
+		void SetPinTypeName(PinTypeID pinTypeID, std::string name);
+		PinTypeID AddPinTypeToNodeType(NodeTypeID nodeTypeID, GenericDataTypeID dataTypeID, eIODirection ioDirection, std::string pinName);
 
-		void SetCustomEventName(CustomEventID aCustomEventID, std::string_view aName, CommandTracker* aCommandTracker);
-		void AddPinTypeToCustomEvent(CustomEventID aCustomEventID, GenericDataTypeID aDataTypeID, std::string_view aPinName, CommandTracker* aCommandTracker);
-		void SetPinDataTypeAtIndexCustomEvent(CustomEventID aCustomEventID, GenericDataTypeID aDataTypeID, size_t aIndex, CommandTracker* aCommandTracker);
-		void SetPinNameAtIndexCustomEvent(CustomEventID aCustomEventID, std::string_view aName, size_t aIndex, CommandTracker* aCommandTracker);
-		void DeletePinAtIndexCustomEvent(CustomEventID aCustomEventID, size_t aIndex, CommandTracker* aCommandTracker);
+		void SetCustomEventName(CustomEventID customEventID, std::string name, CommandTracker* commandTracker);
+		void AddPinTypeToCustomEvent(CustomEventID customEventID, GenericDataTypeID dataTypeID, std::string pinName, CommandTracker* commandTracker);
+		void SetPinDataTypeAtIndexCustomEvent(CustomEventID customEventID, GenericDataTypeID dataTypeID, std::size_t index, CommandTracker* commandTracker);
+		void SetPinNameAtIndexCustomEvent(CustomEventID customEventID, std::string name, std::size_t index, CommandTracker* commandTracker);
+		void DeletePinAtIndexCustomEvent(CustomEventID customEventID, std::size_t index, CommandTracker* commandTracker);
 
-		void AddPinTypeToFunction(FunctionID aFunctionID, GenericDataTypeID aDataTypeID, eIODirection aIODirection, std::string_view aPinName, CommandTracker* aCommandTracker);
-		void SetPinDataTypeAtIndexFunction(FunctionID aFunctionID, GenericDataTypeID aDataTypeID, size_t aIndex, eIODirection aIODirection, CommandTracker* aCommandTracker);
-		void SetPinNameAtIndexFunction(FunctionID aFunctionID, std::string_view aName, size_t aIndex, eIODirection aIODirection, CommandTracker* aCommandTracker);
-		void DeletePinAtIndexFunction(FunctionID aFunctionID, size_t aIndex, eIODirection aIODirection, CommandTracker* aCommandTracker);
+		void AddPinTypeToFunction(FunctionID functionID, GenericDataTypeID dataTypeID, eIODirection ioDirection, std::string pinName, CommandTracker* commandTracker);
+		void SetPinDataTypeAtIndexFunction(FunctionID functionID, GenericDataTypeID dataTypeID, std::size_t index, eIODirection ioDirection, CommandTracker* commandTracker);
+		void SetPinNameAtIndexFunction(FunctionID functionID, std::string name, std::size_t index, eIODirection ioDirection, CommandTracker* commandTracker);
+		void DeletePinAtIndexFunction(FunctionID functionID, std::size_t index, eIODirection ioDirection, CommandTracker* commandTracker);
 
-		void ReplaceNode(NodeGraph& aNodeGraph, NodeID aNodeID, DataTypeID aDataTypeID, CommandTracker* aCommandTracker);
-		void ReplaceTemplateNodeWithLink(NodeGraph& aNodeGraph, PinID aWildcardPinID, PinID aConnectedPinID, CommandTracker* aCommandTracker);
-		void ReplaceTemplateNode(NodeGraph& aNodeGraph, NodeID aNodeID, DataTypeID aDataTypeID, CommandTracker* aCommandTracker);
+		void ReplaceNode(NodeGraph& nodeGraph, NodeID nodeID, DataTypeID dataTypeID, CommandTracker* commandTracker);
+		void ReplaceTemplateNodeWithLink(NodeGraph& nodeGraph, PinID wildcardPinID, PinID connectedPinID, CommandTracker* commandTracker);
+		void ReplaceTemplateNode(NodeGraph& nodeGraph, NodeID nodeID, DataTypeID dataTypeID, CommandTracker* commandTracker);
 
-		[[nodiscard]] std::vector<PinID> GetInputPins(const NodeGraph& aNodeGraph, bool aIncludeDestroyed = false);
-		[[nodiscard]] std::vector<PinID> GetOutputPins(const NodeGraph& aNodeGraph, bool aIncludeDestroyed = false);
+		[[nodiscard]] std::vector<PinID> GetInputPins(const NodeGraph& nodeGraph, bool includeDestroyed = false);
+		[[nodiscard]] std::vector<PinID> GetOutputPins(const NodeGraph& nodeGraph, bool includeDestroyed = false);
 
-		[[nodiscard]] VariableRef GetVariableRefByNodeRef(const GlobalNodeRef& aNodeRef);
-		[[nodiscard]] std::vector<GlobalNodeRef> GetNodeRefsByVariableRef(const VariableRef& aVarRef);
+		[[nodiscard]] VariableRef GetVariableRefByNodeRef(const GlobalNodeRef& nodeRef);
+		[[nodiscard]] std::vector<GlobalNodeRef> GetNodeRefsByVariableRef(const VariableRef& varRef);
 
 
-		[[nodiscard]] PinID GetPinID(const NodeGraph& aNodeGraph, const NodeID aNodeID, const size_t aPinIndex, const eIODirection aIODirection);
-		[[nodiscard]] size_t GetPinIndex(const NodeGraph& aNodeGraph, const PinID aPinID);
-		[[nodiscard]] PinID GetOpposingPinID(const NodeGraph& aPreviousNodeGraph, const PinID aPreviousPinID, const NodeGraph& aNewNodeGraph, const NodeID aNodeID);
+		[[nodiscard]] PinID GetPinID(const NodeGraph& nodeGraph, const NodeID nodeID, const std::size_t pinIndex, const eIODirection ioDirection);
+		[[nodiscard]] std::size_t GetPinIndex(const NodeGraph& nodeGraph, const PinID pinID);
+		[[nodiscard]] PinID GetOpposingPinID(const NodeGraph& previousNodeGraph, const PinID previousPinID, const NodeGraph& newNodeGraph, const NodeID nodeID);
 
-		[[nodiscard]] bool AreDataTypesLinkable(GenericDataTypeID inputDataTypeID, GenericDataTypeID aOutputDataTypeID);
-		[[nodiscard]] bool AreDataTypesLinkable(DataTypeID inputDataTypeID, DataTypeID aOutputDataTypeID);
-		[[nodiscard]] bool ArePinTypesLinkableByDataType(PinTypeID inputPinTypeID, PinTypeID aOutputPinTypeID);
-		[[nodiscard]] Link ArePinsLinkable(const NodeGraph& aNodeGraph, PinID aPinID1, PinID aPinID2);
+		[[nodiscard]] bool AreDataTypesLinkable(GenericDataTypeID inputDataTypeID, GenericDataTypeID outputDataTypeID);
+		[[nodiscard]] bool AreDataTypesLinkable(DataTypeID inputDataTypeID, DataTypeID outputDataTypeID);
+		[[nodiscard]] bool ArePinTypesLinkableByDataType(PinTypeID inputPinTypeID, PinTypeID outputPinTypeID);
+		[[nodiscard]] Link ArePinsLinkable(const NodeGraph& nodeGraph, PinID pinID1, PinID pinID2);
 
-		[[nodiscard]] LinkID GetLinkIDByPinIDs(const NodeGraph& aNodeGraph, const PinID aPinID1, const PinID aPinID2, bool aIncludeDestroyed = false);
-		[[nodiscard]] std::vector<LinkID> GetLinkIDsByPin(const NodeGraph& aNodeGraph, const PinID aPinID, bool aIncludeDestroyed = false);
-		[[nodiscard]] std::vector<LinkID> GetLinkIDsByNode(const NodeGraph& aNodeGraph, const NodeID aNodeID);
+		[[nodiscard]] LinkID GetLinkIDByPinIDs(const NodeGraph& nodeGraph, const PinID pinID1, const PinID pinID2, bool includeDestroyed = false);
+		[[nodiscard]] std::vector<LinkID> GetLinkIDsByPin(const NodeGraph& nodeGraph, const PinID pinID, bool includeDestroyed = false);
+		[[nodiscard]] std::vector<LinkID> GetLinkIDsByNode(const NodeGraph& nodeGraph, const NodeID nodeID);
 
 	}
 

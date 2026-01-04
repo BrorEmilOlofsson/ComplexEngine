@@ -13,10 +13,9 @@ namespace FLY_NAMESPACE
 	public:
 
 
-		CallStack();
-		~CallStack();
+		CallStack() = default;
 		
-		void Push(const NodeRef& aNodeRef);
+		void Push(const NodeRef& nodeRef);
 		NodeRef Pop();
 
 	private:

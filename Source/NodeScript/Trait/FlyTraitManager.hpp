@@ -1,9 +1,11 @@
 #pragma once
+#include <unordered_set>
+#include <unordered_map>
+#include <string>
+
 #include "../FlyDefines.hpp"
 #include "FlyTrait.hpp"
 #include "FlyTraitImplementation.hpp"
-#include <unordered_map>
-#include <unordered_set>
 
 namespace FLY_NAMESPACE
 {
@@ -14,21 +16,21 @@ namespace FLY_NAMESPACE
 
 		TraitManager() = default;
 
-		TraitID CreateTrait(std::string_view aName);
-		TraitID CreateTrait(std::string_view aName, DataTypeID aDataTypeID);
-		[[nodiscard]] bool HasDataTypeTrait(DataTypeID aDataTypeID, TraitID aTraitID) const;
-		void CreateTraitImplementation(DataTypeID aDataTypeID, TraitID aTraitID);
+		TraitID CreateTrait(std::string name);
+		TraitID CreateTrait(std::string name, DataTypeID dataTypeID);
+		[[nodiscard]] bool HasDataTypeTrait(DataTypeID dataTypeID, TraitID traitID) const;
+		void CreateTraitImplementation(DataTypeID dataTypeID, TraitID traitID);
 
-		[[nodiscard]] Trait& GetTrait(TraitID aTraitID);
-		[[nodiscard]] const Trait& GetTrait(TraitID aTraitID) const;
-		[[nodiscard]] Trait& GetTrait(DataTypeID aDataTypeID);
-		[[nodiscard]] const Trait& GetTrait(DataTypeID aDataTypeID) const;
+		[[nodiscard]] Trait& GetTrait(TraitID traitID);
+		[[nodiscard]] const Trait& GetTrait(TraitID traitID) const;
+		[[nodiscard]] Trait& GetTrait(DataTypeID dataTypeID);
+		[[nodiscard]] const Trait& GetTrait(DataTypeID dataTypeID) const;
 
-		[[nodiscard]] TraitImplementation* GetTraitImplementation(DataTypeID aDataTypeID, TraitID aTraitID);
-		[[nodiscard]] const TraitImplementation* GetTraitImplementation(DataTypeID aDataTypeID, TraitID aTraitID) const;
+		[[nodiscard]] TraitImplementation* GetTraitImplementation(DataTypeID dataTypeID, TraitID traitID);
+		[[nodiscard]] const TraitImplementation* GetTraitImplementation(DataTypeID dataTypeID, TraitID traitID) const;
 
 		const std::vector<Trait>& GetTraits() const;
-		TraitID GetTraitIDByDataTypeID(DataTypeID aDataTypeID) const;
+		TraitID GetTraitIDByDataTypeID(DataTypeID dataTypeID) const;
 
 	private:
 
@@ -40,14 +42,14 @@ namespace FLY_NAMESPACE
 
 	};
 
-	inline TraitImplementation* TraitManager::GetTraitImplementation(const DataTypeID aDataTypeID, const TraitID aTraitID)
+	inline TraitImplementation* TraitManager::GetTraitImplementation(const DataTypeID dataTypeID, const TraitID traitID)
 	{
-		auto it = mTraitsByDataTypeID.find(aDataTypeID);
+		auto it = mTraitsByDataTypeID.find(dataTypeID);
 		if (it == mTraitsByDataTypeID.end())
 		{
 			return nullptr;
 		}
-		auto it2 = it->second.find(aTraitID);
+		auto it2 = it->second.find(traitID);
 		if (it2 == it->second.end())
 		{
 			return nullptr;
@@ -55,14 +57,14 @@ namespace FLY_NAMESPACE
 		return it2->second.Get();
 	}
 
-	inline const TraitImplementation* TraitManager::GetTraitImplementation(DataTypeID aDataTypeID, TraitID aTraitID) const
+	inline const TraitImplementation* TraitManager::GetTraitImplementation(DataTypeID dataTypeID, TraitID traitID) const
 	{
-		auto it = mTraitsByDataTypeID.find(aDataTypeID);
+		auto it = mTraitsByDataTypeID.find(dataTypeID);
 		if (it == mTraitsByDataTypeID.end())
 		{
 			return nullptr;
 		}
-		auto it2 = it->second.find(aTraitID);
+		auto it2 = it->second.find(traitID);
 		if (it2 == it->second.end())
 		{
 			return nullptr;
@@ -71,24 +73,24 @@ namespace FLY_NAMESPACE
 	}
 
 
-	inline Trait& TraitManager::GetTrait(const TraitID aTraitID)
+	inline Trait& TraitManager::GetTrait(const TraitID traitID)
 	{
-		return mTraits[aTraitID];
+		return mTraits[traitID];
 	}
 
-	inline const Trait& TraitManager::GetTrait(const TraitID aTraitID) const
+	inline const Trait& TraitManager::GetTrait(const TraitID traitID) const
 	{
-		return mTraits[aTraitID];
+		return mTraits[traitID];
 	}
 
-	inline Trait& TraitManager::GetTrait(const DataTypeID aDataTypeID)
+	inline Trait& TraitManager::GetTrait(const DataTypeID dataTypeID)
 	{
-		return GetTrait(GetTraitIDByDataTypeID(aDataTypeID));
+		return GetTrait(GetTraitIDByDataTypeID(dataTypeID));
 	}
 
-	inline const Trait& TraitManager::GetTrait(const DataTypeID aDataTypeID) const
+	inline const Trait& TraitManager::GetTrait(const DataTypeID dataTypeID) const
 	{
-		return GetTrait(GetTraitIDByDataTypeID(aDataTypeID));
+		return GetTrait(GetTraitIDByDataTypeID(dataTypeID));
 	}
 
 	inline const std::vector<Trait>& TraitManager::GetTraits() const
@@ -96,9 +98,9 @@ namespace FLY_NAMESPACE
 		return mTraits;
 	}
 
-	inline TraitID TraitManager::GetTraitIDByDataTypeID(const DataTypeID aDataTypeID) const
+	inline TraitID TraitManager::GetTraitIDByDataTypeID(const DataTypeID dataTypeID) const
 	{
-		return mTraitIDsByDataTypeID.at(aDataTypeID);
+		return mTraitIDsByDataTypeID.at(dataTypeID);
 	}
 
 }

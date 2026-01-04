@@ -31,23 +31,23 @@ namespace FLY_NAMESPACE
 		Internal::SaveCustomEvents(filePath);
 	}
 
-	GenericDataTypeProxy CreateStruct(std::string_view name, const std::filesystem::path& savePath)
+	GenericDataTypeProxy CreateStruct(std::string name, const std::filesystem::path& savePath)
 	{
-		const DataTypeID dataTypeID = Internal::CreateStruct(name);
+		const DataTypeID dataTypeID = Internal::CreateStruct(std::move(name));
 		Internal::SaveDataType(*Internal::GetDataTypeByID(dataTypeID), savePath);
 		return GenericDataTypeProxy(dataTypeID);
 	}
 
-	ClassProxy CreateClass(const GenericDataTypeProxy targetProxy, const std::string_view name, const std::filesystem::path& savePath)
+	ClassProxy CreateClass(const GenericDataTypeProxy targetProxy, std::string name, const std::filesystem::path& savePath)
 	{
-		const ClassID createdClassID = Internal::CreateClass(targetProxy.GetID(), name);
+		const ClassID createdClassID = Internal::CreateClass(targetProxy.GetID(), std::move(name));
 		Internal::SaveClass(Internal::GetClassByID(createdClassID), savePath);
 		return ClassProxy(createdClassID);
 	}
 
-	ClassProxy CreateClassWithoutTarget(const std::string_view name, const std::filesystem::path& savePath)
+	ClassProxy CreateClassWithoutTarget(std::string name, const std::filesystem::path& savePath)
 	{
-		return CreateClass(GenericDataTypeProxy(GetDataTypeID<None*>()), name, savePath);
+		return CreateClass(GenericDataTypeProxy(GetDataTypeID<None*>()), std::move(name), savePath);
 	}
 
 	GenericDataTypeProxy FindDataTypeByName(const std::string_view name)
@@ -72,7 +72,7 @@ namespace FLY_NAMESPACE
 
 
 
-	void SetDefaultDataTypeColor(const Fly::Color& color)
+	void SetDefaultDataTypeColor(const Color& color)
 	{
 		Internal::GetDataTypeManager().SetDefaultColor(color);
 	}
@@ -207,14 +207,14 @@ namespace FLY_NAMESPACE
 		}
 	}
 
-	CustomEventProxy CreateCustomEvent(const std::string_view name)
+	CustomEventProxy CreateCustomEvent(std::string name)
 	{
-		return CustomEventProxy(Internal::CreateCustomEvent(name));
+		return CustomEventProxy(Internal::CreateCustomEvent(std::move(name)));
 	}
 
-	FunctionProxy CreateGlobalFunction(const std::string_view name)
+	FunctionProxy CreateGlobalFunction(std::string name)
 	{
-		return FunctionProxy(Internal::CreateFunction(name));
+		return FunctionProxy(Internal::CreateFunction(std::move(name)));
 	}
 
 	void BeginFrame(CommandTracker* const commandTracker)
@@ -329,7 +329,7 @@ namespace FLY_NAMESPACE
 
 		for (auto& linkRef : linkRefs)
 		{
-			linkProxys.push_back(LinkProxy(linkRef.mLinkID, NodeGraphProxy(linkRef.mNodeGraphVariantHandle)));
+			linkProxys.push_back(LinkProxy(linkRef.linkID, NodeGraphProxy(linkRef.nodeGraphVariantHandle)));
 		}
 
 		return linkProxys;

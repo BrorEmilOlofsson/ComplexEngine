@@ -11,31 +11,33 @@ namespace FLY_NAMESPACE
 	{
 	public:
 
-		Node(const NodeTypeID aTypeID, const auto& inputPins, const auto& aOutputPins)
-			: mTypeID(aTypeID)
+		Node(const NodeTypeID typeID, const auto& inputPins, const auto& outputPins, const void* inputTuplePtr)
+			: mTypeID(typeID)
 			, mInputPins(begin(inputPins), end(inputPins))
-			, mOutputPins(begin(aOutputPins), end(aOutputPins))
+			, mOutputPins(begin(outputPins), end(outputPins))
 			, mSplitInputPins(mInputPins)
 			, mSplitOutputPins(mOutputPins)
+			, mInputTuplePtr(inputTuplePtr)
 		{
 		}
 
-		Node(const NodeTypeID aTypeID, const std::vector<PinID>& inputPins, const std::vector<PinID>& aOutputPins);
+		Node(const NodeTypeID typeID, const std::vector<PinID>& inputPins, const std::vector<PinID>& outputPins, const void* inputTuplePtr);
 
-		[[nodiscard]] NodeTypeID GetTypeID() const;
-		[[nodiscard]] std::vector<PinID>& GetInputPins();
-		[[nodiscard]] const std::vector<PinID>& GetInputPins() const;
-		[[nodiscard]] std::vector<PinID>& GetOutputPins();
-		[[nodiscard]] const std::vector<PinID>& GetOutputPins() const;
-		[[nodiscard]] std::vector<PinID>& GetSplitInputPins();
-		[[nodiscard]] const std::vector<PinID>& GetSplitInputPins() const;
-		[[nodiscard]] std::vector<PinID>& GetSplitOutputPins();
-		[[nodiscard]] const std::vector<PinID>& GetSplitOutputPins() const;
+		[[nodiscard]] constexpr NodeTypeID GetTypeID() const;
+		[[nodiscard]] constexpr std::vector<PinID>& GetInputPins();
+		[[nodiscard]] constexpr const std::vector<PinID>& GetInputPins() const;
+		[[nodiscard]] constexpr std::vector<PinID>& GetOutputPins();
+		[[nodiscard]] constexpr const std::vector<PinID>& GetOutputPins() const;
+		[[nodiscard]] constexpr std::vector<PinID>& GetSplitInputPins();
+		[[nodiscard]] constexpr const std::vector<PinID>& GetSplitInputPins() const;
+		[[nodiscard]] constexpr std::vector<PinID>& GetSplitOutputPins();
+		[[nodiscard]] constexpr const std::vector<PinID>& GetSplitOutputPins() const;
+		[[nodiscard]] constexpr const void* GetInputTuplePtr() const;
 		[[nodiscard]] Vec2 GetPosition() const;
 		[[nodiscard]] bool IsDestroyed() const;
 
-		void SetPosition(Vec2 aPosition);
-		void SetIsDestroyed(bool aIsDestroyed);
+		void SetPosition(Vec2 position);
+		void SetIsDestroyed(bool isDestroyed);
 
 	private:
 
@@ -44,53 +46,59 @@ namespace FLY_NAMESPACE
 		std::vector<PinID> mOutputPins;
 		std::vector<PinID> mSplitInputPins;
 		std::vector<PinID> mSplitOutputPins;
+		const void* mInputTuplePtr = nullptr;
 		Vec2 mPosition;
 		bool mIsDestroyed = false;
 	};
 
-	inline NodeTypeID Node::GetTypeID() const
+	constexpr NodeTypeID Node::GetTypeID() const
 	{
 		return mTypeID;
 	}
 
-	inline std::vector<PinID>& Node::GetInputPins()
+	constexpr std::vector<PinID>& Node::GetInputPins()
 	{
 		return mInputPins;
 	}
 
-	inline const std::vector<PinID>& Node::GetInputPins() const
+	constexpr const std::vector<PinID>& Node::GetInputPins() const
 	{
 		return mInputPins;
 	}
 
-	inline std::vector<PinID>& Node::GetOutputPins()
+	constexpr std::vector<PinID>& Node::GetOutputPins()
 	{
 		return mOutputPins;
 	}
 
-	inline const std::vector<PinID>& Node::GetOutputPins() const
+	constexpr const std::vector<PinID>& Node::GetOutputPins() const
 	{
 		return mOutputPins;
 	}
 
-	inline std::vector<PinID>& Node::GetSplitInputPins()
+	constexpr std::vector<PinID>& Node::GetSplitInputPins()
 	{
 		return mSplitInputPins;
 	}
 
-	inline const std::vector<PinID>& Node::GetSplitInputPins() const
+	constexpr const std::vector<PinID>& Node::GetSplitInputPins() const
 	{
 		return mSplitInputPins;
 	}
 
-	inline std::vector<PinID>& Node::GetSplitOutputPins()
+	constexpr std::vector<PinID>& Node::GetSplitOutputPins()
 	{
 		return mSplitOutputPins;
 	}
 
-	inline const std::vector<PinID>& Node::GetSplitOutputPins() const
+	constexpr const std::vector<PinID>& Node::GetSplitOutputPins() const
 	{
 		return mSplitOutputPins;
 	}
+
+	constexpr const void* Node::GetInputTuplePtr() const
+	{
+		return mInputTuplePtr;
+    }
 
 }

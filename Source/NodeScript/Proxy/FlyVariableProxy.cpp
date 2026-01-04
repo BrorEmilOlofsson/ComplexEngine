@@ -9,32 +9,32 @@
 namespace FLY_NAMESPACE
 {
 
-	VariableProxy::VariableProxy(const VarID aVarID, const ClassProxy& aClass)
-		: mVarID(aVarID)
-		, mOwnerID(GenericDataTypeID{ aClass.GetID() })
+	VariableProxy::VariableProxy(const VarID varID, const ClassProxy& flyClass)
+		: mVarID(varID)
+		, mOwnerID(GenericDataTypeID{ flyClass.GetID() })
 	{
 	}
 
-	VariableProxy::VariableProxy(const VarID aVarID, const DataTypeProxy& aDataType)
-		: mVarID(aVarID)
-		, mOwnerID(GenericDataTypeID{ aDataType.GetID() })
+	VariableProxy::VariableProxy(const VarID varID, const DataTypeProxy& dataType)
+		: mVarID(varID)
+		, mOwnerID(GenericDataTypeID{ dataType.GetID() })
 	{
 	}
 
-	VariableProxy::VariableProxy(VarID aVarID, const GenericDataTypeProxy& aGenericDataType)
-		: mVarID(aVarID)
-		, mOwnerID(aGenericDataType.GetID())
+	VariableProxy::VariableProxy(VarID varID, const GenericDataTypeProxy& genericDataType)
+		: mVarID(varID)
+		, mOwnerID(genericDataType.GetID())
 	{
 	}
 
 	// Temp
-	static VariableContainer* GetVariableContainer(GenericDataTypeID aDataTypeID)
+	static VariableContainer* GetVariableContainer(GenericDataTypeID dataTypeID)
 	{
 		return std::visit(Visitor
 			{
-			[&](const DataTypeID aDataTypeID) -> VariableContainer* { return &Internal::GetDataTypeManager().Find(aDataTypeID)->GetVariableContainer(); },
-			[&](const ClassID aClassID) -> VariableContainer* { return &Internal::GetClassByID(aClassID).mVariableContainer; }
-			}, aDataTypeID.mID);
+			[&](const DataTypeID dataTypeID) -> VariableContainer* { return &Internal::GetDataTypeManager().Find(dataTypeID)->GetVariableContainer(); },
+			[&](const ClassID classID) -> VariableContainer* { return &Internal::GetClassByID(classID).mVariableContainer; }
+			}, dataTypeID.mID);
 	}
 
 	std::string_view VariableProxy::GetName() const
@@ -62,24 +62,24 @@ namespace FLY_NAMESPACE
 		return GetVariable().GetByteOffset();
 	}
 
-	void VariableProxy::SetName(const std::string_view aName, CommandTracker* const aCommandTracker)
+	void VariableProxy::SetName(std::string name, CommandTracker* const commandTracker)
 	{
-		Internal::SetVariableName(mVarID, *GetVariableContainer(mOwnerID), aName, aCommandTracker);
+		Internal::SetVariableName(mVarID, *GetVariableContainer(mOwnerID), std::move(name), commandTracker);
 	}
 
-	void VariableProxy::Destroy(CommandTracker* const aCommandTracker)
+	void VariableProxy::Destroy(CommandTracker* const commandTracker)
 	{
-		Internal::DestroyVariable(mVarID, *GetVariableContainer(mOwnerID), aCommandTracker);
+		Internal::DestroyVariable(mVarID, *GetVariableContainer(mOwnerID), commandTracker);
 	}
 
-	void VariableProxy::ViewAndEditDefaultValue(CommandTracker* const aCommandTracker)
+	void VariableProxy::ViewAndEditDefaultValue(CommandTracker* const commandTracker)
 	{
-		Internal::ViewAndEditVariableDefaultValue(mVarID, *GetVariableContainer(mOwnerID), aCommandTracker);
+		Internal::ViewAndEditVariableDefaultValue(mVarID, *GetVariableContainer(mOwnerID), commandTracker);
 	}
 
-	void VariableProxy::SetDataType(const GenericDataTypeProxy aDataTypeProxy, CommandTracker* const aCommandTracker)
+	void VariableProxy::SetDataType(const GenericDataTypeProxy dataTypeProxy, CommandTracker* const commandTracker)
 	{
-		Internal::SetVariableDataType(mVarID, *GetVariableContainer(mOwnerID), aDataTypeProxy.GetID(), aCommandTracker);
+		Internal::SetVariableDataType(mVarID, *GetVariableContainer(mOwnerID), dataTypeProxy.GetID(), commandTracker);
 	}
 
 	VariableProxy::operator bool() const

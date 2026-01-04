@@ -3,22 +3,22 @@
 namespace FLY_NAMESPACE
 {
 
-	NodeType::NodeType(std::string aName, CreateNodeFunction aCreateFunction, ExecuteNodeFunction aExecuteFunction, FastExecuteNodeFunction aFastExecuteFunction,
-		eNodeTrait aTraits, EventID aEventID, DataTypeID aOwnerDataTypeID, std::vector<PinTypeID> inputPinTypeIDs, std::vector<PinTypeID> aOutputPinTypeIDs,
-		MemoryPoolID aFunctionMemoryID, DataTypeID aNodeStateDataTypeID, TraitID aTraitID, eNodeOperatorTrait aOperatorTrait)
-		: mName(std::move(aName))
-		, mCreateFunction(aCreateFunction)
-		, mExecuteFunction(aExecuteFunction)
-		, mFastExecuteFunction(aFastExecuteFunction)
-		, mTraits(aTraits)
-		, mEventID(aEventID)
-		, mOwnerDataTypeID(aOwnerDataTypeID)
+	NodeType::NodeType(std::string name, CreateNodeFunction createFunction, ExecuteNodeFunction executeFunction, FastExecuteNodeFunction fastExecuteFunction,
+		eNodeTrait traits, EventID eventID, DataTypeID ownerDataTypeID, std::vector<PinTypeID> inputPinTypeIDs, std::vector<PinTypeID> outputPinTypeIDs,
+		MemoryPoolID functionMemoryID, DataTypeID nodeStateDataTypeID, TraitID traitID, eNodeOperatorType operatorType)
+		: mName(std::move(name))
+		, mCreateFunction(createFunction)
+		, mExecuteFunction(executeFunction)
+		, mFastExecuteFunction(fastExecuteFunction)
+		, mTraits(traits)
+		, mEventID(eventID)
+		, mOwnerDataTypeID(ownerDataTypeID)
 		, mInputPinTypeIDs(std::move(inputPinTypeIDs))
-		, mOutputPinTypeIDs(std::move(aOutputPinTypeIDs))
-		, mFunctionMemoryID(aFunctionMemoryID)
-		, mNodeStateDataTypeID(aNodeStateDataTypeID)
-		, mTraitID(aTraitID)
-		, mOperatorTrait(aOperatorTrait)
+		, mOutputPinTypeIDs(std::move(outputPinTypeIDs))
+		, mFunctionMemoryID(functionMemoryID)
+		, mNodeStateDataTypeID(nodeStateDataTypeID)
+		, mTraitID(traitID)
+		, mOperatorType(operatorType)
 	{
 	}
 
@@ -37,8 +37,8 @@ namespace FLY_NAMESPACE
 		return mNodeRefs;
 	}
 
-	void NodeType::SetName(std::string aName)
+	void NodeType::SetName(std::string name)
 	{
-		mName = std::move(aName);
+		mName = std::move(name);
 	}
 }

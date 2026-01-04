@@ -9,8 +9,8 @@ namespace FLY_NAMESPACE
 
 	
 
-	StructProxy::StructProxy(const StructID aStructID)
-		: mStructID(aStructID)
+	StructProxy::StructProxy(const StructID structID)
+		: mStructID(structID)
 	{
 	}
 
@@ -24,7 +24,7 @@ namespace FLY_NAMESPACE
 		return mStructID;
 	}
 
-	std::vector<VariableProxy> StructProxy::GetMemberVariables(const bool aIncludeDestroyed) const
+	std::vector<VariableProxy> StructProxy::GetMemberVariables(const bool includeDestroyed) const
 	{
 		std::vector<VariableProxy> variableProxys;
 
@@ -33,7 +33,7 @@ namespace FLY_NAMESPACE
 		variableProxys.reserve(s.GetVariableContainer().GetVariables().size());
 		for (size_t i = 0; i < s.GetVariableContainer().GetVariableCount(); i++)
 		{
-			if (!aIncludeDestroyed && s.GetVariableContainer().GetVariable(i).IsDestroyed())
+			if (!includeDestroyed && s.GetVariableContainer().GetVariable(i).IsDestroyed())
 			{
 				continue;
 			}
@@ -44,16 +44,16 @@ namespace FLY_NAMESPACE
 
 	}
 
-	VariableProxy StructProxy::CreateVariable(const GenericDataTypeProxy& aDataTypeProxy, const std::string_view aName, CommandTracker* const aCommandTracker)
+	VariableProxy StructProxy::CreateVariable(const GenericDataTypeProxy& dataTypeProxy, std::string name, CommandTracker* const commandTracker)
 	{
-		VarID varID = Internal::CreateVariable(GetStruct().GetVariableContainer(), aDataTypeProxy.GetID(), aName, aCommandTracker);
+		VarID varID = Internal::CreateVariable(GetStruct().GetVariableContainer(), dataTypeProxy.GetID(), std::move(name), commandTracker);
 		return VariableProxy(varID, *this);
 	}
 
-	void StructProxy::SetName(std::string_view aName, CommandTracker* const aCommandTracker)
+	void StructProxy::SetName(std::string name, CommandTracker* const commandTracker)
 	{
-		aName;
-		aCommandTracker;
+		name;
+		commandTracker;
 		//Internal::SetStructName(mStructID, aName, aCommandTracker);
 	}
 
@@ -68,8 +68,8 @@ namespace FLY_NAMESPACE
 		return mStructID != InvalidID<StructID>();
 	}
 
-	bool operator==(const StructProxy& a, const StructProxy& b)
+	bool operator==(const StructProxy& lhs, const StructProxy& rhs)
 	{
-		return a.mStructID == b.mStructID;
+		return lhs.mStructID == rhs.mStructID;
 	}
 }

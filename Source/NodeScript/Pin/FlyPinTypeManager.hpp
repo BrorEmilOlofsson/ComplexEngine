@@ -16,21 +16,21 @@ namespace FLY_NAMESPACE
 		//PinTypeID CreatePinType(std::string_view aName, eFlowType aFlowType, DataTypeID aDataTypeID, SetPinValueFunction aSetPinValueFunction, SetPinValueFromPinInterface aSetPinValueFromPinInterface, MemoryPoolID aDefaultValueMemoryID = InvalidID<MemoryPoolID>());
 
 		template<typename T>
-		[[nodiscard]] PinTypeID CreatePinType(std::string_view aName, eIODirection aIODirection, SetPinValueF aSetPinValueFunction, SetPinValueFromPinF aSetPinValueFromPinFunction, MemoryPoolID aDefaultValueMemoryID = InvalidID<MemoryPoolID>())
+		[[nodiscard]] PinTypeID CreatePinType(std::string name, eIODirection ioDirection, SetPinValueF setPinValueFunction, SetPinValueFromPinF setPinValueFromPinFunction, MemoryPoolID defaultValueMemoryID = InvalidID<MemoryPoolID>())
 		{
-			return CreatePinType(aName, aIODirection, GenericDataTypeID{ GetDataTypeID<T>() }, aSetPinValueFunction, aSetPinValueFromPinFunction, aDefaultValueMemoryID);
+			return CreatePinType(name, ioDirection, GenericDataTypeID{ GetDataTypeID<T>() }, setPinValueFunction, setPinValueFromPinFunction, defaultValueMemoryID);
 		}
 
-		[[nodiscard]] PinTypeID CreatePinType(std::string_view aName, eIODirection aIODirection, GenericDataTypeID aDataTypeID, SetPinValueF aSetPinValueFunction, SetPinValueFromPinF aSetPinValueFromPinFunction, MemoryPoolID aDefaultValueMemoryID = InvalidID<MemoryPoolID>());
+		[[nodiscard]] PinTypeID CreatePinType(std::string name, eIODirection ioDirection, GenericDataTypeID dataTypeID, SetPinValueF setPinValueFunction, SetPinValueFromPinF setPinValueFromPinFunction, MemoryPoolID defaultValueMemoryID = InvalidID<MemoryPoolID>());
 
-		[[nodiscard]] PinType& GetPinType(PinTypeID aID)
+		[[nodiscard]] constexpr PinType& GetPinType(PinTypeID id)
 		{
-			return mPinTypes[aID];
+			return mPinTypes[id];
 		}
 
-		[[nodiscard]] const PinType& GetPinType(PinTypeID aID) const
+		[[nodiscard]] constexpr const PinType& GetPinType(PinTypeID id) const
 		{
-			return mPinTypes[aID];
+			return mPinTypes[id];
 		}
 
 	private:

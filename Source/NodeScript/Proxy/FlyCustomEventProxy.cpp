@@ -6,8 +6,8 @@
 namespace FLY_NAMESPACE
 {
 
-	CustomEventProxy::CustomEventProxy(const CustomEventID aID)
-		: mCustomEventID(aID)
+	CustomEventProxy::CustomEventProxy(const CustomEventID id)
+		: mCustomEventID(id)
 	{
 	}
 
@@ -26,29 +26,29 @@ namespace FLY_NAMESPACE
 		return mCustomEventID;
 	}
 
-	void CustomEventProxy::SetName(std::string_view aName, CommandTracker* aCommandTracker)
+	void CustomEventProxy::SetName(std::string name, CommandTracker* commandTracker)
 	{
-		Internal::SetCustomEventName(GetID(), aName, aCommandTracker);
+		Internal::SetCustomEventName(GetID(), std::move(name), commandTracker);
 	}
 
-	void CustomEventProxy::AddPin(GenericDataTypeProxy aDataTypeProxy, std::string_view aName, CommandTracker* aCommandTracker)
+	void CustomEventProxy::AddPin(GenericDataTypeProxy dataTypeProxy, std::string name, CommandTracker* commandTracker)
 	{
-		Internal::AddPinTypeToCustomEvent(GetID(), aDataTypeProxy.GetID(), aName, aCommandTracker);
+		Internal::AddPinTypeToCustomEvent(GetID(), dataTypeProxy.GetID(), std::move(name), commandTracker);
 	}
 
-	void CustomEventProxy::SetPinNameAtIndex(std::string_view aName, size_t aIndex, CommandTracker* aCommandTracker)
+	void CustomEventProxy::SetPinNameAtIndex(std::string name, size_t index, CommandTracker* commandTracker)
 	{
-		Internal::SetPinNameAtIndexCustomEvent(GetID(), aName, aIndex, aCommandTracker);
+		Internal::SetPinNameAtIndexCustomEvent(GetID(), std::move(name), index, commandTracker);
 	} 
 
-	void CustomEventProxy::SetPinDataTypeAtIndex(GenericDataTypeProxy aDataTypeProxy, size_t aIndex, CommandTracker* aCommandTracker)
+	void CustomEventProxy::SetPinDataTypeAtIndex(GenericDataTypeProxy dataTypeProxy, size_t index, CommandTracker* commandTracker)
 	{
-		Internal::SetPinDataTypeAtIndexCustomEvent(GetID(), aDataTypeProxy.GetID(), aIndex, aCommandTracker);
+		Internal::SetPinDataTypeAtIndexCustomEvent(GetID(), dataTypeProxy.GetID(), index, commandTracker);
 	}
 
-	void CustomEventProxy::DeletePinAtIndex(size_t aIndex, CommandTracker* aCommandTracker)
+	void CustomEventProxy::DeletePinAtIndex(size_t index, CommandTracker* commandTracker)
 	{
-		Internal::DeletePinAtIndexCustomEvent(GetID(), aIndex, aCommandTracker);
+		Internal::DeletePinAtIndexCustomEvent(GetID(), index, commandTracker);
 	}
 
 	CustomEventProxy::operator bool() const
@@ -61,8 +61,8 @@ namespace FLY_NAMESPACE
 		return Internal::GetNodeTypeManager().GetCustomEvent(mCustomEventID);
 	}
 
-	bool operator==(const CustomEventProxy& a, const CustomEventProxy& b)
+	bool operator==(const CustomEventProxy& lhs, const CustomEventProxy& rhs)
 	{
-		return a.mCustomEventID == b.mCustomEventID;
+		return lhs.mCustomEventID == rhs.mCustomEventID;
 	}
 }

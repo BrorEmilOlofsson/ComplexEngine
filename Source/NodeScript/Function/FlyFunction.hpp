@@ -10,7 +10,7 @@ namespace FLY_NAMESPACE
 	{
 	public:
 
-		Function(std::string_view aName);
+		Function(std::string name);
 
 		[[nodiscard]] const std::string& GetName() const;
 		[[nodiscard]] NodeTypeID GetCallerNodeTypeID() const;
@@ -19,7 +19,7 @@ namespace FLY_NAMESPACE
 		[[nodiscard]] NodeGraph& GetNodeGraph();
 		[[nodiscard]] const NodeGraph& GetNodeGraph() const;
 
-		void SetName(std::string aName);
+		void SetName(std::string name);
 
 		static constexpr NodeID INPUT_NODE_ID = NodeID{ 0 };
 		static constexpr NodeID OUTPUT_NODE_ID = NodeID{ 1 };

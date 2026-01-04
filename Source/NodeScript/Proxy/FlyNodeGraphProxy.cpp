@@ -161,15 +161,15 @@ namespace FLY_NAMESPACE
 		);
 	}
 
-	NodeProxy NodeGraphProxy::CreateNode(const NodeTypeProxy& aNodeTypeProxy, const Vec2 aPosition, CommandTracker* const aCommandTracker)
+	NodeProxy NodeGraphProxy::CreateNode(const NodeTypeProxy& nodeTypeProxy, const Vec2 position, CommandTracker* const commandTracker)
 	{
-		const NodeID nodeID = Internal::CreateNode(mNodeGraphVariant, aNodeTypeProxy.GetID(), aPosition, aCommandTracker);
+		const NodeID nodeID = Internal::CreateNode(mNodeGraphVariant, nodeTypeProxy.GetID(), position, commandTracker);
 		return NodeProxy(nodeID, *this);
 	}
 
-	NodeProxy NodeGraphProxy::CreateNode(const std::string_view aName, const Vec2 aPosition, CommandTracker* const aCommandTracker, const bool aCreateIfNameNotFound)
+	NodeProxy NodeGraphProxy::CreateNode(std::string name, const Vec2 position, CommandTracker* const commandTracker, const bool aCreateIfNameNotFound)
 	{
-		const std::optional<NodeID> nodeID = Internal::CreateNode(mNodeGraphVariant, aName, aPosition, aCreateIfNameNotFound, aCommandTracker);
+		const std::optional<NodeID> nodeID = Internal::CreateNode(mNodeGraphVariant, std::move(name), position, aCreateIfNameNotFound, commandTracker);
 		if (nodeID.has_value())
 		{
 			return NodeProxy(nodeID.value(), *this);
@@ -180,48 +180,48 @@ namespace FLY_NAMESPACE
 		}
 	}
 
-	NodeProxy NodeGraphProxy::CreateNodeAutoLink(const NodeTypeProxy aNodeTypeProxy, const PinID aConnection, const Vec2 aPosition, CommandTracker* const aCommandTracker)
+	NodeProxy NodeGraphProxy::CreateNodeAutoLink(const NodeTypeProxy nodeTypeProxy, const PinID connection, const Vec2 position, CommandTracker* const commandTracker)
 	{
-		const NodeID nodeID = Internal::CreateNodeAutoLink(mNodeGraphVariant, aNodeTypeProxy.GetID(), aConnection, aPosition, aCommandTracker);
+		const NodeID nodeID = Internal::CreateNodeAutoLink(mNodeGraphVariant, nodeTypeProxy.GetID(), connection, position, commandTracker);
 		return NodeProxy(nodeID, *this);
 	}
 
-	/*NodeProxy NodeGraphProxy::CreateGetterNode(const VariableProxy aVariableProxy, const Vec2 aPosition, CommandTracker* const aCommandTracker)
+	/*NodeProxy NodeGraphProxy::CreateGetterNode(const VariableProxy aVariableProxy, const Vec2 position, CommandTracker* const commandTracker)
 	{
-		const NodeID nodeID = Internal::CreateGetterNode(GetNodeGraph(), aVariableProxy.GetID(), aVariableProxy.GetClass(), aVariableProxy.GetDataType().GetID(), aPosition, aCommandTracker);
+		const NodeID nodeID = Internal::CreateGetterNode(GetNodeGraph(), aVariableProxy.GetID(), aVariableProxy.GetClass(), aVariableProxy.GetDataType().GetID(), position, commandTracker);
 		return NodeProxy(nodeID, *this);
 	}
 
-	NodeProxy NodeGraphProxy::CreateSetterNode(const VariableProxy aVariableProxy, const Vec2 aPosition, CommandTracker* const aCommandTracker)
+	NodeProxy NodeGraphProxy::CreateSetterNode(const VariableProxy aVariableProxy, const Vec2 position, CommandTracker* const commandTracker)
 	{
-		const NodeID nodeID = Internal::CreateSetterNode(GetNodeGraph(), aVariableProxy.GetID(), aVariableProxy.GetClass(), aVariableProxy.GetDataType().GetID(), aPosition, aCommandTracker);
+		const NodeID nodeID = Internal::CreateSetterNode(GetNodeGraph(), aVariableProxy.GetID(), aVariableProxy.GetClass(), aVariableProxy.GetDataType().GetID(), position, commandTracker);
 		return NodeProxy(nodeID, *this);
 	}*/
 
-	void NodeGraphProxy::DestroySelection(const std::span<NodeID> aNodeIDs, const std::span<LinkID> aLinkIDs, CommandTracker* const aCommandTracker)
+	void NodeGraphProxy::DestroySelection(const std::span<NodeID> aNodeIDs, const std::span<LinkID> aLinkIDs, CommandTracker* const commandTracker)
 	{
-		Internal::DestroySelection(aNodeIDs, aLinkIDs, GetNodeGraph(), aCommandTracker);
+		Internal::DestroySelection(aNodeIDs, aLinkIDs, GetNodeGraph(), commandTracker);
 	}
 
-	LinkProxy NodeGraphProxy::TryCreateLink(const PinProxy aPinProxy1, const PinProxy aPinProxy2, CommandTracker* const aCommandTracker)
+	LinkProxy NodeGraphProxy::TryCreateLink(const PinProxy aPinProxy1, const PinProxy aPinProxy2, CommandTracker* const commandTracker)
 	{
-		const LinkID linkID = Internal::TryCreateLink(GetNodeGraph(), aPinProxy1.GetID(), aPinProxy2.GetID(), aCommandTracker);
+		const LinkID linkID = Internal::TryCreateLink(GetNodeGraph(), aPinProxy1.GetID(), aPinProxy2.GetID(), commandTracker);
 		return LinkProxy(linkID, *this);
 	}
 
-	void NodeGraphProxy::CommitNodeDrag(const std::unordered_map<NodeID, NodeDragData>& aNodeDragData, CommandTracker* const aCommandTracker)
+	void NodeGraphProxy::CommitNodeDrag(const std::unordered_map<NodeID, NodeDragData>& aNodeDragData, CommandTracker* const commandTracker)
 	{
-		Internal::CommitNodeDrag(aNodeDragData, GetNodeGraph(), aCommandTracker);
+		Internal::CommitNodeDrag(aNodeDragData, GetNodeGraph(), commandTracker);
 	}
 
-	void NodeGraphProxy::ReplaceTemplateNode(const NodeProxy aReplaceNodeProxy, const DataTypeProxy aDataTypeProxy, CommandTracker* const aCommandTracker)
+	void NodeGraphProxy::ReplaceTemplateNode(const NodeProxy aReplaceNodeProxy, const DataTypeProxy aDataTypeProxy, CommandTracker* const commandTracker)
 	{
-		Internal::ReplaceNode(GetNodeGraph(), aReplaceNodeProxy.GetID(), aDataTypeProxy.GetID(), aCommandTracker);
+		Internal::ReplaceNode(GetNodeGraph(), aReplaceNodeProxy.GetID(), aDataTypeProxy.GetID(), commandTracker);
 	}
 
-	void NodeGraphProxy::ReplaceTemplateNode(const PinProxy aReplacePinProxy, const DataTypeProxy aDataTypeProxy, CommandTracker* const aCommandTracker)
+	void NodeGraphProxy::ReplaceTemplateNode(const PinProxy aReplacePinProxy, const DataTypeProxy aDataTypeProxy, CommandTracker* const commandTracker)
 	{
-		Internal::ReplaceTemplateNode(GetNodeGraph(), aReplacePinProxy.GetNodeID(), aDataTypeProxy.GetID(), aCommandTracker);
+		Internal::ReplaceTemplateNode(GetNodeGraph(), aReplacePinProxy.GetNodeID(), aDataTypeProxy.GetID(), commandTracker);
 	}
 
 	const NodeGraphVariantHandle& NodeGraphProxy::GetVariant() const

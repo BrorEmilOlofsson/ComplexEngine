@@ -28,6 +28,12 @@ namespace FLY_NAMESPACE
 		return std::numeric_limits<IDType>::max();
 	}
 
+	template<std::integral IDType>
+	constexpr IDType InvalidIndex()
+	{
+		return std::numeric_limits<IDType>::max();
+	}
+
 	template<typename IDType>
 	struct IDWrapper
 	{
@@ -107,93 +113,14 @@ namespace FLY_NAMESPACE
 		return DataTypeID{ typeid(T).hash_code() };
 	}
 
-	template<typename Output, typename... Inputs>
-	using FuncPtr = Output(*)(Inputs...);
-
-	template<typename ClassType, typename OutputType, typename... InputTypes>
-	using FuncPtrMember = OutputType(ClassType::*)(InputTypes...);
-
-	template<typename ClassType, typename OutputType, typename... InputTypes>
-	using FuncPtrMember_Const = OutputType(ClassType::*)(InputTypes...) const;
-
-	template<typename...>
-	class FunctionWrapper;
-
-	template<typename StrongParam, typename Ret, typename... Args>
-	class FunctionWrapper<Ret(Args...), StrongParam> final
-	{
-		using FunctionType = Ret(Args...);
-	public:
-
-		FunctionWrapper() = default;
-		FunctionWrapper(std::nullptr_t) : mFunction(nullptr) {}
-
-		template<typename F>
-		FunctionWrapper(F aFunction)
-			: mFunction(aFunction)
-		{
-		}
-
-		FunctionWrapper(FunctionType* aFunction)
-			: mFunction(aFunction)
-		{
-		}
-
-		Ret Invoke(Args... aArgs) const
-		{
-			return mFunction(std::forward<Args>(aArgs)...);
-		}
-
-		Ret operator()(Args... aArgs) const
-		{
-			return Invoke(std::forward<Args>(aArgs)...);
-		}
-
-		operator bool() const
-		{
-			return !Empty();
-		}
-
-		[[nodiscard]] bool Empty() const
-		{
-			return mFunction == nullptr;
-		}
-
-		[[nodiscard]] FunctionType* GetPtr() const
-		{
-			return mFunction;
-		}
-
-	private:
-
-		FunctionType* mFunction = nullptr;
-	};
-
-	class Node;
-	class NodeGraph;
-	struct InternalExecutionContext;
-	struct NodeExecutionData;
-	class MemoryPool;
-	class NodeType;
-
-	using CreateNodeFunction = FunctionWrapper<Node(const NodeID aNodeID, const NodeTypeID aNodeTypeID, NodeGraph& aNodeGraph), struct CreateNodeParam>;
-	using ExecuteNodeFunction = FunctionWrapper<void(const NodeExecutionData& aNodeExecutionData, InternalExecutionContext& context), struct ExecuteNodeParam>;
-	using FastExecuteNodeFunction = FunctionWrapper<void(InternalExecutionContext& context, const MemoryPool& aFoundationMemoryPool, const NodeType& aNodeType, const void* aMainInput, const void* inputTuple, void* aOutputValue), struct FastExecuteNodeParam>;
-
-	struct SetPinValueData;
-	struct SetPinValueFromPinData;
-
-	using SetPinValueF = FunctionWrapper<void(const SetPinValueData&, const InternalExecutionContext&), struct SetPinValueParam>;
-	using SetPinValueFromPinF = FunctionWrapper<void(const SetPinValueFromPinData&, const InternalExecutionContext&), struct SetPinValueFromPinParam>;
-
 	template<typename T>
 	class OwningPtr final
 	{
 	public:
 
 		constexpr OwningPtr() = default;
-		constexpr OwningPtr(T* const aPtr)
-			: mPtr(aPtr)
+		constexpr OwningPtr(T* const ptr)
+			: mPtr(ptr)
 		{
 		}
 
@@ -227,8 +154,8 @@ namespace FLY_NAMESPACE
 	public:
 
 		constexpr NonOwningPtr() = default;
-		constexpr NonOwningPtr(T* aPtr)
-			: mPtr(aPtr)
+		constexpr NonOwningPtr(T* ptr)
+			: mPtr(ptr)
 		{
 		}
 
@@ -252,11 +179,11 @@ namespace FLY_NAMESPACE
 	{
 
 		constexpr Color() = default;
-		constexpr Color(float aR, float aG, float aB, float aA = 1.f)
-			: r(aR)
-			, g(aG)
-			, b(aB)
-			, a(aA)
+		constexpr Color(float r, float g, float b, float a = 1.f)
+			: r(r)
+			, g(g)
+			, b(b)
+			, a(a)
 		{
 
 		}
@@ -272,16 +199,16 @@ namespace FLY_NAMESPACE
 
 	};
 
-	constexpr Color operator+(const Color& aColor1, const Color& aColor2)
+	constexpr Color operator+(const Color& lhs, const Color& rhs)
 	{
-		Color c = { aColor1.r + aColor2.r, aColor1.g + aColor2.g, aColor1.b + aColor2.b, aColor1.a + aColor2.a };
+		Color c = { lhs.r + rhs.r, lhs.g + rhs.g, lhs.b + rhs.b, lhs.a + rhs.a };
 		c.Clamp();
 		return c;
 	}
 
-	constexpr Color operator-(const Color& aColor1, const Color& aColor2)
+	constexpr Color operator-(const Color& lhs, const Color& rhs)
 	{
-		Color c = { aColor1.r - aColor2.r, aColor1.g - aColor2.g, aColor1.b - aColor2.b, aColor1.a - aColor2.a };
+		Color c = { lhs.r - rhs.r, lhs.g - rhs.g, lhs.b - rhs.b, lhs.a - rhs.a };
 		c.Clamp();
 		return c;
 	}

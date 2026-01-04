@@ -27,10 +27,10 @@ namespace FLY_NAMESPACE
 	//	return id;
 	//}
 
-	PinTypeID PinTypeManager::CreatePinType(std::string_view aName, const eIODirection aIODirection, const GenericDataTypeID aDataTypeID, SetPinValueF aSetPinValueFunction, SetPinValueFromPinF aSetPinValueFromPinFunction, const MemoryPoolID aDefaultValueMemoryID)
+	PinTypeID PinTypeManager::CreatePinType(std::string name, const eIODirection aIODirection, const GenericDataTypeID aDataTypeID, SetPinValueF aSetPinValueFunction, SetPinValueFromPinF aSetPinValueFromPinFunction, const MemoryPoolID aDefaultValueMemoryID)
 	{
 		const PinTypeID id{ mPinTypes.size() };
-		mPinTypes.push_back(PinType(std::string(aName), aDataTypeID, aSetPinValueFunction, aSetPinValueFromPinFunction, aDefaultValueMemoryID, aIODirection));
+		mPinTypes.push_back(PinType(std::move(name), aDataTypeID, aSetPinValueFunction, aSetPinValueFromPinFunction, aDefaultValueMemoryID, aIODirection));
 		return id;
 	}
 }

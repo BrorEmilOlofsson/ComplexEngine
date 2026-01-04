@@ -3,13 +3,13 @@
 
 namespace FLY_NAMESPACE
 {
-	PinType::PinType(std::string aName, GenericDataTypeID aDataTypeID, SetPinValueF aSetPinValueFunction, SetPinValueFromPinF aSetPinValueFromPinFunction, MemoryPoolID aDefaultValueMemoryID, eIODirection aIODirection)
-		: mName(std::move(aName))
-		, mGenericDataTypeID(std::move(aDataTypeID))
-		, mSetPinValueFunction(aSetPinValueFunction)
-		, mSetPinValueFromPinFunction(aSetPinValueFromPinFunction)
-		, mDefaultValueID(aDefaultValueMemoryID)
-		, mIODirection(aIODirection)
+	PinType::PinType(std::string name, GenericDataTypeID dataTypeID, SetPinValueF setPinValueFunction, SetPinValueFromPinF setPinValueFromPinFunction, MemoryPoolID defaultValueMemoryID, eIODirection ioDirection)
+		: mName(std::move(name))
+		, mGenericDataTypeID(std::move(dataTypeID))
+		, mSetPinValueFunction(setPinValueFunction)
+		, mSetPinValueFromPinFunction(setPinValueFromPinFunction)
+		, mDefaultValueID(defaultValueMemoryID)
+		, mIODirection(ioDirection)
 	{
 	}
 
@@ -18,28 +18,28 @@ namespace FLY_NAMESPACE
 		return mName;
 	}
 
-	void PinType::SetName(std::string aName)
+	void PinType::SetName(std::string name)
 	{
-		mName = std::move(aName);
+		mName = std::move(name);
 	}
 
-	void PinType::AddSplitPinTypeID(PinTypeID aPinTypeID)
+	void PinType::AddSplitPinTypeID(PinTypeID pinTypeID)
 	{
-		mSplitPinTypeIDs.push_back(aPinTypeID);
+		mSplitPinTypeIDs.push_back(pinTypeID);
 	}
 
-	std::string PinIODirectionToString(const eIODirection aIODirection)
+	std::string PinIODirectionToString(const eIODirection ioDirection)
 	{
-		return SelectByIODirection(aIODirection, std::string("Input"), std::string("Output"));
+		return SelectByIODirection(ioDirection, std::string("Input"), std::string("Output"));
 	}
 
-	eIODirection StringToPinIODirection(const std::string& aName)
+	eIODirection StringToPinIODirection(const std::string& name)
 	{
-		if (aName == "Input")
+		if (name == "Input")
 		{
 			return eIODirection::Input;
 		}
-		else if (aName == "Output")
+		else if (name == "Output")
 		{
 			return eIODirection::Output;
 		}

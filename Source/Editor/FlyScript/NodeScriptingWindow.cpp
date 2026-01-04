@@ -127,7 +127,7 @@ namespace Simple
 	{
 		PROFILER_FUNCTION(profiler::colors::Amber600);
 
-		/*if (ImGui::Begin("TestEditorWindow"))
+		if (ImGui::Begin("Test Editor Window"))
 		{
 
 			ax::NodeEditor::Begin("TestEditor");
@@ -144,7 +144,7 @@ namespace Simple
 			ax::NodeEditor::EndNode();
 			ax::NodeEditor::End();
 		}
-		ImGui::End();*/
+		ImGui::End();
 
 		ImGuiBegin b("Node Scripting");
 

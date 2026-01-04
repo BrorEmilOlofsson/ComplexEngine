@@ -11,6 +11,7 @@ namespace FLY_NAMESPACE
 
 	Foundation::Foundation()
 		: mMemoryPool(10000)
+		, mNodeExecutor(mDataTypeManager, mNodeTypeManager, mPinTypeManager, mTraitManager, mMemoryPool)
 	{
 		
 	}
@@ -22,9 +23,8 @@ namespace FLY_NAMESPACE
 	void Foundation::Initialize()
 	{
 		Fly::RegisterType::ValueType<Wildcard>("Wildcard", Colors::Gray);
-		Fly::RegisterType::ValueType<Flow>("Flow", eNodeOperatorTrait::None, Color(0.9f, 0.9f, 0.9f));
+		Fly::RegisterType::ValueType<Flow>("Flow", eNodeOperatorType::None, Color(0.9f, 0.9f, 0.9f));
 		Fly::RegisterType::PointerType<None>("None", Colors::Black);
-		mNodeExecutor->Initialize(mMemoryPool);
 		mNodeTypeManager.Assert();
 
 		Internal::InitializeSubPins();
@@ -84,12 +84,12 @@ namespace FLY_NAMESPACE
 
 	NodeExecutor& Foundation::GetNodeExecutor()
 	{
-		return *mNodeExecutor;
+		return mNodeExecutor;
 	}
 
 	const NodeExecutor& Foundation::GetNodeExecutor() const
 	{
-		return *mNodeExecutor;
+		return mNodeExecutor;
 	}
 
 	EventGraph& Foundation::GetNodeGraphCopy()
@@ -102,17 +102,17 @@ namespace FLY_NAMESPACE
 		return mNodeGraphCopy;
 	}
 
-	const VariableRef& Foundation::GetVariableRefByNodeRef(const GlobalNodeRef& aNodeRef) const
+	const VariableRef& Foundation::GetVariableRefByNodeRef(const GlobalNodeRef& nodeRef) const
 	{
-		return mNodeRefToVarRef.at(aNodeRef);
+		return mNodeRefToVarRef.at(nodeRef);
 	}
 
-	std::vector<GlobalNodeRef> Foundation::GetNodeRefsByVariableRef(const VariableRef& aVarRef) const
+	std::vector<GlobalNodeRef> Foundation::GetNodeRefsByVariableRef(const VariableRef& varRef) const
 	{
 		std::vector<GlobalNodeRef> nodeIDs;
 		for (auto& [nodeRef, varID] : mNodeRefToVarRef)
 		{
-			if (varID == aVarRef)
+			if (varID == varRef)
 			{
 				nodeIDs.push_back(nodeRef);
 			}
