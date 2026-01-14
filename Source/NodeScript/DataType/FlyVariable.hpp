@@ -9,17 +9,17 @@ namespace FLY_NAMESPACE
 	public:
 
 		Variable() = default;
-		Variable(GenericDataTypeID aDataTypeID, std::string aName, size_t aByteOffset);
+		Variable(GenericDataTypeID dataTypeID, std::string name, size_t byteOffset);
 
-		void SetDataTypeID(GenericDataTypeID aDataTypeID);
+		void SetDataTypeID(GenericDataTypeID dataTypeID);
 		[[nodiscard]] GenericDataTypeID GetDataTypeID() const;
-		void SetDefaultValueDataPtr(void* aDataPtr);
+		void SetDefaultValueDataPtr(void* dataPtr);
 		[[nodiscard]] OwningPtr<void> GetDefaultValueDataPtr() const;
 		[[nodiscard]] std::string& Name();
 		[[nodiscard]] const std::string& Name() const;
 
 		[[nodiscard]] size_t GetByteOffset() const;
-		void SetIsDestroyed(bool aIsDestroyed);
+		void SetIsDestroyed(bool isDestroyed);
 		[[nodiscard]] bool IsDestroyed() const;
 
 	private:
@@ -27,7 +27,7 @@ namespace FLY_NAMESPACE
 		GenericDataTypeID mDataTypeID;
 		OwningPtr<void> mDefaultValueDataPtr;
 		std::string mName = "Var";
-		size_t mByteOffset = 0;
+		std::size_t mByteOffset = 0;
 		bool mIsDestroyed = false;
 	};
 
@@ -36,9 +36,9 @@ namespace FLY_NAMESPACE
 		return mDataTypeID;
 	}
 
-	inline void Variable::SetDefaultValueDataPtr(void* aDataPtr)
+	inline void Variable::SetDefaultValueDataPtr(void* dataPtr)
 	{
-		mDefaultValueDataPtr = aDataPtr;
+		mDefaultValueDataPtr = dataPtr;
 	}
 
 	inline OwningPtr<void> Variable::GetDefaultValueDataPtr() const
@@ -46,7 +46,7 @@ namespace FLY_NAMESPACE
 		return mDefaultValueDataPtr;
 	}
 
-	inline size_t Variable::GetByteOffset() const
+	inline std::size_t Variable::GetByteOffset() const
 	{
 		return mByteOffset;
 	}

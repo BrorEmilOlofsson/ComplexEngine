@@ -20,10 +20,6 @@ namespace FLY_NAMESPACE
 		}
 	}
 
-	VariableContainerInstance::~VariableContainerInstance()
-	{
-	}
-
 	VariableContainerInstance::VariableContainerInstance(const VariableContainerInstance& aOther)
 		: mVariableContainer(aOther.mVariableContainer)
 		, mVariableInstances(aOther.mVariableInstances)

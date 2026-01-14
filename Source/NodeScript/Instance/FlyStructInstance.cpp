@@ -3,19 +3,9 @@
 
 namespace FLY_NAMESPACE
 {
-    StructInstance::StructInstance(const Struct& aStruct)
-        : mStruct(&aStruct)
-        , mVariableContainerInstance(aStruct.GetVariableContainer())
+    StructInstance::StructInstance(const Struct& s)
+        : mStruct(&s)
+        , mVariableContainerInstance(s.GetVariableContainer())
     {
-    }
-
-    bool operator==(const StructInstance& a, const StructInstance& b)
-    {
-        if (!a && !b)
-        {
-            return true;
-        }
-
-        return a.mVariableContainerInstance == b.mVariableContainerInstance;
     }
 }

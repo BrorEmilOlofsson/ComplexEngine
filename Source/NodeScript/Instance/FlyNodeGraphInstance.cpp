@@ -23,8 +23,6 @@ namespace FLY_NAMESPACE
 		}
 	}
 
-	NodeGraphInstance::~NodeGraphInstance() = default;
-
 	void NodeGraphInstance::Mirror()
 	{
 		for (NodeID nodeID{ 0 }; nodeID < mNodeGraph->GetNodeCount(); ++nodeID)

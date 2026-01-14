@@ -11,13 +11,13 @@ namespace FLY_NAMESPACE
 	public:
 
 		Struct() = default;
-		Struct(std::string_view aName);
+		Struct(std::string name);
 
 		[[nodiscard]] std::string& Name();
 		[[nodiscard]] const std::string& Name() const;
 
-		[[nodiscard]] VariableContainer& GetVariableContainer();
-		[[nodiscard]] const VariableContainer& GetVariableContainer() const;
+		[[nodiscard]] constexpr VariableContainer& GetVariableContainer();
+		[[nodiscard]] constexpr const VariableContainer& GetVariableContainer() const;
 
 	private:
 
@@ -25,12 +25,12 @@ namespace FLY_NAMESPACE
 		std::string mName;
 	};
 
-	inline VariableContainer& Struct::GetVariableContainer()
+	constexpr VariableContainer& Struct::GetVariableContainer()
 	{
 		return mVariableContainer;
 	}
 	
-	inline const VariableContainer& Struct::GetVariableContainer() const
+	constexpr const VariableContainer& Struct::GetVariableContainer() const
 	{
 		return mVariableContainer;
 	}

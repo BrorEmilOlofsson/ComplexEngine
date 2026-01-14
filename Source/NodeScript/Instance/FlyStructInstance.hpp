@@ -12,20 +12,13 @@ namespace FLY_NAMESPACE
 	public:
 
 		StructInstance() = default;
-		StructInstance(const Struct& aStruct);
+		StructInstance(const Struct& s);
 
+		[[nodiscard]] constexpr const Struct* GetStruct() const;
+		[[nodiscard]] constexpr operator bool() const;
 
-		constexpr operator bool() const
-		{
-			return mStruct != nullptr;
-		}
+		constexpr friend bool operator==(const StructInstance& lhs, const StructInstance& rhs);
 
-		friend bool operator==(const StructInstance& a, const StructInstance& b);
-
-		[[nodiscard]] const Struct* GetStruct() const
-		{
-			return mStruct;
-		}
 
 	private:
 
@@ -35,4 +28,24 @@ namespace FLY_NAMESPACE
 
 		VariableContainerInstance mVariableContainerInstance;
 	};
+
+    [[nodiscard]] constexpr const Struct* StructInstance::GetStruct() const
+	{
+		return mStruct;
+	}
+
+    constexpr StructInstance::operator bool() const
+	{
+		return mStruct != nullptr;
+	}
+
+	constexpr bool operator==(const StructInstance& lhs, const StructInstance& rhs)
+	{
+		if (lhs.mStruct != rhs.mStruct)
+		{
+			return true;
+		}
+
+		return lhs.mVariableContainerInstance == rhs.mVariableContainerInstance;
+	}
 }

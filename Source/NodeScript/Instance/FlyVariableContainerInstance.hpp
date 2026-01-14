@@ -14,24 +14,23 @@ namespace FLY_NAMESPACE
 
 	class VariableContainer;
 
-
 	class VariableContainerInstance final
 	{
-		static constexpr size_t MemoryAlignment = 1024;
+		static constexpr std::size_t BufferSize = 1024;
 	public:
 		VariableContainerInstance() = default;
-		VariableContainerInstance(const VariableContainer& aVariableContainer);
-		~VariableContainerInstance();
+		VariableContainerInstance(const VariableContainer& variableContainer);
+		~VariableContainerInstance() = default;
 
-		VariableContainerInstance(const VariableContainerInstance& aOther);
+		VariableContainerInstance(const VariableContainerInstance& other);
 		VariableContainerInstance(VariableContainerInstance&&) noexcept = default;
-		VariableContainerInstance& operator=(const VariableContainerInstance& aOther);
+		VariableContainerInstance& operator=(const VariableContainerInstance& other);
 		VariableContainerInstance& operator=(VariableContainerInstance&&) noexcept = default;
 
 		void Mirror();
 		void InitRuntime();
 
-		constexpr operator bool() const
+		[[nodiscard]] constexpr operator bool() const
 		{
 			return mVariableContainer != nullptr;
 		}
@@ -42,7 +41,7 @@ namespace FLY_NAMESPACE
 
 		const VariableContainer* mVariableContainer = nullptr;
 		std::vector<VariableInstance> mVariableInstances;
-		MemoryArena<MemoryAlignment> mMemoryArena;
+		MemoryArena<BufferSize> mMemoryArena;
 	};
 	
 }

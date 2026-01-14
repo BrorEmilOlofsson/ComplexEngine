@@ -5,14 +5,10 @@
 namespace FLY_NAMESPACE
 {
 
-	ClassInstance::ClassInstance(ClassID aClassID)
-		: mClassID(aClassID)
-		, mVariableContainerInstance(Internal::GetClassByID(aClassID).mVariableContainer)
-		, mEventGraphInstance(Internal::GetClassByID(aClassID).mEventGraph.GetNodeGraph())
-	{
-	}
-
-	ClassInstance::~ClassInstance()
+	ClassInstance::ClassInstance(ClassID classID)
+		: mClassID(classID)
+		, mVariableContainerInstance(Internal::GetClassByID(classID).mVariableContainer)
+		, mEventGraphInstance(Internal::GetClassByID(classID).mEventGraph.GetNodeGraph())
 	{
 	}
 

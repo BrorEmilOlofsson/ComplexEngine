@@ -7,8 +7,8 @@
 namespace FLY_NAMESPACE
 {
 
-	ClassInstanceProxy::ClassInstanceProxy(ClassInstance& aClassInstance)
-		: mClassInstance(&aClassInstance)
+	ClassInstanceProxy::ClassInstanceProxy(ClassInstance& classInstance)
+		: mClassInstance(&classInstance)
 	{
 	}
 
@@ -17,9 +17,9 @@ namespace FLY_NAMESPACE
 		mClassInstance->InitRuntime();
 	}
 
-	void ClassInstanceProxy::ViewAndEditVariableDefaultValues(CommandTracker* const aCommandTracker)
+	void ClassInstanceProxy::ViewAndEditVariableDefaultValues(CommandTracker* const commandTracker)
 	{
-		Internal::ViewAndEditClassInstanceVariableDefaultValue(*mClassInstance, aCommandTracker);
+		Internal::ViewAndEditClassInstanceVariableDefaultValue(*mClassInstance, commandTracker);
 	}
 
 	void ClassInstanceProxy::Destroy()

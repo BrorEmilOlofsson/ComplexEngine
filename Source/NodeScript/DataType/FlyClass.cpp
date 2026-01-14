@@ -4,13 +4,9 @@
 namespace FLY_NAMESPACE
 {
 
-	Class::Class(const DataTypeID targetID, const std::string& name)
+	Class::Class(const DataTypeID targetID, std::string name)
 		: mTargetID(targetID)
-		, mName(name)
-	{
-	}
-
-	Class::~Class()
+		, mName(std::move(name))
 	{
 	}
 

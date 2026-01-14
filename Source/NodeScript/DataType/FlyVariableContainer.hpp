@@ -8,82 +8,82 @@ namespace FLY_NAMESPACE
 {
 	class VariableContainer final
 	{
-		static constexpr size_t Alignment = 512;
+		static constexpr std::size_t BufferSize = 512;
 	public:
 
 		VariableContainer() = default;
 		~VariableContainer() = default;
 
-		VariableContainer(const VariableContainer& aOther);
+		VariableContainer(const VariableContainer& other);
 		VariableContainer(VariableContainer&&) = default;
-		VariableContainer& operator=(const VariableContainer& aOther);
+		VariableContainer& operator=(const VariableContainer& other);
 		VariableContainer& operator=(VariableContainer&&) = default;
 
-		[[nodiscard]] const std::vector<Variable>& GetVariables();
-		[[nodiscard]] MemoryArena<Alignment>& GetMemoryArena();
-		[[nodiscard]] const MemoryArena<Alignment>& GetMemoryArena() const;
-		[[nodiscard]] Variable& GetVariable(size_t aIndex);
-		[[nodiscard]] const Variable& GetVariable(size_t aIndex) const;
-		[[nodiscard]] size_t GetVariableCount() const;
-		[[nodiscard]] std::vector<Variable>::iterator begin();
-		[[nodiscard]] std::vector<Variable>::const_iterator begin() const;
-		[[nodiscard]] std::vector<Variable>::iterator end();
-		[[nodiscard]] std::vector<Variable>::const_iterator end() const;
+		[[nodiscard]] constexpr const std::vector<Variable>& GetVariables();
+		[[nodiscard]] constexpr MemoryArena<BufferSize>& GetMemoryArena();
+		[[nodiscard]] constexpr const MemoryArena<BufferSize>& GetMemoryArena() const;
+		[[nodiscard]] constexpr Variable& GetVariable(size_t index);
+		[[nodiscard]] constexpr const Variable& GetVariable(size_t index) const;
+		[[nodiscard]] constexpr std::size_t GetVariableCount() const;
+		[[nodiscard]] constexpr std::vector<Variable>::iterator begin();
+		[[nodiscard]] constexpr std::vector<Variable>::const_iterator begin() const;
+		[[nodiscard]] constexpr std::vector<Variable>::iterator end();
+		[[nodiscard]] constexpr std::vector<Variable>::const_iterator end() const;
 
-		void AddVariable(Variable aVariable);
+		void AddVariable(Variable variable);
 
 	private:
 
 		std::vector<Variable> mVariables;
-		MemoryArena<Alignment> mMemoryArena;
+		MemoryArena<BufferSize> mMemoryArena;
 	};
 	
-	inline const std::vector<Variable>& VariableContainer::GetVariables()
+	constexpr const std::vector<Variable>& VariableContainer::GetVariables()
 	{
 		return mVariables;
 	}
 
-	inline MemoryArena<VariableContainer::Alignment>& VariableContainer::GetMemoryArena()
+	constexpr MemoryArena<VariableContainer::BufferSize>& VariableContainer::GetMemoryArena()
 	{
 		return mMemoryArena;
 	}
 
-	inline const MemoryArena<VariableContainer::Alignment>& VariableContainer::GetMemoryArena() const
+	constexpr const MemoryArena<VariableContainer::BufferSize>& VariableContainer::GetMemoryArena() const
 	{
 		return mMemoryArena;
 	}
 
-	inline Variable& VariableContainer::GetVariable(size_t aIndex)
+	constexpr Variable& VariableContainer::GetVariable(size_t aIndex)
 	{
 		return mVariables[aIndex];
 	}
 
-	inline const Variable& VariableContainer::GetVariable(size_t aIndex) const
+	constexpr const Variable& VariableContainer::GetVariable(size_t aIndex) const
 	{
 		return mVariables[aIndex];
 	}
 
-	inline size_t VariableContainer::GetVariableCount() const
+	constexpr size_t VariableContainer::GetVariableCount() const
 	{
 		return mVariables.size();
 	}
 
-	inline std::vector<Variable>::iterator VariableContainer::begin()
+	constexpr std::vector<Variable>::iterator VariableContainer::begin()
 	{
 		return mVariables.begin();
 	}
 
-	inline std::vector<Variable>::const_iterator VariableContainer::begin() const
+	constexpr std::vector<Variable>::const_iterator VariableContainer::begin() const
 	{
 		return mVariables.begin();
 	}
 
-	inline std::vector<Variable>::iterator VariableContainer::end()
+	constexpr std::vector<Variable>::iterator VariableContainer::end()
 	{
 		return mVariables.end();
 	}
 
-	inline std::vector<Variable>::const_iterator VariableContainer::end() const
+	constexpr std::vector<Variable>::const_iterator VariableContainer::end() const
 	{
 		return mVariables.end();
 	}

@@ -12,17 +12,16 @@ namespace FLY_NAMESPACE
 	{
 	public:
 
-		NodeGraphInstance(const NodeGraph& aNodeGraph);
-		~NodeGraphInstance();
+		NodeGraphInstance(const NodeGraph& nodeGraph);
 
 		void Mirror();
 
 		template<typename T>
-		T& GetNodeState(NodeID aNodeID);
+		T& GetNodeState(NodeID nodeID);
 
 	private:
 
-		const NodeGraph* mNodeGraph;
+		const NodeGraph* mNodeGraph = nullptr;
 
 		std::unordered_map<NodeID, void*> mNodeStateMap;
 		MemoryArena<1024> mMemoryArena;
@@ -30,8 +29,8 @@ namespace FLY_NAMESPACE
 	};
 
 	template<typename T>
-	inline T& NodeGraphInstance::GetNodeState(NodeID aNodeID)
+	inline T& NodeGraphInstance::GetNodeState(NodeID nodeID)
 	{
-		return *reinterpret_cast<T*>(mNodeStateMap.at(aNodeID));
+		return *reinterpret_cast<T*>(mNodeStateMap.at(nodeID));
 	}
 }

@@ -3,8 +3,8 @@
 namespace FLY_NAMESPACE
 {
 
-	Struct::Struct(std::string_view aName)
-		: mName(aName)
+	Struct::Struct(std::string name)
+		: mName(std::move(name))
 	{
 	}
 

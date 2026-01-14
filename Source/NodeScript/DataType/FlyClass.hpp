@@ -1,4 +1,7 @@
 #pragma once
+#include <vector>
+#include <string>
+
 #include "../FlyDefines.hpp"
 #include "FlyVariableContainer.hpp"
 #include "../Graph/FlyEventGraph.hpp"
@@ -7,7 +10,6 @@
 namespace FLY_NAMESPACE
 {
 
-	class CommandTracker;
 	class Function;
 	class ClassInstance;
 
@@ -15,8 +17,8 @@ namespace FLY_NAMESPACE
 	{
 	public:
 
-		Class(DataTypeID targetID = GetDataTypeID<None>(), const std::string& name = "Default Class");
-		~Class();
+		Class(DataTypeID targetID = GetDataTypeID<None>(), std::string name = "Default Class");
+		~Class() = default;
 
 		Class(const Class&) = delete;
 		Class(Class&&) = delete;

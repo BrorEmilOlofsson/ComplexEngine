@@ -14,18 +14,18 @@ namespace FLY_NAMESPACE
 	public:
 
 		ClassInstanceProxy() = default;
-		explicit ClassInstanceProxy(ClassInstance& aClassInstance);
+		explicit ClassInstanceProxy(ClassInstance& classInstance);
 
 		void InitRuntime();
 
-		void ViewAndEditVariableDefaultValues(CommandTracker* aCommandTracker);
+		void ViewAndEditVariableDefaultValues(CommandTracker* commandTracker);
 		void Destroy();
 
 		template<typename EventFunction, typename TargetType>
-		void ExecuteEvent(EventFunction aEventFunction, TargetType* aTarget, const ExecutionContextBase& context);
+		void ExecuteEvent(EventFunction eventFunction, TargetType* target, const ExecutionContextBase& context);
 
 		template<typename TargetType>
-		void ExecuteAutoTickers(TargetType* aTarget, const ExecutionContextBase& context);
+		void ExecuteAutoTickers(TargetType* target, const ExecutionContextBase& context);
 
 		[[nodiscard]] std::string_view GetName() const;
 
@@ -41,9 +41,9 @@ namespace FLY_NAMESPACE
 
 		[[nodiscard]] Class& GetClass() const;
 
-		[[nodiscard]] bool IsSameTarget(DataTypeID aDataTypeID) const;
-		void ExecuteEventInternal(EventID aEventID, void* aTarget, const ExecutionContextBase& context);
-		void ExecuteAutoTickersInternal(void* aTarget, const ExecutionContextBase& context);
+		[[nodiscard]] bool IsSameTarget(DataTypeID dataTypeID) const;
+		void ExecuteEventInternal(EventID eventID, void* target, const ExecutionContextBase& context);
+		void ExecuteAutoTickersInternal(void* target, const ExecutionContextBase& context);
 
 	private:
 
@@ -53,17 +53,17 @@ namespace FLY_NAMESPACE
 	};
 
 	template<typename EventFunction, typename TargetType>
-	inline void ClassInstanceProxy::ExecuteEvent(EventFunction aEventFunction, TargetType* aTarget, const ExecutionContextBase& context)
+	inline void ClassInstanceProxy::ExecuteEvent(EventFunction eventFunction, TargetType* target, const ExecutionContextBase& context)
 	{
-		const EventID eventID{ std::hash<EventFunction>()(aEventFunction) };
+		const EventID eventID{ std::hash<EventFunction>()(eventFunction) };
 		assert(IsSameTarget(GetDataTypeID<TargetType*>()));
-		ExecuteEventInternal(eventID, aTarget, context);
+		ExecuteEventInternal(eventID, target, context);
 	}
 
 	template<typename TargetType>
-	inline void ClassInstanceProxy::ExecuteAutoTickers(TargetType* aTarget, const ExecutionContextBase& context)
+	inline void ClassInstanceProxy::ExecuteAutoTickers(TargetType* target, const ExecutionContextBase& context)
 	{
 		assert(IsSameTarget(GetDataTypeID<TargetType>()));
-		ExecuteAutoTickersInternal(aTarget, context);
+		ExecuteAutoTickersInternal(target, context);
 	}
 }

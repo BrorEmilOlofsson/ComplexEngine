@@ -13,8 +13,7 @@ namespace FLY_NAMESPACE
 	public:
 
 
-		ClassInstance(ClassID aClassID);
-		~ClassInstance();
+		ClassInstance(ClassID classID);
 
 		void InitRuntime();
 
