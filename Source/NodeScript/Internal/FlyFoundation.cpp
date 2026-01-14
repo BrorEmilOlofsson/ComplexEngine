@@ -120,7 +120,18 @@ namespace FLY_NAMESPACE
 		return nodeIDs;
 	}
 
-	//inline Fly::RegisterType fly_valuetype37 = Fly::RegisterType::ValueType<Wildcard>("Wildcard", Colors::Gray);;
-	//inline Fly::RegisterType fly_valuetype67 = Fly::RegisterType::ValueType<Flow>("Flow", eNodeOperatorTrait::None, Color(0.9f, 0.9f, 0.9f));;
-	//inline Fly::RegisterType fly_pointertype7 = Fly::RegisterType::PointerType<None>("None", Colors::Black);;
+	bool& Foundation::IsDebugging()
+	{
+		return mIsDebugging;
+    }
+
+	MemoryArena<1024>& Foundation::GetFrameMemoryArena()
+	{
+		return mFrameArena;
+    }
+
+	MemoryArena<10000>& Foundation::GetEditMemoryArena()
+	{
+        return mEditArena;
+	}
 }

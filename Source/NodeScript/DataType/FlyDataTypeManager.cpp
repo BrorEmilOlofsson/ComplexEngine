@@ -536,13 +536,13 @@ namespace FLY_NAMESPACE
 			}, aDataTypeID.mID);
 	}
 
-	size_t DataTypeManager::GetDataTypeAlignment(GenericDataTypeID aDataTypeID) const
+	size_t DataTypeManager::GetDataTypeAlignment(GenericDataTypeID dataTypeID) const
 	{
 		return std::visit(Visitor
 			{
-			[this](const DataTypeID aDataTypeID) -> size_t
+			[this](const DataTypeID dataTypeID) -> size_t
 			{
-				if (const DataType* dataType = Find(aDataTypeID))
+				if (const DataType* dataType = Find(dataTypeID))
 				{
 					return dataType->GetAlignment();
 				}
@@ -556,58 +556,58 @@ namespace FLY_NAMESPACE
 			{
 				return 0;
 			}
-			}, aDataTypeID.mID);
+			}, dataTypeID.mID);
 	}
 
-	SetPinValueF DataTypeManager::GetSetPinValueFunction(const DataTypeID aDataTypeID, const eIODirection aIODirection) const
+	SetPinValueF DataTypeManager::GetSetPinValueFunction(const DataTypeID dataTypeID, const eIODirection ioDirection) const
 	{
-		if (const DataType* dataType = Find(aDataTypeID))
+		if (const DataType* dataType = Find(dataTypeID))
 		{
-			return SelectByIODirection(aIODirection, dataType->GetInterface().GetSetInputPinValueFunction(), dataType->GetInterface().GetSetOutputPinValueFunction());
+			return SelectByIODirection(ioDirection, dataType->GetInterface().GetSetInputPinValueFunction(), dataType->GetInterface().GetSetOutputPinValueFunction());
 		}
 
 		assert(false);
 		return SetPinValueF{};
 	}
 
-	SetPinValueF DataTypeManager::GetSetPinValueFunction(GenericDataTypeID aDataTypeID, eIODirection aIODirection) const
+	SetPinValueF DataTypeManager::GetSetPinValueFunction(GenericDataTypeID dataTypeID, eIODirection ioDirection) const
 	{
-		if (const DataType* dataType = Find(aDataTypeID))
+		if (const DataType* dataType = Find(dataTypeID))
 		{
-			return SelectByIODirection(aIODirection, dataType->GetInterface().GetSetInputPinValueFunction(), dataType->GetInterface().GetSetOutputPinValueFunction());
+			return SelectByIODirection(ioDirection, dataType->GetInterface().GetSetInputPinValueFunction(), dataType->GetInterface().GetSetOutputPinValueFunction());
 		}
 
 		assert(false);
 		return SetPinValueF{};
 	}
 
-	SetPinValueFromPinF DataTypeManager::GetSetPinValueFromPinFunction(const DataTypeID aDataTypeID, const eIODirection aIODirection) const
+	SetPinValueFromPinF DataTypeManager::GetSetPinValueFromPinFunction(const DataTypeID dataTypeID, const eIODirection ioDirection) const
 	{
-		if (const DataType* dataType = Find(aDataTypeID))
+		if (const DataType* dataType = Find(dataTypeID))
 		{
-			return SelectByIODirection(aIODirection, dataType->GetInterface().GetSetInputPinValueFromPinFunction(), dataType->GetInterface().GetSetOutputPinValueFromPinFunction());
+			return SelectByIODirection(ioDirection, dataType->GetInterface().GetSetInputPinValueFromPinFunction(), dataType->GetInterface().GetSetOutputPinValueFromPinFunction());
 		}
 
 		assert(false);
 		return SetPinValueFromPinF{};
 	}
 
-	SetPinValueFromPinF DataTypeManager::GetSetPinValueFromPinFunction(GenericDataTypeID aDataTypeID, const eIODirection aIODirection) const
+	SetPinValueFromPinF DataTypeManager::GetSetPinValueFromPinFunction(GenericDataTypeID dataTypeID, const eIODirection ioDirection) const
 	{
-		if (const DataType* dataType = Find(aDataTypeID))
+		if (const DataType* dataType = Find(dataTypeID))
 		{
-			return SelectByIODirection(aIODirection, dataType->GetInterface().GetSetInputPinValueFromPinFunction(), dataType->GetInterface().GetSetOutputPinValueFromPinFunction());
+			return SelectByIODirection(ioDirection, dataType->GetInterface().GetSetInputPinValueFromPinFunction(), dataType->GetInterface().GetSetOutputPinValueFromPinFunction());
 		}
 
 		assert(false);
 		return SetPinValueFromPinF{};
 	}
 
-	DataTypeID DataTypeManager::GetDataTypeIDByName(std::string_view aName) const
+	DataTypeID DataTypeManager::GetDataTypeIDByName(std::string_view name) const
 	{
 		for (const auto& [dataTypeID, dataType] : mDataTypes)
 		{
-			if (aName == dataType.Name())
+			if (name == dataType.Name())
 			{
 				return dataTypeID;
 			}
@@ -650,9 +650,9 @@ namespace FLY_NAMESPACE
 	}
 
 
-	DataType* DataTypeManager::Find(const DataTypeID aDataTypeID)
+	DataType* DataTypeManager::Find(const DataTypeID dataTypeID)
 	{
-		auto it = mDataTypes.find(aDataTypeID);
+		auto it = mDataTypes.find(dataTypeID);
 		if (it != mDataTypes.end())
 		{
 			return &it->second;
@@ -660,9 +660,9 @@ namespace FLY_NAMESPACE
 		return nullptr;
 	}
 
-	const DataType* DataTypeManager::Find(const DataTypeID aDataTypeID) const
+	const DataType* DataTypeManager::Find(const DataTypeID dataTypeID) const
 	{
-		auto it = mDataTypes.find(aDataTypeID);
+		auto it = mDataTypes.find(dataTypeID);
 		if (it != mDataTypes.end())
 		{
 			return &it->second;
@@ -670,71 +670,71 @@ namespace FLY_NAMESPACE
 		return nullptr;
 	}
 
-	DataType* DataTypeManager::Find(ClassID aClassID)
+	DataType* DataTypeManager::Find(ClassID classID)
 	{
-		return mClassesNew[aClassID].Get();
+		return mClassesNew[classID].Get();
 	}
 
-	const DataType* DataTypeManager::Find(ClassID aClassID) const
+	const DataType* DataTypeManager::Find(ClassID classID) const
 	{
-		return mClassesNew[aClassID].Get();
+		return mClassesNew[classID].Get();
 	}
 
-	DataType* DataTypeManager::Find(GenericDataTypeID aDataTypeID)
-	{
-		return std::visit(Visitor
-			{
-			[this](const DataTypeID aDataTypeID) -> DataType*
-			{
-				return Find(aDataTypeID);
-			},
-			[this](const ClassID aClassID) -> DataType*
-			{
-				return Find(aClassID);
-			}
-			}, aDataTypeID.mID);
-	}
-
-	const DataType* DataTypeManager::Find(const GenericDataTypeID aDataTypeID) const
+	DataType* DataTypeManager::Find(GenericDataTypeID dataTypeID)
 	{
 		return std::visit(Visitor
 			{
-			[this](const DataTypeID aDataTypeID) -> const DataType*
+			[this](const DataTypeID dataTypeID) -> DataType*
 			{
-				return Find(aDataTypeID);
+				return Find(dataTypeID);
 			},
-			[this](const ClassID aClassID) -> const DataType*
+			[this](const ClassID classID) -> DataType*
 			{
-				return Find(aClassID);
+				return Find(classID);
 			}
-			}, aDataTypeID.mID);
+			}, dataTypeID.mID);
 	}
 
-	bool DataTypeManager::IsRegistered(const DataTypeID aDataTypeID) const
+	const DataType* DataTypeManager::Find(const GenericDataTypeID dataTypeID) const
 	{
-		return mDataTypes.contains(aDataTypeID);
+		return std::visit(Visitor
+			{
+			[this](const DataTypeID dataTypeID) -> const DataType*
+			{
+				return Find(dataTypeID);
+			},
+			[this](const ClassID classID) -> const DataType*
+			{
+				return Find(classID);
+			}
+			}, dataTypeID.mID);
 	}
 
-	void DataTypeManager::SetDataTypeColor(GenericDataTypeID aDataTypeID, const Color& aColor)
+	bool DataTypeManager::IsRegistered(const DataTypeID dataTypeID) const
+	{
+		return mDataTypes.contains(dataTypeID);
+	}
+
+	void DataTypeManager::SetDataTypeColor(GenericDataTypeID dataTypeID, const Color& color)
 	{
 		std::visit(Visitor{
-			[&](const DataTypeID aDataTypeID) -> void
+			[&](const DataTypeID dataTypeID) -> void
 			{
-				if (DataType* dataType = Find(aDataTypeID))
+				if (DataType* dataType = Find(dataTypeID))
 				{
-					dataType->SetColor(aColor);
+					dataType->SetColor(color);
 				}
 			},
 			[&](const auto) -> void
 			{
 				assert(false);
 			},
-			}, aDataTypeID.mID);
+			}, dataTypeID.mID);
 	}
 
-	void DataTypeManager::SetDefaultColor(const Color& aColor)
+	void DataTypeManager::SetDefaultColor(const Color& color)
 	{
-		mDefaultColor = aColor;
+		mDefaultColor = color;
 	}
 
 	Color DataTypeManager::GetDefaultColor() const

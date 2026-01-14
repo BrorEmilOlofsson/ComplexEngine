@@ -6,7 +6,7 @@ namespace FLY_NAMESPACE
 {
 	struct NodeDragData final
 	{
-		Vec2 mStartPos;
-		Vec2 mEndPos;
+		Vec2 startPos;
+		Vec2 endPos;
 	};
 }

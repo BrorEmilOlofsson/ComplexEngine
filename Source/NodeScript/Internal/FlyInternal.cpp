@@ -18,9 +18,6 @@ namespace FLY_NAMESPACE
 	namespace Internal
 	{
 
-		bool g_IsDebugging = false;
-		MemoryArena<1024> g_FrameArena;
-		MemoryArena<10000> g_EditArena;
 
 		Foundation& GetFoundation()
 		{
@@ -54,17 +51,17 @@ namespace FLY_NAMESPACE
 
 		bool& IsDebugging()
 		{
-			return g_IsDebugging;
+			return GetFoundation().IsDebugging();
 		}
 
 		MemoryArena<1024>& GetFrameMemoryArena()
 		{
-			return g_FrameArena;
+			return GetFoundation().GetFrameMemoryArena();
 		}
 
 		MemoryArena<10000>& GetEditMemoryArena()
 		{
-			return g_EditArena;
+			return GetFoundation().GetEditMemoryArena();
 		}
 
 		MemoryPool& GetMemoryPool()
@@ -780,38 +777,38 @@ namespace FLY_NAMESPACE
 			SetNodePosition(nodeID, position, oldPos, nodeGraph, commandTracker);
 		}
 
-		void SetNodePosition(const NodeID nodeID, const Vec2 position, const Vec2 aOldPosition, NodeGraph& nodeGraph, CommandTracker* const commandTracker)
+		void SetNodePosition(const NodeID nodeID, const Vec2 position, const Vec2 oldPosition, NodeGraph& nodeGraph, CommandTracker* const commandTracker)
 		{
 
 			struct SetNodePositionData final
 			{
-				NodeID mNodeID;
-				Vec2 mOldPos;
-				Vec2 mNewPos;
-				NodeGraph* mNodeGraph = nullptr;
+				NodeID nodeID;
+				Vec2 oldPos;
+				Vec2 newPos;
+				NodeGraph* nodeGraph = nullptr;
 			} data;
 
-			if (position == aOldPosition)
+			if (position == oldPosition)
 			{
 				return;
 			}
 
 
-			data.mNodeID = nodeID;
-			data.mOldPos = aOldPosition;
-			data.mNewPos = position;
-			data.mNodeGraph = &nodeGraph;
+			data.nodeID = nodeID;
+			data.oldPos = oldPosition;
+			data.newPos = position;
+			data.nodeGraph = &nodeGraph;
 
 			auto doCommandFunction = [](const SetNodePositionData& data) -> void
 				{
-					Node& node = GetNode(data.mNodeID, *data.mNodeGraph);
-					node.SetPosition(data.mNewPos);
+					Node& node = GetNode(data.nodeID, *data.nodeGraph);
+					node.SetPosition(data.newPos);
 				};
 
 			auto undoCommandFunction = [](const SetNodePositionData& data) -> void
 				{
-					Node& node = GetNode(data.mNodeID, *data.mNodeGraph);
-					node.SetPosition(data.mOldPos);
+					Node& node = GetNode(data.nodeID, *data.nodeGraph);
+					node.SetPosition(data.oldPos);
 				};
 
 			if (!commandTracker)
@@ -838,7 +835,7 @@ namespace FLY_NAMESPACE
 
 			for (const auto& [nodeID, dragData] : nodeDragData)
 			{
-				Internal::SetNodePosition(nodeID, dragData.mEndPos, dragData.mStartPos, nodeGraph, commandTracker);
+				Internal::SetNodePosition(nodeID, dragData.endPos, dragData.startPos, nodeGraph, commandTracker);
 			}
 
 			if (commandTracker)

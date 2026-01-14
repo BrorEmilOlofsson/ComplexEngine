@@ -307,7 +307,7 @@ namespace Simple
 			Fly::Vec2 oldPos = node.GetPosition();
 			if (dragStarted && ImNodes::IsNodeSelected(node.GetID()))
 			{
-				nodeGraphContext.mNodeDragData.emplace(node.GetID(), Fly::NodeDragData{ .mStartPos = oldPos });
+				nodeGraphContext.mNodeDragData.emplace(node.GetID(), Fly::NodeDragData{ .startPos = oldPos });
 			}
 			else if (dragEnded)
 			{
@@ -315,7 +315,7 @@ namespace Simple
 
 				if (it != nodeGraphContext.mNodeDragData.end())
 				{
-					it->second.mEndPos = newPos;
+					it->second.endPos = newPos;
 				}
 			}
 			if (newPos != oldPos)

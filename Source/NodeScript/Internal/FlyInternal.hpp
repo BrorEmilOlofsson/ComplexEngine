@@ -62,8 +62,8 @@ namespace FLY_NAMESPACE
 		[[nodiscard]] const Pin& GetPin(PinID pinID, const NodeGraph& nodeGraph);
 		[[nodiscard]] Pin& GetPin(PinID pinID, NodeGraph& nodeGraph);
 		[[nodiscard]] const PinType& GetPinType(PinID pinID, const NodeGraph& nodeGraph);
-		[[nodiscard]] const PinType& GetPinType(const Pin& aPin);
-		[[nodiscard]] const PinType& GetPinType(PinTypeID aPinTypeID);
+		[[nodiscard]] const PinType& GetPinType(const Pin& pin);
+		[[nodiscard]] const PinType& GetPinType(PinTypeID pinTypeID);
 		[[nodiscard]] Node& GetNode(NodeID nodeID, NodeGraph& nodeGraph);
 		[[nodiscard]] const Node& GetNode(NodeID nodeID, const NodeGraph& nodeGraph);
 		[[nodiscard]] const NodeType& GetNodeType(const Node& node);
@@ -109,8 +109,8 @@ namespace FLY_NAMESPACE
 		void SetNodePosition(NodeID nodeID, Vec2 position, Vec2 oldPosition, NodeGraph& nodeGraph, CommandTracker* commandTracker);
 		void CommitNodeDrag(const std::unordered_map<NodeID, NodeDragData>& nodeDragData, NodeGraph& nodeGraph, CommandTracker* const commandTracker);
 
-		[[nodiscard]] std::vector<PinID> CreateInputPins(NodeGraph& nodeGraph, NodeID nodeID, NodeTypeID nodeTypeID, const NodeCreationContext& creationContext, size_t startIndex = 0);
-		[[nodiscard]] std::vector<PinID> CreateOutputPins(NodeGraph& nodeGraph, NodeID, NodeTypeID nodeTypeID, const NodeCreationContext& creationContext, size_t startIndex);
+		[[nodiscard]] std::vector<PinID> CreateInputPins(NodeGraph& nodeGraph, NodeID nodeID, NodeTypeID nodeTypeID, const NodeCreationContext& creationContext, std::size_t startIndex = 0);
+		[[nodiscard]] std::vector<PinID> CreateOutputPins(NodeGraph& nodeGraph, NodeID, NodeTypeID nodeTypeID, const NodeCreationContext& creationContext, std::size_t startIndex);
 
 		[[nodiscard]] PinID CreatePin(NodeGraph& nodeGraph, NodeID nodeID, PinTypeID pinTypeID, const NodeCreationContext& creationContext);
 		[[nodiscard]] PinID CreatePin(NodeGraph& nodeGraph, NodeID nodeID, PinTypeID pinTypeID, void* dataPtr, const NodeCreationContext& creationContext);

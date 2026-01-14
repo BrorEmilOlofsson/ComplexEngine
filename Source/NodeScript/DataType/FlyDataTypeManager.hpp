@@ -679,28 +679,28 @@ namespace FLY_NAMESPACE
 	}
 
 	template<size_t BufferCapacity>
-	inline ClassInstance* DataTypeManager::AllocateClassInstance(const ClassID aClassID, MemoryArena<BufferCapacity>& aArena) const
+	inline ClassInstance* DataTypeManager::AllocateClassInstance(const ClassID classID, MemoryArena<BufferCapacity>& arena) const
 	{
-		return &aArena.Allocate<ClassInstance>(aClassID);
+		return &arena.Allocate<ClassInstance>(classID);
 	}
 
 	template<size_t BufferCapacity>
-	inline void* DataTypeManager::AllocateData(const GenericDataTypeID aDataTypeID, MemoryArena<BufferCapacity>& aArena, const void* aDefaultValue) const
+	inline void* DataTypeManager::AllocateData(const GenericDataTypeID dataTypeID, MemoryArena<BufferCapacity>& arena, const void* defaultValue) const
 	{
 		return std::visit(Visitor{
-			[this, &aArena, aDefaultValue](const DataTypeID aDataTypeID) -> void*
+			[this, &arena, defaultValue](const DataTypeID aDataTypeID) -> void*
 			{
-				return AllocateData(aDataTypeID, aArena, aDefaultValue);
+				return AllocateData(aDataTypeID, arena, defaultValue);
 			},
-			[this, &aArena](const StructID aStructID) -> void*
+			[this, &arena](const StructID structID) -> void*
 			{
-				return AllocateStructInstance(aStructID, aArena);
+				return AllocateStructInstance(structID, arena);
 			},
-			[this, &aArena](const ClassID aClassID) -> void*
+			[this, &arena](const ClassID classID) -> void*
 			{
-				return AllocateClassInstance(aClassID, aArena);
+				return AllocateClassInstance(classID, arena);
 			}
-			}, aDataTypeID.mID
+			}, dataTypeID.mID
 		);
 	}
 

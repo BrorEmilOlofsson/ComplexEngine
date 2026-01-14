@@ -55,22 +55,27 @@ namespace FLY_NAMESPACE
 
 		void Initialize();
 
-		MemoryPool& GetMemoryPool();
-		const MemoryPool& GetMemoryPool() const;
-		NodeTypeManager& GetNodeTypeManager();
-		const NodeTypeManager& GetNodeTypeManager() const;
-		PinTypeManager& GetPinTypeManager();
-		const PinTypeManager& GetPinTypeManager() const;
-		DataTypeManager& GetDataTypeManager();
-		const DataTypeManager& GetDataTypeManager() const;
-		TraitManager& GetTraitManager();
-		const TraitManager& GetTraitManager() const;
-		NodeExecutor& GetNodeExecutor();
-		const NodeExecutor& GetNodeExecutor() const;
-		EventGraph& GetNodeGraphCopy();
-		const EventGraph& GetNodeGraphCopy() const;
+		[[nodiscard]] MemoryPool& GetMemoryPool();
+		[[nodiscard]] const MemoryPool& GetMemoryPool() const;
+		[[nodiscard]] NodeTypeManager& GetNodeTypeManager();
+		[[nodiscard]] const NodeTypeManager& GetNodeTypeManager() const;
+		[[nodiscard]] PinTypeManager& GetPinTypeManager();
+		[[nodiscard]] const PinTypeManager& GetPinTypeManager() const;
+		[[nodiscard]] DataTypeManager& GetDataTypeManager();
+		[[nodiscard]] const DataTypeManager& GetDataTypeManager() const;
+		[[nodiscard]] TraitManager& GetTraitManager();
+		[[nodiscard]] const TraitManager& GetTraitManager() const;
+		[[nodiscard]] NodeExecutor& GetNodeExecutor();
+		[[nodiscard]] const NodeExecutor& GetNodeExecutor() const;
+		[[nodiscard]] EventGraph& GetNodeGraphCopy();
+		[[nodiscard]] const EventGraph& GetNodeGraphCopy() const;
 		const VariableRef& GetVariableRefByNodeRef(const GlobalNodeRef& aNodeRef) const;
 		std::vector<GlobalNodeRef> GetNodeRefsByVariableRef(const VariableRef& aVarRef) const;
+
+		// Editor only
+		[[nodiscard]] bool& IsDebugging();
+		[[nodiscard]] MemoryArena<1024>& GetFrameMemoryArena();
+		[[nodiscard]] MemoryArena<10000>& GetEditMemoryArena();
 
 	private:
 
@@ -86,6 +91,11 @@ namespace FLY_NAMESPACE
 
 		NodeExecutor mNodeExecutor;
 		EventGraph mNodeGraphCopy;
+
+		// Editor only
+		bool mIsDebugging = false;
+		MemoryArena<1024> mFrameArena;
+		MemoryArena<10000> mEditArena;
 
 	public:
 
