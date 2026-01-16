@@ -9,15 +9,5 @@ namespace FLY_NAMESPACE
 		, mName(std::move(name))
 	{
 	}
-
-	void Class::BindFunction(FunctionID functionID)
-	{
-		mMemberFunctionIDs.push_back(functionID);
-	}
-
-	const std::vector<FunctionID>& Class::GetMemberFunctionIDs() const
-	{
-		return mMemberFunctionIDs;
-	}
 }
 

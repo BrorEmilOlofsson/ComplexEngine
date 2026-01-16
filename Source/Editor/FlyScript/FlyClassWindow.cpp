@@ -28,18 +28,18 @@ namespace Simple
 
 	void FlyClassWindow::DrawGraphSelection()
 	{
-		Fly::ClassProxy currentClassProxy = mParentWindow.GetNodeContext().mClass;
-		if (ImGui::Selectable("Event Graph", currentClassProxy.GetEventGraph() == mParentWindow.GetNodeContext().mNodeGraph))
+		Fly::ClassProxy currentClass = mParentWindow.GetNodeContext().mClass;
+		if (ImGui::Selectable("Event Graph", currentClass.GetEventGraph() == mParentWindow.GetNodeContext().mNodeGraph))
 		{
-			mParentWindow.SetNodeContext(currentClassProxy.GetEventGraph(), currentClassProxy);
+			mParentWindow.SetNodeContext(currentClass.GetEventGraph(), currentClass);
 		}
 	}
 
 	void FlyClassWindow::DrawFunctionSelection()
 	{
-		Fly::ClassProxy currentClassProxy = mParentWindow.GetNodeContext().mClass;
+		Fly::ClassProxy currentClass = mParentWindow.GetNodeContext().mClass;
 
-		if (ImGui::Button("Create Member Function"))
+		/*if (ImGui::Button("Create Member Function"))
 		{
 			Fly::FunctionProxy createdFunctionProxy = currentClassProxy.CreateMemberFunction("Function1");
 			mParentWindow.SetNodeContext(createdFunctionProxy.GetNodeGraph(), currentClassProxy);
@@ -65,7 +65,7 @@ namespace Simple
 			}
 
 			ImGui::TreePop();
-		}
+		}*/
 
 	}
 

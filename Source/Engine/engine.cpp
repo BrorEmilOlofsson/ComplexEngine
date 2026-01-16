@@ -48,12 +48,14 @@ namespace Simple
 				return EntityCompositionAsset(std::move(entityComposition));
 			};
 		mAssetManager->GetAssetLoader().SetEntityCompositionLoader(a);
+
+        mDataTypeRegistry = std::move(DataTypeRegistry::GetInstance());
+		DataTypeRegistry::Destroy();
 	}
 
 	Engine::~Engine()
 	{
 		ECSRegistry::Destroy();
-		DataTypeRegistry::Destroy();
 	}
 
 	void LoadGraphicsSettings(bool& vSync)
@@ -79,7 +81,7 @@ namespace Simple
 		mBlackboard->Insert<Key_GraphicsSettings>(*mGraphicsSettings);
 		mBlackboard->Insert<Key_AssetManager>(*mAssetManager);
 		mBlackboard->Insert<Key_SceneManager>(mSceneManager);
-		mBlackboard->Insert<Key_DataTypeRegistry>(DataTypeRegistry::GetInstance());
+		mBlackboard->Insert<Key_DataTypeRegistry>(mDataTypeRegistry);
 		mBlackboard->Insert<Key_InputState>(mInputState);
 
 		mAssetManager->LoadAssets();
@@ -105,7 +107,6 @@ namespace Simple
 		mSceneManager.Init(mBlackboard);
 
         RenderContext r = mOperatingSystem.GetGraphicsFoundation().CreateRenderContext(mOperatingSystem.GetWindow(mMainWindow).GetClientSize());
-		//RenderContext r = mOperatingSystem.CreateRenderContext(mOperatingSystem.GetWindow(mMainWindow).GetClientSize());
 		mSceneManager.GetCurrentScene().GetRenderState().SetRenderContext(std::move(r));
 	}
 
@@ -204,12 +205,12 @@ namespace Simple
 
 	DataTypeRegistry& Engine::GetDataTypeRegistry()
 	{
-		return DataTypeRegistry::GetInstance();
+		return mDataTypeRegistry;
 	}
 
 	const DataTypeRegistry& Engine::GetDataTypeRegistry() const
 	{
-		return DataTypeRegistry::GetInstance();
+		return mDataTypeRegistry;
 	}
 
 	GraphicsFoundation& Engine::GetGraphicsFoundation()

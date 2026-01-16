@@ -25,15 +25,11 @@ namespace FLY_NAMESPACE
 		Class& operator=(const Class&) = delete;
 		Class& operator=(Class&&) = delete;
 
-		void BindFunction(FunctionID functionID);
-		const std::vector<FunctionID>& GetMemberFunctionIDs() const;
-
 	public:
 
 		EventGraph mEventGraph;
 		VariableContainer mVariableContainer;
 
-		std::vector<FunctionID> mMemberFunctionIDs;
 		std::vector<HeapObject<ClassInstance>> mClassInstances;
 
 		DataTypeID mTargetID;

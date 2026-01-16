@@ -59,21 +59,6 @@ namespace FLY_NAMESPACE
 		return variableProxys;
 	}
 
-	std::vector<FunctionProxy> ClassProxy::GetFunctions() const
-	{
-		const std::vector<FunctionID>& functionIDs = GetClass().GetMemberFunctionIDs();
-		std::vector<FunctionProxy> functionProxys;
-
-		functionProxys.reserve(functionIDs.size());
-
-		for (const FunctionID functionID : functionIDs)
-		{
-			functionProxys.push_back(FunctionProxy(functionID));
-		}
-
-		return functionProxys;
-	}
-
 	VariableProxy ClassProxy::CreateVariable(const GenericDataTypeProxy dataType, std::string name, CommandTracker* const commandTracker)
 	{
 		const VarID varID = Internal::CreateVariable(GetClass().mVariableContainer, dataType.GetID(), std::move(name), commandTracker);
@@ -83,14 +68,6 @@ namespace FLY_NAMESPACE
 	ClassInstanceProxy ClassProxy::CreateClassInstance()
 	{
 		return ClassInstanceProxy(Internal::CreateClassInstance(mClassID));
-	}
-
-	FunctionProxy ClassProxy::CreateMemberFunction(std::string name)
-	{
-		const FunctionID id = Internal::CreateFunction(std::move(name));
-		GetClass().BindFunction(id);
-
-		return FunctionProxy(id);
 	}
 
 	ClassID ClassProxy::GetID() const

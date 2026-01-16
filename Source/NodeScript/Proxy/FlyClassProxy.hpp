@@ -13,7 +13,6 @@ namespace FLY_NAMESPACE
 {
 
 	class Class;
-	class EventGraph;
 
 	class ClassProxy final
 	{
@@ -28,11 +27,9 @@ namespace FLY_NAMESPACE
 		[[nodiscard]] NodeGraphProxy GetEventGraph() const;
 
 		[[nodiscard]] std::vector<VariableProxy> GetVariables(bool includeDestroyed = false) const;
-		[[nodiscard]] std::vector<FunctionProxy> GetFunctions() const;
 
 		VariableProxy CreateVariable(GenericDataTypeProxy dataType, std::string name, CommandTracker* commandTracker);
 		ClassInstanceProxy CreateClassInstance();
-		FunctionProxy CreateMemberFunction(std::string name);
 
 		[[nodiscard]] ClassID GetID() const;
 

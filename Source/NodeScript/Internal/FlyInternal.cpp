@@ -2045,7 +2045,7 @@ namespace FLY_NAMESPACE
 			{ // Link new pin
 				const size_t pinIndex = GetPinIndex(nodeGraph, wildcardPinID);
 
-				const PinID createdPinConnectedID = SelectByIODirection(wildcardPinType.GetIODirection(), createdNode.GetInputPins()[pinIndex], createdNode.GetOutputPins()[pinIndex]);
+				const PinID createdPinConnectedID = SelectByIODirection(wildcardPinType.GetIODirection(), createdNode.GetInputPins(), createdNode.GetOutputPins()).at(pinIndex);
 
 				TryCreateLink(nodeGraph, connectedPinID, createdPinConnectedID, commandTracker);
 			}

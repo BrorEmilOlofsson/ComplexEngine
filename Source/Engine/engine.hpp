@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include "Utility/Win/WinConsole.hpp"
 #include "Utility/SystemTimer.hpp"
 #include "Engine/Scene/SceneManager.hpp"
@@ -8,10 +9,8 @@
 #include "Utility/Asset/AssetManager.hpp"
 #include "Graphics/GraphicsSettings.hpp"
 #include "Engine/OperatingSystem/WindowHandle.hpp"
+#include "Engine/Reflection/DataTypeRegistry.hpp"
 #include "Engine/Input/InputManager.hpp"
-#include <memory>
-#include <unordered_map>
-#include <string>
 
 namespace Simple
 {
@@ -79,6 +78,7 @@ namespace Simple
 		std::shared_ptr<AssetManager> mAssetManager;
 		std::shared_ptr<GraphicsSettings> mGraphicsSettings;
 
+		DataTypeRegistry mDataTypeRegistry;
 		InputManager mInputManager;
 	};
 }
