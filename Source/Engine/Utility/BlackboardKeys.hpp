@@ -2,6 +2,7 @@
 #include "Utility/Blackboard.hpp"
 #include "Utility/Math/Transform3.hpp"
 #include <string>
+#include <Engine/ECS/ECSRegistry.hpp>
 
 namespace Simple
 {
@@ -24,4 +25,5 @@ namespace Simple
 	using Key_OSView = BlackboardKey<class OSView, "OSView">;
 	using Key_OperatingSystem = BlackboardKey<class OperatingSystem&, "OperatingSystem">;
 	using Key_AudioManager = BlackboardKey<class AudioManager&, "AudioManager">;
+    using Key_ECSRegistry = BlackboardKey<class ECSRegistry&, "ECSRegistry">;
 }

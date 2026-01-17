@@ -39,20 +39,7 @@ namespace Simple
 
 		void LoadCursors(const std::filesystem::path& path);
 
-		WindowHandle MakeWindow(Vector2ui size, std::wstring title)
-		{
-			return mConcept->MakeWindow(size, title);
-		}
-
-		void SetAssetManager(std::shared_ptr<AssetManager> assetManager)
-		{
-			mConcept->SetAssetManager(assetManager);
-		}
-
-		void SetGraphicsSettings(std::shared_ptr<GraphicsSettings> graphicsSettings)
-		{
-			mConcept->SetGraphicsSettings(graphicsSettings);
-		}
+		WindowHandle MakeWindow(Vector2ui size, std::wstring title);
 
 	private:
 
@@ -75,8 +62,6 @@ namespace Simple
 			virtual WindowHandle MakeWindow(Vector2ui size, std::wstring title) = 0;
             virtual GraphicsFoundation& GetGraphicsFoundation() = 0;
             virtual const GraphicsFoundation& GetGraphicsFoundation() const = 0;
-			virtual void SetAssetManager(std::shared_ptr<AssetManager> assetManager) = 0;
-			virtual void SetGraphicsSettings(std::shared_ptr<GraphicsSettings> graphicsSettings) = 0;
 		};
 
 		template<typename T>
@@ -150,16 +135,6 @@ namespace Simple
 			{
 				return OSGetGraphicsFoundation(mObject);
             }
-
-			void SetAssetManager(std::shared_ptr<AssetManager> assetManager) override
-			{
-				OSSetAssetManager(mObject, assetManager);
-			}
-
-			void SetGraphicsSettings(std::shared_ptr<GraphicsSettings> graphicsSettings) override
-			{
-				OSSetGraphicsSettings(mObject, graphicsSettings);
-			}
 
 		private:
 

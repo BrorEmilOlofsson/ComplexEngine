@@ -11,7 +11,7 @@ namespace Simple
 	{
 	public:
 
-		Scene(std::weak_ptr<Blackboard> blackboard);
+		explicit Scene(std::weak_ptr<Blackboard> blackboard);
 
 		void BeginPlay();
 		void EndPlay();

@@ -49,7 +49,7 @@ namespace Simple
 			constexpr KeyType key = T::key;
 			if constexpr (std::is_reference_v<Type>)
 			{
-				return std::any_cast<std::reference_wrapper<Type>>(mMap.at(key)).get();
+				return std::any_cast<std::reference_wrapper<std::remove_cvref_t<Type>>>(mMap.at(key)).get();
 			}
 			else
 			{

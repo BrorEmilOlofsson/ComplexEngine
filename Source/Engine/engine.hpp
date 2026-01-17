@@ -10,6 +10,7 @@
 #include "Graphics/GraphicsSettings.hpp"
 #include "Engine/OperatingSystem/WindowHandle.hpp"
 #include "Engine/Reflection/DataTypeRegistry.hpp"
+#include "Engine/ECS/ECSRegistry.hpp"
 #include "Engine/Input/InputManager.hpp"
 
 namespace Simple
@@ -20,7 +21,6 @@ namespace Simple
 	public:
 
 		explicit Engine(OperatingSystem&& operatingSystem);
-		~Engine();
 
 		void Init();
 		void LateInit();
@@ -49,6 +49,8 @@ namespace Simple
 		[[nodiscard]] const class DataTypeRegistry& GetDataTypeRegistry() const;
 		[[nodiscard]] GraphicsFoundation& GetGraphicsFoundation();
         [[nodiscard]] const GraphicsFoundation& GetGraphicsFoundation() const;
+        [[nodiscard]] ECSRegistry& GetECSRegistry() { return mECSRegistry; }
+        [[nodiscard]] const ECSRegistry& GetECSRegistry() const { return mECSRegistry; }
 		void SetShouldExit(bool shouldExit = true);
 		void SetCurrentDropPath(const std::filesystem::path& path);
 
@@ -79,6 +81,7 @@ namespace Simple
 		std::shared_ptr<GraphicsSettings> mGraphicsSettings;
 
 		DataTypeRegistry mDataTypeRegistry;
+        ECSRegistry mECSRegistry;
 		InputManager mInputManager;
 	};
 }

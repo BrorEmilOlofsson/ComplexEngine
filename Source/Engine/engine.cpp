@@ -16,14 +16,15 @@
 #include "Engine/ECS/ECSSerializer.hpp"
 #include <External/nlohmann/json.hpp>
 #include <fstream>
-#include <dwmapi.h>
-#pragma comment(lib, "dwmapi.lib")
 
 namespace Simple
 {
 
 	Engine::Engine(OperatingSystem&& operatingSystem)
 		: mOperatingSystem(std::move(operatingSystem))
+		, mBlackboard(std::make_shared<Blackboard>())
+        , mAssetManager(std::make_shared<AssetManager>())
+        , mGraphicsSettings(std::make_shared<GraphicsSettings>())
 	{
 		RegisterEngineComponents();
 		ECSRegistry::Get().RegisterSystem<RotatingMovementSystem>();
@@ -33,29 +34,28 @@ namespace Simple
 		ECSRegistry::Get().RegisterSystem<AnimationSystem>();
 		ECSRegistry::Get().RegisterSystem<NavmeshSystem>();
 		ECSRegistry::Get().RegisterSystem<DebugShapeSystem>();
-		DataTypeRegistry::GetInstance().Assert();
-		mBlackboard = std::make_shared<Blackboard>();
-		mAssetManager = std::make_shared<AssetManager>();
-		mGraphicsSettings = std::make_shared<GraphicsSettings>();
-		mOperatingSystem.SetAssetManager(mAssetManager);
-		mOperatingSystem.SetGraphicsSettings(mGraphicsSettings);
+
+		mDataTypeRegistry = std::move(DataTypeRegistry::GetInstance());
+		DataTypeRegistry::Destroy();
+        mECSRegistry = std::move(ECSRegistry::Get());
+		ECSRegistry::Destroy();
+
+		mDataTypeRegistry.Assert();
+		mOperatingSystem.GetGraphicsFoundation().SetAssetManager(mAssetManager);
+        mOperatingSystem.GetGraphicsFoundation().SetGraphicsSettings(mGraphicsSettings);
 
 		std::shared_ptr<Blackboard> blackboard = mBlackboard;
-		auto a = [blackboard](const std::filesystem::path& path)
+        ECSRegistry* ecsRegistry = &mECSRegistry;
+		auto a = [blackboard, ecsRegistry](const std::filesystem::path& path)
 			{
-				std::shared_ptr<EntityComposition> entityComposition = std::make_shared<EntityComposition>(ECSRegistry::Get());
+				std::shared_ptr<EntityComposition> entityComposition = std::make_shared<EntityComposition>(*ecsRegistry);
 				LoadEntityComposition(path, *entityComposition, *blackboard);
 				return EntityCompositionAsset(std::move(entityComposition));
 			};
 		mAssetManager->GetAssetLoader().SetEntityCompositionLoader(a);
 
-        mDataTypeRegistry = std::move(DataTypeRegistry::GetInstance());
-		DataTypeRegistry::Destroy();
-	}
+        mBlackboard->Insert<Key_ECSRegistry>(mECSRegistry);
 
-	Engine::~Engine()
-	{
-		ECSRegistry::Destroy();
 	}
 
 	void LoadGraphicsSettings(bool& vSync)
@@ -76,7 +76,7 @@ namespace Simple
 
 	void Engine::Init()
 	{
-		ECSRegistry::Get().SetBlackboard(mBlackboard);
+		mECSRegistry.SetBlackboard(mBlackboard);
 
 		mBlackboard->Insert<Key_GraphicsSettings>(*mGraphicsSettings);
 		mBlackboard->Insert<Key_AssetManager>(*mAssetManager);

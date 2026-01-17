@@ -25,6 +25,8 @@ namespace Simple
 
 		Win_OperatingSystem(const Win_OperatingSystem&) = delete;
 		Win_OperatingSystem(Win_OperatingSystem&&);
+		Win_OperatingSystem& operator=(const Win_OperatingSystem&) = delete;
+		Win_OperatingSystem& operator=(Win_OperatingSystem&&) = delete;
 
 		void Init();
 		void Shutdown();
@@ -54,34 +56,22 @@ namespace Simple
 		unsigned int MakeWindow(Vector2ui size, std::wstring title);
 		LRESULT HandleMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-		/*[[nodiscard]] DX11Foundation& GetGraphicsFoundation() noexcept
-		{
-			return mGraphicsFoundation;
-		}
-		[[nodiscard]] const DX11Foundation& GetGraphicsFoundation() const noexcept
-		{
-			return mGraphicsFoundation;
-		}*/
-
 		[[nodiscard]] GraphicsFoundation& GetGraphicsFoundation() noexcept
 		{
-			return mGraphicsFoundationNew;
+			return mGraphicsFoundation;
 		}
 		[[nodiscard]] const GraphicsFoundation& GetGraphicsFoundation() const noexcept
 		{
-			return mGraphicsFoundationNew;
+			return mGraphicsFoundation;
 		}
 
 	private:
 
 		HINSTANCE mInstanceHandle = HINSTANCE{};
 		std::unique_ptr<Win_WindowClass> mWindowClass;
-		GraphicsFoundation mGraphicsFoundationNew;
-		//DX11Foundation mGraphicsFoundation;
+		GraphicsFoundation mGraphicsFoundation;
 		std::vector<std::unique_ptr<Win_Window>> mWindows;
 		Win_Style mStyle;
-		std::shared_ptr<AssetManager> mAssetManager;
-		std::shared_ptr<GraphicsSettings> mGraphicsSettings;
 	};
 
 	inline void OSBeginFrame(Win_OperatingSystem& os, const GraphicsBufferData& data)
@@ -143,31 +133,6 @@ namespace Simple
 	{
 		return os.GetGraphicsFoundation();
     }
-
-	/*[[nodiscard]] inline RenderTargetView OSCreateRenderTarget(Win_OperatingSystem& os, const Vector2ui& size)
-	{
-		return os.GetGraphicsFoundation().CreateRenderTarget(size);
-	}
-
-	[[nodiscard]] inline DepthStencilViewHandle OSCreateDepthStencilView(Win_OperatingSystem& os, const Vector2ui& size)
-	{
-		return os.GetGraphicsFoundation().CreateDepthStencilView(size);
-	}
-
-	[[nodiscard]] inline RenderContext OSCreateRenderContext(Win_OperatingSystem& os, const Vector2ui& size)
-	{
-		return os.GetGraphicsFoundation().CreateRenderContext(size);
-	}*/
-
-	inline void OSSetAssetManager(Win_OperatingSystem& os, std::shared_ptr<AssetManager> assetManager)
-	{
-		os.SetAssetManager(assetManager);
-	}
-
-	inline void OSSetGraphicsSettings(Win_OperatingSystem& os, std::shared_ptr<GraphicsSettings> graphicsSettings)
-	{
-		os.SetGraphicsSettings(graphicsSettings);
-	}
 }
 
 #endif

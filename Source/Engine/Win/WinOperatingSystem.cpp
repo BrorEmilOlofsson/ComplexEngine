@@ -33,19 +33,16 @@ namespace Simple
 	Win_OperatingSystem::Win_OperatingSystem(HINSTANCE instanceHandle, std::wstring className)
 		: mInstanceHandle(instanceHandle)
 		, mWindowClass(std::make_unique<Win_WindowClass>(instanceHandle, className, HandleMsgSetup))
-        , mGraphicsFoundationNew(DX11Foundation())
+        , mGraphicsFoundation(DX11Foundation())
 	{
 	}
 
 	Win_OperatingSystem::Win_OperatingSystem(Win_OperatingSystem&& other)
 		: mInstanceHandle(std::move(other.mInstanceHandle))
 		, mWindowClass(std::move(other.mWindowClass))
-        , mGraphicsFoundationNew(std::move(other.mGraphicsFoundationNew))
-		//, mGraphicsFoundation(std::move(other.mGraphicsFoundation))
+        , mGraphicsFoundation(std::move(other.mGraphicsFoundation))
 		, mWindows(std::move(other.mWindows))
 		, mStyle(std::move(other.mStyle))
-		, mAssetManager(std::move(other.mAssetManager))
-		, mGraphicsSettings(std::move(other.mGraphicsSettings))
 	{
 		for (auto& window : mWindows)
 		{
@@ -53,36 +50,19 @@ namespace Simple
 		}
 	}
 
-	void Win_OperatingSystem::SetAssetManager(std::shared_ptr<AssetManager> assetManager)
-	{
-		mAssetManager = std::move(assetManager);
-		mGraphicsFoundationNew.SetAssetManager(mAssetManager);
-		//mGraphicsFoundation.SetAssetManager(mAssetManager);
-	}
-
-	void Win_OperatingSystem::SetGraphicsSettings(std::shared_ptr<GraphicsSettings> graphicsSettings)
-	{
-		mGraphicsSettings = graphicsSettings;
-		mGraphicsFoundationNew.SetGraphicsSettings(graphicsSettings);
-		//mGraphicsFoundation.SetGraphicsSettings(graphicsSettings);
-	}
-
 	void Win_OperatingSystem::Init()
 	{
-		mGraphicsFoundationNew.Init();
-		//mGraphicsFoundation.Init();
+		mGraphicsFoundation.Init();
 	}
 
 	void Win_OperatingSystem::Shutdown()
 	{
-		mGraphicsFoundationNew.Shutdown();
-		//mGraphicsFoundation.Shutdown();
+		mGraphicsFoundation.Shutdown();
 	}
 
 	void Win_OperatingSystem::BeginFrame(const GraphicsBufferData& data)
 	{
-		mGraphicsFoundationNew.BeginFrame(data);
-		//mGraphicsFoundation.BeginFrame(data);
+		mGraphicsFoundation.BeginFrame(data);
 		for (auto& window : mWindows)
 		{
 			window->BeginFrame();
@@ -95,8 +75,7 @@ namespace Simple
 		{
 			window->GetGraphicsWindow().BindBackBuffer();
 		}
-		mGraphicsFoundationNew.EndFrame();
-		//mGraphicsFoundation.EndFrame();
+		mGraphicsFoundation.EndFrame();
 		for (auto& window : mWindows)
 		{
 			window->EndFrame(renderContext);
@@ -110,7 +89,7 @@ namespace Simple
 
 	void Win_OperatingSystem::Render(RenderState& renderState)
 	{
-		mGraphicsFoundationNew.Render(renderState);
+		mGraphicsFoundation.Render(renderState);
 		//mGraphicsFoundation.Render(renderState);
 	}
 
@@ -118,22 +97,13 @@ namespace Simple
 	{
 		try
 		{
-
-
 			auto window = std::make_unique<Win_Window>(
-				/*mGraphicsFoundation.GetDevice(),
-				mGraphicsFoundation.GetContext(),
-				mAssetManager,
-				mGraphicsSettings,
-				mGraphicsFoundation.GetDepthStencilViewManager(),
-				mGraphicsFoundation.GetSamplerState(),*/
 				size,
 				title,
 				*mWindowClass,
-				this//,
-				//mWindows.empty()
+				this
 			);
-			GraphicsWindowView windowView = mGraphicsFoundationNew.MakeWindow(WindowView(*window));
+			GraphicsWindowView windowView = mGraphicsFoundation.MakeWindow(WindowView(*window));
 			window->SetGraphicsWindowView(windowView);
 			SetWindowLongPtr(window->GetHandle(), GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 

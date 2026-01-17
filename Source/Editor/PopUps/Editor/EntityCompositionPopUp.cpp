@@ -30,7 +30,7 @@ namespace Simple
 
         if (!mEntityCompositionAsset.IsValid())
         {
-            std::shared_ptr<EntityComposition> ec = std::make_shared<EntityComposition>(ECSRegistry::Get());
+            std::shared_ptr<EntityComposition> ec = std::make_shared<EntityComposition>(blackboard.Get<Key_ECSRegistry>());
             const std::filesystem::path defaultPath = std::filesystem::absolute(SIMPLE_DIR_ASSETS) / "EntityCompositions" / "Test.json";
             blackboard.Get<Key_AssetManager>().AddEntityCompositionAsset(defaultPath, EntityCompositionAsset(ec));
 

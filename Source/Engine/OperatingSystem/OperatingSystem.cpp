@@ -63,4 +63,9 @@ namespace Simple
 	{
 		GetOS().LoadCursors(path);
 	}
+
+    WindowHandle OperatingSystem::MakeWindow(Vector2ui size, std::wstring title)
+	{
+		return mConcept->MakeWindow(size, title);
+	}
 }

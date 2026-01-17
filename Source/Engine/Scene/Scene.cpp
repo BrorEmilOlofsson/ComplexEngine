@@ -2,13 +2,16 @@
 #include "Scene.hpp"
 #include "Utility/CameraMath.hpp"
 #include "Utility/ShapeMath.hpp"
+#include "Utility/Blackboard.hpp"
+#include <memory>
+#include "Engine/ECS/ECSRegistry.hpp"
 
 namespace Simple
 {
 
 	Scene::Scene(std::weak_ptr<Blackboard> blackboard)
-		: mECS(ECSRegistry::Get())
-		, mBackupECS(ECSRegistry::Get())
+		: mECS(blackboard.lock()->Get<Key_ECSRegistry>())
+		, mBackupECS(blackboard.lock()->Get<Key_ECSRegistry>())
 		, mBlackboard(blackboard)
 	{
 		mBlackboard.lock()->Insert<Key_IsPlaying>(false);

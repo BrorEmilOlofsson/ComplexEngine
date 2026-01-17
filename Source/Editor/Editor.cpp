@@ -54,8 +54,7 @@ namespace Simple
         std::vector<std::unique_ptr<MainMenuTabBase>>& mainMenuTabs,
         Engine& engine,
         bool& isCameraSettingsPopUpActive,
-        bool& isGraphicsSettingsPopUpActive
-        /*SceneWindowPopUp& sceneWindowPopUp*/)
+        bool& isGraphicsSettingsPopUpActive)
     {
         MenuTabDefault& sceneTab = AddMenuTab<MenuTabDefault>(mainMenuTabs, "Scene");
         MenuTabWindow& windowsTab = AddMenuTab<MenuTabWindow>(mainMenuTabs, "Windows");
@@ -81,20 +80,6 @@ namespace Simple
             });
 
         MenuItemPopUp* editorPopUpButton = windowsTab.AddPopUp("Editor");
-        //MenuItemPopUp* nodeScriptingPopUpButton = windowsTab.AddPopUp("NodeScript");
-
-        //std::shared_ptr<NodeScriptingWindow> nodeScriptingPopUp = AddPopUpWindow<NodeScriptingWindow>(popUpWindows, "NodeScripting Window");
-
-        //std::shared_ptr<GraphicsSettingsPopUp> graphicsSettingPopUp = AddPopUpWindow<GraphicsSettingsPopUp>(popUpWindows, "Graphics Settings");
-        //std::shared_ptr<AssetBrowserPopUp> assetBrowserPopUp2 = AddPopUpWindow<AssetBrowserPopUp>(popUpWindows, "Asset Browser", &windowsTab, nodeScriptingPopUpButton);
-        //std::shared_ptr<SceneWindowPopUp> sceneWindowPopUp = AddPopUpWindow<SceneWindowPopUp>(popUpWindows);
-        /*std::shared_ptr<EntityCompositionPopUp> entityCompositionPopUp = AddPopUpWindow<EntityCompositionPopUp>(
-            popUpWindows,
-            "",
-            engine.GetOperatingSystem().CreateRenderContext(engine.GetMainWindow().GetClientSize())
-        );*/
-
-        //p = entityCompositionPopUp.get();
 
         {
             const std::vector<std::filesystem::path> scenePaths = FileUtility::GetPathsFromDirectory(std::filesystem::absolute(SIMPLE_DIR_SCENES));
@@ -119,28 +104,17 @@ namespace Simple
                 isGraphicsSettingsPopUpActive = !isGraphicsSettingsPopUpActive;
             });
 
-        //editorPopUpButton->AddCallback(EditorCallbacks::SetPopUpActive(assetBrowserPopUp2, &editorPopUpButton->GetIsActiveRef()));
-        //editorPopUpButton->AddCallback(EditorCallbacks::SetPopUpActive(sceneWindowPopUp, &editorPopUpButton->GetIsActiveRef()));
-        //editorPopUpButton->AddCallback(EditorCallbacks::SetPopUpActive(entityCompositionPopUp, &editorPopUpButton->GetIsActiveRef()));
-       /* bool* isEditorPopUpButtonIsActive = &editorPopUpButton->GetIsActiveRef();
-        editorPopUpButton->AddCallback([&sceneWindowPopUp, isEditorPopUpButtonIsActive]()
-            {
-                sceneWindowPopUp.IsActive() = *isEditorPopUpButtonIsActive;
-            });*/
-
-        //nodeScriptingPopUpButton->AddCallback(EditorCallbacks::SetPopUpActive(nodeScriptingPopUp, &nodeScriptingPopUpButton->GetIsActiveRef()));
-
-        { //TO-DO(v11.4.5): Temp should be refactor
+        {
             editorPopUpButton->SetIsActive(true);
             editorPopUpButton->Invoke();
         }
     }
 
     Editor::Editor(Engine* engine)
-        : mECSBuffer(ECSRegistry::Get())
+        : mECSBuffer(engine->GetECSRegistry())
         , mEngine(engine)
     {
-        ECSRegistry::Get().RegisterSystem<EditorSystem>();
+        engine->GetECSRegistry().RegisterSystem<EditorSystem>();
     }
 
     void Editor::Init()
@@ -230,6 +204,7 @@ namespace Simple
         editorBlackboard.Insert<Key_WindowView>(mEngine->GetMainWindow());
         editorBlackboard.Insert<Key_AssetManager>(mEngine->GetAssetManager());
         editorBlackboard.Insert<Key_DataTypeRegistry>(mEngine->GetDataTypeRegistry());
+        editorBlackboard.Insert<Key_ECSRegistry>(mEngine->GetECSRegistry());
         editorBlackboard.Insert<Key_ImGuiStyleManager>(GetImGuiStyleManager());
         editorBlackboard.Insert<Key_GraphicsSettings>(mEngine->GetGraphicsSettings());
         editorBlackboard.Insert<Key_InputState>(mEngine->GetInputState());
@@ -263,6 +238,7 @@ namespace Simple
         editorBlackboard.Insert<Key_WindowView>(mEngine->GetMainWindow());
         editorBlackboard.Insert<Key_AssetManager>(mEngine->GetAssetManager());
         editorBlackboard.Insert<Key_DataTypeRegistry>(mEngine->GetDataTypeRegistry());
+        editorBlackboard.Insert<Key_ECSRegistry>(mEngine->GetECSRegistry());
         editorBlackboard.Insert<Key_ImGuiStyleManager>(GetImGuiStyleManager());
         editorBlackboard.Insert<Key_GraphicsSettings>(mEngine->GetGraphicsSettings());
         editorBlackboard.Insert<Key_InputState>(mEngine->GetInputState());
