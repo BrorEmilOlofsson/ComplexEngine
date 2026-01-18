@@ -103,20 +103,20 @@ namespace FLY_NAMESPACE
 
 	struct CustomName final
 	{
-		std::string mName;
+		std::string name;
 	};
 
 	struct RegisterType final
 	{
 
 		template<typename T, eNodeOperatorType Operators, typename... Traits>
-		constexpr static RegisterType ValueType_Impl(const std::string& aName, [[maybe_unused]] Traits&&... traits)
+		constexpr static RegisterType ValueType_Impl(std::string name, [[maybe_unused]] Traits&&... traits)
 		{
-			const Color color = TryExtract(Internal::GetDataTypeManager().GetDefaultColor(), std::forward<Traits>(traits)...);
-			const CustomName customName = TryExtract(CustomName{ aName }, std::forward<Traits>(traits)...);
+			const Color color = TryExtract(Internal::GetDataTypeManager().GetDefaultColor(), traits...);
+			const CustomName customName = TryExtract(CustomName{ std::move(name) }, traits...);
 
 			TypeParameters typeParameters;
-			typeParameters.mName = customName.mName;
+			typeParameters.mName = customName.name;
 			typeParameters.mColor = color;
 			typeParameters.mIsTargetable = false;
 			typeParameters.mRegisterPointer = true;
@@ -127,27 +127,27 @@ namespace FLY_NAMESPACE
 		}
 
 		template<typename T, typename... Traits>
-		constexpr static RegisterType ValueType(const char* name, Traits&&... traits)
+		constexpr static RegisterType ValueType(std::string name, Traits&&... traits)
 		{
-			return ValueType_Impl<T, eNodeOperatorType::All, Traits...>(name, std::forward<Traits>(traits)...);
+			return ValueType_Impl<T, eNodeOperatorType::All, Traits...>(std::move(name), std::forward<Traits>(traits)...);
 		}
 
 		template<typename T, eNodeOperatorType Operators, typename... Traits>
-		constexpr static RegisterType ValueType(const char* name, Traits&&... traits)
+		constexpr static RegisterType ValueType(std::string name, Traits&&... traits)
 		{
-			return ValueType_Impl<T, Operators, Traits...>(name, std::forward<Traits>(traits)...);
+			return ValueType_Impl<T, Operators, Traits...>(std::move(name), std::forward<Traits>(traits)...);
 		}
 
 		template<typename T, eNodeOperatorType Operators, typename... Traits>
-		constexpr static RegisterType PointerType_Impl(const char* name, [[maybe_unused]] Traits&&... traits)
+		constexpr static RegisterType PointerType_Impl(std::string name, [[maybe_unused]] Traits&&... traits)
 		{
 			const bool isTargetable = !ContainsType<NonTargetable, Traits...>;
 
-			const Color color = TryExtract(Internal::GetDataTypeManager().GetDefaultColor(), std::forward<Traits>(traits)...);
-			const CustomName customName = TryExtract(CustomName{ name }, std::forward<Traits>(traits)...);
+			const Color color = TryExtract(Internal::GetDataTypeManager().GetDefaultColor(), traits...);
+			const CustomName customName = TryExtract(CustomName{ std::move(name) }, traits...);
 
 			TypeParameters typeParameters;
-			typeParameters.mName = customName.mName;
+			typeParameters.mName = customName.name;
 			typeParameters.mColor = color;
 			typeParameters.mIsTargetable = isTargetable;
 			typeParameters.mRegisterPointer = false;
@@ -158,15 +158,15 @@ namespace FLY_NAMESPACE
 		}
 
 		template<typename T, typename... Traits>
-		constexpr static RegisterType PointerType(const char* name, Traits&&... traits)
+		constexpr static RegisterType PointerType(std::string name, Traits&&... traits)
 		{
-			return PointerType_Impl<T, eNodeOperatorType::None, Traits...>(name, std::forward<Traits>(traits)...);
+			return PointerType_Impl<T, eNodeOperatorType::None, Traits...>(std::move(name), std::forward<Traits>(traits)...);
 		}
 
 		template<typename T, eNodeOperatorType Operators, typename... Traits>
-		constexpr static RegisterType PointerType(const char* name, Traits&&... traits)
+		constexpr static RegisterType PointerType(std::string name, Traits&&... traits)
 		{
-			return PointerType_Impl<T, Operators, Traits...>(name, std::forward<Traits>(traits)...);
+			return PointerType_Impl<T, Operators, Traits...>(std::move(name), std::forward<Traits>(traits)...);
 		}
 	};
 
@@ -179,9 +179,9 @@ namespace FLY_NAMESPACE
 		}
 
 		template<typename ParentType, typename MemberType, typename... Extra>
-		static constexpr RegisterMemberVariable Member(MemberType ParentType::* aMember, const std::string& aName, [[maybe_unused]] Extra&&... aExtra)
+		static constexpr RegisterMemberVariable Member(MemberType ParentType::* member, std::string name, [[maybe_unused]] Extra&&... extra)
 		{
-			DataTypeRegistry::RegisterMemberVariable(aMember, aName);
+			DataTypeRegistry::RegisterMemberVariable(member, name);
 
 			return RegisterMemberVariable();
 		}
