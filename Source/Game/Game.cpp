@@ -8,8 +8,6 @@
 #include "Football/FootballPlayerGenerator.hpp"
 #include "Football/FootballMatchFormatGenerator.hpp"
 #include "Football/FootballMatchSimulator.hpp"
-#include "Engine/Physics/Physics.hpp"
-#include "Engine/Physics/PhysicsObject.hpp"
 #include "Game/ECS/GameSystemRegistration.hpp"
 
 namespace Simple
