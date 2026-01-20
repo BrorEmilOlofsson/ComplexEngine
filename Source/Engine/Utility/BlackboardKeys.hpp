@@ -22,7 +22,6 @@ namespace Simple
 	using Key_AssetManager = BlackboardKey<class AssetManager&, "AssetManager">;
 	using Key_DataTypeRegistry = BlackboardKey<class DataTypeRegistry&, "DataTypeRegistry">;
 	using Key_InputState = BlackboardKey<const class InputState&, "InputState">;
-	using Key_OSView = BlackboardKey<class OSView, "OSView">;
 	using Key_OperatingSystem = BlackboardKey<class OperatingSystem&, "OperatingSystem">;
 	using Key_AudioManager = BlackboardKey<class AudioManager&, "AudioManager">;
     using Key_ECSRegistry = BlackboardKey<class ECSRegistry&, "ECSRegistry">;

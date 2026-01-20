@@ -1,9 +1,8 @@
 #include "Editor/Precompiled/EditorPch.hpp"
 #include "EditorFunctions.hpp"
-#include "Utility/ShapeMath.hpp"
-#include "Graphics/RenderState.hpp"
 #include "Utility/Math/TransformMode.hpp"
 #include "Editor/EditorSceneSettings.hpp"
+#include "Engine/OperatingSystem/OperatingSystem.hpp"
 
 namespace Simple
 {
@@ -49,7 +48,7 @@ namespace Simple
 		return rect;
 	}
 
-	void UpdateEditorCamera(Camera& camera, FreeFlyCameraSettings& settings, const float deltaTime, const WindowView windowView, const InputState& input, OSView os)
+	void UpdateEditorCamera(Camera& camera, FreeFlyCameraSettings& settings, const float deltaTime, const WindowView windowView, const InputState& input, OperatingSystem& os)
 	{
 		if (os.GetForegroundWindow() != windowView.GetHandle())
 		{

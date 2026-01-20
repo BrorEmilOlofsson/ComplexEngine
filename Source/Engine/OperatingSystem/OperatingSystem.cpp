@@ -14,16 +14,6 @@ namespace Simple
 		mConcept->EndFrame(renderContext);
 	}
 
-	void OperatingSystem::Render()
-	{
-		mConcept->Render();
-	}
-
-	void OperatingSystem::Render(RenderState& renderState)
-	{
-		mConcept->Render(renderState);
-	}
-
 	void OperatingSystem::Init()
 	{
 		mConcept->Init();
@@ -44,11 +34,6 @@ namespace Simple
 		return mConcept->GetCWindow(windowHandle);
 	}
 
-	OSView OperatingSystem::GetOS()
-	{
-		return mConcept->GetOS();
-	}
-
 	GraphicsFoundation& OperatingSystem::GetGraphicsFoundation()
 	{
 		return mConcept->GetGraphicsFoundation();
@@ -59,13 +44,39 @@ namespace Simple
 		return mConcept->GetGraphicsFoundation();
     }
 
-	void OperatingSystem::LoadCursors(const std::filesystem::path& path)
-	{
-		GetOS().LoadCursors(path);
-	}
 
     WindowHandle OperatingSystem::MakeWindow(Vector2ui size, std::wstring title)
 	{
 		return mConcept->MakeWindow(size, title);
+	}
+
+	void OperatingSystem::LoadCursors(const std::filesystem::path& path)
+	{
+		mConcept->LoadCursors(path);
+	}
+
+	void* OperatingSystem::GetForegroundWindow() const
+	{
+		return mConcept->GetForegroundWindow();
+    }
+
+	bool OperatingSystem::IsCursorVisible() const
+	{
+        return mConcept->IsCursorVisible();
+	}
+
+	Point2i OperatingSystem::GetCursorScreenPosition() const
+	{
+		return mConcept->GetCursorScreenPosition();
+    }
+
+	void OperatingSystem::ShowCursor()
+	{
+		mConcept->ShowCursor();
+    }
+
+	void OperatingSystem::HideCursor()
+	{
+		mConcept->HideCursor();
 	}
 }

@@ -1,163 +1,219 @@
 #include "Engine/Precompiled/EnginePch.hpp"
 #include "WinOperatingSystem.hpp"
 #include "Utility/Win/WinException.hpp"
-#include "Utility/Asset/AssetManager.hpp"
+#include "Graphics/DX11/DX11Foundation.hpp"
 
 #ifdef _WIN32
 
 namespace Simple
 {
-	static LRESULT HandleMsgMain(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
-	{
-		Win_OperatingSystem* const operatingSystem = reinterpret_cast<Win_OperatingSystem*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
-		if (operatingSystem == nullptr)
-		{
-			return 0;
-		}
-		return operatingSystem->HandleMessage(hwnd, msg, wParam, lParam);
-	}
+    static LRESULT HandleMsgMain(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+    {
+        Win_OperatingSystem* const operatingSystem = reinterpret_cast<Win_OperatingSystem*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+        if (operatingSystem == nullptr)
+        {
+            return 0;
+        }
+        return operatingSystem->HandleMessage(hwnd, msg, wParam, lParam);
+    }
 
-	static LRESULT HandleMsgSetup(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
-	{
-		if (msg == WM_NCCREATE)
-		{
-			const CREATESTRUCTW* const create = reinterpret_cast<const CREATESTRUCTW*>(lParam);
-			Win_OperatingSystem* const operatingSystem = static_cast<Win_OperatingSystem*>(create->lpCreateParams);
-			SetWindowLongPtr(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(operatingSystem));
-			SetWindowLongPtr(hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(HandleMsgMain));
-		}
+    static LRESULT HandleMsgSetup(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+    {
+        if (msg == WM_NCCREATE)
+        {
+            const CREATESTRUCTW* const create = reinterpret_cast<const CREATESTRUCTW*>(lParam);
+            Win_OperatingSystem* const operatingSystem = static_cast<Win_OperatingSystem*>(create->lpCreateParams);
+            SetWindowLongPtr(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(operatingSystem));
+            SetWindowLongPtr(hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(HandleMsgMain));
+        }
 
-		return DefWindowProc(hwnd, msg, wParam, lParam);
-	}
+        return DefWindowProc(hwnd, msg, wParam, lParam);
+    }
 
-	Win_OperatingSystem::Win_OperatingSystem(HINSTANCE instanceHandle, std::wstring className)
-		: mInstanceHandle(instanceHandle)
-		, mWindowClass(std::make_unique<Win_WindowClass>(instanceHandle, className, HandleMsgSetup))
+    Win_OperatingSystem::Win_OperatingSystem(HINSTANCE instanceHandle, std::wstring className)
+        : mInstanceHandle(instanceHandle)
+        , mWindowClass(std::make_unique<Win_WindowClass>(instanceHandle, std::move(className), HandleMsgSetup))
         , mGraphicsFoundation(DX11Foundation())
-	{
-	}
+    {
+    }
 
-	Win_OperatingSystem::Win_OperatingSystem(Win_OperatingSystem&& other)
-		: mInstanceHandle(std::move(other.mInstanceHandle))
-		, mWindowClass(std::move(other.mWindowClass))
+    Win_OperatingSystem::Win_OperatingSystem(Win_OperatingSystem&& other)
+        : mInstanceHandle(std::move(other.mInstanceHandle))
+        , mWindowClass(std::move(other.mWindowClass))
         , mGraphicsFoundation(std::move(other.mGraphicsFoundation))
-		, mWindows(std::move(other.mWindows))
-		, mStyle(std::move(other.mStyle))
-	{
-		for (auto& window : mWindows)
-		{
-			SetWindowLongPtr(window->GetHandle(), GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
-		}
-	}
+        , mWindows(std::move(other.mWindows))
+        , mCursors(std::move(other.mCursors))
+        , mIsCursorVisible(std::move(other.mIsCursorVisible))
+    {
+        for (auto& window : mWindows)
+        {
+            SetWindowLongPtr(window->GetHandle(), GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
+        }
+    }
 
-	void Win_OperatingSystem::Init()
-	{
-		mGraphicsFoundation.Init();
-	}
+    void Win_OperatingSystem::Init()
+    {
+        mGraphicsFoundation.Init();
+    }
 
-	void Win_OperatingSystem::Shutdown()
-	{
-		mGraphicsFoundation.Shutdown();
-	}
+    void Win_OperatingSystem::Shutdown()
+    {
+        mGraphicsFoundation.Shutdown();
+    }
 
-	void Win_OperatingSystem::BeginFrame(const GraphicsBufferData& data)
-	{
-		mGraphicsFoundation.BeginFrame(data);
-		for (auto& window : mWindows)
-		{
-			window->BeginFrame();
-		}
-	}
+    void Win_OperatingSystem::BeginFrame(const GraphicsBufferData& data)
+    {
+        mGraphicsFoundation.BeginFrame(data);
+        for (auto& window : mWindows)
+        {
+            window->BeginFrame();
+        }
+    }
 
-	void Win_OperatingSystem::EndFrame(RenderContext* renderContext)
-	{
-		for (auto& window : mWindows)
-		{
-			window->GetGraphicsWindow().BindBackBuffer();
-		}
-		mGraphicsFoundation.EndFrame();
-		for (auto& window : mWindows)
-		{
-			window->EndFrame(renderContext);
-		}
-	}
+    void Win_OperatingSystem::EndFrame(RenderContext* renderContext)
+    {
+        for (auto& window : mWindows)
+        {
+            window->GetGraphicsWindow().BindBackBuffer();
+        }
+        mGraphicsFoundation.EndFrame();
+        for (auto& window : mWindows)
+        {
+            window->EndFrame(renderContext);
+        }
+    }
 
-	void Win_OperatingSystem::Render()
-	{
+    LRESULT Win_OperatingSystem::HandleMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+    {
+        switch (msg)
+        {
+        case WM_SETCURSOR:
 
-	}
+            if (LOWORD(lParam) == HTCLIENT)
+            {
+                ::SetCursor(LoadCursor(nullptr, IDC_ARROW));
+                return TRUE;
+            }
 
-	void Win_OperatingSystem::Render(RenderState& renderState)
-	{
-		mGraphicsFoundation.Render(renderState);
-		//mGraphicsFoundation.Render(renderState);
-	}
+            return DefWindowProc(hwnd, msg, wParam, lParam);
 
-	uint32_t Win_OperatingSystem::MakeWindow(Vector2ui size, std::wstring title)
-	{
-		try
-		{
-			auto window = std::make_unique<Win_Window>(
-				size,
-				title,
-				*mWindowClass,
-				this
-			);
-			GraphicsWindowView windowView = mGraphicsFoundation.MakeWindow(WindowView(*window));
-			window->SetGraphicsWindowView(windowView);
-			SetWindowLongPtr(window->GetHandle(), GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
+            break;
+        case WM_DESTROY:
+            PostQuitMessage(0);
+            break;
+        default:
+            auto it = std::ranges::find_if(mWindows, [hwnd](auto& window) { return hwnd == window->GetHandle(); });
+            if (it != end(mWindows))
+            {
+                if (it->get()->HandleMessage(msg, wParam, lParam))
+                {
+                    return 0;
+                }
+            }
+
+            return DefWindowProc(hwnd, msg, wParam, lParam);
+            break;
+        }
+
+        return 0;
+    }
+
+    uint32_t Win_OperatingSystem::MakeWindow(Vector2ui size, std::wstring title)
+    {
+        try
+        {
+            auto window = std::make_unique<Win_Window>(
+                size,
+                title,
+                *mWindowClass,
+                this
+            );
+            GraphicsWindowView windowView = mGraphicsFoundation.MakeWindow(WindowView(*window));
+            window->SetGraphicsWindowView(windowView);
+            SetWindowLongPtr(window->GetHandle(), GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 
 
-			window->GetGraphicsWindow().Init();
+            window->GetGraphicsWindow().Init();
 
-			mWindows.push_back(std::move(window));
-			return static_cast<uint32_t>(mWindows.size() - 1);
-		}
-		catch (const WinException& exception)
-		{
-			if (!mWindows.empty())
-			{
-				mWindows.front()->HandleException(exception);
-			}
-		}
+            mWindows.push_back(std::move(window));
+            return static_cast<uint32_t>(mWindows.size() - 1);
+        }
+        catch (const WinException& exception)
+        {
+            if (!mWindows.empty())
+            {
+                mWindows.front()->HandleException(exception);
+            }
+            else
+            {
+                assert(false);
+            }
+        }
 
-		return std::numeric_limits<uint32_t>::max();
-	}
+        return std::numeric_limits<uint32_t>::max();
+    }
 
-	LRESULT Win_OperatingSystem::HandleMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
-	{
-		switch (msg)
-		{
-		case WM_SETCURSOR:
+    Win_Window& Win_OperatingSystem::GetWindow(const WindowID windowID)
+    {
+        return *mWindows[windowID];
+    }
 
-			if (LOWORD(lParam) == HTCLIENT)
-			{
-				SetCursor(LoadCursor(nullptr, IDC_ARROW));
-				return TRUE;
-			}
+    const Win_Window& Win_OperatingSystem::GetWindow(const WindowID windowID) const
+    {
+        return *mWindows[windowID];
+    }
 
-			return DefWindowProc(hwnd, msg, wParam, lParam);
+    GraphicsFoundation& Win_OperatingSystem::GetGraphicsFoundation() noexcept
+    {
+        return mGraphicsFoundation;
+    }
 
-			break;
-		case WM_DESTROY:
-			PostQuitMessage(0);
-			break;
-		default:
-			auto it = std::ranges::find_if(mWindows, [hwnd](auto& window) { return hwnd == window->GetHandle(); });
-			if (it != end(mWindows))
-			{
-				if (it->get()->HandleMessage(msg, wParam, lParam))
-				{
-					return 0;
-				}
-			}
+    const GraphicsFoundation& Win_OperatingSystem::GetGraphicsFoundation() const noexcept
+    {
+        return mGraphicsFoundation;
+    }
 
-			return DefWindowProc(hwnd, msg, wParam, lParam);
-			break;
-		}
 
-		return 0;
-	}
+
+    void Win_OperatingSystem::LoadCursors(const std::filesystem::path& path)
+    {
+        mCursors.emplace("DefaultCursor", LoadCursorW(nullptr, IDC_ARROW));
+        assert(mCursors["DefaultCursor"] && "Failed to load Custom Cursor");
+
+        for (const std::filesystem::path& cursorPath : std::filesystem::directory_iterator(std::filesystem::absolute(path)))
+        {
+            const std::filesystem::path name = cursorPath.filename();
+            const HCURSOR cursor = LoadCursorFromFile(cursorPath.c_str());
+
+            assert(cursor != nullptr && "Failed to load Custom Cursor");
+
+            mCursors.emplace(name, cursor);
+        }
+    }
+
+
+    void Win_OperatingSystem::SetCursor(const std::filesystem::path& path)
+    {
+        HCURSOR cursor = mCursors.at(path);
+        ::SetCursor(cursor);
+    }
+
+    void Win_OperatingSystem::ShowCursor()
+    {
+        ::ShowCursor(true);
+        mIsCursorVisible = true;
+    }
+
+    void Win_OperatingSystem::HideCursor()
+    {
+        ::ShowCursor(false);
+        mIsCursorVisible = false;
+    }
+
+    bool Win_OperatingSystem::IsCursorVisible() const
+    {
+        return mIsCursorVisible;
+    }
 
 }
 

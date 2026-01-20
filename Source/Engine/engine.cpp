@@ -139,7 +139,7 @@ namespace Simple
 			FileUtility::CopyFiles(windowFrameBuffer.droppedFiles, mCurrentDropPath);
 		}
 
-		mSceneManager.GetCurrentScene().BeginFrame(mOperatingSystem.GetWindow(mMainWindow).GetClientSize(), mOperatingSystem.GetOS().GetCursorScreenPosition());
+		mSceneManager.GetCurrentScene().BeginFrame(mOperatingSystem.GetWindow(mMainWindow).GetClientSize(), mOperatingSystem.GetCursorScreenPosition());
 
 		return !mShouldExit.load();
 	}
@@ -195,7 +195,7 @@ namespace Simple
 #ifndef _EDITOR
 		mSceneManager.GetCurrentScene().GetRenderState().SetRenderRect(AABB2i::CreateFromDefaultAndExtent(Vector2i(mOperatingSystem.GetWindow(mMainWindow).GetClientSize())));
 #endif
-		mOperatingSystem.Render(mSceneManager.GetCurrentScene().GetRenderState());
+		mOperatingSystem.GetGraphicsFoundation().Render(mSceneManager.GetCurrentScene().GetRenderState());
 	}
 
 	WindowView Engine::GetMainWindow()

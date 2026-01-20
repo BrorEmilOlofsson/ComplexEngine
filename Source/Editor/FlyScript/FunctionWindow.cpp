@@ -7,13 +7,8 @@
 namespace Simple
 {
 
-	FunctionWindow::FunctionWindow(NodeScriptingWindow& aParentWindow)
-		: myParentWindow(aParentWindow)
-	{
-
-	}
-
-	FunctionWindow::~FunctionWindow()
+	FunctionWindow::FunctionWindow(NodeScriptingWindow& parentWindow)
+		: myParentWindow(parentWindow)
 	{
 	}
 

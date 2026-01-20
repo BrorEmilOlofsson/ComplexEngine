@@ -1,6 +1,5 @@
 #include "Editor/Precompiled/EditorPch.hpp"
 #include "Editor/PopUps/Editor/SceneWindowPopUp.hpp"
-#include "Engine/ECSEngine/Components/CameraComponent.hpp"
 #include "Editor/Functions/ECSEditorFunctions.hpp"
 #include "Editor/Editor.hpp"
 #include "Editor/Functions/EditorFunctions.hpp"
@@ -8,12 +7,10 @@
 #include "Engine/Navmesh/NavmeshLoader.hpp"
 #include "Engine/Scene/SceneManager.hpp"
 #include "Engine/Utility/BlackboardKeys.hpp"
-#include "Engine/OperatingSystem/OSView.hpp"
+#include "Engine/OperatingSystem/OperatingSystem.hpp"
 #include "Editor/EditorSceneSettings.hpp"
 #include "Engine/Utility/DebugShapes.hpp"
 #include "Utility/Asset/AssetManager.hpp"
-#include "Utility/ShapeMath.hpp"
-#include "Utility/Algorithm.hpp"
 #include <External/AwsomeFontIcons/IconFontDefines.h>
 
 namespace Simple
@@ -178,7 +175,7 @@ namespace Simple
         const WindowView windowView = blackboard.Get<Key_WindowView>();
         const InputState& input = blackboard.Get<Key_InputState>();
         const float deltaTime = blackboard.Get<Key_DeltaTime>();
-        OSView os = blackboard.Get<Key_OSView>();
+        OperatingSystem& os = blackboard.Get<Key_OperatingSystem>();
         EditorCommandTracker& commandTracker = blackboard.Get<Key_CommandTracker>();
         FreeFlyCameraSettings& cameraSettings = blackboard.Get<Key_FreeFlyCameraSettings>();
         
@@ -247,7 +244,7 @@ namespace Simple
         newBlackboard.Insert<Key_CurrentRenderState>(sceneManager.GetCurrentScene().GetRenderState());
         EditorCommandTracker& commandTracker = blackboard.Get<Key_CommandTracker>();
         const InputState& input = blackboard.Get<Key_InputState>();
-        const OSView os = blackboard.Get<Key_OSView>();
+        OperatingSystem& os = blackboard.Get<Key_OperatingSystem>();
         AssetManager& assetManager = blackboard.Get<Key_AssetManager>();
         EditorSceneSettings& editorSceneSettings = blackboard.Get<Key_EditorSceneSettings>();
 
@@ -286,7 +283,7 @@ namespace Simple
                 editorSceneSettings.snapValue,
                 mCamera,
                 input,
-                os,
+                os.IsCursorVisible(),
                 commandTracker
             );
 

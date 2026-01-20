@@ -15,7 +15,7 @@ namespace Simple
 
 	void ShowEntityImGuizmo(ECS& ecs, const EntityID selectedEntityID, const eTransformMode transformMode, const Camera& camera, 
 		const AABB2i renderRect, const bool useSnap, const float snapValue, bool& isDraggingEntity,
-		SetEntityTransformCommand& setEntityTransformCommand, const InputState& input, OSView os, EditorCommandTracker& commandTracker)
+		SetEntityTransformCommand& setEntityTransformCommand, const InputState& input, const bool isCursorVisible, EditorCommandTracker& commandTracker)
 	{
 		if (selectedEntityID == InvalidEntityID)
 		{
@@ -48,7 +48,7 @@ namespace Simple
 
 		static ImGuizmo::OPERATION operation = ImGuizmo::OPERATION::TRANSLATE;
 
-		if (os.IsCursorVisible() && !input.IsKeyHeld(eInputKey::Ctrl))
+		if (isCursorVisible && !input.IsKeyHeld(eInputKey::Ctrl))
 		{
 			if (input.IsKeyPressed(eInputKey::E))
 			{
@@ -114,7 +114,7 @@ namespace Simple
 	}
 
 	void TransformEntityTool::ShowEntityImGuizmo(ECS& ecs, const EntityID selectedEntityID, const eTransformMode transformMode, AABB2i renderRect,
-		const bool useSnap, const float snapValue, const Camera& camera, const InputState& input, OSView os, EditorCommandTracker& commandTracker)
+		const bool useSnap, const float snapValue, const Camera& camera, const InputState& input, const bool isCursorVisible, EditorCommandTracker& commandTracker)
 	{
 		::Simple::ShowEntityImGuizmo(
 			ecs, 
@@ -127,7 +127,7 @@ namespace Simple
 			mIsDraggingEntity, 
 			mSetEntityTransformCommand,
 			input,
-			os,
+			isCursorVisible,
 			commandTracker);
 	}
 }

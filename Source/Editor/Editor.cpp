@@ -208,7 +208,7 @@ namespace Simple
         editorBlackboard.Insert<Key_ImGuiStyleManager>(GetImGuiStyleManager());
         editorBlackboard.Insert<Key_GraphicsSettings>(mEngine->GetGraphicsSettings());
         editorBlackboard.Insert<Key_InputState>(mEngine->GetInputState());
-        editorBlackboard.Insert<Key_OSView>(mEngine->GetOperatingSystem().GetOS());
+        editorBlackboard.Insert<Key_OperatingSystem>(mEngine->GetOperatingSystem());
         editorBlackboard.Insert<Key_FreeFlyCameraSettings>(mFreeFlyCameraSettings);
         editorBlackboard.Insert<Key_EditorSceneSettings>(mEditorSceneSettings);
         editorBlackboard.Insert<Key_ShowUnitVectorInScene>(mEditorSceneSettings.showUnitVectorInScene);
@@ -243,7 +243,6 @@ namespace Simple
         editorBlackboard.Insert<Key_GraphicsSettings>(mEngine->GetGraphicsSettings());
         editorBlackboard.Insert<Key_InputState>(mEngine->GetInputState());
         editorBlackboard.Insert<Key_IsPlaying>(mEngine->GetSceneManager().IsPlaying());
-        editorBlackboard.Insert<Key_OSView>(mEngine->GetOperatingSystem().GetOS());
         editorBlackboard.Insert<Key_EditorSceneSettings>(mEditorSceneSettings);
         editorBlackboard.Insert<Key_ShowUnitVectorInScene>(mEditorSceneSettings.showUnitVectorInScene);
         editorBlackboard.Insert<Key_OperatingSystem>(mEngine->GetOperatingSystem());

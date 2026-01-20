@@ -2,17 +2,15 @@
 #include "EntityCompositionPopUp.hpp"
 #include "Editor/Functions/ECSEditorFunctions.hpp"
 #include "Engine/ECS/EntityComposition.hpp"
-#include "Engine/ECSEngine/Utility/ECSEntityCompositionUtility.hpp"
 #include "Engine/Utility/BlackboardKeys.hpp"
-#include "Engine/Scene/SceneManager.hpp"
 #include "Editor/Functions/EditorFunctions.hpp"
 #include "Editor/EditorSceneSettings.hpp"
 #include "Engine/Utility/DebugShapes.hpp"
 #include "Engine/OperatingSystem/OperatingSystem.hpp"
 #include "Engine/ECSEngine/Utility/ECSTransformUtility.hpp"
-#include "Engine/ECSEngine/Components/EntityCompositionComponent.hpp"
 #include "Engine/ECSEngine/Utility/ECSTransformHierarchyUtility.hpp"
 #include "Engine/ECS/ECSSerializer.hpp"
+#include "Utility/Asset/AssetManager.hpp"
 
 namespace Simple
 {
@@ -39,17 +37,12 @@ namespace Simple
             mEntityCompositionAsset->GetECS().GetComponent<NameComponent>(mEntityCompositionAsset->GetRootEntity())->name = "Root";
         }
 
-        /*if (!IsActive())
-        {
-            return;
-        }*/
-
         Blackboard newBlackboard = blackboard;
         newBlackboard.Insert<Key_CurrentCamera>(mCamera);
         newBlackboard.Insert<Key_CurrentRenderState>(mRenderState);
         const InputState& input = blackboard.Get<Key_InputState>();
         EditorCommandTracker& commandTracker = blackboard.Get<Key_CommandTracker>();
-        const OSView os = blackboard.Get<Key_OSView>();
+        OperatingSystem& os = blackboard.Get<Key_OperatingSystem>();
         mEntityCompositionAsset->GetECS().EditorUpdate(newBlackboard);
 
 
@@ -107,8 +100,7 @@ namespace Simple
         ECS& ecsBuffer = blackboard.Get<Key_ECSBuffer>();
         EditorCommandTracker& commandTracker = blackboard.Get<Key_CommandTracker>();
         const WindowView windowView = blackboard.Get<Key_WindowView>();
-        //SceneManager& sceneManager = blackboard.Get<Key_SceneManager>();
-        OSView os = blackboard.Get<Key_OSView>();
+        OperatingSystem& os = blackboard.Get<Key_OperatingSystem>();
         EditorSceneSettings& editorSceneSettings = blackboard.Get<Key_EditorSceneSettings>();
         const InputState& input = blackboard.Get<Key_InputState>();
         input;
@@ -119,7 +111,7 @@ namespace Simple
         if (mIsOpen)
         {
             mEntityCompositionAsset->GetECS().Render(newBlackboard);
-            blackboard.Get<Key_OperatingSystem>().Render(mRenderState);
+            blackboard.Get<Key_OperatingSystem>().GetGraphicsFoundation().Render(mRenderState);
         }
 
         if (ImGui::Begin("Entity Composition Hierarchy"))
@@ -180,7 +172,7 @@ namespace Simple
                 editorSceneSettings.snapValue,
                 mCamera,
                 input,
-                os,
+                os.IsCursorVisible(),
                 commandTracker
             );
 

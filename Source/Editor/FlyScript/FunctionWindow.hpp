@@ -10,7 +10,6 @@ namespace Simple
 	public:
 
 		FunctionWindow(NodeScriptingWindow& aParentWindow);
-		~FunctionWindow();
 
 		void Update();
 

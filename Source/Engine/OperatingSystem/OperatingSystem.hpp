@@ -1,10 +1,6 @@
 #pragma once
 #include "Engine/OperatingSystem/WindowView.hpp"
-#include "Engine/OperatingSystem/OSView.hpp"
 #include "Engine/OperatingSystem/WindowHandle.hpp"
-#include "Utility/Input/InputState.hpp"
-#include "Utility/Asset/AssetManager.hpp"
-#include "Graphics/GraphicsSettings.hpp"
 #include "Utility/GraphicsBufferData.hpp"
 #include "Graphics/GraphicsFoundation.hpp"
 #include "Graphics/RenderState.hpp"
@@ -25,21 +21,24 @@ namespace Simple
 		void BeginFrame(const GraphicsBufferData& bufferData);
 		void EndFrame(RenderContext* renderContext);
 
-		void Render();
-		void Render(RenderState& renderState);
-
 		void Init();
 		void Shutdown();
 
 		[[nodiscard]] WindowView GetWindow(WindowHandle windowHandle);
 		[[nodiscard]] CWindowView GetWindow(WindowHandle windowHandle) const;
-		[[nodiscard]] OSView GetOS();
         [[nodiscard]] GraphicsFoundation& GetGraphicsFoundation();
         [[nodiscard]] const GraphicsFoundation& GetGraphicsFoundation() const;
 
-		void LoadCursors(const std::filesystem::path& path);
 
 		WindowHandle MakeWindow(Vector2ui size, std::wstring title);
+
+
+		void LoadCursors(const std::filesystem::path& path);
+        [[nodiscard]] void* GetForegroundWindow() const;
+		[[nodiscard]] bool IsCursorVisible() const;
+		Point2i GetCursorScreenPosition() const;
+        void ShowCursor();
+		void HideCursor();
 
 	private:
 
@@ -54,14 +53,18 @@ namespace Simple
 			virtual void EndFrame(RenderContext* renderContext) = 0;
 			virtual void Init() = 0;
 			virtual void Shutdown() = 0;
-			virtual void Render() = 0;
-			virtual void Render(RenderState& renderState) = 0;
 			virtual WindowView GetWindow(WindowHandle windowHandle) = 0;
 			virtual CWindowView GetCWindow(WindowHandle windowHandle) const = 0;
-			virtual OSView GetOS() = 0;
 			virtual WindowHandle MakeWindow(Vector2ui size, std::wstring title) = 0;
             virtual GraphicsFoundation& GetGraphicsFoundation() = 0;
             virtual const GraphicsFoundation& GetGraphicsFoundation() const = 0;
+			virtual void LoadCursors(const std::filesystem::path& path) = 0;
+            virtual void* GetForegroundWindow() const = 0;
+			virtual bool IsCursorVisible() const = 0;
+			virtual Point2i GetCursorScreenPosition() const = 0;
+            virtual void ShowCursor() = 0;
+            virtual void HideCursor() = 0;
+
 		};
 
 		template<typename T>
@@ -94,16 +97,6 @@ namespace Simple
 				OSShutdown(mObject);
 			}
 
-			void Render() override
-			{
-				OSRender(mObject);
-			}
-
-			void Render(RenderState& renderState) override
-			{
-				OSRender(mObject, renderState);
-			}
-
 			WindowView GetWindow(WindowHandle windowHandle) override
 			{
 				auto& window = GetOSWindow(mObject, windowHandle);
@@ -114,11 +107,6 @@ namespace Simple
 			{
 				auto& window = GetOSWindow(mObject, windowHandle);
 				return CWindowView(window);
-			}
-
-			OSView GetOS() override
-			{
-				return OSView(GetOSStyle(mObject));
 			}
 
 			WindowHandle MakeWindow(Vector2ui size, std::wstring title) override
@@ -136,6 +124,36 @@ namespace Simple
 				return OSGetGraphicsFoundation(mObject);
             }
 
+			void LoadCursors(const std::filesystem::path& path) override
+			{
+                OSLoadCursors(mObject, path);
+			}
+
+			void* GetForegroundWindow() const override
+			{
+				return OSGetForegroundWindow(mObject);
+            }
+
+			bool IsCursorVisible() const override
+			{
+				return OSIsCursorVisible(mObject);
+            }
+
+			Point2i GetCursorScreenPosition() const override
+			{
+                return OSGetCursorPos(mObject);
+			}
+
+			void ShowCursor() override
+			{
+                OSShowCursor(mObject);
+			}
+
+			void HideCursor() override
+			{
+				OSHideCursor(mObject);
+            }
+
 		private:
 
 			T mObject;
@@ -143,7 +161,6 @@ namespace Simple
 
 
 		std::unique_ptr<OperatingSystemConcept> mConcept;
-		InputState mInputState;
 
 	};
 
