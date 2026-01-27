@@ -1,5 +1,9 @@
 #pragma once
-#include "NodeScript/Pin/FlyPinType.hpp"
+
+namespace Fly
+{
+	class CommandTracker;
+}
 
 namespace Simple
 {
@@ -10,17 +14,14 @@ namespace Simple
 	{
 	public:
 
-		FunctionSettingsWindow(NodeScriptingWindow& aParent);
-		~FunctionSettingsWindow();
+		FunctionSettingsWindow(NodeScriptingWindow& parent);
 
-		void Update();
-
-	private:
-
-		void ShowInputOutput(Fly::eIODirection aIODirection);
+		void Update(Fly::CommandTracker& commandTracker);
 
 	private:
 
-		NodeScriptingWindow& myParent;
+	private:
+
+		NodeScriptingWindow& mParent;
 	};
 }

@@ -1,4 +1,6 @@
 #pragma once
+#include <string>
+
 #include "../FlyDefines.hpp"
 
 namespace FLY_NAMESPACE
@@ -19,12 +21,13 @@ namespace FLY_NAMESPACE
 		VariableProxy(VarID varID, const StructProxy& flyStruct);
 		VariableProxy(VarID varID, const DataTypeProxy& dataType);
 		VariableProxy(VarID varID, const GenericDataTypeProxy& genericDataType);
+        VariableProxy(VarID varID, const FunctionID functionID);
 
 		[[nodiscard]] std::string_view GetName() const;
 		[[nodiscard]] GenericDataTypeID GetDataTypeID() const;
 		[[nodiscard]] bool IsDestroyed() const;
 		[[nodiscard]] VarID GetID() const;
-		[[nodiscard]] size_t GetByteOffset() const;
+		[[nodiscard]] std::size_t GetByteOffset() const;
 
 		void SetName(std::string name, CommandTracker* commandTracker);
 		void Destroy(CommandTracker* commandTracker);
@@ -36,9 +39,10 @@ namespace FLY_NAMESPACE
 	private:
 
 		const Variable& GetVariable() const;
+
 	private:
 
 		VarID mVarID = InvalidID<VarID>();
-		GenericDataTypeID mOwnerID;
+		std::variant<GenericDataTypeID, FunctionID> mOwnerID;
 	};
 }

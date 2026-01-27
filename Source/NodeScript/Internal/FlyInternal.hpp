@@ -87,7 +87,6 @@ namespace FLY_NAMESPACE
 		[[nodiscard]] TraitID CreateTrait(std::string name);
 		void CreateTraitImplementation(DataTypeID dataTypeID, TraitID traitID);
 
-		[[nodiscard]] CustomEventID CreateCustomEvent(std::string name);
 		[[nodiscard]] FunctionID CreateFunction(std::string name);
 		[[nodiscard]] NodeID CreateNode(const NodeGraphVariantHandle& nodeGraphVariant, NodeTypeID nodeTypeID, Vec2 position = Vec2(), CommandTracker* commandTracker = nullptr);
 		[[nodiscard]] std::optional<NodeID> CreateNode(const NodeGraphVariantHandle& nodeGraphVariant, std::string name, Vec2 position, bool createIfNameNotFound, CommandTracker* commandTracker);
@@ -147,12 +146,6 @@ namespace FLY_NAMESPACE
 
 		void SetPinTypeName(PinTypeID pinTypeID, std::string name);
 		PinTypeID AddPinTypeToNodeType(NodeTypeID nodeTypeID, GenericDataTypeID dataTypeID, eIODirection ioDirection, std::string pinName);
-
-		void SetCustomEventName(CustomEventID customEventID, std::string name, CommandTracker* commandTracker);
-		void AddPinTypeToCustomEvent(CustomEventID customEventID, GenericDataTypeID dataTypeID, std::string pinName, CommandTracker* commandTracker);
-		void SetPinDataTypeAtIndexCustomEvent(CustomEventID customEventID, GenericDataTypeID dataTypeID, std::size_t index, CommandTracker* commandTracker);
-		void SetPinNameAtIndexCustomEvent(CustomEventID customEventID, std::string name, std::size_t index, CommandTracker* commandTracker);
-		void DeletePinAtIndexCustomEvent(CustomEventID customEventID, std::size_t index, CommandTracker* commandTracker);
 
 		void AddPinTypeToFunction(FunctionID functionID, GenericDataTypeID dataTypeID, eIODirection ioDirection, std::string pinName, CommandTracker* commandTracker);
 		void SetPinDataTypeAtIndexFunction(FunctionID functionID, GenericDataTypeID dataTypeID, std::size_t index, eIODirection ioDirection, CommandTracker* commandTracker);

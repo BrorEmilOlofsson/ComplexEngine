@@ -7,7 +7,6 @@
 #include "Command/FlyCommandTracker.hpp"
 #include "FlyFoundation.hpp"
 #include "Serialization/FlySerializer.hpp"
-#include "DataType/FlyPtrValueVariant.hpp"
 
 namespace FLY_NAMESPACE
 {
@@ -24,11 +23,6 @@ namespace FLY_NAMESPACE
 	void LoadAllFlyFiles(const std::filesystem::path& filePath)
 	{
 		Internal::LoadAllFlyFiles(filePath);
-	}
-
-	void SaveCustomEvents(const std::filesystem::path& filePath)
-	{
-		Internal::SaveCustomEvents(filePath);
 	}
 
 	GenericDataTypeProxy CreateStruct(std::string name, const std::filesystem::path& savePath)
@@ -207,12 +201,7 @@ namespace FLY_NAMESPACE
 		}
 	}
 
-	CustomEventProxy CreateCustomEvent(std::string name)
-	{
-		return CustomEventProxy(Internal::CreateCustomEvent(std::move(name)));
-	}
-
-	FunctionProxy CreateGlobalFunction(std::string name)
+	FunctionProxy CreateFreeFunction(std::string name)
 	{
 		return FunctionProxy(Internal::CreateFunction(std::move(name)));
 	}
@@ -307,20 +296,6 @@ namespace FLY_NAMESPACE
 		return views;
 	}
 
-	std::vector<CustomEventProxy> GetCustomEvents()
-	{
-		const auto& customEvents = Internal::GetNodeTypeManager().GetCustomEvents();
-		std::vector<CustomEventProxy> customEventProxys;
-		customEventProxys.reserve(customEvents.size());
-
-		for (CustomEventID customEventID{ 0 }; customEventID < customEvents.size(); ++customEventID)
-		{
-			customEventProxys.push_back(CustomEventProxy(customEventID));
-		}
-
-		return customEventProxys;
-	}
-
 	std::vector<LinkProxy> GetTraversedLinks()
 	{
 		std::vector<LinkProxy> linkProxys;
@@ -338,14 +313,14 @@ namespace FLY_NAMESPACE
 
 
 	template<typename FilterFunction>
-	std::vector<NodeTypeProxy> GetNodeTypesFiltered(FilterFunction&& aFilter)
+	std::vector<NodeTypeProxy> GetNodeTypesFiltered(FilterFunction&& filter)
 	{
 		std::vector<NodeTypeProxy> facades;
 		const std::vector<NodeType>& nodeTypes = Internal::GetNodeTypeManager().GetNodeTypes();
 		facades.reserve(nodeTypes.size());
 		for (NodeTypeID id{ 0 }; id < nodeTypes.size(); id++)
 		{
-			if (aFilter(nodeTypes[id]))
+			if (filter(nodeTypes[id]))
 			{
 				facades.push_back(NodeTypeProxy(id));
 			}
@@ -353,15 +328,15 @@ namespace FLY_NAMESPACE
 		return facades;
 	}
 
-	std::vector<NodeTypeProxy> GetNodeTypesFilteredByDataTypeAndFlowType(const GenericDataTypeID aDataTypeID, const eIODirection aIODirection)
+	std::vector<NodeTypeProxy> GetNodeTypesFilteredByDataTypeAndFlowType(const GenericDataTypeID dataTypeID, const eIODirection ioDirection)
 	{
-		return GetNodeTypesFiltered([aDataTypeID, aIODirection](const NodeType& aNodeType) -> bool
+		return GetNodeTypesFiltered([dataTypeID, ioDirection](const NodeType& nodeType) -> bool
 			{
-				const std::vector<PinTypeID>& pinTypeIDs = SelectByIODirection(aIODirection, aNodeType.GetInputPinTypeIDs(), aNodeType.GetOutputPinTypeIDs());
+				const std::vector<PinTypeID>& pinTypeIDs = SelectByIODirection(ioDirection, nodeType.GetInputPinTypeIDs(), nodeType.GetOutputPinTypeIDs());
 				for (const PinTypeID pinTypeID : pinTypeIDs)
 				{
 					const PinType& pinType = Internal::GetPinTypeManager().GetPinType(pinTypeID);
-					if (pinType.GetDataTypeID() == aDataTypeID)
+					if (pinType.GetDataTypeID() == dataTypeID)
 					{
 						return true;
 					}
@@ -376,25 +351,25 @@ namespace FLY_NAMESPACE
 		return NodeTypeProxyIteratorService(NodeTypeID{ Internal::GetNodeTypeManager().GetNodeTypes().size() });
 	}
 
-	NodeTypeProxyIteratorService IterateNodeTypes(Predicate<NodeTypeProxy> aFilterPredicate)
+	NodeTypeProxyIteratorService IterateNodeTypes(Predicate<NodeTypeProxy> filterPredicate)
 	{
-		return NodeTypeProxyIteratorService(NodeTypeID{ Internal::GetNodeTypeManager().GetNodeTypes().size() }, aFilterPredicate);
+		return NodeTypeProxyIteratorService(NodeTypeID{ Internal::GetNodeTypeManager().GetNodeTypes().size() }, filterPredicate);
 	}
 
-	std::vector<NodeTypeProxy> GetNodeTypesFilteredByRelatedDataTypesAndFlowTypeAndTrait(const GenericDataTypeID aDataTypeID, const eIODirection aIODirection, const eNodeTrait aNodeTrait, bool(*aBitOperation)(eNodeTrait, eNodeTrait))
+	std::vector<NodeTypeProxy> GetNodeTypesFilteredByRelatedDataTypesAndFlowTypeAndTrait(const GenericDataTypeID dataTypeID, const eIODirection ioDirection, const eNodeTrait nodeTrait, bool(*bitOperation)(eNodeTrait, eNodeTrait))
 	{
-		return GetNodeTypesFiltered([aDataTypeID, aIODirection, aNodeTrait, aBitOperation](const NodeType& aNodeType) -> bool
+		return GetNodeTypesFiltered([dataTypeID, ioDirection, nodeTrait, bitOperation](const NodeType& nodeType) -> bool
 			{
-				if (!aBitOperation(aNodeTrait, aNodeType.GetTraits()))
+				if (!bitOperation(nodeTrait, nodeType.GetTraits()))
 				{
 					return false;
 				}
-				const std::vector<PinTypeID>& pinTypeIDs = SelectByIODirection(aIODirection, aNodeType.GetInputPinTypeIDs(), aNodeType.GetOutputPinTypeIDs());
+				const std::vector<PinTypeID>& pinTypeIDs = SelectByIODirection(ioDirection, nodeType.GetInputPinTypeIDs(), nodeType.GetOutputPinTypeIDs());
 				for (const PinTypeID pinTypeID : pinTypeIDs)
 				{
 					const PinType& pinType = Internal::GetPinTypeManager().GetPinType(pinTypeID);
-					const GenericDataTypeID inputDataTypeID = SelectByIODirection(aIODirection, pinType.GetDataTypeID(), aDataTypeID);
-					const GenericDataTypeID outputDataTypeID = SelectByIODirection(aIODirection, aDataTypeID, pinType.GetDataTypeID());
+					const GenericDataTypeID inputDataTypeID = SelectByIODirection(ioDirection, pinType.GetDataTypeID(), dataTypeID);
+					const GenericDataTypeID outputDataTypeID = SelectByIODirection(ioDirection, dataTypeID, pinType.GetDataTypeID());
 					if (Internal::AreDataTypesLinkable(inputDataTypeID, outputDataTypeID))
 					{
 						return true;
@@ -405,11 +380,11 @@ namespace FLY_NAMESPACE
 		);
 	}
 
-	std::vector<NodeTypeProxy> GetNodeTypesFilteredByTrait(const eNodeTrait aNodeTrait, bool(*aBitOperation)(eNodeTrait, eNodeTrait))
+	std::vector<NodeTypeProxy> GetNodeTypesFilteredByTrait(const eNodeTrait nodeTrait, bool(*bitOperation)(eNodeTrait, eNodeTrait))
 	{
-		return GetNodeTypesFiltered([aNodeTrait, aBitOperation](const NodeType& aNodeType) -> bool
+		return GetNodeTypesFiltered([nodeTrait, bitOperation](const NodeType& nodeType) -> bool
 			{
-				return aBitOperation(aNodeTrait, aNodeType.GetTraits());
+				return bitOperation(nodeTrait, nodeType.GetTraits());
 			}
 		);
 	}
@@ -428,7 +403,7 @@ namespace FLY_NAMESPACE
 		return views;
 	}
 
-	std::vector<ClassProxy> GetClassesByTargetDataType(const DataTypeProxy aDataTypeProxy)
+	std::vector<ClassProxy> GetClassesByTargetDataType(const DataTypeProxy dataTypeProxy)
 	{
 		auto& classes = Internal::GetDataTypeManager().GetClasses();
 
@@ -436,7 +411,7 @@ namespace FLY_NAMESPACE
 
 		for (size_t i = 0; i < classes.size(); ++i)
 		{
-			if (classes[i]->mTargetID == aDataTypeProxy.GetID())
+			if (classes[i]->mTargetID == dataTypeProxy.GetID())
 			{
 				views.push_back(ClassProxy(ClassID{ i }));
 			}

@@ -22,19 +22,9 @@ namespace FLY_NAMESPACE
 	{
 	}
 
-	const std::string& NodeType::GetName()const
+	const std::string& NodeType::GetName() const
 	{
 		return mName;
-	}
-
-	std::vector<NodeRef>& NodeType::GetNodeRefs()
-	{
-		return mNodeRefs;
-	}
-
-	const std::vector<NodeRef>& NodeType::GetNodeRefs() const
-	{
-		return mNodeRefs;
 	}
 
 	void NodeType::SetName(std::string name)

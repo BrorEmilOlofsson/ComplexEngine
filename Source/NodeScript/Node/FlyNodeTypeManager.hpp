@@ -1,7 +1,6 @@
 #pragma once
 #include "../FlyDefines.hpp"
 #include "FlyNodeType.hpp"
-#include "../CustomEvent/FlyCustomEvent.hpp"
 #include "../Function/FlyFunction.hpp"
 #include "../Utilities/FlyMeta.hpp"
 #include <unordered_map>
@@ -51,13 +50,6 @@ namespace FLY_NAMESPACE
 
 		[[nodiscard]] const std::vector<NodeType>& GetNodeTypes();
 
-		[[nodiscard]] CustomEvent& GetCustomEvent(CustomEventID id);
-		[[nodiscard]] const CustomEvent& GetCustomEvent(CustomEventID id) const;
-		[[nodiscard]] std::vector<CustomEvent>& GetCustomEvents();
-		[[nodiscard]] const std::vector<CustomEvent>& GetCustomEvents() const;
-
-		[[nodiscard]] CustomEventID GetCustomEventID(NodeTypeID nodeTypeID) const;
-
 		[[nodiscard]] Function& GetFunction(FunctionID functionID);
 		[[nodiscard]] const Function& GetFunction(FunctionID functionID) const;
 		[[nodiscard]] const std::vector<HeapObject<Function>>& GetFunctions();
@@ -69,7 +61,6 @@ namespace FLY_NAMESPACE
 		[[nodiscard]] std::string GetShortName(NodeTypeID nodeTypeID) const;
 		[[nodiscard]] std::string GetNameDirectory(NodeTypeID nodeTypeID) const;
 
-		CustomEventID CreateCustomEvent(std::string name);
 		FunctionID CreateFunction(std::string name);
 
 		[[nodiscard]] const std::unordered_map<DataTypeID, NodeTypeID>& GetTemplateMapByOperator(eNodeOperatorType operatorType) const;
@@ -84,10 +75,8 @@ namespace FLY_NAMESPACE
 
 	private:
 		std::vector<NodeType> mNodeTypes;
-		std::vector<CustomEvent> mCustomEvents;
 		std::vector<HeapObject<Function>> mFunctions;
 
-		std::unordered_multimap<NodeTypeID, CustomEventID> mToCustomEventID;
 		std::unordered_multimap<NodeTypeID, FunctionID> mToFunctionID;
 		std::unordered_map<DataTypeID, NodeTypeID> mGetterNodeTypeIDs;
 		std::unordered_map<DataTypeID, NodeTypeID> mSetterNodeTypeIDs;

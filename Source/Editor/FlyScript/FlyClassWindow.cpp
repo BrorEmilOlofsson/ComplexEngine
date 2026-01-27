@@ -29,6 +29,10 @@ namespace Simple
 	void FlyClassWindow::DrawGraphSelection()
 	{
 		Fly::ClassProxy currentClass = mParentWindow.GetNodeContext().mClass;
+		if (!currentClass)
+		{
+			return;
+		}
 		if (ImGui::Selectable("Event Graph", currentClass.GetEventGraph() == mParentWindow.GetNodeContext().mNodeGraph))
 		{
 			mParentWindow.SetNodeContext(currentClass.GetEventGraph(), currentClass);

@@ -3,8 +3,6 @@
 #include "../Node/FlyNodeTypeRegistry.hpp"
 #include "../Pin/FlyPinTypeManager.hpp"
 #include "../Internal/FlyInternal.hpp"
-#include "../Command/FlyCommandTracker.hpp"
-#include "../Internal/FlyFoundation.hpp"
 #include <fstream>
 #include <External/nlohmann/json.hpp>
 
@@ -632,107 +630,6 @@ namespace FLY_NAMESPACE
 			else
 			{
 				throw std::runtime_error("Failed copying file");
-			}
-		}
-
-		void SaveCustomEvents(const std::filesystem::path& fileDirectory)
-		{
-			const std::filesystem::path filePath = std::filesystem::absolute(fileDirectory) / CUSTOM_EVENT_FILE_NAME;
-
-			if (!std::filesystem::create_directories(filePath))
-			{
-				throw std::runtime_error("Failed to create directory for writing: " + filePath.string());
-				return;
-			}
-
-			std::ofstream ofs(filePath, std::ios::out);
-
-			if (!ofs.is_open())
-			{
-				throw std::runtime_error("Failed to open file for writing: " + filePath.string());
-				return;
-			}
-
-			nlohmann::json jsonDoc = nlohmann::json::object();
-			nlohmann::json customEventsJson = nlohmann::json::array();
-
-			const NodeTypeManager& nodeTypeManager = GetNodeTypeManager();
-
-			const std::vector<CustomEvent>& customEventNodeTypes = nodeTypeManager.GetCustomEvents();
-
-			for (const CustomEvent& customEventNodeType : customEventNodeTypes)
-			{
-				const NodeType& executorNodeType = GetNodeTypeManager().GetNodeType(customEventNodeType.GetExecutorTypeID());
-
-				nlohmann::json customEventJson;
-
-				customEventJson["Name"] = nodeTypeManager.GetShortName(customEventNodeType.GetExecutorTypeID());
-
-
-				nlohmann::json pinArrayJson = nlohmann::json::array();
-
-				for (size_t i = 1; i < executorNodeType.GetOutputPinTypeIDs().size(); ++i)
-				{
-					const PinTypeID pinTypeID = executorNodeType.GetOutputPinTypeIDs()[i];
-
-					nlohmann::json customEventPinJson;
-
-					const PinType& pinType = GetPinTypeManager().GetPinType(pinTypeID);
-
-					customEventPinJson["Name"] = pinType.GetName();
-					customEventPinJson["DataType"] = GetDataTypeManager().GetName(pinType.GetDataTypeID());
-
-					pinArrayJson.push_back(customEventPinJson);
-				}
-
-				customEventJson["Pins"] = pinArrayJson;
-
-				customEventsJson.push_back(customEventJson);
-			}
-
-			jsonDoc["CustomEvents"] = customEventsJson;
-
-			ofs << jsonDoc;
-
-			ofs.close();
-		}
-
-		void LoadCustomEvents(const std::filesystem::path& fileDirectory)
-		{
-			const std::filesystem::path filePath = fileDirectory / CUSTOM_EVENT_FILE_NAME;
-			std::ifstream ifs(filePath);
-			std::string file(
-				(std::istreambuf_iterator<char>(ifs)),
-				(std::istreambuf_iterator<char>())
-			);
-
-			if (!ifs.is_open())
-			{
-				return;
-			}
-
-			ifs.close();
-
-			const nlohmann::json& jsonDoc = nlohmann::json::parse(file);
-			const nlohmann::json& customEventsJson = jsonDoc["CustomEvents"];
-
-			for (const nlohmann::json& customEventJson : customEventsJson)
-			{
-				const std::string& nodeName = customEventJson["Name"];
-
-				const CustomEventID customEventID = Internal::CreateCustomEvent(nodeName);
-
-				const nlohmann::json& pinsJson = customEventJson["Pins"];
-
-				for (const nlohmann::json& pinJson : pinsJson)
-				{
-					const std::string& pinName = pinJson["Name"];
-					const std::string& dataTypeName = pinJson["DataType"];
-
-					const GenericDataTypeID dataTypeID = GetDataTypeManager().GetGenericDataTypeIDByName(dataTypeName);
-
-					Internal::AddPinTypeToCustomEvent(customEventID, dataTypeID, pinName, nullptr);
-				}
 			}
 		}
 	}

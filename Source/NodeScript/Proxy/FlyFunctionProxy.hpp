@@ -4,6 +4,7 @@
 #include "FlyNodeProxy.hpp"
 #include "FlyNodeTypeProxy.hpp"
 #include "FlyNodeGraphProxy.hpp"
+#include "FlyVariableProxy.hpp"
 
 namespace FLY_NAMESPACE
 {
@@ -22,6 +23,7 @@ namespace FLY_NAMESPACE
 		[[nodiscard]] NodeTypeProxy GetInputNodeType() const;
 		[[nodiscard]] NodeTypeProxy GetOutputNodeType() const;
 		[[nodiscard]] NodeGraphProxy GetNodeGraph();
+		[[nodiscard]] std::vector<VariableProxy> GetLocalVariables() const;
 
 		[[nodiscard]] FunctionID GetID() const;
 

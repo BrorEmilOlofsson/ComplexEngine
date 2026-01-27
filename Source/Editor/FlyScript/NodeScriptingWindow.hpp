@@ -1,6 +1,9 @@
 #pragma once
+#include <vector>
+#include <string>
+#include <functional>
+
 #include "Editor/Core/PopUp.hpp"
-#include "CustomEventWindow.hpp"
 #include "FunctionWindow.hpp"
 #include "FunctionSettingsWindow.hpp"
 #include "FlyClassWindow.hpp"
@@ -10,9 +13,6 @@
 #include "FlyScriptEditorUtilities.hpp"
 #include "NodeScript/Fly.hpp"
 #include <External/imgui/imgui.h>
-#include <vector>
-#include <string>
-#include <functional>
 
 struct ImNodesContext;
 
@@ -43,22 +43,22 @@ namespace Simple
 
 		NodeGraphContext& GetNodeContext();
 		const NodeGraphContext& GetNodeContext() const;
-		void SetNodeContext(Fly::NodeGraphProxy nodeGraphProxy, Fly::ClassProxy classProxy);
+		void SetNodeContext(Fly::NodeGraphProxy nodeGraph, Fly::ClassProxy flyClass);
 		eGraphMode GetCurrentMode() const;
-		void SetSelectedFunctionProxy(Fly::FunctionProxy functionProxy);
+		void SetSelectedFunction(Fly::FunctionProxy function);
 
 		bool OpenClassByName(std::string_view aName);
 
 		void UpdateContext();
 
-		void Render(const Blackboard& aEditorMultiton) override;
+		void Render(const Blackboard& blackboard) override;
 
 		void ShowSelectionMenu();
 		void ShowLoadingMenu();
 
 		ImVec2 GetMiddlePos() const;
 
-		Fly::FunctionProxy GetCurrentFunctionProxy();
+		Fly::FunctionProxy GetCurrentFunction();
 
 		Fly::CommandTracker& GetCommandTracker()
 		{
@@ -77,18 +77,18 @@ namespace Simple
 		char mCreateCopyNameText[NodeGraphContext::TEXT_MAX_LENGTH]{};
 
 		FlyClassWindow mClassWindow;
-		CustomEventWindow mCustomEventWindow;
 		FunctionSettingsWindow mFunctionSettingsWindow;
 		StructCreatorWindow mStructCreatorWindow;
 		FlyReflectionMemoryWindow mReflectionMemoryWindow;
 		FlyTraitWindow mTraitWindow;
+        FunctionWindow mFunctionWindow;
 
 		NodeContextHistory mNodeContextHistory;
 
 		bool mIsContextSensitive = false;
 		bool mIsNodeEditorHovered = false;
 
-		Fly::FunctionProxy mSelectedFunctionProxy;
+		Fly::FunctionProxy mSelectedFunction;
 
 		static constexpr const char* ASSET_FILE_PATH = "Assets/FlyClasses";
 

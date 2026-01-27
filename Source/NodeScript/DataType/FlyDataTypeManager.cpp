@@ -772,21 +772,21 @@ namespace FLY_NAMESPACE
 		return id;
 	}
 
-	Class& DataTypeManager::GetClass(const ClassID aClassID)
+	Class& DataTypeManager::GetClass(const ClassID classID)
 	{
-		return *mClasses[aClassID];
+		return *mClasses[classID];
 	}
 
-	const Class& DataTypeManager::GetClass(const ClassID aClassID) const
+	const Class& DataTypeManager::GetClass(const ClassID classID) const
 	{
-		return *mClasses[aClassID];
+		return *mClasses[classID];
 	}
 
-	ClassID DataTypeManager::GetClassIDByName(std::string_view aName) const
+	ClassID DataTypeManager::GetClassIDByName(std::string_view name) const
 	{
 		for (size_t i = 0; i < mClasses.size(); i++)
 		{
-			if (mClasses[i]->mName == aName)
+			if (mClasses[i]->mName == name)
 			{
 				return ClassID{ i };
 			}

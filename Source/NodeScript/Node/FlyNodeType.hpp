@@ -46,8 +46,6 @@ namespace FLY_NAMESPACE
 		[[nodiscard]] constexpr MemoryPoolID GetFunctionMemoryID() const;
 		[[nodiscard]] constexpr DataTypeID GetNodeStateDataTypeID() const;
 		[[nodiscard]] constexpr TraitID GetTraitID() const;
-		[[nodiscard]] std::vector<NodeRef>& GetNodeRefs();
-		[[nodiscard]] const std::vector<NodeRef>& GetNodeRefs() const;
 		[[nodiscard]] constexpr eNodeOperatorType GetOperatorType() const;
 
 		void SetName(std::string name);
@@ -66,7 +64,6 @@ namespace FLY_NAMESPACE
 		MemoryPoolID mFunctionMemoryID = InvalidID<MemoryPoolID>();
 		DataTypeID mNodeStateDataTypeID;
 		TraitID mTraitID;
-		std::vector<NodeRef> mNodeRefs;
 		eNodeOperatorType mOperatorType = eNodeOperatorType::None;
 	};
 

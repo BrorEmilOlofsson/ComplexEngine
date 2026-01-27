@@ -7,7 +7,6 @@
 #include "Proxy/FlyVariableProxy.hpp"
 #include "Proxy/FlyLinkProxy.hpp"
 #include "Proxy/FlyFunctionProxy.hpp"
-#include "Proxy/FlyCustomEventProxy.hpp"
 #include "Proxy/FlyDataTypeProxy.hpp"
 #include "Proxy/FlyStructProxy.hpp"
 #include "Proxy/FlyClassProxy.hpp"
@@ -30,7 +29,6 @@ namespace FLY_NAMESPACE
 	void DestroyFoundation();
 
 	void LoadAllFlyFiles(const std::filesystem::path& filePath);
-	void SaveCustomEvents(const std::filesystem::path& filePath);
 
 	GenericDataTypeProxy CreateStruct(std::string name, const std::filesystem::path& savePath);
 	ClassProxy CreateClass(GenericDataTypeProxy targetProxy, std::string name, const std::filesystem::path& savePath);
@@ -45,8 +43,7 @@ namespace FLY_NAMESPACE
 	void CreateCopyBuffer(std::span<NodeID> nodeIDs, NodeGraphProxy copiedFromNodeGraph);
 	void PasteCopyBuffer(NodeGraphProxy targetNodeGraphProxy, Vec2 position, CommandTracker* commandTracker);
 
-	CustomEventProxy CreateCustomEvent(std::string name);
-	FunctionProxy CreateGlobalFunction(std::string name);
+	FunctionProxy CreateFreeFunction(std::string name);
 
 	void BeginFrame(CommandTracker* commandTracker);
 	[[nodiscard]] bool& IsDebugging();
@@ -58,7 +55,6 @@ namespace FLY_NAMESPACE
 	[[nodiscard]] std::vector<NodeTypeProxy> GetNodeTypes();
 
 	[[nodiscard]] std::vector<FunctionProxy> GetFunctions();
-	[[nodiscard]] std::vector<CustomEventProxy> GetCustomEvents();
 
 	[[nodiscard]] std::vector<LinkProxy> GetTraversedLinks();
 

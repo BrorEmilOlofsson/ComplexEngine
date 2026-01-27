@@ -1,4 +1,5 @@
 #pragma once
+#include <span>
 #include "../FlyDefines.hpp"
 #include "FlyNodeProxy.hpp"
 #include "FlyPinProxy.hpp"
@@ -9,7 +10,6 @@
 #include "../Node/FlyNodeDragData.hpp"
 #include "ProxyIterators/FlyProxyContextIterator.hpp"
 #include "ProxyIterators/FlyNodeProxyIterator.hpp"
-#include <span>
 
 namespace FLY_NAMESPACE
 {

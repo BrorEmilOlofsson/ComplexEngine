@@ -48,6 +48,19 @@ namespace FLY_NAMESPACE
 		return NodeGraphProxy(*this);
 	}
 
+	std::vector<VariableProxy> FunctionProxy::GetLocalVariables() const
+	{
+		const Function& function = GetFunction();
+		const auto& localVariables = function.GetVariableContainer().GetVariables();
+		std::vector<VariableProxy> localVariableProxies;
+		localVariableProxies.reserve(localVariables.size());
+		for (VarID varID = VarID{ 0 }; varID < localVariables.size(); ++varID)
+		{
+            localVariableProxies.emplace_back(Fly::VariableProxy(varID, mFunctionID));
+		}
+		return localVariableProxies;
+    }
+
 	FunctionID FunctionProxy::GetID() const
 	{
 		return mFunctionID;

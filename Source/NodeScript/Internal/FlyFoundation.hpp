@@ -1,4 +1,6 @@
 #pragma once
+#include <vector>
+
 #include "../FlyDefines.hpp"
 #include "../Memory/FlyMemoryArena.hpp"
 #include "../DataType/FlyVariableRef.hpp"
@@ -9,9 +11,6 @@
 #include "../Pin/FlyPinTypeManager.hpp"
 #include "../Trait/FlyTraitManager.hpp"
 #include "../Execution/FlyNodeExecutor.hpp"
-#include "../Memory/FlyHeapObject.hpp"
-#include <memory>
-#include <string_view>
 
 namespace FLY_NAMESPACE
 {
@@ -99,6 +98,7 @@ namespace FLY_NAMESPACE
 
 	public:
 
+		std::unordered_map<NodeTypeID, std::vector<NodeRef>> mNodeRefs;
 		std::unordered_map<GlobalNodeRef, VariableRef, GlobalNodeRefHasher> mNodeRefToVarRef;
 	};
 }

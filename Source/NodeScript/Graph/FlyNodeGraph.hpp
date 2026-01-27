@@ -15,7 +15,7 @@ namespace FLY_NAMESPACE
 	public:
 
 		NodeGraph() = default;
-		~NodeGraph();
+		~NodeGraph() = default;
 
 		NodeGraph(const NodeGraph&);
 		NodeGraph(NodeGraph&&) noexcept = default;

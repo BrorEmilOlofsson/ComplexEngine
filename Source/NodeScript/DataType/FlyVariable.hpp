@@ -9,7 +9,7 @@ namespace FLY_NAMESPACE
 	public:
 
 		Variable() = default;
-		Variable(GenericDataTypeID dataTypeID, std::string name, size_t byteOffset);
+		Variable(GenericDataTypeID dataTypeID, std::string name, std::size_t byteOffset);
 
 		void SetDataTypeID(GenericDataTypeID dataTypeID);
 		[[nodiscard]] GenericDataTypeID GetDataTypeID() const;
@@ -18,7 +18,7 @@ namespace FLY_NAMESPACE
 		[[nodiscard]] std::string& Name();
 		[[nodiscard]] const std::string& Name() const;
 
-		[[nodiscard]] size_t GetByteOffset() const;
+		[[nodiscard]] std::size_t GetByteOffset() const;
 		void SetIsDestroyed(bool isDestroyed);
 		[[nodiscard]] bool IsDestroyed() const;
 
@@ -27,6 +27,7 @@ namespace FLY_NAMESPACE
 		GenericDataTypeID mDataTypeID;
 		OwningPtr<void> mDefaultValueDataPtr;
 		std::string mName = "Var";
+
 		std::size_t mByteOffset = 0;
 		bool mIsDestroyed = false;
 	};

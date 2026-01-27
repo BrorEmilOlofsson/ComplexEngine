@@ -94,7 +94,6 @@ namespace FLY_NAMESPACE
 	struct NodeTypeID final : IDWrapper<size_t> {};
 	struct VarID final : IDWrapper<size_t> {};
 	struct FunctionID final : IDWrapper<size_t> {};
-	struct CustomEventID final : IDWrapper<size_t> {};
 	struct EventID final : IDWrapper<size_t> {};
     struct GenericDataTypeID final : IDWrapper<std::variant<DataTypeID, ClassID>> {};
 	struct TraitID final : IDWrapper<size_t> {};
@@ -257,9 +256,6 @@ namespace std
 
 	template<>
 	struct hash<Fly::NodeTypeID> : hash<Fly::IDWrapper<Fly::NodeTypeID::value_type>> {};
-
-	template<>
-	struct hash<Fly::CustomEventID> : hash<Fly::IDWrapper<Fly::CustomEventID::value_type>> {};
 
 	template<>
 	struct hash<Fly::EventID> : hash<Fly::IDWrapper<Fly::EventID::value_type>> {};

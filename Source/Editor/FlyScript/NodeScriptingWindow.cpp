@@ -16,9 +16,9 @@ namespace Simple
 	NodeScriptingWindow::NodeScriptingWindow()
 		: PopUp("Node Scripting")
 		, mClassWindow(*this)
-		, mCustomEventWindow(*this)
 		, mFunctionSettingsWindow(*this)
 		, mStructCreatorWindow(this)
+		, mFunctionWindow(*this)
 	{
 		Fly::SetEditorTextFunction([](const std::string& text) { ImGui::TextWrapped(text.c_str()); });
 
@@ -41,14 +41,19 @@ namespace Simple
 	void NodeScriptingWindow::SetNodeContext(const Fly::NodeGraphProxy nodeGraphProxy, Fly::ClassProxy classProxy)
 	{
 		assert(nodeGraphProxy);
-		assert(classProxy);
 
 		std::unique_ptr<NodeGraphContext> nodeContext = std::make_unique<NodeGraphContext>();
 
 		nodeContext->mClass = classProxy;
 		nodeContext->mNodeGraph = nodeGraphProxy;
-		nodeContext->mClassInstance = classProxy.CreateClassInstance();
-
+		if (classProxy)
+		{
+			nodeContext->mClassInstance = classProxy.CreateClassInstance();
+		}
+		else
+		{
+            nodeContext->mClassInstance = Fly::ClassInstanceProxy();
+		}
 		ImNodes::SetCurrentContext(nodeContext->mImNodesContext);
 		mNodeContextHistory.history.push_back(std::move(nodeContext));
 		mNodeContextHistory.currentIndex++;
@@ -59,9 +64,9 @@ namespace Simple
 		return GetNodeContext().mClass ? eGraphMode::Class : eGraphMode::Global;
 	}
 
-	void NodeScriptingWindow::SetSelectedFunctionProxy(Fly::FunctionProxy functionProxy)
+	void NodeScriptingWindow::SetSelectedFunction(Fly::FunctionProxy function)
 	{
-		mSelectedFunctionProxy = functionProxy;
+		mSelectedFunction = function;
 	}
 
 	bool NodeScriptingWindow::OpenClassByName(std::string_view name)
@@ -236,15 +241,14 @@ namespace Simple
 		ShowNodeGraph(*mNodeContextHistory.history[mNodeContextHistory.currentIndex]);
 
 		mClassWindow.Draw();
-		mCustomEventWindow.Update();
 		mStructCreatorWindow.Update();
 		mReflectionMemoryWindow.Update();
 		mTraitWindow.Update();
-
+		mFunctionWindow.Update();
 
 		if (GetNodeContext().mNodeGraph.GetType() == Fly::eNodeGraphType::Function)
 		{
-			mFunctionSettingsWindow.Update();
+			mFunctionSettingsWindow.Update(*GetNodeContext().mCommandTracker);
 		}
 
 	}
@@ -387,13 +391,6 @@ namespace Simple
 			ImGui::EndPopup();
 		}
 
-		ImGui::SameLine();
-
-		if (ImGui::Button("Save Custom Events"))
-		{
-			Fly::SaveCustomEvents(ASSET_FILE_PATH);
-		}
-
 		if (GetCurrentMode() == eGraphMode::Class)
 		{
 
@@ -447,7 +444,7 @@ namespace Simple
 			}
 		}
 
-		if (GetNodeContext().mClass.GetTargetDataType().GetID() == Fly::GetDataTypeID<Fly::None*>())
+		/*if (GetNodeContext().mClass.GetTargetDataType().GetID() == Fly::GetDataTypeID<Fly::None*>())
 		{
 			GetNodeContext().mClassInstance.GetClassInstance().mEventGraphInstance.Mirror();
 			Fly::ExecutionContextBase c
@@ -460,7 +457,7 @@ namespace Simple
 			PROFILER_END();
 
 			GetNodeContext().mTraversedLinks = Fly::GetTraversedLinks();
-		}
+		}*/
 	}
 
 	ImVec2 NodeScriptingWindow::GetMiddlePos() const
@@ -469,9 +466,9 @@ namespace Simple
 		return currentImNodesContext->CanvasOriginScreenSpace + ImNodes::EditorContextGetPanning() / 2.f;
 	}
 
-	Fly::FunctionProxy NodeScriptingWindow::GetCurrentFunctionProxy()
+	Fly::FunctionProxy NodeScriptingWindow::GetCurrentFunction()
 	{
-		return mSelectedFunctionProxy;
+		return mSelectedFunction;
 	}
 
 

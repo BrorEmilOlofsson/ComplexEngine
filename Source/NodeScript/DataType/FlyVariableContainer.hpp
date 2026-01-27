@@ -12,14 +12,13 @@ namespace FLY_NAMESPACE
 	public:
 
 		VariableContainer() = default;
-		~VariableContainer() = default;
 
 		VariableContainer(const VariableContainer& other);
 		VariableContainer(VariableContainer&&) = default;
 		VariableContainer& operator=(const VariableContainer& other);
 		VariableContainer& operator=(VariableContainer&&) = default;
 
-		[[nodiscard]] constexpr const std::vector<Variable>& GetVariables();
+		[[nodiscard]] constexpr const std::vector<Variable>& GetVariables() const;
 		[[nodiscard]] constexpr MemoryArena<BufferSize>& GetMemoryArena();
 		[[nodiscard]] constexpr const MemoryArena<BufferSize>& GetMemoryArena() const;
 		[[nodiscard]] constexpr Variable& GetVariable(size_t index);
@@ -38,7 +37,7 @@ namespace FLY_NAMESPACE
 		MemoryArena<BufferSize> mMemoryArena;
 	};
 	
-	constexpr const std::vector<Variable>& VariableContainer::GetVariables()
+	constexpr const std::vector<Variable>& VariableContainer::GetVariables() const
 	{
 		return mVariables;
 	}

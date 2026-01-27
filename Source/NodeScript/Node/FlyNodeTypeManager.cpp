@@ -102,44 +102,14 @@ namespace FLY_NAMESPACE
 		return mNodeTypes;
 	}
 
-	CustomEvent& NodeTypeManager::GetCustomEvent(const CustomEventID id)
+	Function& NodeTypeManager::GetFunction(const FunctionID id)
 	{
-		return mCustomEvents.at(id);
+		return *mFunctions.at(id);
 	}
 
-	const CustomEvent& NodeTypeManager::GetCustomEvent(const CustomEventID id) const
+	const Function& NodeTypeManager::GetFunction(const FunctionID id) const
 	{
-		return mCustomEvents.at(id);
-	}
-
-	std::vector<CustomEvent>& NodeTypeManager::GetCustomEvents()
-	{
-		return mCustomEvents;
-	}
-
-	const std::vector<CustomEvent>& NodeTypeManager::GetCustomEvents() const
-	{
-		return mCustomEvents;
-	}
-
-	CustomEventID NodeTypeManager::GetCustomEventID(const NodeTypeID nodeTypeID) const
-	{
-		auto it = mToCustomEventID.find(nodeTypeID);
-		if (it != mToCustomEventID.end())
-		{
-			return it->second;
-		}
-		return InvalidID<CustomEventID>();
-	}
-
-	Function& NodeTypeManager::GetFunction(const FunctionID anID)
-	{
-		return *mFunctions.at(anID);
-	}
-
-	const Function& NodeTypeManager::GetFunction(const FunctionID anID) const
-	{
-		return *mFunctions.at(anID);
+		return *mFunctions.at(id);
 	}
 
 	const std::vector<HeapObject<Function>>& NodeTypeManager::GetFunctions()
@@ -157,11 +127,11 @@ namespace FLY_NAMESPACE
 		return InvalidID<FunctionID>();
 	}
 
-	NodeTypeID NodeTypeManager::GetTypeID(std::string_view aName)
+	NodeTypeID NodeTypeManager::GetTypeID(std::string_view name)
 	{
 		for (NodeTypeID id{ 0 }; id < mNodeTypes.size(); ++id)
 		{
-			if (GetShortName(id) == aName)
+			if (GetShortName(id) == name)
 			{
 				return id;
 			}
@@ -169,14 +139,14 @@ namespace FLY_NAMESPACE
 		return NodeTypeID{};
 	}
 
-	const std::string& NodeTypeManager::GetFullName(const NodeTypeID aID) const
+	const std::string& NodeTypeManager::GetFullName(const NodeTypeID id) const
 	{
-		return GetNodeType(aID).GetName();
+		return GetNodeType(id).GetName();
 	}
 
-	std::string NodeTypeManager::GetShortName(const NodeTypeID aID) const
+	std::string NodeTypeManager::GetShortName(const NodeTypeID id) const
 	{
-		const std::string& fullName = GetFullName(aID);
+		const std::string& fullName = GetFullName(id);
 		if (fullName.find_last_of('/') != std::string::npos)
 		{
 			return fullName.substr(fullName.find_last_of('/') + 1, fullName.length());
@@ -188,9 +158,9 @@ namespace FLY_NAMESPACE
 		}
 	}
 
-	std::string NodeTypeManager::GetNameDirectory(const NodeTypeID aID) const
+	std::string NodeTypeManager::GetNameDirectory(const NodeTypeID id) const
 	{
-		const std::string& fullName = GetFullName(aID);
+		const std::string& fullName = GetFullName(id);
 		if (fullName.find_last_of('/') != std::string::npos)
 		{
 			return fullName.substr(0, fullName.find_last_of('/') + 1);
@@ -200,17 +170,6 @@ namespace FLY_NAMESPACE
 		{
 			return fullName;
 		}
-	}
-
-	CustomEventID NodeTypeManager::CreateCustomEvent(std::string name)
-	{
-		const CustomEventID id{ mCustomEvents.size() };
-		const CustomEvent& customEvent = mCustomEvents.emplace_back(CustomEvent(name));
-
-		mToCustomEventID.emplace(customEvent.GetCallerTypeID(), id);
-		mToCustomEventID.emplace(customEvent.GetExecutorTypeID(), id);
-
-		return id;
 	}
 
 	FunctionID NodeTypeManager::CreateFunction(std::string name)
