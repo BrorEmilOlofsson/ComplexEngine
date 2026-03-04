@@ -9,6 +9,7 @@
 #include "Football/FootballMatchFormatGenerator.hpp"
 #include "Football/FootballMatchSimulator.hpp"
 #include "Game/ECS/GameSystemRegistration.hpp"
+#include <iostream>
 
 namespace CLX
 {

@@ -2,7 +2,6 @@
 #include "Engine/Math/Vector3.hpp"
 #include "Engine/Math/Math.hpp"
 #include "Engine/Utility/ValueType.hpp"
-#include <iostream>
 #include <array>
 
 namespace CLX
@@ -257,12 +256,6 @@ namespace CLX
 	[[nodiscard]] constexpr Vector3<T> operator/(const UnitVector3<T>& vector, const T& scalar) noexcept
 	{
 		return Vector3<T>(vector.X() / scalar, vector.Y() / scalar, vector.Z() / scalar);
-	}
-
-	template<typename T>
-	std::ostream& operator<<(std::ostream& os, const UnitVector3<T>& vector)
-	{
-		return os << "UnitVector3(" << vector.X() << ", " << vector.Y() << ", " << vector.Z() << ")";
 	}
 
 	template<typename T>

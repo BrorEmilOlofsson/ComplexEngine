@@ -2,7 +2,6 @@
 #include "Engine/Math/Vector2.hpp"
 #include "Engine/Math/Math.hpp"
 #include "Engine/Utility/ValueType.hpp"
-#include <iostream>
 
 namespace CLX
 {
@@ -197,12 +196,6 @@ namespace CLX
 	[[nodiscard]] constexpr Vector2<T> operator/(const UnitVector2<T>& vector, const T& scalar)
 	{
 		return Vector2<T>(vector.X() / scalar, vector.Y() / scalar);
-	}
-
-	template<typename T>
-	std::ostream& operator<<(std::ostream& os, const UnitVector2<T>& vector)
-	{
-		return os << "UnitVector2(" << vector.X() << ", " << vector.Y() << ")";
 	}
 
 	template<typename T>

@@ -1,5 +1,4 @@
 #pragma once
-#include <iostream>
 #include <cstdint>
 
 namespace CLX
@@ -137,11 +136,5 @@ namespace CLX
 	[[nodiscard]] constexpr bool operator==(const Vector4<T>& a, const Vector4<T>& b) noexcept
 	{
 		return a.x == b.x && a.y == b.y && a.z == b.z && a.w == b.w;
-	}
-
-	template<typename T>
-	std::ostream& operator<<(std::ostream& os, const Vector4<T>& vector)
-	{
-		return os << "{ X: " << vector.x << " Y: " << vector.y << " Z: " << vector.z << " W: " << vector.w << " }";
 	}
 }

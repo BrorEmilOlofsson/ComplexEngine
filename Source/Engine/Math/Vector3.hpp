@@ -1,7 +1,6 @@
 #pragma once
 #include <cstdint>
 #include <array>
-#include <iostream>
 #include "Engine/Math/Math.hpp"
 #include "Engine/Utility/ValueType.hpp"
 
@@ -199,12 +198,6 @@ namespace CLX
 	[[nodiscard]] constexpr bool operator==(const Vector3<T>& a, const Vector3<T>& b) noexcept
 	{
 		return a.x == b.x && a.y == b.y && a.z == b.z;
-	}
-
-	template<typename T>
-	std::ostream& operator<<(std::ostream& os, const Vector3<T>& vector)
-	{
-		return os << "{ X: " << vector.x << " Y: " << vector.y << " Z: " << vector.z << " }";
 	}
 
 	template<typename T>

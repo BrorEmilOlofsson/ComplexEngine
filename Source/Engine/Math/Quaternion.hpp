@@ -3,7 +3,6 @@
 #include "Engine/Math/Rotator.hpp"
 #include "Engine/Math/Math.hpp"
 #include "Engine/Math/UnitVector3.hpp"
-#include <iostream>
 #include <utility>
 #include <cassert>
 
@@ -293,9 +292,4 @@ namespace CLX
 			);
 	}
 
-	template<typename T>
-	std::ostream& operator<<(std::ostream& aOS, const Quaternion<T>& aQuaternion)
-	{
-		return aOS << "{ W: " << aQuaternion.w << " X: " << aQuaternion.x << " Y: " << aQuaternion.y << " Z: " << aQuaternion.z << " }" << std::endl;
-	}
 }

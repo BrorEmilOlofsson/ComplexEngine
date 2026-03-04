@@ -4,6 +4,7 @@
 #include <consoleapi.h>
 #include <consoleapi2.h>
 #include <processenv.h>
+#include <iostream>
 
 namespace CLX
 {

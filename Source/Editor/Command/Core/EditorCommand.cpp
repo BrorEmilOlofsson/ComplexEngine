@@ -1,5 +1,6 @@
 #include "Editor/Precompiled/EditorPch.hpp"
 #include "EditorCommand.hpp"
+#include <iostream>
 
 namespace CLX
 {

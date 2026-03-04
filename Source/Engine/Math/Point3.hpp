@@ -2,7 +2,6 @@
 #include "Engine/Math/Vector3.hpp"
 #include "Engine/Math/UnitVector3.hpp"
 #include <cstdint>
-#include <iostream>
 #include <format>
 
 namespace CLX
@@ -147,15 +146,9 @@ namespace CLX
 	}
 
 	template<typename T>
-	std::ostream& operator<<(std::ostream& os, const Point3<T>& point)
+	[[nodiscard]] constexpr bool NearlyEqual(const Point3<T>& a, const Point3<T>& b, const Tolerance<T>& tolerance = Tolerance<T>{}) noexcept
 	{
-		return os << "Point3(" << point.x << ", " << point.y << ", " << point.z << ")";
-	}
-
-	template<typename T>
-	[[nodiscard]] constexpr bool NearlyEqual(const Point3<T>& a, const Point3<T>& b, const T& tolerance = static_cast<T>(0.0001)) noexcept
-	{
-		return (Abs(a.x - b.x) < tolerance) && (Abs(a.y - b.y) < tolerance) && (Abs(a.z - b.z) < tolerance);
+		return NearlyEqual(a.x, b.x, tolerance) && NearlyEqual(a.y, b.y, tolerance) && NearlyEqual(a.z, b.z, tolerance);
 	}
 }
 

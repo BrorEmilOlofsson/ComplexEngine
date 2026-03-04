@@ -130,11 +130,4 @@ namespace CLX
 			&& a.Yaw() == b.Yaw()
 			&& a.Roll() == b.Roll();
 	}
-	
-	template<typename T>
-	std::ostream& operator<<(std::ostream& os, const Rotator<T>& rotator)
-	{
-		os << "Pitch: " << rotator.Pitch() << ", Yaw: " << rotator.Yaw() << ", Roll: " << rotator.Roll();
-		return os;
-	}
 }

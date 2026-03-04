@@ -161,13 +161,6 @@ namespace CLX
                 static_cast<R>(a.y) - static_cast<R>(b.y)
             );
     }
-
-    template<typename T>
-    std::ostream& operator<<(std::ostream& os, const Point2<T>& point)
-    {
-        os << "{ x: " << point.x << ", y: " << point.y << " }";
-        return os;
-    }
 }
 
 template<typename T>

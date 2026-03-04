@@ -1,5 +1,4 @@
 #pragma once
-#include <iostream>
 #include "Engine/Math/Vector3.hpp"
 #include "Engine/Math/UnitVector3.hpp"
 #include "Engine/Math/Point3.hpp"
@@ -164,11 +163,5 @@ namespace CLX
 	constexpr Transform3 Transform3::ToWorld(const Transform3& parent) const
 	{
 		return Transform3(ToWorldSpace(mMatrix, parent.mMatrix));
-	}
-
-	inline std::ostream& operator<<(std::ostream& os, const Transform3& transform)
-	{
-		os << "Position: " << transform.GetPosition() << ", Rotation: " << transform.GetRotation() << ", Scale: " << transform.GetScale();
-		return os;
 	}
 }
