@@ -7,7 +7,7 @@
 #include "Engine/Graphics/RenderTarget/RenderTargetView.hpp"
 #include "Engine/Graphics/DX11/DX11SamplerState.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	template<std::ranges::range R, typename GetTransformMatrixFunc>

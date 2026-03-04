@@ -3,7 +3,7 @@
 #include <string_view>
 #include "Engine/Utility/EnumUtility.hpp"
 
-namespace Simple
+namespace CLX
 {
 	//using MeshTextureKey = std::tuple<const DX11Mesh*, const class Texture*, const class Texture*, const class Texture*>;
 

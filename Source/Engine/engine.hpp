@@ -13,7 +13,7 @@
 #include "Engine/ECS/ECSRegistry.hpp"
 #include "Engine/Input/InputManager.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	class Engine final

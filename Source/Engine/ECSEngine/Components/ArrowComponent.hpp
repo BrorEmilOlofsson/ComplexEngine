@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/Utility/Color.hpp"
 
-namespace Simple
+namespace CLX
 {
 	
 	struct ArrowComponent final

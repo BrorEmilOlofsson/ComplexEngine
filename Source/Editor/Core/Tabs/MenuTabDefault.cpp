@@ -2,7 +2,7 @@
 #include "Editor/Core/Tabs/MenuTabDefault.hpp"
 #include <External/imgui/imgui.h>
 
-namespace Simple
+namespace CLX
 {
 
 	MenuTabDefault::MenuTabDefault(const std::string& name, const std::string& imGuiTag)

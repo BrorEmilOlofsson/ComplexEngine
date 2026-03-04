@@ -10,7 +10,7 @@
 #include "Engine/Graphics/RenderState.hpp"
 #include "Engine/Utility/DebugShapes.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	static void SetCamera(ECS& ecs, RenderState& renderState)

@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/Utility/Blackboard.hpp"
 
-namespace Simple
+namespace CLX
 {
 	class ECS;
 }
@@ -14,8 +14,8 @@ public:
 	PlayerMovementSystem() = default;
 
 
-	static void BeginPlay(Simple::ECS& ecs, const Simple::Blackboard& blackboard);
-	static void Update(Simple::ECS& ecs, const float deltaTime, const Simple::Blackboard& blackboard);
-	static void EditorUpdate(Simple::ECS& ecs, const Simple::Blackboard& blackboard);
+	static void BeginPlay(CLX::ECS& ecs, const CLX::Blackboard& blackboard);
+	static void Update(CLX::ECS& ecs, const float deltaTime, const CLX::Blackboard& blackboard);
+	static void EditorUpdate(CLX::ECS& ecs, const CLX::Blackboard& blackboard);
 
 };

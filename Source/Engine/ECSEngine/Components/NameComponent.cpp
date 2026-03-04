@@ -2,7 +2,7 @@
 #include "NameComponent.hpp"
 #include "Engine/Reflection/Reflection.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	void RegisterNameComponent()

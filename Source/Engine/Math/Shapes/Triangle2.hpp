@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/Math/Point2.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	template<typename T>

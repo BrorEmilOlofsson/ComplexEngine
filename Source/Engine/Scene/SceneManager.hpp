@@ -6,7 +6,7 @@
 #include "Engine/Utility/EventDispatcher.hpp"
 #include "Engine/Scene/SceneSettings.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	using SceneID = std::size_t;

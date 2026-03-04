@@ -5,7 +5,7 @@
 #include "Engine/Math/Vector2.hpp"
 #include "Engine/Math/Angle.hpp"
 
-namespace Simple
+namespace CLX
 {
 	enum class eCameraType
 	{

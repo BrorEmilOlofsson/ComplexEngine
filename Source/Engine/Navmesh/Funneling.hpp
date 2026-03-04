@@ -2,7 +2,7 @@
 #include "NavmeshData.hpp"
 #include <vector>
 
-namespace Simple
+namespace CLX
 {
 
 	class Navmesh;

@@ -1,7 +1,7 @@
 #include <External/Catch2/catch_amalgamated.hpp>
 #include "Engine/Math/Shapes/Line3.hpp"
 
-using namespace Simple;
+using namespace CLX;
 
 
 TEST_CASE("Line3::Default Constructor", "[Line3]")

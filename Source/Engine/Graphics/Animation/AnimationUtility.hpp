@@ -4,7 +4,7 @@
 #include "Engine/Math/RotationMath.hpp"
 #include <span>
 
-namespace Simple
+namespace CLX
 {
 	constexpr std::array<Matrix4x4f, GlobalMaxBones> ComputeGlobalTransforms(
 		std::span<const Matrix4x4f> localTransforms, std::span<const Bone> bones)

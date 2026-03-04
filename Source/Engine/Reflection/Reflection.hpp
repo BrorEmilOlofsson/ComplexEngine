@@ -2,7 +2,7 @@
 #include "DataTypeRegistry.hpp"
 #include "Engine/Utility/MacroUtility.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	struct IsDefaultComponent {};
@@ -55,19 +55,18 @@ namespace Simple
 
 #define REGISTER_COMPONENT(ComponentType, ...) \
     static bool ComponentRegistered_##ComponentType = []() { \
-        Simple::__RegisterComponent::RegisterComponent<ComponentType>(__VA_ARGS__); \
+        CLX::__RegisterComponent::RegisterComponent<ComponentType>(__VA_ARGS__); \
         return true; \
     }();
 
-#define REGISTER_DATATYPE(dataType) inline Simple::__RegisterDataType<dataType> Reflection_ECS_Registered_Datatype_##dataType;
+#define REGISTER_DATATYPE(DATATYPE) inline CLX::__RegisterDataType<DATATYPE> Reflection_ECS_Registered_Datatype_##DATATYPE;
 
 #define REGISTER_MEMBER(VARIABLE, ...) \
-	static Simple::__RegisterMemberVariable COMBINE_FOR_UNIQUE_NAME(Reflection_ECS_Registered_Property_, __COUNTER__) = \
-		Simple::__RegisterMemberVariable(&VARIABLE, Simple::ExtractVariableNameFromDataTypeName(CONVERT_TO_STRING(VARIABLE)), __VA_ARGS__);
+	static CLX::__RegisterMemberVariable COMBINE_FOR_UNIQUE_NAME(Reflection_ECS_Registered_Property_, __COUNTER__) = \
+		CLX::__RegisterMemberVariable(&VARIABLE, CLX::ExtractVariableNameFromDataTypeName(CONVERT_TO_STRING(VARIABLE)), __VA_ARGS__);
 
-//TO-DO(v11.0.3): maybe figure out a more modular way to register different type of const, pointers and array of different sizes
-#define REGISTER_DATATYPE_CONST_POINTER(dataType) inline Simple::__RegisterDataType<const dataType*> Reflection_ECS_Registered_Datatype_Const_Pointer_##dataType;
-#define REGISTER_DATATYPE_POINTER(dataType) inline Simple::__RegisterDataType<dataType*> Reflection_ECS_Registered_Datatype_Pointer_##dataType;
-#define REGISTER_DATATYPE_ARRAY(array, dataType, size) inline Simple::__RegisterDataType<array<dataType, size>> Reflection_ECS_Registered_Datatype_Array_##array;
-#define REGISTER_DATATYPE_ARRAY_POINTER(aArray, dataType, aSize) inline Simple::__RegisterDataType<aArray<dataType*, aSize>> Reflection_ECS_Registered_Datatype_Array_Const_Pointer_##aArray;
-#define REGISTER_DATATYPE_ARRAY_CONST_POINTER(aArray, dataType, aSize) inline Simple::__RegisterDataType<aArray<const dataType*, aSize>> Reflection_ECS_Registered_Datatype_Array_Const_Pointer_##aArray;
+#define REGISTER_DATATYPE_CONST_POINTER(DATATYPE) inline CLX::__RegisterDataType<const DATATYPE*> Reflection_ECS_Registered_Datatype_Const_Pointer_##DATATYPE;
+#define REGISTER_DATATYPE_POINTER(DATATYPE) inline CLX::__RegisterDataType<DATATYPE*> Reflection_ECS_Registered_Datatype_Pointer_##DATATYPE;
+#define REGISTER_DATATYPE_ARRAY(ARRAY, DATATYPE, SIZE) inline CLX::__RegisterDataType<ARRAY<DATATYPE, SIZE>> Reflection_ECS_Registered_Datatype_Array_##ARRAY;
+#define REGISTER_DATATYPE_ARRAY_POINTER(ARRAY, DATATYPE, SIZE) inline CLX::__RegisterDataType<ARRAY<DATATYPE*, SIZE>> Reflection_ECS_Registered_Datatype_Array_Const_Pointer_##ARRAY;
+#define REGISTER_DATATYPE_ARRAY_CONST_POINTER(ARRAY, DATATYPE, SIZE) inline CLX::__RegisterDataType<ARRAY<const DATATYPE*, SIZE>> Reflection_ECS_Registered_Datatype_Array_Const_Pointer_##ARRAY;

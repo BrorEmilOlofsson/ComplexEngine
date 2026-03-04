@@ -5,7 +5,7 @@
 #include <string>
 #include <filesystem>
 
-namespace Simple
+namespace CLX
 {
 	struct BoneKeyFrames
 	{

@@ -3,7 +3,7 @@
 #include <stdexcept>
 #include <numeric>
 
-namespace Simple
+namespace CLX
 {
 	template<typename ValueType, std::integral WeightType>
 	class OutcomeTable final

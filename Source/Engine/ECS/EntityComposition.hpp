@@ -2,7 +2,7 @@
 #include "Engine/ECS/ECS.hpp"
 #include <filesystem>
 
-namespace Simple
+namespace CLX
 {
 
 	class EntityComposition final

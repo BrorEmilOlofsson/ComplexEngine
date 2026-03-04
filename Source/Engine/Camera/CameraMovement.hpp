@@ -3,7 +3,7 @@
 #include "Engine/Input/InputKey.hpp"
 #include "Engine/Input/InputState.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	struct CameraControls

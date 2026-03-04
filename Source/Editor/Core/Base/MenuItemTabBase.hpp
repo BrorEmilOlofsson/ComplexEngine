@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-namespace Simple
+namespace CLX
 {
 	class MainMenuTabBase
 	{
@@ -26,7 +26,7 @@ namespace Simple
 	};
 }
 
-namespace Simple
+namespace CLX
 {
 	template <typename T>
 	concept DerivedFromMainMenuTabBase = std::is_base_of_v<MainMenuTabBase, T>&& std::is_class_v<T>;

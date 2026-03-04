@@ -6,7 +6,7 @@
 #include "Engine/Graphics/GraphicsConstants.hpp"
 #include <limits>
 
-namespace Simple
+namespace CLX
 {
 
 	struct AnimatedModelInstance final

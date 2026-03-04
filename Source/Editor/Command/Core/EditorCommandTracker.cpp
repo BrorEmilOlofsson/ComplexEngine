@@ -2,7 +2,7 @@
 #include "EditorCommandTracker.hpp"
 #include "EditorCompositeCommand.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	void EditorCommandTracker::Clear()

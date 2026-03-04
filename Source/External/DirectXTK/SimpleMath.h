@@ -61,7 +61,7 @@
 
 namespace DirectX
 {
-    namespace SimpleMath
+    namespace CLXMath
     {
         struct Vector2;
         struct Vector4;
@@ -1022,7 +1022,7 @@ namespace DirectX
 
     #include "SimpleMath.inl"
 
-    } // namespace SimpleMath
+    } // namespace CLXMath
 
 } // namespace DirectX
 

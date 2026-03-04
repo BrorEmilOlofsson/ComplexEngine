@@ -4,7 +4,7 @@
 #include "Editor/Command/Core/EditorCommand.hpp"
 #include "Editor/Command/Core/EditorCompositeCommand.hpp"
 
-namespace Simple
+namespace CLX
 {
 	class EditorCompositeCommandBuilder final
 	{

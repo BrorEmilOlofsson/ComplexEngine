@@ -6,7 +6,7 @@
 #include <d3d11.h>
 #include "Engine/Graphics/DX11/DX11Factory.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	template<typename T> requires std::is_trivially_copyable_v<T>

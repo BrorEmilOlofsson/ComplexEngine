@@ -2,7 +2,7 @@
 #include "Engine/Math/Point2.hpp"
 #include "Engine/Math/GeometryMath.hpp"
 
-namespace Simple
+namespace CLX
 {
     
     template<typename T>

@@ -9,7 +9,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <External/stb/stb_image.h>
 
-namespace Simple
+namespace CLX
 {
 	DX11Texture::DX11Texture(Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv, Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, const std::filesystem::path& relativePath)
 		: mShaderResourceView(srv)

@@ -4,7 +4,7 @@
 #include "Engine/Utility/Camera.hpp"
 #include "Engine/Camera/CameraMovement.hpp"
 
-namespace Simple
+namespace CLX
 {
 
     static void ShowCameraSettings(FreeFlyCameraSettings& cameraSettings)

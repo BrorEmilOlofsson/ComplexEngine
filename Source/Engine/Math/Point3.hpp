@@ -5,7 +5,7 @@
 #include <iostream>
 #include <format>
 
-namespace Simple
+namespace CLX
 {
 	template<typename T>
 	class Point3 final
@@ -160,10 +160,10 @@ namespace Simple
 }
 
 template<typename T>
-struct std::formatter<Simple::Point3<T>, char> : std::formatter<std::string, char>
+struct std::formatter<CLX::Point3<T>, char> : std::formatter<std::string, char>
 {
 	template<typename FormatContext>
-	auto format(const Simple::Point3<T>& point, FormatContext& ctx) const
+	auto format(const CLX::Point3<T>& point, FormatContext& ctx) const
 	{
 		return std::format_to(ctx.out(), "{{ X: {} Y: {} Z: {} }}", point.x, point.y, point.z);
 	}

@@ -3,7 +3,7 @@
 #include "UIButton.hpp"
 #include "UIText.hpp"
 
-namespace Simple
+namespace CLX
 {
 	using UIElement = std::variant<UIButton, UIText>;
 }

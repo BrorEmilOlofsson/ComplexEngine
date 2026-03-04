@@ -3,7 +3,7 @@
 #include "Engine/ECS/ECS.hpp"
 #include "Engine/ECSEngine/Components/TransformHierarchyComponent.hpp"
 
-namespace Simple
+namespace CLX
 {
 	[[nodiscard]] std::vector<EntityID> GetRootEntities(const ECS& ecs);
 

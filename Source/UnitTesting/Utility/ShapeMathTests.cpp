@@ -2,7 +2,7 @@
 
 #include "Engine/Math/ShapeMath.hpp"
 
-using namespace Simple;
+using namespace CLX;
 
 TEST_CASE("ShapeMath::ToLine (LineSegment2 -> Line2)", "[ShapeMath]")
 {

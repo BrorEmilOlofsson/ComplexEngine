@@ -3,7 +3,7 @@
 #include <memory>
 #include <vector>
 
-namespace Simple
+namespace CLX
 {
 
 	class MenuItemMenu final : public MenuItemBase

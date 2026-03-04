@@ -11,7 +11,7 @@
 #include "Engine/Math/Matrix4x4.hpp"
 #include "Engine/Math/Shapes/AABB2.hpp"
  
-namespace Simple
+namespace CLX
 {
 
 	[[nodiscard]] inline DirectX::XMVECTOR ToXMVector(const Color& color)

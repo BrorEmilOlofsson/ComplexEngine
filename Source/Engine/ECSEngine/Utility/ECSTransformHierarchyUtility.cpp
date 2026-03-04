@@ -1,7 +1,7 @@
 #include "Engine/Precompiled/EnginePch.hpp"
 #include "ECSTransformHierarchyUtility.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	std::vector<EntityID> GetRootEntities(const ECS& ecs)

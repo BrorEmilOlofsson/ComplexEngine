@@ -2,7 +2,7 @@
 #include "Editor/Core/Base/MenuItemBase.hpp"
 #include <functional>
 
-namespace Simple
+namespace CLX
 {
 	class MenuItemButton final : public MenuItemBase
 	{

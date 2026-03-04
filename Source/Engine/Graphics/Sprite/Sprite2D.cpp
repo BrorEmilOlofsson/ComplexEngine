@@ -1,7 +1,7 @@
 #include "Engine/Precompiled/EnginePch.hpp"
 #include "Engine/Graphics/Sprite/Sprite2D.hpp"
 
-namespace Simple
+namespace CLX
 {
 	void Sprite2D::SetTexture(TextureAssetHandle texture)
 	{

@@ -1,7 +1,7 @@
 #include "Editor/Precompiled/EditorPch.hpp"
 #include "EditorCompositeCommand.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	EditorCompositeCommand::EditorCompositeCommand(std::string name, std::vector<EditorCommand> commands)

@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/Utility/Blackboard.hpp"
 
-namespace Simple
+namespace CLX
 {
 
     class ECS;

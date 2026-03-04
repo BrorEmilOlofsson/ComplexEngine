@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/Utility/Camera.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	struct CameraComponent final

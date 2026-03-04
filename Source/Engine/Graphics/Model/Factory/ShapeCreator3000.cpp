@@ -2,7 +2,7 @@
 #include "ShapeCreator3000.hpp"
 #include <External/TheGameAssembly/Uppgift5/uppgift05_helper.h>
 
-namespace Simple
+namespace CLX
 {
 	MeshData<Vertex> ShapeCreator3000::CreateTerrain(const TerrainData& terrainData)
 	{

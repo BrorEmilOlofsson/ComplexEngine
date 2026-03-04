@@ -3,7 +3,7 @@
 #include "Engine/Math/UnitVector3.hpp"
 #include "Engine/Math/VectorMath.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	template<typename T>

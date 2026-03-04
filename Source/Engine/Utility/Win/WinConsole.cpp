@@ -5,7 +5,7 @@
 #include <consoleapi2.h>
 #include <processenv.h>
 
-namespace Simple
+namespace CLX
 {
 	Console::Console()
 	{

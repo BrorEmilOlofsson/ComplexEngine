@@ -1,7 +1,7 @@
 #include <External/Catch2/catch_amalgamated.hpp>
 #include "Engine/Math/GeometryMath.hpp"
 
-using namespace Simple;
+using namespace CLX;
 
 TEST_CASE("GeometryMath::Equality Operator (Radius)", "[GeometryMath]")
 {

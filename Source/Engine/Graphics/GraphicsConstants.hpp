@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Simple
+namespace CLX
 {
 	constexpr std::size_t GlobalMaxBones = 64;
 	constexpr std::size_t Global_Max_PointLights = 100;

@@ -4,7 +4,7 @@
 #include "Editor/EditorSceneSettings.hpp"
 #include "Engine/OperatingSystem/OperatingSystem.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	AABB2i GetImGuiRenderRect()

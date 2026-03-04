@@ -9,7 +9,7 @@
 #include "Engine/Graphics/RenderState.hpp"
 #include <External/imgui/imgui.h>
 
-namespace Simple
+namespace CLX
 {
 
 	AnimationAsset CreateAnimationAsset()

@@ -1,7 +1,7 @@
 #include "Engine/Precompiled/EnginePch.hpp"
 #include "DynamicMemoryArena.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	DynamicMemoryArena::DynamicMemoryArena(const size_t aDefaultCapacity)

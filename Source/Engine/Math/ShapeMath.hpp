@@ -21,7 +21,7 @@
 #include "Engine/Utility/Approximation.hpp"
 #include <expected>
 
-namespace Simple
+namespace CLX
 {
 
     template<typename T>

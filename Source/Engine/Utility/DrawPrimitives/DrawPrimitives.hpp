@@ -6,7 +6,7 @@
 #include "Engine/Math/Shapes/Plane.hpp"
 #include "Engine/Utility/Color.hpp"
 
-namespace Simple
+namespace CLX
 {
 	struct DrawBoundingBox final
 	{

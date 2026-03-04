@@ -3,7 +3,7 @@
 #include "Engine/ECSEngine/Components/TransformComponent.hpp"
 #include "Engine/Scene/SceneManager.hpp"
 
-namespace Simple
+namespace CLX
 {
 	void SetEntityTransform(ECS& ecs, EntityID entityID, const Transform& transform)
 	{

@@ -8,7 +8,7 @@
 #include "Engine/Win/WinDefines.hpp"
 #include <Windows.h>
 
-namespace Simple
+namespace CLX
 {
 
 	class Win_MouseInput final

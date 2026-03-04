@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/Math/Transform3.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	struct TransformComponent final

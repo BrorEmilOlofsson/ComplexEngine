@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Simple
+namespace CLX
 {
 
 	template<typename T, typename Checker>

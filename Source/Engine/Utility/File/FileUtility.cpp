@@ -3,7 +3,7 @@
 #include "Engine/Utility/Win/WinConsole.hpp"
 #include <fstream>
 
-namespace Simple
+namespace CLX
 {
 
 	void FileUtility::CopyFiles(std::span<const std::filesystem::path> paths, const std::filesystem::path& dropPath)

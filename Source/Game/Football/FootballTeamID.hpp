@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/Utility/StrongType.hpp"
 
-using FootballTeamID = Simple::StrongType<size_t, struct STFootballTeamID>;
+using FootballTeamID = CLX::StrongType<size_t, struct STFootballTeamID>;
 
 bool Equals(FootballTeamID, FootballTeamID);
 

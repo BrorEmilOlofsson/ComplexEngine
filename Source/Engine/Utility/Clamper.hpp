@@ -2,7 +2,7 @@
 #include "Engine/Math/Math.hpp"
 #include "Engine/Utility/Assert.hpp"
 
-namespace Simple
+namespace CLX
 {
 
     template<typename T, T Min, T Max>

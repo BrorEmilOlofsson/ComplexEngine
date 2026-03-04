@@ -7,7 +7,7 @@
 #include "Engine/Math/DynamicVector.hpp"
 #include "Engine/Math/DynamicUnitVector.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	template<typename T>

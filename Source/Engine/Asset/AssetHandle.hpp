@@ -3,7 +3,7 @@
 #include <memory>
 #include "Engine/Asset/Asset.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	template<typename T>

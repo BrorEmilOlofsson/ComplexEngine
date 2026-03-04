@@ -2,14 +2,14 @@
 #include "Editor/Core/Base/Window.hpp"
 #include "Engine/Utility/Algorithm.hpp"
 
-namespace Simple
+namespace CLX
 {
 	Window::Window(const std::string& name, const std::string& tag)
 		: mName(name)
 		//, mIsActive(true)
 		, mIsFocus(false)
 	{
-		mImGuiTag = "##" + Simple::ConvertTypeIndexNameToPrettyName(tag);
+		mImGuiTag = "##" + ConvertTypeIndexNameToPrettyName(tag);
 		mImGuiName = mName + mImGuiTag;
 	}
 

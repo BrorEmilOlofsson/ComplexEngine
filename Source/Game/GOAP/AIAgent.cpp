@@ -2,7 +2,7 @@
 #include "AIAgent.hpp"
 #include "Engine/Math/DynamicMath.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	void AIAgent::Update(const float deltaTime)

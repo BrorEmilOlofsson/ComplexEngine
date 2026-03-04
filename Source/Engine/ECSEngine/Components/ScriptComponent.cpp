@@ -9,7 +9,7 @@ namespace Fly
 	REGISTER_DATATYPE(ClassInstanceProxy);
 }
 
-namespace Simple
+namespace CLX
 {
 	void RegisterScriptComponent() {}
 

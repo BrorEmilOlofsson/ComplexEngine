@@ -1,7 +1,7 @@
 #include "Engine/Precompiled/EnginePch.hpp"
 #include "UICanvas.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	void UICanvas::Update()

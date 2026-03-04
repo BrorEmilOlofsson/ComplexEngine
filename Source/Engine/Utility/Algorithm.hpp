@@ -7,7 +7,7 @@
 #include <unordered_set>
 #include <ranges>
 
-namespace Simple
+namespace CLX
 {
 
 	template<typename T>

@@ -3,7 +3,7 @@
 #include "Engine/Graphics/DX11/DX11Factory.hpp"
 #include "Engine/Graphics/GraphicsConstants.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	DX11GBuffer::DX11GBuffer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, Microsoft::WRL::ComPtr<ID3D11Device> device, const Vector2ui size)

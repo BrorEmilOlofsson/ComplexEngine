@@ -3,7 +3,7 @@
 #include "Engine/Camera/CameraMovement.hpp"
 #include "Engine/OperatingSystem/WindowView.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	class OperatingSystem;

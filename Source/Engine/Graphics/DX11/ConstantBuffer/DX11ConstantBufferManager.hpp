@@ -9,7 +9,7 @@
 
 #ifdef _WIN32
 
-namespace Simple
+namespace CLX
 {
 	class DX11ConstantBufferManager final
 	{

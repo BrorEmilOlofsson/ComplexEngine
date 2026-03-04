@@ -2,7 +2,7 @@
 #include "Engine/Math/Angle.hpp"
 #include "Engine/Math/Math.hpp"
 
-namespace Simple
+namespace CLX
 {
 	template<typename T>
 	class Rotator final

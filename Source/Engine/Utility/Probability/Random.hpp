@@ -4,7 +4,7 @@
 #include "Engine/Utility/Probability/OutcomeTable.hpp"
 #include "Engine/Utility/Bounds.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	template<std::integral T, typename Rand>

@@ -1,7 +1,7 @@
 #pragma once
 #include <limits>
 
-namespace Simple
+namespace CLX
 {
 	struct DataTypeID final
 	{
@@ -30,9 +30,9 @@ namespace Simple
 namespace std
 {
 	template<>
-	struct hash<Simple::DataTypeID>
+	struct hash<CLX::DataTypeID>
 	{
-		std::size_t operator()(Simple::DataTypeID a) const
+		std::size_t operator()(CLX::DataTypeID a) const
 		{
 			return a.myID;
 		}

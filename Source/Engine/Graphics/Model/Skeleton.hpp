@@ -4,7 +4,7 @@
 #include "Engine/Graphics/Model/Bone.hpp"
 #include "Engine/Graphics/GraphicsConstants.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	class Skeleton final

@@ -1,7 +1,7 @@
 #include <External/Catch2/catch_amalgamated.hpp>
 #include "Engine/Math/Shapes/Cylinder.hpp"
 
-using namespace Simple;
+using namespace CLX;
 
 TEST_CASE("Cylinder::Default Constructor", "[Cylinder]") 
 {

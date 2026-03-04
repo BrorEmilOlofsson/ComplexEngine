@@ -14,7 +14,7 @@
 #include <Windows.h>
 #include <WinUser.h>
 
-namespace Simple
+namespace CLX
 {
 
 	class Win_Window final

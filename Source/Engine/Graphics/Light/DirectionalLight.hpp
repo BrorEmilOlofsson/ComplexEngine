@@ -2,7 +2,7 @@
 #include "Engine/Math/UnitVector3.hpp"
 #include "Engine/Utility/RGBColor.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	class DirectionalLight final

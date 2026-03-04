@@ -1,7 +1,7 @@
 #include "Engine/Precompiled/EnginePch.hpp"
 #include "UIText.hpp"
 
-namespace Simple
+namespace CLX
 {
 	void UIText::Update()
 	{

@@ -2,7 +2,7 @@
 #include <vector>
 #include "Engine/ECS/EntityID.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	struct TransformHierarchyComponent final

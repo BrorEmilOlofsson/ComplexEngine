@@ -2,7 +2,7 @@
 #include "Editor/Core/PopUp.hpp"
 #include "Engine/ECS/EntityID.hpp"
 
-namespace Simple
+namespace CLX
 {
 	class SceneHierarchyPopUp;
 

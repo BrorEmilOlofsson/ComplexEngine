@@ -8,7 +8,7 @@
 #include "Engine/Utility/BlackboardKeys.hpp"
 #include "Engine/Scene/SceneManager.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	static void ShowInspector(SceneManager& sceneManager, Camera& camera, const InputState& input, ECS& ecsBuffer, EditorCommandTracker& commandTracker,

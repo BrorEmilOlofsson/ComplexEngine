@@ -4,7 +4,7 @@
 #include <string>
 #include <Engine/ECS/ECSRegistry.hpp>
 
-namespace Simple
+namespace CLX
 {
 	using Key_SceneRenderState = BlackboardKey<class RenderState&, "SceneRenderState">;
 	using Key_CurrentRenderState = BlackboardKey<class RenderState&, "CurrentRenderState">;

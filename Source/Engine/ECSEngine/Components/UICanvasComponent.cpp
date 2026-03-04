@@ -2,7 +2,7 @@
 #include "UICanvasComponent.hpp"
 #include "Engine/Reflection/Reflection.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	void RegisterUICanvasComponent()

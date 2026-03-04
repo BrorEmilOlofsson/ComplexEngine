@@ -7,7 +7,7 @@
 #include "Engine/ECSEngine/Utility/ECSTransformHierarchyUtility.hpp"
 #include "Editor/PopUps/Editor/EntityCompositionPopUp.hpp"
 
-namespace Simple
+namespace CLX
 {
 	SceneHierarchyPopUp::SceneHierarchyPopUp(const std::string& aName)
 		: PopUp(aName)
@@ -123,7 +123,7 @@ namespace Simple
 
 	void SceneHierarchyPopUp::OnSceneLoaded(Scene& scene)
 	{
-		mRootEntities = ::Simple::GetRootEntities(scene.GetECS());
+		mRootEntities = ::CLX::GetRootEntities(scene.GetECS());
 		mSelectedEntityID = InvalidEntityID;
 	}
 

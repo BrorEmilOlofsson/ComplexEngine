@@ -5,7 +5,7 @@ namespace Fly
 	class VariableProxy;
 }
 
-namespace Simple
+namespace CLX
 {
 
 	class NodeScriptingWindow;

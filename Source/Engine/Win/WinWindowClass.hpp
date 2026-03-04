@@ -7,7 +7,7 @@
 #include <Windows.h>
 
 
-namespace Simple
+namespace CLX
 {
 
 	class Win_WindowClass final

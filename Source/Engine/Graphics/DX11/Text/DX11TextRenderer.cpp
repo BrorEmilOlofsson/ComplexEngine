@@ -3,7 +3,7 @@
 #include "Engine/Utility/Win/WinAdapterFunctions.hpp"
 #include "Engine/Utility/CameraMath.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	void DX11TextRenderer::Init(ID3D11DeviceContext* context, ID3D11Device* device, const std::wstring& font)

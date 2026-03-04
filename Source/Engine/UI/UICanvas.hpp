@@ -2,7 +2,7 @@
 #include <vector>
 #include "UILayer.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	class UICanvas final

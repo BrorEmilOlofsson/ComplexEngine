@@ -1,7 +1,7 @@
 #include "Engine/Precompiled/EnginePch.hpp"
 #include "DX11MeshRenderer.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	void DX11MeshRenderer::Init(ID3D11Device& device, MeshData<Vertex>&& meshData)

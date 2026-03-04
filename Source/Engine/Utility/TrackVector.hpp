@@ -2,7 +2,7 @@
 #include <vector>
 #include <tuple>
 
-namespace Simple
+namespace CLX
 {
 
 	template<typename... Types>

@@ -5,7 +5,7 @@
 #include <string>
 #include <set>
 
-namespace Simple
+namespace CLX
 {
 	class Camera;
 	class ECS;

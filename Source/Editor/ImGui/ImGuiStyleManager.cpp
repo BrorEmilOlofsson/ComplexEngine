@@ -2,7 +2,7 @@
 #include "ImGuiStyleManager.hpp"
 #include <IconFontDefines.h>
 
-namespace Simple
+namespace CLX
 {
 
 	static void LoadImGuiIniFile()

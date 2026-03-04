@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/Navmesh/NavmeshRenderSettings.hpp"
 
-namespace Simple
+namespace CLX
 {
 	struct SceneSettings final
 	{

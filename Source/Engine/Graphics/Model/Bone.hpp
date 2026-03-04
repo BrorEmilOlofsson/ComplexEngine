@@ -4,7 +4,7 @@
 #include <cstdint>
 #include "Engine/Math/Matrix4x4.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	struct Bone final

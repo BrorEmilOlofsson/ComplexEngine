@@ -1,7 +1,7 @@
 #pragma once
 #include <utility>
 
-namespace Simple
+namespace CLX
 {
 	template<typename Allocator, typename Deallocator>
 	class FunctionResource final

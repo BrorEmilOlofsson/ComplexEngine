@@ -1,7 +1,7 @@
 #include "Editor/Precompiled/EditorPch.hpp"
 #include "Editor/Core/Items/MenuItemSelectable.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	MenuItemSelectable::MenuItemSelectable(const std::string& name, std::function<void(const std::string&)> callback)

@@ -1,7 +1,7 @@
 #include "Engine/Precompiled/EnginePch.hpp"
 #include "GraphicsFoundation.hpp"
 
-namespace Simple
+namespace CLX
 {
 
     void GraphicsFoundation::BeginFrame(const GraphicsBufferData& bufferData)

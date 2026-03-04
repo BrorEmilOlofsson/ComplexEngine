@@ -2,7 +2,7 @@
 #include <concepts>
 #include <type_traits>
 
-namespace Simple
+namespace CLX
 {
 
     template<typename T, template<typename> typename CRTPType>
@@ -496,7 +496,7 @@ namespace Simple
 namespace std
 {
 
-    template<typename T> requires Simple::ST_Hashable<T>
+    template<typename T> requires CLX::ST_Hashable<T>
     struct hash<T>
     {
         constexpr std::size_t operator()(const T& pST) const

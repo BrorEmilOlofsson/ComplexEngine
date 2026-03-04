@@ -3,7 +3,7 @@
 #include <functional>
 #include <vector>
 
-namespace Simple
+namespace CLX
 {
 
 	class MenuItemPopUp final : public MenuItemBase

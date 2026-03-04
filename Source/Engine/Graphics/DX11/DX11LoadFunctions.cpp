@@ -13,7 +13,7 @@
 #include <External/assimp/scene.h>
 #include <External/assimp/postprocess.h>
 
-namespace Simple
+namespace CLX
 {
 
 	[[nodiscard]] constexpr Point3f ToPoint3(const aiVector3f& vec)

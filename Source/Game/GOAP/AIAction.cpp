@@ -1,7 +1,7 @@
 #include "Game/Precompiled/GamePch.hpp"
 #include "AIAction.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	AIAction::AIAction(const AIActionParams& aParams)

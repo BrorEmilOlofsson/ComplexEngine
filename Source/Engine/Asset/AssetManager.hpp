@@ -6,7 +6,7 @@
 #include "Engine/Asset/AssetTypes.hpp"
 #include "Engine/Asset/AssetLoader.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	[[nodiscard]] decltype(auto) MapFind(auto& map, const auto& key)

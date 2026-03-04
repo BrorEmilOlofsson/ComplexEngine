@@ -22,7 +22,7 @@
 #include "Engine/Graphics/Model/AnimatedModelInstance.hpp"
 #include "Engine/Graphics/Animation/AnimationUtility.hpp"
 
-namespace Simple
+namespace CLX
 {
 	/*static void PushStaticAnimationLines(const Transform& transform, const AnimationComponent& animationPlayerComponent, RenderList& renderList)
 	{

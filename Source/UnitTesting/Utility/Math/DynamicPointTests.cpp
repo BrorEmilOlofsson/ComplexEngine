@@ -4,7 +4,7 @@
 #include "Engine/Math/DynamicVector.hpp"
 #include "Engine/Math/DynamicUnitVector.hpp"
 
-using namespace Simple;
+using namespace CLX;
 
 TEST_CASE("DynamicPoint::Default Constructor", "[DynamicPoint]")
 {

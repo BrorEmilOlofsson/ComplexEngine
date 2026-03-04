@@ -3,7 +3,7 @@
 #include "Engine/Asset/AssetHandle.hpp"
 #include <filesystem>
 
-namespace Simple
+namespace CLX
 {
 	using VertexShaderAsset = Asset<class VertexShader>;
 	using VertexShaderAssetHandle = AssetHandle<class VertexShader>;

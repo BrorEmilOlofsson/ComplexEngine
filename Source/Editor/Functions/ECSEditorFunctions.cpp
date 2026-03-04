@@ -15,7 +15,7 @@
 #include "Engine/ECSEngine/Utility/ECSEntityCompositionUtility.hpp"
 #include "Engine/ECSEngine/Utility/ECSTransformHierarchyUtility.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	static void SwapEntities(ECS& ecs1, ECS& ecs2, EntityID entityID1, EntityID entityID2)

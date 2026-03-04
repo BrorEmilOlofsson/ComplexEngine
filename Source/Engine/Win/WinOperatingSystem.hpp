@@ -12,7 +12,7 @@
 #include "Engine/Win/WinDefines.hpp"
 #include <Windows.h>
 
-namespace Simple
+namespace CLX
 {
 
 	using WindowID = unsigned int;

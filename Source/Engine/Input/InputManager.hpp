@@ -3,7 +3,7 @@
 #include <queue>
 #include "Engine/Input/InputState.hpp"
 
-namespace Simple
+namespace CLX
 {
 	enum class eInputTriggerType
 	{
@@ -29,16 +29,16 @@ namespace Simple
 }
 
 template<>
-struct std::hash<Simple::InputTrigger>
+struct std::hash<CLX::InputTrigger>
 {
-	std::size_t operator()(const Simple::InputTrigger& inputTrigger) const
+	std::size_t operator()(const CLX::InputTrigger& inputTrigger) const
 	{
-		return static_cast<std::underlying_type_t<Simple::eInputTriggerType>>(inputTrigger.triggerType) + 
-			static_cast<std::underlying_type_t<Simple::eInputKey>>(inputTrigger.key) * Simple::EnumCount<Simple::eInputTriggerType>::value;
+		return static_cast<std::underlying_type_t<CLX::eInputTriggerType>>(inputTrigger.triggerType) +
+			static_cast<std::underlying_type_t<CLX::eInputKey>>(inputTrigger.key) * CLX::EnumCount<CLX::eInputTriggerType>::value;
 	}
 };
 
-namespace Simple
+namespace CLX
 {
 
 	class InputResponse

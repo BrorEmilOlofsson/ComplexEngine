@@ -4,7 +4,7 @@
 #include <array>
 #include "EntityID.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 

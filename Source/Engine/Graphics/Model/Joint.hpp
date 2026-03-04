@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/Math/Matrix4x4.hpp"
 
-namespace Simple
+namespace CLX
 {
 	class Joint final
 	{

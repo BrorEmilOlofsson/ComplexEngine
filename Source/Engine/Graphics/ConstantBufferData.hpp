@@ -8,7 +8,7 @@
 #include <array>
 #include <limits>
 
-namespace Simple
+namespace CLX
 {
 	struct alignas(16) PointLightData final
 	{

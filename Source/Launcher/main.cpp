@@ -20,7 +20,7 @@ struct Profiler
 		PROFILER_END();
 		PROFILER_DISABLE();
 
-		Simple::EasyProfilerOutput();
+		CLX::EasyProfilerOutput();
 	}
 };
 
@@ -29,7 +29,7 @@ struct Profiler
 #include "Engine/Win/WinWindow.hpp"
 #include "Engine/Win/WinOperatingSystem.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	static OperatingSystem CreateWindowsOperatingSystem(HINSTANCE hInstance)
@@ -44,7 +44,7 @@ namespace Simple
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, [[maybe_unused]] _In_ int nCmdShow)
 {
 	Profiler profiler("Main.cpp");
-	Simple::Run(Simple::CreateWindowsOperatingSystem(hInstance));
+	CLX::Run(CLX::CreateWindowsOperatingSystem(hInstance));
 
 	return 0;
 
@@ -52,7 +52,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR,
 
 #endif
 
-namespace Simple
+namespace CLX
 {
 	using RunFunction = void(*)(OperatingSystem&&);
 

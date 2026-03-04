@@ -3,7 +3,7 @@
 #include "Engine/Math/Shapes/AABB3.hpp"
 #include "Engine/Utility/Grid/PrimitiveGrid3.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	template<typename T>

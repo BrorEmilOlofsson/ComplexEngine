@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/Utility/EnumUtility.hpp"
 
-namespace Simple
+namespace CLX
 {
 
     enum class eInputKey : unsigned char

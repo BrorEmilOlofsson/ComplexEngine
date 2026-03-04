@@ -10,7 +10,7 @@
 #include <wrl/client.h>
 #include "Engine/Graphics/DX11/DX11VertexBuffer.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 

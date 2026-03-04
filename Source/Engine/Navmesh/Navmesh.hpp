@@ -16,7 +16,7 @@
 #include "Engine/Utility/Grid/Grid2.hpp"
 #include "Engine/Math/Shapes/Ray3.hpp"
 
-namespace Simple
+namespace CLX
 {
 	using NavmeshWallIndex = int;
 

@@ -3,7 +3,7 @@
 #include "Engine/ECS/EntityID.hpp"
 #include <vector>
 
-namespace Simple
+namespace CLX
 {
 
 	class SceneHierarchyPopUp final : public PopUp

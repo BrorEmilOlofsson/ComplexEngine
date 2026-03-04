@@ -8,7 +8,7 @@
 #include <functional>
 #include <vector>
 
-namespace Simple
+namespace CLX
 {
 
 	class MenuTabDefault final : public MainMenuTabBase

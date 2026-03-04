@@ -2,7 +2,7 @@
 
 #include "Engine/Math/RotationMath.hpp"
 
-using namespace Simple;
+using namespace CLX;
 
 
 TEST_CASE("Rotation matrix")

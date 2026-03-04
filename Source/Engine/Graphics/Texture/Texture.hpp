@@ -3,7 +3,7 @@
 #include <string>
 #include <filesystem>
 
-namespace Simple
+namespace CLX
 {
 	class Texture
 	{

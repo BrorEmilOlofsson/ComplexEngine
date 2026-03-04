@@ -5,7 +5,7 @@
 #include <string_view>
 #include "Engine/Utility/FixedString.hpp"
 
-namespace Simple
+namespace CLX
 {
 	template<typename T, typename KeyType>
 	concept IsBlackboardKey = requires

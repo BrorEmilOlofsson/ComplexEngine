@@ -8,7 +8,7 @@
 #include "Engine/Utility/Assert.hpp"
 #include "Engine/Math/DynamicVector.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	template<std::ranges::range R>

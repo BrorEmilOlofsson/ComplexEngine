@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/Graphics/Sprite/Sprite3D.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	struct Sprite3DComponent final

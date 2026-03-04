@@ -4,7 +4,7 @@
 
 #ifdef _WIN32
 
-namespace Simple
+namespace CLX
 {
 	DX11RenderTargetManager::DX11RenderTargetManager(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
 		: mDevice(std::move(device))

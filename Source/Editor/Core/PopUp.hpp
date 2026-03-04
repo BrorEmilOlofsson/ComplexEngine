@@ -2,7 +2,7 @@
 #include "Editor/Core/Base/Window.hpp"
 #include <type_traits>
 
-namespace Simple
+namespace CLX
 {
 
 	class PopUp : public Window

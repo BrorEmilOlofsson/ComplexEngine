@@ -6,7 +6,7 @@
 #include <ranges>
 #include <algorithm>
 
-namespace Simple
+namespace CLX
 {
 
 	static void SaveComponents(ECS::ConstEntityView entityView, nlohmann::ordered_json& entityJson, const DataTypeRegistry& dataTypeRegistry)

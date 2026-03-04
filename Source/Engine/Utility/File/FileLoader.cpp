@@ -2,7 +2,7 @@
 #include <fstream>
 #include "FileLoader.hpp"
 
-namespace Simple
+namespace CLX
 {
 	MeshData<Vertex> FileLoader::LoadObj(const std::filesystem::path& path)
 	{

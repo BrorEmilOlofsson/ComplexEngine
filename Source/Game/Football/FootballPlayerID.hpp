@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/Utility/StrongType.hpp"
 
-using FootballPlayerID = Simple::StrongType<std::size_t, struct STFootballPlayerID>;
+using FootballPlayerID = CLX::StrongType<std::size_t, struct STFootballPlayerID>;
 
 inline bool operator==(FootballPlayerID a, FootballPlayerID b)
 {

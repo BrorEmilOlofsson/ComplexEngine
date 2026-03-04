@@ -5,7 +5,7 @@
 #include "Engine/Math/Shapes/AABB2.hpp"
 #include "Engine/Math/ShapeMath.hpp"
 
-namespace Simple
+namespace CLX
 {
 	template<std::integral T>
 	[[nodiscard]] constexpr T GetInvalidIndex()

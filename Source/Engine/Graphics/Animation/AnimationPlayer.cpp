@@ -4,7 +4,7 @@
 #include <span>
 #include "Engine/Graphics/Model/Bone.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	std::pair<std::size_t, std::size_t> FindKeyFrameIndexPair(const std::vector<float>& timestamps, float time)

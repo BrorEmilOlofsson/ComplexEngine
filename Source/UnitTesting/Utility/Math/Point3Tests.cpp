@@ -1,7 +1,7 @@
 #include <External/Catch2/catch_amalgamated.hpp>
 #include "Engine/Math/Point3.hpp"
 
-using namespace Simple;
+using namespace CLX;
 
 TEST_CASE("Point3 constructor and accessors", "[Point3]")
 {

@@ -8,7 +8,7 @@
 #include "Editor/Tools/TransformEntityTool.hpp"
 #include "Engine/Asset/EntityCompositionAsset.hpp"
 
-namespace Simple
+namespace CLX
 {
 	class EntityCompositionPopUp final
 	{

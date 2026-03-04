@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/Asset/EntityCompositionAsset.hpp"
 
-namespace Simple
+namespace CLX
 {
 	struct EntityCompositionComponent final
 	{

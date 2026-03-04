@@ -2,7 +2,7 @@
 #include <vector>
 #include <type_traits>
 
-namespace Simple
+namespace CLX
 {
 	struct DynamicMemoryArenaHandle final
 	{

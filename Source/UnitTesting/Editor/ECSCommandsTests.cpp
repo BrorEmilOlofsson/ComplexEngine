@@ -5,7 +5,7 @@
 #include "Engine/ECSEngine/Components/AllEngineComponents.hpp"
 #include "Editor/Command/Core/EditorCommandTracker.hpp"
 
-using namespace Simple;
+using namespace CLX;
 
 ECSRegistry CreateECSRegistry()
 {

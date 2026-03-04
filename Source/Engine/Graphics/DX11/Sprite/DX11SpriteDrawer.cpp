@@ -4,7 +4,7 @@
 #include "Engine/Math/VectorMath.hpp"
 #include "Engine/Graphics/Texture/Texture.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	void DX11SpriteDrawer::Init(ID3D11Device& device, ID3D11DeviceContext& deviceContext, TextureAssetHandle texture)

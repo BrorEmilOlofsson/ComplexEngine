@@ -5,7 +5,7 @@
 #include "Engine/ECSEngine/Utility/ECSTransformUtility.hpp"
 #include <External/imgui/imguizmo/imguizmo.h>
 
-namespace Simple
+namespace CLX
 {
 
 	constexpr ImGuizmo::MODE ToImGuizmoMode(eTransformMode transformMode)
@@ -116,7 +116,7 @@ namespace Simple
 	void TransformEntityTool::ShowEntityImGuizmo(ECS& ecs, const EntityID selectedEntityID, const eTransformMode transformMode, AABB2i renderRect,
 		const bool useSnap, const float snapValue, const Camera& camera, const InputState& input, const bool isCursorVisible, EditorCommandTracker& commandTracker)
 	{
-		::Simple::ShowEntityImGuizmo(
+		::CLX::ShowEntityImGuizmo(
 			ecs, 
 			selectedEntityID, 
 			transformMode, 

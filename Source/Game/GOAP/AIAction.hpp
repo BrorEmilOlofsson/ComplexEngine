@@ -3,7 +3,7 @@
 #include "AIMath.hpp"
 #include "AICheckedValue.hpp"
 
-namespace Simple
+namespace CLX
 {
 	enum class eAIUpdateResult
 	{

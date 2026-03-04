@@ -1,7 +1,7 @@
 #include <External/Catch2/catch_amalgamated.hpp>
 #include "Engine/Math/CubicBezierCurve2.hpp"
 
-using namespace Simple;
+using namespace CLX;
 
 TEST_CASE("CubicBezierCurve2::AddAnchorPoint", "[CubicBezierCurve2]")
 {

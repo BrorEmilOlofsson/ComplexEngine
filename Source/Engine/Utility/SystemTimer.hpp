@@ -2,7 +2,7 @@
 #include <chrono>
 #include <concepts>
 
-namespace Simple
+namespace CLX
 {
 
 	template<std::floating_point T>

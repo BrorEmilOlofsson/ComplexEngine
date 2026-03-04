@@ -2,7 +2,7 @@
 #include <vector>
 #include "UIElement.hpp"
 
-namespace Simple
+namespace CLX
 {
 	class UILayer final
 	{

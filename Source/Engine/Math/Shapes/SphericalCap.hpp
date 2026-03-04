@@ -3,7 +3,7 @@
 #include "Engine/Math/Shapes/Sphere.hpp"
 #include "Engine/Utility/Height.hpp"
 
-namespace Simple
+namespace CLX
 {
 
     template<typename T>

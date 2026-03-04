@@ -8,7 +8,7 @@
 #include "UnitVector2.hpp"
 #include "UnitVector3.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	template<typename T>

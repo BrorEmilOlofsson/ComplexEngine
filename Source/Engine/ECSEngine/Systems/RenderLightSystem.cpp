@@ -6,7 +6,7 @@
 #include "Engine/Graphics/RenderState.hpp"
 #include "Engine/ECSEngine/Utility/ECSTransformUtility.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	static void ProcessPointLights(const ECS& ecs, RenderList& renderList)

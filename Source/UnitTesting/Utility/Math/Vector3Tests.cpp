@@ -2,7 +2,7 @@
 
 #include "Engine/Math/Vector3.hpp"
 
-using namespace Simple;
+using namespace CLX;
 
 TEST_CASE("Vector3 Default Construction", "[Vector3]")
 {

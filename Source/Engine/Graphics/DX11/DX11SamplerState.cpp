@@ -2,7 +2,7 @@
 #include "DX11SamplerState.hpp"
 #include "Engine/Graphics/DX11/DX11Factory.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	DX11SamplerState::DX11SamplerState(ID3D11Device& device)

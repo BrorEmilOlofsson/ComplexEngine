@@ -2,7 +2,7 @@
 #include "Engine/Asset/EntityCompositionAsset.hpp"
 #include <External/nlohmann/json.hpp>
 
-namespace Simple
+namespace CLX
 {
 
 	class ECS;

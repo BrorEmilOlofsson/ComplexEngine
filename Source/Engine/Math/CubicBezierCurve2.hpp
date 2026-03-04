@@ -3,7 +3,7 @@
 #include <optional>
 #include "Engine/Math/Point2.hpp"
 
-namespace Simple
+namespace CLX
 {
 
     template<typename T>

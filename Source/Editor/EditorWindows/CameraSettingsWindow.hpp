@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/Camera/CameraMovement.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	void ShowCameraSettingsWindow(FreeFlyCameraSettings& cameraSettings, bool& isActive);

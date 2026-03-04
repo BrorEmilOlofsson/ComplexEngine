@@ -13,7 +13,7 @@
 #include "Engine/Graphics/DX11/DX11GBuffer.hpp"
 #include "Engine/Graphics/DX11/DX11RenderContext.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	static void RenderModels(std::span<const ModelInstance> modelInstances, DX11ConstantBuffer<TransformBufferData>& transformCB, DX11ConstantBuffer<ObjectIDBufferData>& objectIDCB, ID3D11DeviceContext& context)

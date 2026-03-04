@@ -7,7 +7,7 @@
 
 #ifdef _WIN32
 
-namespace Simple
+namespace CLX
 {
 
 	D3D11_VIEWPORT DX11Factory::CreateViewport(Vector2ui windowSize)

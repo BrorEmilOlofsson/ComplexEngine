@@ -6,7 +6,7 @@
 
 #ifdef _WIN32
 
-namespace Simple
+namespace CLX
 {
 
 	void DX11WireBoxDrawer::Init(ID3D11Device& device, AssetManager& assetManager)

@@ -4,7 +4,7 @@
 #include <windowsx.h>
 #include "Engine/Utility/Win/WinUtility.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	bool Win_MouseInput::HandleMessages([[maybe_unused]] HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam, Vector2ui windowSize)

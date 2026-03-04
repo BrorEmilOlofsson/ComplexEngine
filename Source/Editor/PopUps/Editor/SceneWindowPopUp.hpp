@@ -5,7 +5,7 @@
 #include "Editor/PopUps/Editor/SceneInspectorPopUp.hpp"
 #include "Engine/Utility/Camera.hpp"
 
-namespace Simple
+namespace CLX
 {
 	class SceneWindowPopUp final
 	{

@@ -4,7 +4,7 @@
 #include <External/TheGameAssembly/SoundEngine/SoundEngine.h>
 #include <External/TheGameAssembly/SoundEngine/SoundEngineImpl.hpp>
 
-namespace Simple
+namespace CLX
 {
 
 	AudioManager::~AudioManager()

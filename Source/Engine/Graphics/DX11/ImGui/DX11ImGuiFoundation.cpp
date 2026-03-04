@@ -4,7 +4,7 @@
 #include <External/imgui/imguizmo/ImGuizmo.h>
 #include <filesystem>
 
-namespace Simple
+namespace CLX
 {
 
 	DX11ImGuiFoundation::DX11ImGuiFoundation(ID3D11Device* device, ID3D11DeviceContext* context)

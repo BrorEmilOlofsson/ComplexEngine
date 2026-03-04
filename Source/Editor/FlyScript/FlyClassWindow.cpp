@@ -4,7 +4,7 @@
 #include "NodeScriptingWindow.hpp"
 #include "FlyScriptEditorUtilities.hpp"
 
-namespace Simple
+namespace CLX
 {
 	FlyClassWindow::FlyClassWindow(NodeScriptingWindow& parentWindow)
 		: mParentWindow(parentWindow)

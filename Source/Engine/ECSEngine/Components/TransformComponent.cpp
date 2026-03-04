@@ -2,7 +2,7 @@
 #include "TransformComponent.hpp"
 #include "Engine/Reflection/Reflection.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	void RegisterTransformComponent() {}

@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/Math/TransformMode.hpp"
 
-namespace Simple
+namespace CLX
 {
 	struct EditorSceneSettings final
 	{

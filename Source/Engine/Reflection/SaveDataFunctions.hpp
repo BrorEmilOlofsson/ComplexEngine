@@ -29,7 +29,7 @@ namespace std
 	[[nodiscard]] nlohmann::json ToJSON(const std::string& value);
 }
 
-namespace Simple
+namespace CLX
 {
 	[[nodiscard]] nlohmann::json SaveDataPtr(const DataTypeID dataTypeID, const void* dataPtr);
 
@@ -204,7 +204,7 @@ namespace std
 		nlohmann::json arrayJson = nlohmann::json::array();
 		for (const T& data : vector)
 		{
-			nlohmann::json element = Simple::SaveDataPtr(Simple::GetDataTypeID<T>(), &data);
+			nlohmann::json element = CLX::SaveDataPtr(CLX::GetDataTypeID<T>(), &data);
 
 			arrayJson.push_back(element);
 		}

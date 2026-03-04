@@ -7,7 +7,7 @@
 #include "Engine/Utility/Algorithm.hpp"
 #include <fstream>
 
-namespace Simple
+namespace CLX
 {
 
 	void SceneManager::Clear()

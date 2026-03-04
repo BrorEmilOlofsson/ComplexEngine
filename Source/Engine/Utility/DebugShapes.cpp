@@ -4,7 +4,7 @@
 #include "Engine/Math/Shapes/Ray3.hpp"
 #include "Engine/Graphics/RenderList.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	void RenderSphere(const Spheref& sphere, const Color& color, RenderList& renderList)

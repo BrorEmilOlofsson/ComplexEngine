@@ -7,7 +7,7 @@
 #include "Engine/OperatingSystem/WindowView.hpp"
 #include "Engine/Utility/GraphicsBufferData.hpp"
 
-namespace Simple
+namespace CLX
 {
     class RenderState;
     class AssetManager;

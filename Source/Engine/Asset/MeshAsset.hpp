@@ -4,7 +4,7 @@
 #include <exception>
 #include <filesystem>
 
-namespace Simple
+namespace CLX
 {
 	using MeshAsset = Asset<class Mesh>;
 	using MeshAssetHandle = AssetHandle<class Mesh>;

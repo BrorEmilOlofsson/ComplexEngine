@@ -3,7 +3,7 @@
 #include "Engine/Utility/Grid/Grid2.hpp"
 #include "Engine/Utility/Grid/Grid3.hpp"
 
-using namespace Simple;
+using namespace CLX;
 
 TEST_CASE("Grid2 Coordinates")
 {

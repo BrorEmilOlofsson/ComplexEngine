@@ -2,7 +2,7 @@
 #include "Engine/Math/Point3.hpp"
 #include "Engine/Utility/RGBColor.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	struct PointLight final

@@ -8,7 +8,7 @@
 #include "Engine/Utility/FunctionResource.hpp"
 #include <External/imgui/imgui_impl_win32.h>
 
-namespace Simple
+namespace CLX
 {
 
     class DX11ImGuiWindow final

@@ -11,7 +11,7 @@
 #include "Engine/Graphics/DepthBuffer/DepthStencilViewHandle.hpp"
 #include "Engine/Graphics/RenderContext.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	class RenderState final

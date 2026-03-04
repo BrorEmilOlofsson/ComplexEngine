@@ -3,7 +3,7 @@
 #include <initializer_list>
 #include "Engine/Utility/Assert.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	template<typename T>

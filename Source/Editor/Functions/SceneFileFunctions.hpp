@@ -7,7 +7,7 @@
 #include <functional>
 #include <fstream>
 
-namespace Simple
+namespace CLX
 {
 	class SceneFileFunctions
 	{

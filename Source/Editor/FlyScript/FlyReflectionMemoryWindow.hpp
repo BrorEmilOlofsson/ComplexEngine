@@ -1,7 +1,7 @@
 #pragma once
 #include "NodeScript/Fly.hpp"
 
-namespace Simple
+namespace CLX
 {
 	class FlyReflectionMemoryWindow
 	{

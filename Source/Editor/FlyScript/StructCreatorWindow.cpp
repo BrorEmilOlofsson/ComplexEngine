@@ -3,7 +3,7 @@
 #include "NodeScriptingWindow.hpp"
 #include "FlyScriptEditorUtilities.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	StructCreatorWindow::StructCreatorWindow(NodeScriptingWindow* aParentWindow)

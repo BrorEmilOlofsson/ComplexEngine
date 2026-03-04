@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 
-namespace Simple
+namespace CLX
 {
 	class AudioManager
 	{

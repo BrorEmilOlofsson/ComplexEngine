@@ -2,7 +2,7 @@
 #include <span>
 #include "NavmeshData.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	class Navmesh;

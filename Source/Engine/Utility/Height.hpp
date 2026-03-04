@@ -2,7 +2,7 @@
 #include "Engine/Utility/StrongType.hpp"
 #include "Engine/Utility/Clamper.hpp"
 
-namespace Simple
+namespace CLX
 {
     template<typename T>
     using Height = StrongAssertedTypeNew<T, PositiveOrZeroAsserter<T>, struct HeightTag, EquatableTrait, ComparableTrait>;

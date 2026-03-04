@@ -6,7 +6,7 @@
 #include "Engine/Utility/Blackboard.hpp"
 #include <array>
 
-namespace Simple
+namespace CLX
 {
 	struct ModelComponent final
 	{

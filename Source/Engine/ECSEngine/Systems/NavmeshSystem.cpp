@@ -9,7 +9,7 @@
 #include "Engine/Input/InputState.hpp"
 #include <External/fmt/core.h>
 
-namespace Simple
+namespace CLX
 {
 
 	void RenderNavmesh(const Navmesh& navmesh, RenderList& renderList, const NavmeshRenderSettings& renderSettings)

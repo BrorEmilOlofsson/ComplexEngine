@@ -2,7 +2,7 @@
 #include "Engine/Math/Shapes/AABB2.hpp"
 #include "UIText.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	class UIButton final

@@ -9,7 +9,7 @@
 #include <unordered_map>
 #include <stdlib.h>
 
-namespace Simple
+namespace CLX
 {
 
 	static void UpdateFPSCapSettings(GraphicsSettings& graphicsSettings, const unsigned int /*aMonitorUpdateFrequency*/)

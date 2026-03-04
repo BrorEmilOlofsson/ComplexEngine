@@ -2,7 +2,7 @@
 
 #include "Engine/Utility/Probability/OutcomeTable.hpp"
 
-using namespace Simple;
+using namespace CLX;
 
 int Add(int a, int b)
 {

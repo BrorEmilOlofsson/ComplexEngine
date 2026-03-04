@@ -3,7 +3,7 @@
 
 #ifdef _WIN32
 
-namespace Simple
+namespace CLX
 {
 
 	DX11VertexShader::DX11VertexShader(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context,

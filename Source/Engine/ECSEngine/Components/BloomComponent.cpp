@@ -2,7 +2,7 @@
 #include "BloomComponent.hpp"
 #include "Engine/Reflection/Reflection.hpp"
 
-namespace Simple
+namespace CLX
 {
 	void RegisterBloomComponent() {}
 

@@ -2,7 +2,7 @@
 #include "Engine/Math/Point2.hpp"
 #include "Engine/Math/Math.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	class InputMouseState final

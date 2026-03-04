@@ -2,7 +2,7 @@
 #include <External/imgui/imgui.h>
 #include <array>
 
-namespace Simple
+namespace CLX
 {
 	enum class eImGuiEditorStyle
 	{

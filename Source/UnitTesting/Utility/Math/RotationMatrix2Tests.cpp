@@ -2,7 +2,7 @@
 #include "Engine/Math/RotationMatrix2.hpp"
 #include "Engine/Utility/Approximation.hpp"
 
-using namespace Simple;
+using namespace CLX;
 
 TEST_CASE("RotationMatrix2::Default Constructor", "[RotationMatrix2]")
 {

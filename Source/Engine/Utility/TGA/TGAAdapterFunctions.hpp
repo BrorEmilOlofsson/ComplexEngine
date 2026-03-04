@@ -2,7 +2,7 @@
 #include "Engine/Utility/MeshData.hpp"
 #include <External/TheGameAssembly/FBXImporter/Source/Importer.h>
 
-namespace Simple
+namespace CLX
 {
 
 	inline MeshData<Vertex> LoadMeshData(const TGA::FBX::Mesh& tgaMesh)

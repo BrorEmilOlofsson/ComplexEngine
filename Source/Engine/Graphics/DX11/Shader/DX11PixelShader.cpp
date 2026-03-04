@@ -3,7 +3,7 @@
 
 #ifdef _WIN32
 
-namespace Simple
+namespace CLX
 {
 
 	DX11PixelShader::DX11PixelShader(

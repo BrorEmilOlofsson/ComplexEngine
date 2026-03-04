@@ -1,7 +1,7 @@
 #include "Engine/Precompiled/EnginePch.hpp"
 #include "InputManager.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	static bool IsKeyTriggered(const InputState& inputState, const InputTrigger& inputTrigger)

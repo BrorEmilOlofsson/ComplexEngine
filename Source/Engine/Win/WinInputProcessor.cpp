@@ -3,7 +3,7 @@
 #include <windowsx.h>
 #include <string>
 
-namespace Simple
+namespace CLX
 {
 
 	static constexpr eInputKey ToSimpleKey(unsigned int winKey)

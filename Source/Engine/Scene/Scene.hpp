@@ -4,7 +4,7 @@
 #include "Engine/Navmesh/Navmesh.hpp"
 #include "Engine/Math/Shapes/Ray3.hpp"
 
-namespace Simple
+namespace CLX
 {
 	
 	class Scene final

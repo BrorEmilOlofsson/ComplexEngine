@@ -5,7 +5,7 @@
 #include "Engine/Asset/ModelAsset.hpp"
 #include <limits>
 
-namespace Simple
+namespace CLX
 {
 
 	struct ModelInstance final

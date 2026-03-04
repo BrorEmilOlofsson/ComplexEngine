@@ -1,7 +1,7 @@
 #include "Engine/Precompiled/EnginePch.hpp"
 #include "UIButton.hpp"
 
-namespace Simple
+namespace CLX
 {
 	void UIButton::Update()
 	{

@@ -2,7 +2,7 @@
 #include "Editor/Core/Tabs/MenuTabWindow.hpp"
 #include <External/imgui/imgui.h>
 
-namespace Simple
+namespace CLX
 {
 
 	MenuTabWindow::MenuTabWindow(const std::string& name, const std::string& imGuiTag)

@@ -10,7 +10,7 @@
 #include "Football/FootballMatchSimulator.hpp"
 #include "Game/ECS/GameSystemRegistration.hpp"
 
-namespace Simple
+namespace CLX
 {
 	Game::Game()
 	{	/*auto teams = MakeTeams();

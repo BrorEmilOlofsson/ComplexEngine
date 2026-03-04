@@ -5,7 +5,7 @@
 #ifdef _WIN32
 #include <Windows.h>
 
-namespace Simple
+namespace CLX
 {
 
 	class WinException : public std::exception
@@ -30,7 +30,7 @@ namespace Simple
 	};
 }
 
-#define WIN_EXCEPTION(hr) Simple::WinException(__LINE__, __FILE__, hr);
+#define WIN_EXCEPTION(hr) CLX::WinException(__LINE__, __FILE__, hr);
 #define WIN_CHECK_HRESULT(hr) if (FAILED(hr)) throw WIN_EXCEPTION(hr);
 
 #endif

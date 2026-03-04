@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 
-namespace Simple
+namespace CLX
 {
 	class FileUtility final
 	{

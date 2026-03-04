@@ -4,7 +4,7 @@
 #include "Engine/Math/Math.hpp"
 #include "Engine/Utility/ValueType.hpp"
 
-namespace Simple
+namespace CLX
 {
 
     template<typename T>

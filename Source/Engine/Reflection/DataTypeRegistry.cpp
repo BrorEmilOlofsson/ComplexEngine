@@ -2,7 +2,7 @@
 #include "Engine/Reflection/DataTypeRegistry.hpp"
 #include <External/imgui/imgui.h>
 
-namespace Simple
+namespace CLX
 {
 	DataTypeRegistry::DataTypeRegistry()
 	{

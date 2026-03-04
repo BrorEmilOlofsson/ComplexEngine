@@ -1,7 +1,7 @@
 #pragma once
 #include <External/imgui/imgui.h>
 
-namespace Simple
+namespace CLX
 {
 
 	class ImGuiBegin final

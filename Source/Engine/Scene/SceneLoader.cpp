@@ -9,7 +9,7 @@
 #include "Engine/ECS/ECSSerializer.hpp"
 #include <fstream>
 
-namespace Simple
+namespace CLX
 {
 
 	void SceneLoader::SaveScene(const Scene& scene, const std::filesystem::path& filePath, const DataTypeRegistry& dataTypeRegistry)
@@ -55,8 +55,8 @@ namespace Simple
 			if (shouldSave)
 			{
 				SaveScene(scene, filePath, blackboard.Get<Key_DataTypeRegistry>());
-				Simple::Console::Print(ConvertFilePathToPrettyName(filePath), Simple::ConsoleTextColor::Red, false);
-				Simple::Console::Print(" has been updated due to changes in the source code", Simple::ConsoleTextColor::White, true);
+				Console::Print(ConvertFilePathToPrettyName(filePath), ConsoleTextColor::Red, false);
+				Console::Print(" has been updated due to changes in the source code", ConsoleTextColor::White, true);
 			}
 		}
 		else

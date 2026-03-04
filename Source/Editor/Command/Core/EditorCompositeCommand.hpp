@@ -2,7 +2,7 @@
 #include "EditorCommand.hpp"
 #include <vector>
 
-namespace Simple
+namespace CLX
 {
 	class EditorCompositeCommand final
 	{

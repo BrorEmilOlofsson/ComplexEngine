@@ -18,7 +18,7 @@
 #include <string>
 #include <array>
 
-namespace Simple
+namespace CLX
 {
 	void LoadDataPtr(DataTypeID dataTypeID, void* dataPtr, const nlohmann::json& json, const Blackboard& blackboard);
 }
@@ -34,7 +34,7 @@ namespace std
 	void FromJSON(std::string& value, const nlohmann::json& json);
 }
 
-namespace Simple
+namespace CLX
 {
 	template<typename T>
 	void FromJSON(Vector2<T>& vector, const nlohmann::json& json)
@@ -188,7 +188,7 @@ namespace Simple
 namespace std
 {
 	template<typename T>
-	void FromJSON(std::vector<T>& vector, const nlohmann::json& json, const Simple::Blackboard& blackboard)
+	void FromJSON(std::vector<T>& vector, const nlohmann::json& json, const CLX::Blackboard& blackboard)
 	{
 		for (const nlohmann::json& element : json)
 		{
@@ -196,13 +196,13 @@ namespace std
 			{
 				vector.emplace_back();
 				bool data = vector.emplace_back();
-				Simple::LoadDataPtr(Simple::GetDataTypeID<T>(), &data, element, blackboard);
+				CLX::LoadDataPtr(CLX::GetDataTypeID<T>(), &data, element, blackboard);
 				vector[vector.size() - 1] = data;
 			}
 			else
 			{
 				T& data = vector.emplace_back();
-				Simple::LoadDataPtr(Simple::GetDataTypeID<T>(), &data, element, blackboard);
+				CLX::LoadDataPtr(CLX::GetDataTypeID<T>(), &data, element, blackboard);
 			}
 		}
 	}

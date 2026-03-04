@@ -1,101 +1,107 @@
 #include <External/TheGameAssembly/StackTrace/StackTrace.h>
 
-void ToStringStackWalker::SetBuffer(std::array<const char*, STACK_TRACE_MAX_LINES>* aBuffer,const int aSkipCount)
+void ToStringStackWalker::SetBuffer(std::array<const char*, STACK_TRACE_MAX_LINES>* aBuffer, const int aSkipCount)
 {
-	myBuffer = aBuffer;
-	myCurrentIndex = -aSkipCount;
-	m_MaxRecursionCount = STACK_TRACE_MAX_LINES + aSkipCount;
+    myBuffer = aBuffer;
+    myCurrentIndex = -aSkipCount;
+    m_MaxRecursionCount = STACK_TRACE_MAX_LINES + aSkipCount;
 }
 
 void ToStringStackWalker::OnOutput(LPCSTR szText)
 {
-	if (!myBuffer)
-		return;
+    if (!myBuffer)
+        return;
 
-	if (myCurrentIndex < 0)
-	{
-		myCurrentIndex++;
-		return;
-	}
+    if (myCurrentIndex < 0)
+    {
+        myCurrentIndex++;
+        return;
+    }
 
-	if (myCurrentIndex >= STACK_TRACE_MAX_LINES)
-		return;
+    if (myCurrentIndex >= STACK_TRACE_MAX_LINES)
+        return;
 
-	std::array<char, STACK_TRACE_MAX_LINE_LENGTH> myLine{};
-	strncpy_s(myLine.data(), STACK_TRACE_MAX_LINE_LENGTH, szText, STACK_TRACE_MAX_LINE_LENGTH);
-	auto pair = ToStrongStackWalkerWrapper::localStackTraceLineCache.insert(myLine);
-	const char* cachedLine = pair.first->data();
+    std::array<char, STACK_TRACE_MAX_LINE_LENGTH> myLine{};
+    strncpy_s(myLine.data(), STACK_TRACE_MAX_LINE_LENGTH, szText, STACK_TRACE_MAX_LINE_LENGTH);
+    auto pair = ToStrongStackWalkerWrapper::localStackTraceLineCache.insert(myLine);
+    const char* cachedLine = pair.first->data();
 
-	(*myBuffer)[myCurrentIndex] = cachedLine;
-	myCurrentIndex++;
+    (*myBuffer)[myCurrentIndex] = cachedLine;
+    myCurrentIndex++;
 }
 
-SimpleTracker::StackTrace::StackTrace(const StackTraceImpl& aStackTraceImpl) 
-	: myImpl(&aStackTraceImpl)
+namespace CLXTracker
 {
-}
 
-SimpleTracker::StackTrace::StackTrace() 
-	: myImpl(nullptr)
-{
-}
 
-SimpleTracker::StackTrace SimpleTracker::StackTrace::CaptureStackTrace(int aSkipDepth)
-{
-	std::lock_guard<std::mutex> guard(ToStrongStackWalkerWrapper::localStackTraceMutex);
+    StackTrace::StackTrace(const StackTraceImpl& aStackTraceImpl)
+        : myImpl(&aStackTraceImpl)
+    {
+    }
 
-	StackTraceImpl impl;
-	ToStrongStackWalkerWrapper::localStackWalker.SetBuffer(&impl.myLines, 2+aSkipDepth);
-	ToStrongStackWalkerWrapper::localStackWalker.ShowCallstack();
-	ToStrongStackWalkerWrapper::localStackWalker.SetBuffer(nullptr);
+    StackTrace::StackTrace()
+        : myImpl(nullptr)
+    {
+    }
 
-	const auto& it = ToStrongStackWalkerWrapper::localStackTraceCache.insert(impl).first;
-	return StackTrace(*it);
-}
+    StackTrace StackTrace::CaptureStackTrace(int aSkipDepth)
+    {
+        std::lock_guard<std::mutex> guard(ToStrongStackWalkerWrapper::localStackTraceMutex);
 
-const std::vector<const char*> SimpleTracker::StackTrace::GetLines() const
-{
-	std::vector<const char*> lines;
+        StackTraceImpl impl;
+        ToStrongStackWalkerWrapper::localStackWalker.SetBuffer(&impl.myLines, 2 + aSkipDepth);
+        ToStrongStackWalkerWrapper::localStackWalker.ShowCallstack();
+        ToStrongStackWalkerWrapper::localStackWalker.SetBuffer(nullptr);
 
-	if (myImpl == nullptr)
-	{
-		return lines;
-	}
+        const auto& it = ToStrongStackWalkerWrapper::localStackTraceCache.insert(impl).first;
+        return StackTrace(*it);
+    }
 
-	for (const auto& line : myImpl->myLines)
-	{
-		if (line == nullptr)
-		{
-			break;
-		}
+    const std::vector<const char*> StackTrace::GetLines() const
+    {
+        std::vector<const char*> lines;
 
-		lines.push_back(line);
-	}
+        if (myImpl == nullptr)
+        {
+            return lines;
+        }
 
-	return lines;
-}
+        for (const auto& line : myImpl->myLines)
+        {
+            if (line == nullptr)
+            {
+                break;
+            }
 
-void SimpleTracker::StackTrace::Print() const
-{
-	if (myImpl == nullptr)
-	{
-		OutputDebugStringA("Empty Stack Trace\n");
-		return;
-	}
+            lines.push_back(line);
+        }
 
-	for (const auto& line : myImpl->myLines)
-	{
-		if (line == nullptr)
-			break;
+        return lines;
+    }
 
-		OutputDebugStringA(line);
-	}
-}
+    void StackTrace::Print() const
+    {
+        if (myImpl == nullptr)
+        {
+            OutputDebugStringA("Empty Stack Trace\n");
+            return;
+        }
 
-std::size_t SimpleTracker::StackTrace::ComputeHash() const
-{
-	if (myImpl == nullptr)
-		return 0;
+        for (const auto& line : myImpl->myLines)
+        {
+            if (line == nullptr)
+                break;
 
-	return std::hash<StackTraceImpl>()(*myImpl);
+            OutputDebugStringA(line);
+        }
+    }
+
+    std::size_t StackTrace::ComputeHash() const
+    {
+        if (myImpl == nullptr)
+            return 0;
+
+        return std::hash<StackTraceImpl>()(*myImpl);
+    }
+
 }

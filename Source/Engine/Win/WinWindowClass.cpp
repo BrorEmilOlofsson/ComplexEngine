@@ -3,7 +3,7 @@
 
 #ifdef _WIN32
 
-namespace Simple
+namespace CLX
 {
 
 	Win_WindowClass::Win_WindowClass(HINSTANCE hInstance, std::wstring name, LRESULT(*winProc)(HWND, UINT, WPARAM, LPARAM))

@@ -1,7 +1,7 @@
 #include "Editor/Precompiled/EditorPch.hpp"
 #include "EditorNodeRegistration.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	Fly::Flow EditorUpdate()
@@ -11,7 +11,7 @@ namespace Simple
 
 	FLY_FUNCTION(EditorUpdate, Fly::Directory{ "Events" }, Fly::Event{});
 
-	Fly::Flow ImGuiButton(const std::string& aLabel, Simple::Vector2f aSize)
+	Fly::Flow ImGuiButton(const std::string& aLabel, Vector2f aSize)
 	{
 		const std::string label = aLabel.empty() ? "Label" : aLabel;
 		const bool wasClicked = ImGui::Button(label.c_str(), ImVec2{ aSize.x, aSize.y });

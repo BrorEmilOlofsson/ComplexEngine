@@ -1,7 +1,7 @@
 #include "Engine/Precompiled/EnginePch.hpp"
 #include "Skeleton.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	Skeleton::Skeleton(const std::array<Bone, GlobalMaxBones>& bones)

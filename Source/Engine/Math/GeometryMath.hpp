@@ -6,7 +6,7 @@
 #include "Engine/Utility/ValueType.hpp"
 #include <type_traits>
 
-namespace Simple
+namespace CLX
 {
 
 	template<typename T>

@@ -2,7 +2,7 @@
 #include "UILayer.hpp"
 #include "Engine/Utility/Visitor.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	void UILayer::Update()

@@ -31,18 +31,18 @@
 #include "Engine/Reflection/LoadDataFunctions.hpp"
 #include "Engine/Reflection/SaveDataFunctions.hpp"
 
-inline Simple::__RegisterDataType<float> Global_ECS_Registered_Datatype_float;
-inline Simple::__RegisterDataType<int> Global_ECS_Registered_Datatype_int;
-inline Simple::__RegisterDataType<bool> Global_ECS_Registered_Datatype_bool;
-inline Simple::__RegisterDataType<char> Global_ECS_Registered_Datatype_char;
+inline CLX::__RegisterDataType<float> Global_ECS_Registered_Datatype_float;
+inline CLX::__RegisterDataType<int> Global_ECS_Registered_Datatype_int;
+inline CLX::__RegisterDataType<bool> Global_ECS_Registered_Datatype_bool;
+inline CLX::__RegisterDataType<char> Global_ECS_Registered_Datatype_char;
 
 namespace std
 {
 	REGISTER_DATATYPE(string);
-	REGISTER_DATATYPE_ARRAY(array, Simple::TextureAssetHandle, 3);
+	REGISTER_DATATYPE_ARRAY(array, CLX::TextureAssetHandle, 3);
 }
 
-namespace Simple
+namespace CLX
 {
 	REGISTER_DATATYPE(Vector2f);
 	REGISTER_DATATYPE(Vector3f);
@@ -63,7 +63,7 @@ namespace Simple
 	REGISTER_DATATYPE(eTransformMode);
 }
 
-namespace Simple
+namespace CLX
 {
 	REGISTER_DATATYPE(PointLight);
 	REGISTER_DATATYPE(DirectionalLight);

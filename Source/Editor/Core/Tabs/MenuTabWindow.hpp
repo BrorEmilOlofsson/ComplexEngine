@@ -4,7 +4,7 @@
 #include <vector>
 #include <memory>
 
-namespace Simple
+namespace CLX
 {
 	class MenuTabWindow final : public MainMenuTabBase
 	{

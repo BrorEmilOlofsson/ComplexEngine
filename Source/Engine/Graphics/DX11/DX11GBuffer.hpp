@@ -8,7 +8,7 @@
 #include <wrl/client.h>
 #include <d3d11.h>
 
-namespace Simple
+namespace CLX
 {
 
 	class DX11GBuffer final

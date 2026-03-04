@@ -4,7 +4,7 @@
 //#include <Windows.h>
 #include <DirectXMath.h>
 
-using namespace Simple;
+using namespace CLX;
 
 Point2f GetScreenPositionDX(const Point3f& position, const Camera& camera, const Vector2ui& windowSize)
 {

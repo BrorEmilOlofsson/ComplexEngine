@@ -3,7 +3,7 @@
 #include <functional>
 #include <memory>
 
-namespace Simple
+namespace CLX
 {
 
 	class EditorCallbacks

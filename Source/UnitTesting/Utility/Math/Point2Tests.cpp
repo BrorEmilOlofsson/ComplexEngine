@@ -2,7 +2,7 @@
 
 #include "Engine/Math/Point2.hpp"
 
-using namespace Simple;
+using namespace CLX;
 
 TEST_CASE("Point2 constructor and accessors", "[Point2]")
 {

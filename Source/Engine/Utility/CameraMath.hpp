@@ -4,7 +4,7 @@
 #include "Engine/Utility/Camera.hpp"
 #include "Engine/Math/Shapes/AABB2.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	[[nodiscard]] constexpr Ray3f CalculateMouseRay(const Point3f& rayOrigin, const Matrix4x4f& viewMatrix, const Matrix4x4f& projectionMatrix, const Point2i& point, const Vector2ui& windowSize)

@@ -2,7 +2,7 @@
 #include <string>
 #include <memory>
 
-namespace Simple
+namespace CLX
 {
 
 	template<typename T>

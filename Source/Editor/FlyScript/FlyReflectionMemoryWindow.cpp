@@ -3,7 +3,7 @@
 #include "FlyScriptEditorUtilities.hpp"
 #include <algorithm>
 
-namespace Simple
+namespace CLX
 {
 	void FlyReflectionMemoryWindow::Update()
 	{

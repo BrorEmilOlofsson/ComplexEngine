@@ -2,7 +2,7 @@
 #include "NavmeshLoader.hpp"
 #include "Engine/Utility/File/FileLoader.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	static NavmeshData ConvertMeshToNavmesh(const MeshData<Vertex>& meshData)

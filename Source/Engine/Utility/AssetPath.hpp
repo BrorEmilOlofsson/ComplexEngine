@@ -3,7 +3,7 @@
 #include "Engine/Utility/StrongType.hpp"
 #include "Engine/Utility/FixedString.hpp"
 
-namespace Simple
+namespace CLX
 {
 	template<typename Tag>
 	using AssetPath = StrongType<FixedString<256>, Tag>;

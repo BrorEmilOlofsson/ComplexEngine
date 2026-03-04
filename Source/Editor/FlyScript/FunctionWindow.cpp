@@ -4,7 +4,7 @@
 #include "NodeScript/Fly.hpp"
 #include "FlyScriptEditorUtilities.hpp"
 
-namespace Simple
+namespace CLX
 {
 
     FunctionWindow::FunctionWindow(NodeScriptingWindow& parentWindow)

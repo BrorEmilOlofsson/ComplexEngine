@@ -3,7 +3,7 @@
 #include "Engine/Graphics/Animation/AnimationPlayer.hpp"
 #include "Engine/Asset/TextureAsset.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	struct AnimatedModelComponent

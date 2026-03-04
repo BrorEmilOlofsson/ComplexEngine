@@ -4,7 +4,7 @@
 #include <cstddef>
 #include <bitset>
 
-namespace Simple
+namespace CLX
 {
 
 	class InputKeyState final

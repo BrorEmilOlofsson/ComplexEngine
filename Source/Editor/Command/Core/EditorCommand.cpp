@@ -1,7 +1,7 @@
 #include "Editor/Precompiled/EditorPch.hpp"
 #include "EditorCommand.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	void EditorCommand::ExecuteCommand(const bool debugPrint) const

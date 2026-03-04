@@ -10,7 +10,7 @@
 #include <array>
 #include <cassert>
 
-namespace Simple
+namespace CLX
 {
 
 	template<typename T>

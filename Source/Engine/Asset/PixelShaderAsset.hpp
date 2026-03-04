@@ -3,7 +3,7 @@
 #include "Engine/Asset/AssetHandle.hpp"
 #include <filesystem>
 
-namespace Simple
+namespace CLX
 {
 	using PixelShaderAsset = Asset<class PixelShader>;
 	using PixelShaderAssetHandle = AssetHandle<class PixelShader>;

@@ -4,7 +4,7 @@
 #include <functional>
 #include <string>
 
-namespace Simple
+namespace CLX
 {
 	class UIText final
 	{

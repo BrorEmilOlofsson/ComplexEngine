@@ -4,7 +4,7 @@
 #include "Engine/Math/Shapes/AABB3.hpp"
 #include "Engine/Graphics/Model/Skeleton.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	class AnimatedModel final

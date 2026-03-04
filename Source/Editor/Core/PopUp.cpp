@@ -1,7 +1,7 @@
 #include "Editor/Precompiled/EditorPch.hpp"
 #include "Editor/Core/PopUp.hpp"
 
-namespace Simple
+namespace CLX
 {
 	PopUp::PopUp(const std::string& windowName)
 		: Window(windowName, "DefaultPopUp")

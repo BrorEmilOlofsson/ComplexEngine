@@ -13,7 +13,7 @@
 #include "Engine/Asset/AssetManager.hpp"
 #include <External/AwsomeFontIcons/IconFontDefines.h>
 
-namespace Simple
+namespace CLX
 {
 
     static void ShowSceneData(SceneManager& sceneManager)

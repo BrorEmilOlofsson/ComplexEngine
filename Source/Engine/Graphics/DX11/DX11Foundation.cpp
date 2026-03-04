@@ -14,7 +14,7 @@
 #include "Engine/Graphics/Shader/PixelShader.hpp"
 #include "Engine/Graphics/Shader/VertexShader.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	void CreateLoaders(AssetLoader& assetLoader, Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)

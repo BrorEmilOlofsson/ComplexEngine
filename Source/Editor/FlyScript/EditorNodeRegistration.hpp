@@ -1,7 +1,7 @@
 #pragma once
 #include "NodeScript/FlyRegistration.hpp"
 
-namespace Simple
+namespace CLX
 {
 		Fly::Flow EditorUpdate();
 }

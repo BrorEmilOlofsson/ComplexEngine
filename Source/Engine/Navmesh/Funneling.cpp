@@ -2,7 +2,7 @@
 #include "Funneling.hpp"
 #include "Navmesh.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	static void CalculateLeftAndRightIndex(const Navmesh& navmesh, NavmeshVertexIndex& leftPoint, NavmeshVertexIndex& rightPoint, const NavmeshNodeIndex firstIndex, const NavmeshNodeIndex secondIndex)

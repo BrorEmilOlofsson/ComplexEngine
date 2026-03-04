@@ -4,7 +4,7 @@
 #include "Engine/Utility/Camera.hpp"
 #include "Engine/Math/Shapes/AABB2.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	void ShowEntityImGuizmo(ECS& ecs, const EntityID selectedEntityID, const eTransformMode transformMode, const Camera& camera, AABB2i renderRect,

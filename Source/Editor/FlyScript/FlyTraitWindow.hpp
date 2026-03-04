@@ -2,7 +2,7 @@
 #include "NodeScript/Fly.hpp"
 #include "FlyScriptEditorUtilities.hpp"
 
-namespace Simple
+namespace CLX
 {
 	class FlyTraitWindow final
 	{

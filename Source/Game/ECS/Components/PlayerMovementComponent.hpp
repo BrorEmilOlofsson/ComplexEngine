@@ -5,10 +5,10 @@ struct PlayerMovementComponent final
 {
 	float walkSpeed = 5.f;
 	float rotationRate = 3.f;
-	Simple::Vector3f velocity;
+	CLX::Vector3f velocity;
 	bool isInAir = false;
 	float jumpForce = 1000.f;
-	Simple::Vector3f gravityVelocity;
+	CLX::Vector3f gravityVelocity;
 };
 
 

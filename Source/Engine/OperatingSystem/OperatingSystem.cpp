@@ -1,7 +1,7 @@
 #include "Engine/Precompiled/EnginePch.hpp"
 #include "OperatingSystem.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	void OperatingSystem::BeginFrame(const GraphicsBufferData& bufferData)

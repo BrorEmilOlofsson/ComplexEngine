@@ -3,7 +3,7 @@
 #include "Engine/ECS/ECS.hpp"
 #include "Engine/ECSEngine/Components/UICanvasComponent.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	static void UpdateUI(ECS& ecs)

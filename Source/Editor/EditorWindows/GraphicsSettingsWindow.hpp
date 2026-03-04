@@ -7,7 +7,7 @@
 #include <string>
 #include <optional>
 
-namespace Simple
+namespace CLX
 {
 
 	inline auto GetRasterizerStateNames()

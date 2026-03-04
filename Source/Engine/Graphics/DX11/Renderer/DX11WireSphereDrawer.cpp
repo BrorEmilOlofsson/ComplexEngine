@@ -8,7 +8,7 @@
 
 #ifdef _WIN32
 
-namespace Simple
+namespace CLX
 {
 
 	void DX11WireSphereDrawer::Init(ID3D11Device& device, AssetManager& assetManager)

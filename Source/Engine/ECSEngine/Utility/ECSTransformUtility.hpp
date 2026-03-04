@@ -5,7 +5,7 @@
 #include "Engine/ECSEngine/Components/TransformComponent.hpp"
 #include <variant>
 
-namespace Simple
+namespace CLX
 {
 
 	template<typename T>

@@ -2,7 +2,7 @@
 #include "Engine/Math/UnitVector3.hpp"
 #include "Engine/Math/TransformMode.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	struct RotatingMovementComponent final

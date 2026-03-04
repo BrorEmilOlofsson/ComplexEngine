@@ -3,7 +3,7 @@
 #include "External/profiler.h"
 #include <filesystem>
 
-namespace Simple
+namespace CLX
 {
 	std::filesystem::path InsertBeforeExtension(const std::filesystem::path& aPath, const std::filesystem::path& aExtension, const std::string& aText)
 	{

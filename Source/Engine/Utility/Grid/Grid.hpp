@@ -12,7 +12,7 @@
 #include <unordered_set>
 #include <span>
 
-namespace Simple
+namespace CLX
 {
 	template<typename T>
 	[[nodiscard]] constexpr int GetGridCoordinate(const T position, const T min, const T cellSize, const T offset) noexcept

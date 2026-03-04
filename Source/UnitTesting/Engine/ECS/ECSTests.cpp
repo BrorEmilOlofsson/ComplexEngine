@@ -3,7 +3,7 @@
 #include "Engine/ECS/ECS.hpp"
 #include <thread>
 
-using namespace Simple;
+using namespace CLX;
 
 static ECSRegistry CreateRegistry()
 {

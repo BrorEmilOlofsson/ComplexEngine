@@ -3,7 +3,7 @@
 
 #ifdef _WIN32
 
-namespace Simple
+namespace CLX
 {
 	
 	DX11AnimatedModel::DX11AnimatedModel(std::vector<DX11Mesh>&& meshData, const Skeleton& skeleton, const std::string& name, const std::filesystem::path& path,

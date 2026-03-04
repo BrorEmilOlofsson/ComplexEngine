@@ -1,7 +1,7 @@
 #include "Engine/Precompiled/EnginePch.hpp"
 #include "ECS.hpp"
 
-namespace Simple
+namespace CLX
 {
 	/*ECS::ECS()
 	{

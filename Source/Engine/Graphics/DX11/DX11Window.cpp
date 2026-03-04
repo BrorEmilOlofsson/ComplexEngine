@@ -10,7 +10,7 @@
 #define REPORT_DX_WARNINGS
 #endif
 
-namespace Simple
+namespace CLX
 {
 
 	std::optional<DX11ImGuiWindow> CreateImGuiWindow(const bool instantiate, HWND handle)

@@ -5,7 +5,7 @@
 #include "Asset.hpp"
 #include "Engine/Asset/AssetTypes.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	struct FBXParseResult

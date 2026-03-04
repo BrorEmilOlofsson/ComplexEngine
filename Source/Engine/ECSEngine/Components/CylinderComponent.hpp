@@ -2,7 +2,7 @@
 #include "Engine/Math/Shapes/Cylinder.hpp"
 #include "Engine/Utility/RGBColor.hpp"
 
-namespace Simple
+namespace CLX
 {
     struct CylinderComponent final
     {

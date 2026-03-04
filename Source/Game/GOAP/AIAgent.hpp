@@ -4,7 +4,7 @@
 #include "AIAction.hpp"
 #include "AIDynamicGrid.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	class AIAgent final

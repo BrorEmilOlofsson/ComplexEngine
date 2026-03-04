@@ -2,10 +2,9 @@
 #include "Engine/Utility/Bounds.hpp"
 #include "Engine/Math/Point2.hpp"
 #include "Engine/Math/VectorMath.hpp"
-#include <iostream>
 #include <limits>
 
-namespace Simple
+namespace CLX
 {
 	struct AABB2BoundsChecker final
 	{
@@ -116,9 +115,9 @@ namespace Simple
 }
 
 template<typename T>
-struct std::formatter<Simple::AABB2<T>> : std::formatter<std::string>
+struct std::formatter<CLX::AABB2<T>> : std::formatter<std::string>
 {
-	auto format(const Simple::AABB2<T>& rect, auto& ctx) const
+	auto format(const CLX::AABB2<T>& rect, auto& ctx) const
 	{
 		return std::format_to(
 			ctx.out(),

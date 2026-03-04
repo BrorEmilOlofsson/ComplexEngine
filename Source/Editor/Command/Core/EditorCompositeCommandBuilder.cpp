@@ -1,7 +1,7 @@
 #include "Editor/Precompiled/EditorPch.hpp"
 #include "EditorCompositeCommandBuilder.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	void EditorCompositeCommandBuilder::AddCommand(EditorCommand&& command)

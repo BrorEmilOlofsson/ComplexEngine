@@ -3,7 +3,7 @@
 #include "Engine/Reflection/Reflection.hpp"
 #include "Engine/Asset/AssetManager.hpp"
 
-namespace Simple
+namespace CLX
 {
 	
 	static void Initialize(SkyBoxComponent& component, AssetManager& assetManager)

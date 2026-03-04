@@ -3,7 +3,7 @@
 #include "Engine/Engine.hpp"
 #include "Game/Game.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	void RunGame(OperatingSystem&& operatingSystem)

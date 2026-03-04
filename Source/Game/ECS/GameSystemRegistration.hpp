@@ -3,7 +3,7 @@
 #include "Engine/Utility/TypeList.hpp"
 #include "Game/ECS/GameComponents.hpp"
 
-namespace Simple
+namespace CLX
 {
 	constexpr TypeList<PlayerMovementSystem> GameSystemTypeList{};
 

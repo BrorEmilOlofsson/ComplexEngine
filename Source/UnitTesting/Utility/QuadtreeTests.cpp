@@ -1,7 +1,7 @@
 #include <External/Catch2/catch_amalgamated.hpp>
 #include "Engine/Utility/Quadtree.hpp"
 
-using namespace Simple;
+using namespace CLX;
 
 TEST_CASE("QuadtreeRecursive::Default Constructor")
 {

@@ -1,7 +1,7 @@
 #include <External/Catch2/catch_amalgamated.hpp>
 #include "Engine/Math/Shapes/Ray3.hpp"
 
-using namespace Simple;
+using namespace CLX;
 
 TEST_CASE("Ray3::Default Constructor", "[Ray3]")
 {

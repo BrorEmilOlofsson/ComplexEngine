@@ -2,7 +2,7 @@
 #include <iostream>
 #include <cstdint>
 
-namespace Simple
+namespace CLX
 {
 	template<typename T>
 	class Vector4 final

@@ -2,7 +2,7 @@
 #include "Sprite3DComponent.hpp"
 #include "Engine/Reflection/Reflection.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	void RegisterSprite3DComponent()

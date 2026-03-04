@@ -2,7 +2,7 @@
 #include "Engine/Math/CubicBezierCurve2.hpp"
 #include "Editor/Command/Core/EditorCommandTracker.hpp"
 
-namespace Simple
+namespace CLX
 {
 
     void AddAnchorPointToCurve(CubicBezierCurve2f& curve, const Point2f& point, EditorCommandTracker& commandTracker);

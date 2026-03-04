@@ -1,6 +1,6 @@
 #pragma once
 
-namespace SimpleTracker
+namespace CLXTracker
 {
 
 	class SimpleMemoryTrackerWrapper final

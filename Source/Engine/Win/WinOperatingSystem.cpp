@@ -5,7 +5,7 @@
 
 #ifdef _WIN32
 
-namespace Simple
+namespace CLX
 {
     static LRESULT HandleMsgMain(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     {

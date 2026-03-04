@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-namespace Simple
+namespace CLX
 {
 	
 	struct NameComponent final

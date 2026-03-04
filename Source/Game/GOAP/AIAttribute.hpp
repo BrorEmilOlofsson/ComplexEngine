@@ -1,7 +1,7 @@
 #pragma once
 #include <functional>
 
-namespace Simple
+namespace CLX
 {
 
 	class AIAttribute final

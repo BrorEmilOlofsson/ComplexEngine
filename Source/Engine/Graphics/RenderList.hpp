@@ -9,7 +9,7 @@
 #include "Engine/Graphics/Sprite/Sprite3D.hpp"
 #include "Engine/Graphics/Text/Text3D.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	class RenderList final

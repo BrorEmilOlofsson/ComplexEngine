@@ -13,7 +13,7 @@
 #include <cassert>
 #include <iomanip>
 
-namespace Simple
+namespace CLX
 {
 
 	template<typename T>

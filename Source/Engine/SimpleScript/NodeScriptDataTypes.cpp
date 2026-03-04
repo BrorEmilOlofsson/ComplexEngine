@@ -228,5 +228,5 @@ void RegisterFundamentalDataTypes()
 	Fly::RegisterType::ValueType<uint64>("uint64", Fly::CustomName{ "UInt64" }, Fly::Color(0.1f, 0.5f, 1.f));;
 	Fly::RegisterType::ValueType<char>("char", Fly::CustomName{ "Char" }, Fly::Color(0.2f, 0.7f, 0.4f));;
 	Fly::RegisterType::ValueType<std::string>("std::string", Fly::CustomName{ "String" }, Fly::Color(0.3f, 0.8f, 0.2f));;
-	Fly::RegisterType::ValueType<Simple::Vector2f>("Vector", Fly::Color(0.3f, 0.8f, 0.2f));
+	Fly::RegisterType::ValueType<CLX::Vector2f>("Vector", Fly::Color(0.3f, 0.8f, 0.2f));
 }

@@ -2,7 +2,7 @@
 #include "Engine/Utility/StrongType.hpp"
 #include "Engine/Utility/Clamper.hpp"
 
-namespace Simple
+namespace CLX
 {
 	template<std::floating_point T>
 	using Percent = StrongCheckedType<T, Clamper<T, 0, 1>, struct PercentTag>;

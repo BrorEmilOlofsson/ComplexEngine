@@ -5,7 +5,7 @@
 #include "Engine/ECSEngine/Components/CylinderComponent.hpp"
 #include "Engine/Math/ShapeMath.hpp"
 
-namespace Simple
+namespace CLX
 {
 
     void DebugShapeSystem::Render(const ECS& ecs, const Blackboard& blackboard)

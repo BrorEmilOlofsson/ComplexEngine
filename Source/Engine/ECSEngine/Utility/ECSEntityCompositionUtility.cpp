@@ -5,7 +5,7 @@
 #include "Engine/ECSEngine/Components/TransformHierarchyComponent.hpp"
 #include "Engine/ECSEngine/Components/EntityCompositionComponent.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	void UpdateEntityIDs(const ECS& previousECS, ECS& ecs, const EntityIDConverter& entityIDConverter)

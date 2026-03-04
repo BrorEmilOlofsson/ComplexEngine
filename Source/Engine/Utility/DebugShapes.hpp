@@ -11,7 +11,7 @@
 #include "Engine/Utility/Color.hpp"
 #include "Engine/Utility/Grid/PrimitiveGrid3.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	class RenderList;

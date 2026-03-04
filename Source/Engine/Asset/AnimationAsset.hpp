@@ -2,7 +2,7 @@
 #include "Engine/Asset/Asset.hpp"
 #include "Engine/Asset/AssetHandle.hpp"
 
-namespace Simple
+namespace CLX
 {
 	using AnimationAsset = Asset<class Animation>;
 	using AnimationAssetHandle = AssetHandle<Animation>;

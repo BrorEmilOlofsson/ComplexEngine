@@ -4,7 +4,7 @@
 #include "Engine/Math/Matrix4x4.hpp"
 #include "Engine/Math/RotationMath.hpp"
 
-using namespace Simple;
+using namespace CLX;
 
 TEST_CASE("Quaternion - Default constructor is identity")
 {

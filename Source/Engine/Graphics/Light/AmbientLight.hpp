@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/Utility/RGBColor.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	class AmbientLight final

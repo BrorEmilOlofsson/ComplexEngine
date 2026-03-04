@@ -10,7 +10,7 @@
 #include "Engine/Reflection/ViewAndEditResult.hpp"
 #include "Engine/Utility/Algorithm.hpp"
 
-namespace Simple
+namespace CLX
 {
 	using InPlaceAllocateFunction = void(*)(void* data, const void* defaultValuePtr);
 	using DestroyFunction = void(*)(void* data);

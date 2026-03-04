@@ -4,7 +4,7 @@
 #include "Engine/Math/Vector2.hpp"
 #include "Engine/Utility/Approximation.hpp"
 
-using namespace Simple;
+using namespace CLX;
 
 TEST_CASE("UnitVector2::Default Constructor", "[UnitVector2]")
 {

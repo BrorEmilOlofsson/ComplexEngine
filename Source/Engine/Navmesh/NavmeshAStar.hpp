@@ -7,7 +7,7 @@
 #include <span>
 #include <vector>
 
-namespace Simple
+namespace CLX
 {
 
 	class Navmesh;

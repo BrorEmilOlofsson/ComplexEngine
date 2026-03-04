@@ -2,7 +2,7 @@
 #include <type_traits>
 #include "Engine/Utility/EnumUtility.hpp"
 
-namespace Simple
+namespace CLX
 {
 	enum class eTransformMode : uint8_t
 	{

@@ -1,7 +1,7 @@
 #pragma once
 #include <limits>
 
-namespace Simple
+namespace CLX
 {
 
 	template<typename T>

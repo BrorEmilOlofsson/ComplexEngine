@@ -3,7 +3,7 @@
 #include "Engine/Utility/Color.hpp"
 #include <string>
 
-namespace Simple
+namespace CLX
 {
 
 	class Text2D final

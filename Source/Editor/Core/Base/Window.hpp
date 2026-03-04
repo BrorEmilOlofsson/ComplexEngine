@@ -2,7 +2,7 @@
 #include "Engine/Utility/Blackboard.hpp"
 #include <string>
 
-namespace Simple
+namespace CLX
 {
 
 	class Scene;

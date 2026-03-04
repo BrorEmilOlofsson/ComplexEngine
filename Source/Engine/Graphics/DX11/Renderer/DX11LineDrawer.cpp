@@ -4,7 +4,7 @@
 #include "Engine/Graphics/Shader/PixelShader.hpp"
 #include "Engine/Graphics/Shader/VertexShader.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	

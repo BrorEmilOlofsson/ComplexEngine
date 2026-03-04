@@ -6,7 +6,7 @@
 
 #include <optional>
 
-namespace Simple
+namespace CLX
 {
 
 	std::vector<Point3f> Pathfinder::FindPath(const Navmesh& navmesh, const Point3f& startPosition, const NavmeshPositionData& endData)

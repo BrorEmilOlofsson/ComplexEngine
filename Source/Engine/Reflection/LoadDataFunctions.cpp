@@ -12,7 +12,7 @@
 #include "Engine/Graphics/GraphicsConstants.hpp"
 #include <filesystem>
 
-namespace Simple
+namespace CLX
 {
 	void LoadDataPtr(DataTypeID dataTypeID, void* dataPtr, const nlohmann::json& json, const Blackboard& blackboard)
 	{
@@ -54,7 +54,7 @@ namespace std
 	}
 }
 
-namespace Simple
+namespace CLX
 {
 
 	void FromJSON(Transform& transform, const nlohmann::json& json)

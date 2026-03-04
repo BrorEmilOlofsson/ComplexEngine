@@ -1,7 +1,7 @@
 #pragma once
 #include <unordered_set>
 
-namespace Simple
+namespace CLX
 {
 
 	template<typename T>

@@ -11,7 +11,7 @@
 #include <External/nlohmann/json.hpp>
 #include <fstream>
 
-namespace Simple
+namespace CLX
 {
 
 	Engine::Engine(OperatingSystem&& operatingSystem)

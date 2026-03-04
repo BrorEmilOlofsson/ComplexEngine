@@ -3,7 +3,7 @@
 #include "Engine/Audio/AudioManager.hpp"
 #include "Engine/Utility/BlackboardKeys.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	void ShowAudioSettingsWindow(bool& isWindowActive)

@@ -8,7 +8,7 @@
 #include "Engine/Math/Point3.hpp"
 #include <utility>
 
-namespace Simple
+namespace CLX
 {
 
 	template<typename T>

@@ -8,7 +8,7 @@
 #include "ComponentPool.hpp"
 #include "EntityID.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	struct ECSComponentType final

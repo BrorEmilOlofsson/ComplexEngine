@@ -7,7 +7,7 @@
 #include <d3d11.h>
 #include <wrl/client.h>
 
-namespace Simple
+namespace CLX
 {
 
 	class DX11DepthStencilViewManager final

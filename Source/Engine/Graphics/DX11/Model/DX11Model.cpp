@@ -4,7 +4,7 @@
 #undef min
 #undef max
 
-namespace Simple
+namespace CLX
 {
 
 	DX11Model::DX11Model(std::vector<DX11Mesh>&& meshData, const std::string& name, const std::filesystem::path& path,

@@ -6,7 +6,7 @@
 #include "Engine/ECSEngine/Components/TransformHierarchyComponent.hpp"
 #include "Engine/ECSEngine/Utility/ECSTransformHierarchyUtility.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	static void ReplaceHierarchy(ECS& targetECS, const EntityID targetEntity, const ECS& sourceECS, const EntityID sourceEntity)

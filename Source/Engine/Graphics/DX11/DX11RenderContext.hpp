@@ -5,7 +5,7 @@
 #include "Engine/Graphics/DX11/DX11GBuffer.hpp"
 #include <vector>
 
-namespace Simple
+namespace CLX
 {
 	class DX11RenderContext final
 	{

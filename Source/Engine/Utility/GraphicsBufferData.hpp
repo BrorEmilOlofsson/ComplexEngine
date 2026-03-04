@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/Utility/SystemTimer.hpp"
 
-namespace Simple
+namespace CLX
 {
 	struct GraphicsBufferData final
 	{

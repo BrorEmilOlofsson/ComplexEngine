@@ -15,7 +15,7 @@
 #include "Editor/PopUps/Editor/AssetBrowserPopUp.hpp"
 #include "Editor/PopUps/Editor/EntityCompositionPopUp.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	class Editor final

@@ -10,7 +10,7 @@
 #include <string>
 #include <variant>
 
-namespace Simple
+namespace CLX
 {
 
 	[[nodiscard]] std::expected<DX11Mesh, std::string> LoadDX11Mesh(const std::filesystem::path& path, 

@@ -1,7 +1,7 @@
 #include <External/Catch2/catch_amalgamated.hpp>
 #include "Engine/Math/Shapes/AABB2.hpp"
 
-using namespace Simple;
+using namespace CLX;
 
 TEST_CASE("AABB2::Default Constructor", "[AABB2]")
 {

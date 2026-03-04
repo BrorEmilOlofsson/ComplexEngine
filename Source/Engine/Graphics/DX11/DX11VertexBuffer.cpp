@@ -2,7 +2,7 @@
 #include "DX11VertexBuffer.hpp"
 #include "Engine/Graphics/DX11/DX11Factory.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	DX11VertexBuffer::DX11VertexBuffer(ID3D11Device& device, const void* data, unsigned int sizeInBytes)

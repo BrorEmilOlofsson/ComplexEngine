@@ -3,7 +3,7 @@
 #include <queue>
 #include <vector>
 
-namespace Simple
+namespace CLX
 {
 	class Navmesh;
 

@@ -1,7 +1,7 @@
 #include <External/Catch2/catch_amalgamated.hpp>
 #include "Engine/Math/Shapes/Circle.hpp"
 
-using namespace Simple;
+using namespace CLX;
 
 TEST_CASE("Circle::Default Constructor", "[Circle]")
 {

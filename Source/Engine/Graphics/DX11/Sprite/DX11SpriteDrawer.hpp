@@ -11,7 +11,7 @@
 #include <External/DirectXTK/CommonStates.h>
 #include <External/DirectXTK/SpriteBatch.h>
 
-namespace Simple
+namespace CLX
 {
 
 	class DX11SpriteDrawer final

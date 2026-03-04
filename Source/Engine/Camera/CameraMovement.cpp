@@ -3,7 +3,7 @@
 #include "Engine/Math/RotationMath.hpp"
 #include "Engine/Input/InputState.hpp"
 
-namespace Simple
+namespace CLX
 {
 
     void FreeFlyCameraUpdate(Camera& camera, const float deltaTime, const float moveSpeed, const float rotationSpeed,

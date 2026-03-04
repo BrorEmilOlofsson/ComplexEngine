@@ -4,7 +4,7 @@
 #include "Engine/Input/InputState.hpp"
 #include "Engine/Utility/SystemTimer.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	struct WindowOperations final

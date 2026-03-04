@@ -1,7 +1,7 @@
 #include "Editor/Precompiled/EditorPch.hpp"
 #include "Editor/Core/Items/MenuItemMenu.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	MenuItemMenu::MenuItemMenu(const std::string& name)

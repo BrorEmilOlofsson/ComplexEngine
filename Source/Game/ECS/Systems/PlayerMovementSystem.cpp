@@ -8,32 +8,32 @@
 #include "Engine/Math/ShapeMath.hpp"
 #include "Engine/Graphics/RenderState.hpp"
 
-using namespace Simple;
+using namespace CLX;
 
-void CreatePlayer(Simple::ECS& ecs)
+void CreatePlayer(CLX::ECS& ecs)
 {
-	const Simple::EntityID entityID = ecs.CreateEntity();
-	ecs.AddComponent<Simple::TransformComponent>(entityID);
-	ecs.AddComponent<Simple::NameComponent>(entityID).name = "Player";
-	ecs.AddComponent<Simple::MeshComponent>(entityID);
+	const CLX::EntityID entityID = ecs.CreateEntity();
+	ecs.AddComponent<CLX::TransformComponent>(entityID);
+	ecs.AddComponent<CLX::NameComponent>(entityID).name = "Player";
+	ecs.AddComponent<CLX::MeshComponent>(entityID);
 	ecs.AddComponent<PlayerMovementComponent>(entityID);
 
 	const EntityID cameraEntityID = ecs.CreateEntity();
-	Transform& transform = ecs.AddComponent<Simple::TransformComponent>(cameraEntityID).transform;
+	Transform& transform = ecs.AddComponent<CLX::TransformComponent>(cameraEntityID).transform;
 	transform.SetPosition(Point3f(0, 2, -5));
 	transform.RotateOnAxis(UnitVector3f::Right(), Degreesf(-20.f));
-	ecs.AddComponent<Simple::NameComponent>(cameraEntityID).name = "PlayerCamera";
+	ecs.AddComponent<CLX::NameComponent>(cameraEntityID).name = "PlayerCamera";
 	ecs.AddComponent<CameraComponent>(cameraEntityID);
 
 	SetParentEntity(ecs, cameraEntityID, entityID);
 }
 
-void PlayerMovementSystem::BeginPlay(Simple::ECS&, const Blackboard&)
+void PlayerMovementSystem::BeginPlay(CLX::ECS&, const Blackboard&)
 {
 	//CreatePlayer(ecs);
 }
 
-static Vector3f GetMovementVector(const Transform& transform, const Simple::InputState& input)
+static Vector3f GetMovementVector(const Transform& transform, const CLX::InputState& input)
 {
 	Vector3f moveVector;
 	if (input.IsKeyHeld(eInputKey::W))
@@ -186,7 +186,7 @@ static void RenderPlanets(const ECS& ecs, RenderList& renderList)
 	}
 }
 
-void PlayerMovementSystem::Update(Simple::ECS& ecs, const float deltaTime, const Blackboard& blackboard)
+void PlayerMovementSystem::Update(CLX::ECS& ecs, const float deltaTime, const Blackboard& blackboard)
 {
 	auto playerMovementView = ecs.View<PlayerMovementComponent, TransformComponent>();
 
@@ -215,7 +215,7 @@ void PlayerMovementSystem::Update(Simple::ECS& ecs, const float deltaTime, const
 	RenderPlanets(ecs, blackboard.Get<Key_SceneRenderState>().GetRenderList());
 }
 
-void PlayerMovementSystem::EditorUpdate(Simple::ECS& ecs, const Blackboard& blackboard)
+void PlayerMovementSystem::EditorUpdate(CLX::ECS& ecs, const Blackboard& blackboard)
 {
 	RenderPlanets(ecs, blackboard.Get<Key_SceneRenderState>().GetRenderList());
 }

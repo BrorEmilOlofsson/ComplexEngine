@@ -1,7 +1,7 @@
 #pragma once
 #include <concepts>
 
-namespace Simple
+namespace CLX
 {
 	template<std::floating_point T>
 	constexpr T PI = static_cast<T>(3.14159265358979323846);

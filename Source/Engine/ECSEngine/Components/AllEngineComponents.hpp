@@ -19,7 +19,7 @@
 #include "Engine/ECSEngine/Components/ArrowComponent.hpp"
 #include "Engine/ECSEngine/Components/CylinderComponent.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	inline void RegisterEngineComponents()

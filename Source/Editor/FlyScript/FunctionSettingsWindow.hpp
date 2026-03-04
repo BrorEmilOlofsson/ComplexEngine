@@ -5,7 +5,7 @@ namespace Fly
 	class CommandTracker;
 }
 
-namespace Simple
+namespace CLX
 {
 
 	class NodeScriptingWindow;

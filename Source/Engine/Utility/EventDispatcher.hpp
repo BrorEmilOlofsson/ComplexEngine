@@ -2,7 +2,7 @@
 #include <vector>
 #include <functional>
 
-namespace Simple
+namespace CLX
 {
 
 	template<typename... Params>

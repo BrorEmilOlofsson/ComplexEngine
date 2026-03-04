@@ -1,7 +1,7 @@
 #pragma once
 #include "NodeScript/Proxy/FlyClassInstanceProxy.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	struct ScriptComponent final

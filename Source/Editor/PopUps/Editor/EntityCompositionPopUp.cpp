@@ -12,7 +12,7 @@
 #include "Engine/ECS/ECSSerializer.hpp"
 #include "Engine/Asset/AssetManager.hpp"
 
-namespace Simple
+namespace CLX
 {
 
     EntityCompositionPopUp::EntityCompositionPopUp(RenderContext&& renderContext)

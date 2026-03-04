@@ -5,7 +5,7 @@
 #include <iostream>
 #include <array>
 
-namespace Simple
+namespace CLX
 {
 
 	/// <summary>

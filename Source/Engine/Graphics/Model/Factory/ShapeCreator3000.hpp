@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/Graphics/DX11/Mesh/DX11Mesh.hpp"
 
-namespace Simple
+namespace CLX
 {
 	struct TerrainData
 	{
@@ -12,7 +12,7 @@ namespace Simple
 	};
 }
 
-namespace Simple
+namespace CLX
 {
 	class ShapeCreator3000 final
 	{

@@ -3,7 +3,7 @@
 #include "Engine/Math/DynamicVector.hpp"
 #include "Engine/Math/Math.hpp"
 
-using namespace Simple;
+using namespace CLX;
 
 TEST_CASE("DynamicVector::Default Constructor", "[DynamicVector]")
 {

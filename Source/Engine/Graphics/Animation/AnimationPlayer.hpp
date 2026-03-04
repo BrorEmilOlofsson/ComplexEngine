@@ -4,7 +4,7 @@
 #include "Engine/Graphics/Model/Bone.hpp"
 #include <span>
 
-namespace Simple
+namespace CLX
 {
 
 	class AnimationPlayer final

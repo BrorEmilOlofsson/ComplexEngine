@@ -5,7 +5,7 @@
 #include "Engine/Math/DynamicUnitVector.hpp"
 #include "Engine/Math/Math.hpp"
 
-using namespace Simple;
+using namespace CLX;
 
 TEST_CASE("DynamicMath::GetUnitVector", "[DynamicMath]")
 {

@@ -5,7 +5,7 @@
 #include <stack>
 #include <memory>
 
-namespace Simple
+namespace CLX
 {
 
 	class EditorCommandTracker final

@@ -5,7 +5,7 @@
 #include "NavmeshDefines.hpp"
 #include "Engine/Math/Shapes/Plane.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	constexpr unsigned int Vertices_In_Triangle = 3;

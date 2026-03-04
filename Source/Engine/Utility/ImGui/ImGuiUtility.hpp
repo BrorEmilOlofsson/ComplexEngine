@@ -5,7 +5,7 @@
 #include <optional>
 #include <string>
 
-namespace Simple
+namespace CLX
 {
 
 	template<typename T = float>
@@ -81,7 +81,7 @@ namespace Simple
 
 }
 
-namespace Simple
+namespace CLX
 {
 
 

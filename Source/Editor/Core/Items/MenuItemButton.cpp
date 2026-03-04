@@ -1,7 +1,7 @@
 #include "Editor/Precompiled/EditorPch.hpp"
 #include "Editor/Core/Items/MenuItemButton.hpp"
 
-namespace Simple
+namespace CLX
 {
 	MenuItemButton::MenuItemButton(const std::string& name, std::function<void()> callback)
 		: MenuItemBase(name)

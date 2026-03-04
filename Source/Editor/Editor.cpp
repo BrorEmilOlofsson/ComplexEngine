@@ -22,7 +22,7 @@
 #include "Engine/Engine.hpp"
 #include "Engine/Utility/BlackboardKeys.hpp"
 
-namespace Simple
+namespace CLX
 {
 
     /*template<DerivedFromPopUpWindow T, typename ... Args>

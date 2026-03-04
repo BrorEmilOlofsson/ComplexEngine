@@ -1,11 +1,10 @@
 #pragma once
 #include <cstdint>
-#include <iostream>
 #include <format>
 
 #include "Engine/Utility/Assert.hpp"
 
-namespace Simple
+namespace CLX
 {
 	template<typename T>
 	class Vector2 final
@@ -181,19 +180,13 @@ namespace Simple
 	{
 		return a.x == b.x && a.y == b.y;
 	}
-
-	template<typename T>
-	std::ostream& operator<<(std::ostream& os, const Vector2<T>& vector)
-	{
-		return os << "{ X: " << vector.x << " Y: " << vector.y << " }";
-	}
 }
 
 template<typename T>
-struct std::formatter<Simple::Vector2<T>, char> : std::formatter<std::string, char>
+struct std::formatter<CLX::Vector2<T>, char> : std::formatter<std::string, char>
 {
 	template<typename FormatContext>
-	auto format(const Simple::Vector2<T>& vector, FormatContext& ctx) const
+	auto format(const CLX::Vector2<T>& vector, FormatContext& ctx) const
 	{
 		return std::format_to(ctx.out(), "{{ X: {} Y: {} }}", vector.x, vector.y);
 	}

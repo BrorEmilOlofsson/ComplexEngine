@@ -2,7 +2,7 @@
 
 #include "Engine/Math/Matrix4x4.hpp"
 
-using namespace Simple;
+using namespace CLX;
 
 Matrix4x4f GetRandomMatrix();
 std::array<float, 16> GetRandomArray();

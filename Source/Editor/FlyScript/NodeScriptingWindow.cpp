@@ -10,7 +10,7 @@
 #include <External/imgui/imnodes/imnodes_internal.h>
 #include <External/imgui/imgui-node-editor/imgui_node_editor.h>
 
-namespace Simple
+namespace CLX
 {
 
 	NodeScriptingWindow::NodeScriptingWindow()

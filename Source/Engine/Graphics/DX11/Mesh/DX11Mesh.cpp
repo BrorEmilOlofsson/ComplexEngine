@@ -5,7 +5,7 @@
 #undef min
 #undef max
 
-namespace Simple
+namespace CLX
 {
 
 	DX11Mesh::DX11Mesh(const MeshData<Vertex>& meshData, const std::filesystem::path& meshName, const std::filesystem::path& relativePath, 

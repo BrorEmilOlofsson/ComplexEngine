@@ -30,7 +30,7 @@ namespace Fly
 	class ClassInstanceProxy;
 }
 
-namespace Simple
+namespace CLX
 {
 
 	constexpr const std::string& GetVariableName(const Blackboard& blackboard)
@@ -228,17 +228,12 @@ namespace Simple
 		return ViewAndEditValue(value, GetVariableName(blackboard));
 	}
 
-	
-}
-
-namespace std
-{
 	template<typename T>
-	Simple::ViewAndEditResult ViewAndEditValue(std::vector<T>& vector, const Simple::Blackboard& blackboard)
+	ViewAndEditResult ViewAndEditValueVectorImpl(std::vector<T>& vector, const Blackboard& blackboard)
 	{
 		static size_t currentPopupIndex = 0;
 		static constexpr const char* VectorElementPopupStrID = "Vector Element Popup";
-		Simple::ViewAndEditResult result;
+		ViewAndEditResult result;
 
 		for (size_t i = 0; i < vector.size(); ++i)
 		{
@@ -246,7 +241,7 @@ namespace std
 			if constexpr (std::same_as<T, bool>)
 			{
 				bool b = vector[i];
-				result.isActive |= Simple::ViewAndEditDataPtr(Simple::GetDataTypeID<T>(), &b, blackboard).isActive;
+				result.isActive |= ViewAndEditDataPtr(GetDataTypeID<T>(), &b, blackboard).isActive;
 				vector[i] = b;
 
 				ImGui::SameLine();
@@ -259,7 +254,7 @@ namespace std
 			else
 			{
 				T& data = vector[i];
-				result.isActive |= Simple::ViewAndEditDataPtr(Simple::GetDataTypeID<T>(), &data, blackboard).isActive;
+				result.isActive |= ViewAndEditDataPtr(GetDataTypeID<T>(), &data, blackboard).isActive;
 				ImGui::SameLine();
 
 				ImGui::PushID(&data);
@@ -306,5 +301,14 @@ namespace std
 		}
 
 		return result;
+	}
+}
+
+namespace std
+{
+	template<typename T>
+	CLX::ViewAndEditResult ViewAndEditValue(std::vector<T>& vector, const CLX::Blackboard& blackboard)
+	{
+        return CLX::ViewAndEditValueVectorImpl(vector, blackboard);
 	}
 }

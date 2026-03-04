@@ -3,7 +3,7 @@
 #include "Engine/Math/Transform3.hpp"
 #include "Engine/ECS/EntityID.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	class SetEntityTransformCommand final

@@ -5,7 +5,7 @@
 #include "Engine/Asset/TextureAsset.hpp"
 //#include <External/DirectXTK/SpriteBatch.h>
 
-namespace Simple
+namespace CLX
 {
 
 	class Sprite2D final

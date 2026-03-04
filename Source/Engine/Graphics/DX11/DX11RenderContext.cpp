@@ -2,7 +2,7 @@
 #include "DX11RenderContext.hpp"
 #include "Engine/Graphics/DX11/DX11Factory.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	DX11RenderContext::DX11RenderContext(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, Vector2ui size)

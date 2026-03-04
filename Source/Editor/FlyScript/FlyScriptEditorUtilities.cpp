@@ -5,7 +5,7 @@
 #include <External/imgui/imnodes/imnodes.h>
 #include <External/imgui/imnodes/imnodes_internal.h>
 
-namespace Simple
+namespace CLX
 {
 
 	static bool DataTypeCombo(const char* comboLabel, Fly::GenericDataTypeProxy& dataTypeProxy, auto filterPredicate)

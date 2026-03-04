@@ -2,7 +2,7 @@
 
 #include "Engine/Math/VectorMath.hpp"
 
-using namespace Simple;
+using namespace CLX;
 
 TEST_CASE("VectorMath::GetX/Y/Z (Point3)", "[VectorMath]")
 {

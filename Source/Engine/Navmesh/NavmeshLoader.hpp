@@ -3,7 +3,7 @@
 
 #include <filesystem>
 
-namespace Simple
+namespace CLX
 {
 	class NavmeshLoader
 	{

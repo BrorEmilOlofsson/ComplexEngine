@@ -3,7 +3,7 @@
 #include "Engine/Math/RotationMath.hpp"
 #include "Engine/Math/Rotator.hpp"
 
-using namespace Simple;
+using namespace CLX;
 
 //TEST_CASE("Rotator Directions")
 //{

@@ -7,7 +7,7 @@
 #include <filesystem>
 
 
-namespace Simple
+namespace CLX
 {
 
 	class DX11VertexShader final

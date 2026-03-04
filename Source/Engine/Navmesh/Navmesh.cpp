@@ -9,7 +9,7 @@
 #include <assert.h>
 #include <limits>
 
-namespace Simple
+namespace CLX
 {
 	Navmesh::Navmesh()
 	{

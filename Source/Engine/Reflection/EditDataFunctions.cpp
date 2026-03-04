@@ -26,7 +26,7 @@
 #include <External/imgui/imgui.h>
 #include <External/imgui/imguizmo/imguizmo.h>
 
-namespace Simple
+namespace CLX
 {
 
 	constexpr static float labelWidth = 120;
@@ -100,7 +100,7 @@ namespace Simple
 	}
 }
 
-namespace Simple
+namespace CLX
 {
 	static std::string ExtractStringFromImGuiIDFullName(const std::string& string)
 	{

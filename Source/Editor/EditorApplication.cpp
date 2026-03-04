@@ -4,7 +4,7 @@
 #include "Editor/Editor.hpp"
 #include "Game/Game.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	void RunEditor(OperatingSystem&& operatingSystem)

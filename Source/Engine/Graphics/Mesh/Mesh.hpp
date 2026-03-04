@@ -3,7 +3,7 @@
 #include "Engine/Utility/MeshData.hpp"
 #include "Engine/Math/Shapes/AABB3.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	class Mesh final

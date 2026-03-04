@@ -5,7 +5,7 @@
 #include "Engine/Graphics/GraphicsFoundation.hpp"
 #include "Engine/Graphics/RenderState.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	class OperatingSystem final

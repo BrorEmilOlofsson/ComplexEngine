@@ -5,7 +5,7 @@
 #include "NodeScript/DataType/FlyDataTypeManager.hpp"
 #include "NodeScript/Trait/FlyTraitManager.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	FlyTraitWindow::FlyTraitWindow()

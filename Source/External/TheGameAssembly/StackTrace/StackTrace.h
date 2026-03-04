@@ -13,7 +13,7 @@
 constexpr std::size_t STACK_TRACE_MAX_LINES = 32;
 constexpr std::size_t STACK_TRACE_MAX_LINE_LENGTH = 1024;
 
-namespace SimpleTracker
+namespace CLXTracker
 {
 	struct StackTraceImpl final
 	{
@@ -26,7 +26,7 @@ namespace SimpleTracker
 	};
 }
 
-namespace SimpleTracker
+namespace CLXTracker
 {
 	struct StackTraceImpl;
 
@@ -53,9 +53,9 @@ namespace SimpleTracker
 
 namespace std
 {
-	template<> struct hash<SimpleTracker::StackTrace>
+	template<> struct hash<CLXTracker::StackTrace>
 	{
-		std::size_t operator()(const SimpleTracker::StackTrace& aStackTrace) const noexcept
+		std::size_t operator()(const CLXTracker::StackTrace& aStackTrace) const noexcept
 		{
 			return aStackTrace.ComputeHash();
 		}
@@ -64,9 +64,9 @@ namespace std
 
 namespace std
 {
-	template<> struct hash<SimpleTracker::StackTraceImpl>
+	template<> struct hash<CLXTracker::StackTraceImpl>
 	{
-		std::size_t operator()(const SimpleTracker::StackTraceImpl& aStackTrace) const noexcept
+		std::size_t operator()(const CLXTracker::StackTraceImpl& aStackTrace) const noexcept
 		{
 			size_t result = 0;
 			for (auto e : aStackTrace.myLines)
@@ -108,6 +108,6 @@ class ToStrongStackWalkerWrapper final
 public:
 	inline static ToStringStackWalker localStackWalker = {};
 	inline static std::unordered_set<std::array<char, STACK_TRACE_MAX_LINE_LENGTH>, StackTraceLineHash> localStackTraceLineCache;
-	inline static std::unordered_set<SimpleTracker::StackTraceImpl> localStackTraceCache;
+	inline static std::unordered_set<CLXTracker::StackTraceImpl> localStackTraceCache;
 	inline static std::mutex localStackTraceMutex;
 };

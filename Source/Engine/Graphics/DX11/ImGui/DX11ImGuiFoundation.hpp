@@ -8,7 +8,7 @@
 #include <External/imgui/imgui_impl_dx11.h>
 #include <d3d11.h>
 
-namespace Simple
+namespace CLX
 {
 	struct ImGuiContextCreator
 	{

@@ -15,7 +15,7 @@
 #include "Engine/ECS/ECSSerializer.hpp"
 #include "Engine/Graphics/GraphicsConstants.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	static void* GetSRVFromIconType(const eIconType iconType, AssetManager& assetManager)

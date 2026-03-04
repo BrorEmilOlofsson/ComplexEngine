@@ -3,7 +3,7 @@
 #include "Engine/Math/UnitVector2.hpp"
 #include <format>
 
-namespace Simple
+namespace CLX
 {
     template<typename T>
     class Point2 final
@@ -171,10 +171,10 @@ namespace Simple
 }
 
 template<typename T>
-struct std::formatter<Simple::Point2<T>> : std::formatter<std::string>
+struct std::formatter<CLX::Point2<T>> : std::formatter<std::string>
 {
     template<typename FormatContext>
-    auto format(const Simple::Point2<T>& point, FormatContext& ctx) const
+    auto format(const CLX::Point2<T>& point, FormatContext& ctx) const
     {
         return std::format_to(ctx.out(), "{{ x: {}, y: {} }}", point.x, point.y);
     }

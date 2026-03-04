@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/Graphics/Light/DirectionalLight.hpp"
 
-namespace Simple
+namespace CLX
 {
 	struct DirectionalLightComponent final
 	{

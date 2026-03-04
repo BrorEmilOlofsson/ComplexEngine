@@ -1,7 +1,7 @@
 #include <External/Catch2/catch_amalgamated.hpp>
 #include "Engine/Math/RotationMatrix3.hpp"
 
-using namespace Simple;
+using namespace CLX;
 
 TEST_CASE("RotationMatrix3::Default constructor", "[RotationMatrix3]")
 {

@@ -6,7 +6,7 @@
 
 #define COMMENTS_ENABLED 0
 
-namespace Simple
+namespace CLX
 {
 
 	[[nodiscard]] constexpr NavmeshAStar::AStarNode& GetNode(NavmeshAStar::AStarData& aStarData, const NavmeshAStar::AStarNodeIndex aIndex)

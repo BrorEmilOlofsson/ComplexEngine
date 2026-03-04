@@ -13,7 +13,7 @@
 #include "Engine/Utility/Blackboard.hpp"
 #include "Engine/Utility/TypeList.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	template<typename T>

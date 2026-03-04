@@ -6,7 +6,7 @@
 #include "Engine/ECSEngine/Components/TransformHierarchyComponent.hpp"
 #include "Engine/ECSEngine/Components/NameComponent.hpp"
 
-using namespace Simple;
+using namespace CLX;
 
 template<std::size_t I>
 struct FakeComponent

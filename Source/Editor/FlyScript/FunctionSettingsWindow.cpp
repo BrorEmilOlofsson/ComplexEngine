@@ -3,7 +3,7 @@
 #include "NodeScriptingWindow.hpp"
 #include "NodeScript/Fly.hpp"
 
-namespace Simple
+namespace CLX
 {
 
     static void ShowInputsOrOutputs(Fly::FunctionProxy function, const Fly::eIODirection ioDirection, Fly::CommandTracker& commandTracker)

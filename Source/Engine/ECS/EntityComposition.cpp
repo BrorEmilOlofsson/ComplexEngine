@@ -1,7 +1,7 @@
 #include "Engine/Precompiled/EnginePch.hpp"
 #include "EntityComposition.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	EntityComposition::EntityComposition(const ECSRegistry& ecsRegistry)

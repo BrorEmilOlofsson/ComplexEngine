@@ -3,7 +3,7 @@
 #include "Editor/Functions/CurveEditorFunctions.hpp"
 #include "Engine/Math/Transform2.hpp"
 
-namespace Simple
+namespace CLX
 {
 
     void DrawBezierCurve(ImDrawList& drawList, const std::array<Point2f, 4>& controlPoints, Color color, float thickness)

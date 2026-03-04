@@ -2,7 +2,7 @@
 #include "Engine/Asset/Asset.hpp"
 #include "Engine/Asset/AssetHandle.hpp"
 
-namespace Simple
+namespace CLX
 {
 	using EntityCompositionAsset = Asset<class EntityComposition>;
 	using EntityCompositionAssetHandle = AssetHandle<class EntityComposition>;

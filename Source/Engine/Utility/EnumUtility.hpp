@@ -2,7 +2,7 @@
 #include <type_traits>
 #include <string_view>
 
-namespace Simple
+namespace CLX
 {
 
 	template<typename T>

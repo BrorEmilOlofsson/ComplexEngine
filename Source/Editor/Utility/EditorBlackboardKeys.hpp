@@ -2,7 +2,7 @@
 #include <string_view>
 #include "Engine/Utility/Blackboard.hpp"
 
-namespace Simple
+namespace CLX
 {
 	using Key_CommandTracker = BlackboardKey<class EditorCommandTracker&, "CommandTracker">;
 	using Key_ECSBuffer = BlackboardKey<class ECS&, "ECSBuffer">;

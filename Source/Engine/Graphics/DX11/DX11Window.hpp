@@ -17,12 +17,12 @@
 #include <wrl/client.h>
 #include <d3d11.h>
 
-namespace Simple
+namespace CLX
 {
 	class Win_Window;
 }
 
-namespace Simple
+namespace CLX
 {
 	class DX11Window final
 	{

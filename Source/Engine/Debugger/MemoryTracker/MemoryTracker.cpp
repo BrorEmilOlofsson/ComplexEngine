@@ -37,7 +37,7 @@ typedef struct _SimpleCrtMemBlockHeader
 } _SimpleCrtMemBlockHeader;
 
 
-namespace SimpleTracker
+namespace CLXTracker
 {
 
 	class SimpleMemoryTracker;
@@ -57,7 +57,7 @@ namespace SimpleTracker
 
 	class TemporaryScopedMemoryTrackerData final
 	{
-		friend class SimpleTracker::SimpleMemoryTracker;
+		friend class CLXTracker::SimpleMemoryTracker;
 	public:
 		std::unordered_map<StackTrace, int> stackTraceToAllocationCount;
 		std::unordered_map<long, Allocation> allocationMap;
@@ -90,7 +90,7 @@ namespace SimpleTracker
 
 	class SimpleMemoryTracker final
 	{
-		friend class SimpleTracker::SimpleMemoryTrackerWrapper;
+		friend class SimpleMemoryTrackerWrapper;
 
 	public:
 		static void StartMemoryTracking(const bool aShowAdvanced = false, const std::string& aCallerName = "");
@@ -449,7 +449,7 @@ namespace SimpleTracker
 
 		filePath += extension;
 
-		const std::filesystem::path fileNameWithCounter = Simple::AppendCounterIfAlreadyExist(filePath);
+		const std::filesystem::path fileNameWithCounter = CLX::AppendCounterIfAlreadyExist(filePath);
 
 		std::ofstream writeFile(fileNameWithCounter);
 		assert(writeFile.is_open() && "Failed to open the file");

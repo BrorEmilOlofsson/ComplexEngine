@@ -2,7 +2,7 @@
 #include "Engine/Math/Point2.hpp"
 #include <span>
 
-namespace Simple
+namespace CLX
 {
 
     template<typename T, typename U>

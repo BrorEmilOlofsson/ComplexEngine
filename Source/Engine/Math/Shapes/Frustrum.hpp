@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/Math/Shapes/Plane.hpp"
 
-namespace Simple
+namespace CLX
 {
 	enum class eFrustrumSide : std::uint8_t
 	{

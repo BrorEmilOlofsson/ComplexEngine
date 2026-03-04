@@ -5,7 +5,7 @@
 #include "Engine/Asset/PixelShaderAsset.hpp"
 #include "Engine/Asset/VertexShaderAsset.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	struct SkyBoxComponent final

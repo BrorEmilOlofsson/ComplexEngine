@@ -1,13 +1,13 @@
 #pragma once
 #include "Editor/Core/PopUp.hpp"
 
-namespace Simple
+namespace CLX
 {
 	class MenuTabWindow;
 	class MenuItemPopUp;
 }
 
-namespace Simple
+namespace CLX
 {
 
 	class AssetBrowserPopUp final : public PopUp

@@ -2,7 +2,7 @@
 #include "CylinderComponent.hpp"
 #include "Engine/Reflection/Reflection.hpp"
 
-namespace Simple
+namespace CLX
 {
 
     void RegisterCylinderComponent()

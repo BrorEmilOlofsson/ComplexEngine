@@ -4,7 +4,7 @@
 #include "Engine/Utility/ValueType.hpp"
 #include <iostream>
 
-namespace Simple
+namespace CLX
 {
 
 	/// <summary>

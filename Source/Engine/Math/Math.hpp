@@ -12,7 +12,7 @@
 #include "Engine/Math/Angle.hpp"
 #include "Engine/Utility/Assert.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	template<typename T>

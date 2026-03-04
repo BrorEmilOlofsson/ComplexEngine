@@ -3,7 +3,7 @@
 #include <optional>
 #include "AIMath.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	template<typename T>

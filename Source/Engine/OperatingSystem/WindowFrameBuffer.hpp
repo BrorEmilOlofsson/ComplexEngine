@@ -2,7 +2,7 @@
 #include <vector>
 #include <filesystem>
 
-namespace Simple
+namespace CLX
 {
 
 	enum class eQuit : unsigned char

@@ -3,7 +3,7 @@
 #include "NavmeshData.hpp"
 #include "Navmesh.hpp"
 
-namespace Simple
+namespace CLX
 {
 	void NavmeshCreator::CreateNavmesh(Navmesh& navmesh)
 	{

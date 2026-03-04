@@ -2,7 +2,7 @@
 #include "AssetManager.hpp"
 #include <queue>
 
-namespace Simple
+namespace CLX
 {
 
 	/*Skeleton ToSkeleton(const TGA::FBX::Mesh& tgaMesh)
@@ -265,8 +265,8 @@ namespace Simple
 
 		LoadAssetsNew(std::filesystem::path(SIMPLE_DIR_SHADERS), *this);
 		LoadAssetsNew(std::filesystem::path(SIMPLE_DIR_ASSETS), *this);
-		//::Simple::LoadAssets(*this, std::filesystem::path(SIMPLE_DIR_ASSETS), CreateLoaderMap());
-		//::Simple::LoadAssets(*this, std::filesystem::path(SIMPLE_DIR_SHADERS), CreateLoaderMap());
+		//::CLX::LoadAssets(*this, std::filesystem::path(SIMPLE_DIR_ASSETS), CreateLoaderMap());
+		//::CLX::LoadAssets(*this, std::filesystem::path(SIMPLE_DIR_SHADERS), CreateLoaderMap());
 
 		
 	}

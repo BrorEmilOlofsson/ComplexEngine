@@ -7,7 +7,7 @@
 #include "Engine/Math/Matrix4x4.hpp"
 #include "Engine/Math/RotationMath.hpp"
 
-namespace Simple
+namespace CLX
 {
 	class Transform3 final
 	{

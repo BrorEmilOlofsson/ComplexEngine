@@ -2,7 +2,7 @@
 #include <limits>
 #include <stdint.h>
 
-namespace Simple
+namespace CLX
 {
 
 	struct EntityID final

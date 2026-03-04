@@ -10,7 +10,7 @@
 #include <wrl/client.h>
 #include "Engine/Graphics/DX11/Mesh/DX11Mesh.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	class DX11Model final

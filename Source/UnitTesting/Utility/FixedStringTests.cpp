@@ -2,7 +2,7 @@
 
 #include "Engine/Utility/FixedString.hpp"
 
-using namespace Simple;
+using namespace CLX;
 
 TEST_CASE("FixedString")
 {

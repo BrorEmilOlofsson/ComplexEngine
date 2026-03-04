@@ -16,7 +16,7 @@
 #include "Engine/Graphics/DX11/Mesh/DX11Mesh.hpp"
 #include "Engine/Graphics/Model/Skeleton.hpp"
 
-namespace Simple
+namespace CLX
 {
 	class DX11AnimatedModel final
 	{

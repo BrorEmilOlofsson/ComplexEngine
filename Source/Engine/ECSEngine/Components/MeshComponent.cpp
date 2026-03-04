@@ -4,7 +4,7 @@
 #include "Engine/Asset/AssetManager.hpp"
 #include "Engine/Graphics/GraphicsConstants.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	static void Initialize(MeshComponent& component, AssetManager& assetManager)

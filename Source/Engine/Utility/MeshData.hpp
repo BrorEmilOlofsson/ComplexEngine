@@ -2,7 +2,7 @@
 #include <vector>
 #include "Engine/Utility/Vertex.hpp"
 
-namespace Simple
+namespace CLX
 {
 	template<typename VertexType>
 	struct MeshData final

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Simple
+namespace CLX
 {
     template<std::size_t N>
     class FixedString final

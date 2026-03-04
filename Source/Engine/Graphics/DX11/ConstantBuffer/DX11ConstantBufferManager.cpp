@@ -5,7 +5,7 @@
 #include "Engine/Graphics/GraphicsConstants.hpp"
 #include <cassert>
 
-namespace Simple
+namespace CLX
 {
 
 	DX11ConstantBufferManager::DX11ConstantBufferManager(ID3D11Device& device)

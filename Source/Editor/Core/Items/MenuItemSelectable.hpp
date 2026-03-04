@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-namespace Simple
+namespace CLX
 {
 
 	class MenuItemSelectable final : public MenuItemBase

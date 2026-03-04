@@ -7,7 +7,7 @@
 #include <array>
 #include <limits>
 
-namespace Simple
+namespace CLX
 {
 
 	template<typename T>

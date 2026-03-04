@@ -1,7 +1,7 @@
 #pragma once
 #include <filesystem>
 
-namespace Simple
+namespace CLX
 {
 
 	class PixelShader final

@@ -32,7 +32,7 @@ namespace ImGui
 
 struct ImNodesContext;
 
-namespace Simple
+namespace CLX
 {
 
 	struct NodeTypeCategory final

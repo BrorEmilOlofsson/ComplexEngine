@@ -4,7 +4,7 @@
 #include "Engine/Utility/Grid/PrimitiveGrid2.hpp"
 #include <ranges>
 
-namespace Simple
+namespace CLX
 {
 	template<typename T>
 	[[nodiscard]] constexpr T GetVolume(const Vector2<T>& vector) noexcept

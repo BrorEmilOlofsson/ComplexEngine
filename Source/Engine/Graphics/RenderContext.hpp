@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-namespace Simple
+namespace CLX
 {
 
 	struct GBufferData final

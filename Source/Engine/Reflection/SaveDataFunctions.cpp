@@ -13,7 +13,7 @@
 #include "Engine/Graphics/GraphicsConstants.hpp"
 #include "Engine/Reflection/DataTypeRegistry.hpp"
 
-namespace Simple
+namespace CLX
 {
 	nlohmann::json SaveDataPtr(const DataTypeID dataTypeID, const void* dataPtr)
 	{
@@ -54,7 +54,7 @@ namespace std
 	}
 }
 
-namespace Simple
+namespace CLX
 {
 	nlohmann::json ToJSON(const Transform& transform)
 	{

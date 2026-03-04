@@ -3,7 +3,7 @@
 #include <Windows.h>
 #include <string>
 
-namespace SimpleTracker
+namespace CLXTracker
 {
 	struct InlineLogger
 	{

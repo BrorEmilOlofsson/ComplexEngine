@@ -3,7 +3,7 @@
 #include <filesystem>
 #include "Engine/Math/Shapes/AABB3.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 

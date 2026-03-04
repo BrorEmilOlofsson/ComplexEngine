@@ -6,7 +6,7 @@
 #include "Engine/Utility/Blackboard.hpp"
 #include "Engine/ECS/ECSRegistry.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	Scene::Scene(std::weak_ptr<Blackboard> blackboard)

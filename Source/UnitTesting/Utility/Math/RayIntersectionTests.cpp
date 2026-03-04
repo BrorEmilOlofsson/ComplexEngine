@@ -2,7 +2,7 @@
 
 #include "Engine/Utility/Intersection.hpp"
 
-using namespace Simple;
+using namespace CLX;
 
 TEST_CASE("Ray Vs Sphere Intersection")
 {

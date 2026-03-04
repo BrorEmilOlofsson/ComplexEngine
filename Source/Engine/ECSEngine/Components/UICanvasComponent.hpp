@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/UI/UICanvas.hpp"
 
-namespace Simple
+namespace CLX
 {
 	struct UICanvasComponent final
 	{

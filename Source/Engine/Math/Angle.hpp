@@ -2,7 +2,7 @@
 #include "Engine/Utility/StrongType.hpp"
 #include "Engine/Math/MathConstants.hpp"
 
-namespace Simple
+namespace CLX
 {
 	
 	template<typename T>

@@ -7,7 +7,7 @@
 #include <Windows.h>
 #include "Engine/Utility/Win/WinAdapterFunctions.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	[[nodiscard]] inline AABB2i GetDefaultClientRect(const Vector2ui windowSize)

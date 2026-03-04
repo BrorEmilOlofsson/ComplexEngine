@@ -9,7 +9,7 @@
 #include "Engine/Utility/Grid/Grid2.hpp"
 #include "Engine/Math/ShapeMath.hpp"
 
-namespace Simple
+namespace CLX
 {
 
     template<typename T, typename U>

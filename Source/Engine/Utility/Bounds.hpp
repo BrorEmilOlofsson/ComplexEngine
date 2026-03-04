@@ -3,7 +3,7 @@
 #include <type_traits>
 #include "Engine/Utility/Assert.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	template<typename BoundsChecker, typename T>

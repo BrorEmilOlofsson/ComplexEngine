@@ -3,7 +3,7 @@
 #include "Engine/ECSEngine/Components/RotatingMovementComponent.hpp"
 #include "Engine/ECS/ECS.hpp"
 
-namespace Simple
+namespace CLX
 {
 
     void PerformRotation(Transform& transform, const UnitVector3f& rotationAxis, const float rotationSpeed, const float deltaTime)

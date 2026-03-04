@@ -2,7 +2,7 @@
 #include "DX11DepthStencilViewManager.hpp"
 #include "Engine/Graphics/DX11/DX11Factory.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	DX11DepthStencilViewManager::DX11DepthStencilViewManager(Microsoft::WRL::ComPtr<ID3D11Device> device)

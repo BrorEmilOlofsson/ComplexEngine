@@ -7,7 +7,7 @@
 #include <utility>
 #include <cassert>
 
-namespace Simple
+namespace CLX
 {
 	template<typename T>
 	class Quaternion final

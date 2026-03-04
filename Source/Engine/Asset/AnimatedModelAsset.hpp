@@ -2,7 +2,7 @@
 #include "Engine/Asset/Asset.hpp"
 #include "Engine/Asset/AssetHandle.hpp"
 
-namespace Simple
+namespace CLX
 {
 	class AnimatedModel;
 

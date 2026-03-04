@@ -1,7 +1,7 @@
 #include <External/Catch2/catch_amalgamated.hpp>
 #include "Engine/Math/UnitVector3.hpp"
 
-using namespace Simple;
+using namespace CLX;
 
 TEST_CASE("UnitVector3::default constructor", "[UnitVector3]")
 {

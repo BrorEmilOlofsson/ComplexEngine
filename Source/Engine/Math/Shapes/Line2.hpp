@@ -2,7 +2,7 @@
 #include "Engine/Math/Point2.hpp"
 #include "Engine/Math/UnitVector2.hpp"
 
-namespace Simple
+namespace CLX
 {
 	template<typename T>
 	class Line2 final

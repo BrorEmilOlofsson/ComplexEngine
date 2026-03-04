@@ -2,7 +2,7 @@
 #include <filesystem>
 #include "Engine/Utility/MeshData.hpp"
 
-namespace Simple
+namespace CLX
 {
 
 	class FileLoader final
