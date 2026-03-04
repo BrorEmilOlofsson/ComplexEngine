@@ -2,6 +2,7 @@
 #include <concepts>
 #include <random>
 #include "Engine/Utility/Probability/OutcomeTable.hpp"
+#include "Engine/Utility/Bounds.hpp"
 
 namespace Simple
 {
@@ -25,6 +26,18 @@ namespace Simple
 	{
 		std::mt19937 engine{ std::random_device{}() };
 		return GetRandomNumber(engine, min, max);
+	}
+
+	template<typename T, typename Rand> requires std::integral<T> || std::floating_point<T>
+	[[nodiscard]] constexpr T GetRandomNumber(Rand&& engine, const Bounds<T>&bounds)
+	{
+		return GetRandomNumber(bounds.GetMin(), bounds.GetMax());
+	}
+
+	template<typename T> requires std::integral<T> || std::floating_point<T>
+	[[nodiscard]] constexpr T GetRandomNumber(const Bounds<T>& bounds)
+	{
+        return GetRandomNumber(bounds.GetMin(), bounds.GetMax());
 	}
 
 	template<typename Rand>
