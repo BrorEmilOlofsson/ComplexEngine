@@ -17,14 +17,14 @@ namespace Simple
 
 		constexpr OutcomeTable() = default;
 
-		constexpr void Insert(const ValueType& value, WeightType probability)
+		constexpr void Insert(const ValueType& value, WeightType weight)
 		{
-			mOutcomes.push_back({ value, probability });
+			mOutcomes.push_back({ value, weight });
 		}
 
-		constexpr void Insert(ValueType&& value, WeightType probability)
+		constexpr void Insert(ValueType&& value, WeightType weight)
 		{
-			mOutcomes.push_back({ std::move(value), probability });
+			mOutcomes.push_back({ std::move(value), weight });
 		}
 
 		constexpr void Clear() noexcept
