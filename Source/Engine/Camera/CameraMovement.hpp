@@ -1,7 +1,7 @@
 #pragma once
-#include "Utility/Camera.hpp"
-#include "Utility/Input/InputKey.hpp"
-#include "Utility/Input/InputState.hpp"
+#include "Engine/Utility/Camera.hpp"
+#include "Engine/Input/InputKey.hpp"
+#include "Engine/Input/InputState.hpp"
 
 namespace Simple
 {

@@ -1,13 +1,13 @@
 #pragma once
 #include <memory>
-#include "Utility/Win/WinConsole.hpp"
-#include "Utility/SystemTimer.hpp"
+#include "Engine/Utility/Win/WinConsole.hpp"
+#include "Engine/Utility/SystemTimer.hpp"
 #include "Engine/Scene/SceneManager.hpp"
 #include "Engine/Audio/AudioManager.hpp"
 #include "Engine/OperatingSystem/OperatingSystem.hpp"
 #include "Engine/SimpleScript/SimpleNodeScript.hpp"
-#include "Utility/Asset/AssetManager.hpp"
-#include "Graphics/GraphicsSettings.hpp"
+#include "Engine/Asset/AssetManager.hpp"
+#include "Engine/Graphics/GraphicsSettings.hpp"
 #include "Engine/OperatingSystem/WindowHandle.hpp"
 #include "Engine/Reflection/DataTypeRegistry.hpp"
 #include "Engine/ECS/ECSRegistry.hpp"

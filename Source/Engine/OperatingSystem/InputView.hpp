@@ -1,6 +1,6 @@
 #pragma once
-#include "Utility/Input/InputKey.hpp"
-#include "Utility/Input/InputState.hpp"
+#include "Engine/Utility/Input/InputKey.hpp"
+#include "Engine/Utility/Input/InputState.hpp"
 
 namespace Simple
 {

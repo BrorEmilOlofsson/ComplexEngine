@@ -1,5 +1,5 @@
 #pragma once
-#include "Graphics/Sprite/Sprite3D.hpp"
+#include "Engine/Graphics/Sprite/Sprite3D.hpp"
 
 namespace Simple
 {

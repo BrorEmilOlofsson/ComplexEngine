@@ -3,34 +3,17 @@
 namespace FLY_NAMESPACE
 {
 
-	PinTypeManager::PinTypeManager()
-	{
-	}
-
-	PinTypeManager::~PinTypeManager()
-	{
-	}
-
-	//PinTypeID PinTypeManager::CreatePinType(std::string_view aName, const eFlowType aFlowType, const DataTypeID aDataTypeID, SetPinValueInterface aSetPinValueFunction, SetPinValueFromPinInterface aSetPinValueFromPinFunction, const MemoryPoolID aDefaultValueMemoryID)
-	//{
-	//	const PinTypeID id{ mPinTypes.size() };
-	//	mPinTypes.push_back(PinType
-	//		{
-	//			.mName = std::string(aName),
-	//			//.mDataTypeID = aDataTypeID,
-	//			.mGenericDataTypeID = aDataTypeID,
-	//			.mSetPinValueFunction = aSetPinValueFunction,
-	//			.mSetPinValueFromPinFunction = aSetPinValueFromPinFunction,
-	//			.mDefaultValueID = aDefaultValueMemoryID,
-	//			.mFlowType = aFlowType,
-	//		});
-	//	return id;
-	//}
-
-	PinTypeID PinTypeManager::CreatePinType(std::string name, const eIODirection aIODirection, const GenericDataTypeID aDataTypeID, SetPinValueF aSetPinValueFunction, SetPinValueFromPinF aSetPinValueFromPinFunction, const MemoryPoolID aDefaultValueMemoryID)
+	PinTypeID PinTypeManager::CreatePinType(std::string name, const eIODirection ioDirection, const GenericDataTypeID dataTypeID, SetPinValueF setPinValueFunction, SetPinValueFromPinF setPinValueFromPinFunction, const PinTypeID parentID, const MemoryPoolID defaultValueMemoryID)
 	{
 		const PinTypeID id{ mPinTypes.size() };
-		mPinTypes.push_back(PinType(std::move(name), aDataTypeID, aSetPinValueFunction, aSetPinValueFromPinFunction, aDefaultValueMemoryID, aIODirection));
+		mPinTypes.push_back(PinType::Create(
+			std::move(name),
+			dataTypeID, 
+			setPinValueFunction, 
+			setPinValueFromPinFunction, 
+			defaultValueMemoryID, 
+			ioDirection,
+			parentID));
 		return id;
 	}
 }

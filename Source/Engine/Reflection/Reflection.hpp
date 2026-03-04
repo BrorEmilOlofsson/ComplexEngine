@@ -1,6 +1,6 @@
 #pragma once
 #include "DataTypeRegistry.hpp"
-#include <External/nlohmann/json.hpp>
+#include "Engine/Utility/MacroUtility.hpp"
 
 namespace Simple
 {
@@ -52,8 +52,6 @@ namespace Simple
 		return name;
 	}
 }
-
-#include "Utility/MacroUtility.hpp"
 
 #define REGISTER_COMPONENT(ComponentType, ...) \
     static bool ComponentRegistered_##ComponentType = []() { \

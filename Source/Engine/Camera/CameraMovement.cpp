@@ -1,7 +1,7 @@
 #include "Engine/Precompiled/EnginePch.hpp"
 #include "CameraMovement.hpp"
-#include "Utility/Math/RotationMath.hpp"
-#include "Utility/Input/InputState.hpp"
+#include "Engine/Math/RotationMath.hpp"
+#include "Engine/Input/InputState.hpp"
 
 namespace Simple
 {

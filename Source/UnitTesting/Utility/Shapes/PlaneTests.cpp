@@ -1,5 +1,5 @@
 #include <External/Catch2/catch_amalgamated.hpp>
-#include "Utility/Shapes/Plane.hpp"
+#include "Engine/Math/Shapes/Plane.hpp"
 
 using namespace Simple;
 

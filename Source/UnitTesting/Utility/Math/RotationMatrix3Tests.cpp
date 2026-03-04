@@ -1,5 +1,5 @@
 #include <External/Catch2/catch_amalgamated.hpp>
-#include "Utility/Math/RotationMatrix3.hpp"
+#include "Engine/Math/RotationMatrix3.hpp"
 
 using namespace Simple;
 

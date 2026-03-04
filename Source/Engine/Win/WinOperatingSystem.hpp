@@ -4,8 +4,8 @@
 
 #include "Engine/Win/WinWindow.hpp"
 #include "Engine/OperatingSystem/WindowHandle.hpp"
-#include "Graphics/GraphicsFoundation.hpp"
-#include "Utility/Win/WinUtility.hpp"
+#include "Engine/Graphics/GraphicsFoundation.hpp"
+#include "Engine/Utility/Win/WinUtility.hpp"
 
 #ifdef _WIN32
 

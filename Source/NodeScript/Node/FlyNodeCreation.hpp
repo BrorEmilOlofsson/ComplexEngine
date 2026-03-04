@@ -232,7 +232,14 @@ namespace FLY_NAMESPACE
                 return InvalidID<MemoryPoolID>();
             }();
 
-        pinTypeIDs[Index] = Internal::GetPinTypeManager().CreatePinType<AllocationType>(pinNames[Index], IODirection, CreateSetPinValueFunction<AllocationType, IODirection>(), CreateSetPinValueFromPinFunction<AllocationType, IODirection>(), defaultValueMemoryID);
+        pinTypeIDs[Index] = Internal::GetPinTypeManager().CreatePinType<AllocationType>(
+            pinNames[Index],
+            IODirection, 
+            CreateSetPinValueFunction<AllocationType, IODirection>(), 
+            CreateSetPinValueFromPinFunction<AllocationType, IODirection>(),
+            InvalidID<PinTypeID>(),
+            defaultValueMemoryID
+        );
 
         if constexpr (Index + 1 < Size)
         {

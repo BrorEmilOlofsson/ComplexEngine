@@ -22,16 +22,16 @@ namespace FLY_NAMESPACE
 	{
 		if constexpr (DefaultConstructible<T>)
 		{
-			return [](void* aDataPtr, const void* aDefaultValue) -> void
+			return [](void* dataPtr, const void* defaultValuePtr) -> void
 				{
-					if (aDefaultValue != nullptr)
+					if (defaultValuePtr != nullptr)
 					{
-						const T& defaultValue = *reinterpret_cast<const T*>(aDefaultValue);
-						new(aDataPtr)T(defaultValue);
+						const T& defaultValue = *reinterpret_cast<const T*>(defaultValuePtr);
+						new(dataPtr)T(defaultValue);
 					}
 					else
 					{
-						new(aDataPtr)T();
+						new(dataPtr)T();
 					}
 				};
 		}
@@ -44,9 +44,9 @@ namespace FLY_NAMESPACE
 	template<typename T>
 	constexpr ReleaseInterface CreateReleaseInterface()
 	{
-		return [](void* const aDataPtr) -> void
+		return [](void* const dataPtr) -> void
 			{
-				T& value = *reinterpret_cast<T*>(aDataPtr);
+				T& value = *reinterpret_cast<T*>(dataPtr);
 				value.~T();
 			};
 	}
@@ -54,10 +54,10 @@ namespace FLY_NAMESPACE
 	template<Copyable T>
 	constexpr CopyInterface CreateCopyInterface()
 	{
-		return [](void* aDestination, const void* aSource)
+		return [](void* destinationPtr, const void* sourcePtr)
 			{
-				T& destination = *reinterpret_cast<T*>(aDestination);
-				const T& source = *reinterpret_cast<const T*>(aSource);
+				T& destination = *reinterpret_cast<T*>(destinationPtr);
+				const T& source = *reinterpret_cast<const T*>(sourcePtr);
 				destination = source;
 			};
 	}
@@ -65,10 +65,10 @@ namespace FLY_NAMESPACE
 	template<std::swappable T>
 	constexpr SwapInterface CreateSwapInterface()
 	{
-		return [](void* aDataPtr1, void* aDataPtr2)
+		return [](void* dataPtr1, void* dataPtr2)
 			{
-				T& value1 = *reinterpret_cast<T*>(aDataPtr1);
-				T& value2 = *reinterpret_cast<T*>(aDataPtr2);
+				T& value1 = *reinterpret_cast<T*>(dataPtr1);
+				T& value2 = *reinterpret_cast<T*>(dataPtr2);
 
 				std::swap(value1, value2);
 			};
@@ -94,10 +94,10 @@ namespace FLY_NAMESPACE
 		{
 			if constexpr (HasOperator_EqualTo<T>)
 			{
-				return [](const void* aDataPtr1, const void* aDataPtr2) -> bool
+				return [](const void* dataPtr1, const void* dataPtr2) -> bool
 					{
-						const T& value1 = *reinterpret_cast<const T*>(aDataPtr1);
-						const T& value2 = *reinterpret_cast<const T*>(aDataPtr2);
+						const T& value1 = *reinterpret_cast<const T*>(dataPtr1);
+						const T& value2 = *reinterpret_cast<const T*>(dataPtr2);
 
 						return value1 == value2;
 					};
@@ -114,9 +114,9 @@ namespace FLY_NAMESPACE
 	{
 		if constexpr (ViewAndEditable<T>)
 		{
-			return ViewAndEditF([](void* aDataPtr, EditorTextFunction) -> ViewAndEditResult
+			return ViewAndEditF([](void* dataPtr, EditorTextFunction) -> ViewAndEditResult
 				{
-					T& value = *reinterpret_cast<T*>(aDataPtr);
+					T& value = *reinterpret_cast<T*>(dataPtr);
 					return ViewAndEdit(value);
 				});
 		}
@@ -130,7 +130,7 @@ namespace FLY_NAMESPACE
 			{
 				return [](void*, EditorTextFunction aTextFunction) -> ViewAndEditResult
 					{
-						//T& value = *reinterpret_cast<T*>(aDataPtr);
+						//T& value = *reinterpret_cast<T*>(dataPtr);
 						//if (value)
 						//{
 						//	//return ViewAndEdit(*value);
@@ -149,9 +149,9 @@ namespace FLY_NAMESPACE
 		}
 		else if constexpr (Fundamental<T>)
 		{
-			return [](void* aDataPtr, EditorTextFunction) -> ViewAndEditResult
+			return [](void* dataPtr, EditorTextFunction) -> ViewAndEditResult
 				{
-					T& value = *reinterpret_cast<T*>(aDataPtr);
+					T& value = *reinterpret_cast<T*>(dataPtr);
 					return ::ViewAndEdit(value);
 				};
 		}
@@ -166,9 +166,9 @@ namespace FLY_NAMESPACE
 	{
 		if constexpr (Viewable<T>)
 		{
-			return [](const void* aDataPtr, EditorTextFunction) -> void
+			return [](const void* dataPtr, EditorTextFunction) -> void
 				{
-					const T& value = *reinterpret_cast<const T*>(aDataPtr);
+					const T& value = *reinterpret_cast<const T*>(dataPtr);
 					View(value);
 				};
 		}
@@ -176,9 +176,9 @@ namespace FLY_NAMESPACE
 		{
 			if constexpr (Viewable<std::remove_pointer_t<T>>)
 			{
-				return [](const void* aDataPtr, EditorTextFunction aTextFunction) -> void
+				return [](const void* dataPtr, EditorTextFunction aTextFunction) -> void
 					{
-						const T& value = *reinterpret_cast<const T*>(aDataPtr);
+						const T& value = *reinterpret_cast<const T*>(dataPtr);
 
 						if (value)
 						{
@@ -194,9 +194,9 @@ namespace FLY_NAMESPACE
 			{
 				if constexpr (GlobalViewable<std::remove_pointer_t<T>>)
 				{
-					return [](const void* aDataPtr, EditorTextFunction aTextFunction) -> void
+					return [](const void* dataPtr, EditorTextFunction aTextFunction) -> void
 						{
-							const T& value = *reinterpret_cast<const T*>(aDataPtr);
+							const T& value = *reinterpret_cast<const T*>(dataPtr);
 
 							if (value)
 							{
@@ -221,9 +221,9 @@ namespace FLY_NAMESPACE
 		}
 		else if constexpr (Fundamental<T> && GlobalViewable<T>)
 		{
-			return [](const void* aDataPtr, EditorTextFunction) -> void
+			return [](const void* dataPtr, EditorTextFunction) -> void
 				{
-					const T& value = *reinterpret_cast<const T*>(aDataPtr);
+					const T& value = *reinterpret_cast<const T*>(dataPtr);
 
 					::View(value);
 				};
@@ -239,18 +239,18 @@ namespace FLY_NAMESPACE
 	{
 		if constexpr (Savable<T, nlohmann::json>)
 		{
-			return [](const void* aDataPtr, nlohmann::json& aJson) -> void
+			return [](const void* dataPtr, nlohmann::json& json) -> void
 				{
-					const T& value = *reinterpret_cast<const T*>(aDataPtr);
-					Save(value, aJson);
+					const T& value = *reinterpret_cast<const T*>(dataPtr);
+					Save(value, json);
 				};
 		}
 		else if constexpr (Fundamental<T>)
 		{
-			return [](const void* aDataPtr, nlohmann::json& aJson) -> void
+			return [](const void* dataPtr, nlohmann::json& json) -> void
 				{
-					const T& value = *reinterpret_cast<const T*>(aDataPtr);
-					::Save(value, aJson);
+					const T& value = *reinterpret_cast<const T*>(dataPtr);
+					::Save(value, json);
 				};
 		}
 		else
@@ -265,18 +265,18 @@ namespace FLY_NAMESPACE
 	{
 		if constexpr (Loadable<T, nlohmann::json>)
 		{
-			return [](void* aDataPtr, const nlohmann::json& aJson) -> void
+			return [](void* dataPtr, const nlohmann::json& json) -> void
 				{
-					T& value = *reinterpret_cast<T*>(aDataPtr);
-					Load(value, aJson);
+					T& value = *reinterpret_cast<T*>(dataPtr);
+					Load(value, json);
 				};
 		}
 		else if constexpr (Fundamental<T>)
 		{
-			return [](void* aDataPtr, const nlohmann::json& aJson) -> void
+			return [](void* dataPtr, const nlohmann::json& json) -> void
 				{
-					T& value = *reinterpret_cast<T*>(aDataPtr);
-					::Load(value, aJson);
+					T& value = *reinterpret_cast<T*>(dataPtr);
+					::Load(value, json);
 				};
 		}
 		else
@@ -288,9 +288,9 @@ namespace FLY_NAMESPACE
 	template<typename T>
 	constexpr ViewAndEditF CreateEditTemplateInterface()
 	{
-		return [](void* aDataPtr) -> bool
+		return [](void* dataPtr) -> bool
 			{
-				T& value = *reinterpret_cast<T*>(aDataPtr);
+				T& value = *reinterpret_cast<T*>(dataPtr);
 				return EditTemplate(value);
 			};
 	}
@@ -298,20 +298,20 @@ namespace FLY_NAMESPACE
 	template<typename T>
 	constexpr SaveF CreateSaveTemplateInterface()
 	{
-		return [](nlohmann::json& aJson, const void* aDataPtr) -> void
+		return [](nlohmann::json& json, const void* dataPtr) -> void
 			{
-				const T& value = *reinterpret_cast<const T*>(aDataPtr);
-				SaveTemplate(aJson, value);
+				const T& value = *reinterpret_cast<const T*>(dataPtr);
+				SaveTemplate(json, value);
 			};
 	}
 
 	template<typename T>
 	constexpr LoadF CreateLoadTemplateInterface()
 	{
-		return [](const nlohmann::json& aJson, void* aDataPtr) -> void
+		return [](const nlohmann::json& json, void* dataPtr) -> void
 			{
-				T& value = *reinterpret_cast<T*>(aDataPtr);
-				LoadTemplate(aJson, value);
+				T& value = *reinterpret_cast<T*>(dataPtr);
+				LoadTemplate(json, value);
 			};
 	}
 
@@ -378,77 +378,77 @@ namespace FLY_NAMESPACE
 
 	private:
 
-		[[nodiscard]] ViewAndEditResult ViewAndEditData(const DataType& aDataType, void* aDataPtr, const bool aViewAndEditMembers) const;
-		void ViewData(const DataType& aDataType, const void* aDataPtr) const;
-		bool SaveData(const DataType& aDataType, const void* aDataPtr, nlohmann::json& aJson) const;
-		bool LoadData(const DataType& aDataType, void* aDataPtr, const nlohmann::json& aJson) const;
+		[[nodiscard]] ViewAndEditResult ViewAndEditData(const DataType& dataType, void* dataPtr, const bool viewAndEditMembers) const;
+		void ViewData(const DataType& dataType, const void* dataPtr) const;
+		bool SaveData(const DataType& dataType, const void* dataPtr, nlohmann::json& json) const;
+		bool LoadData(const DataType& dataType, void* dataPtr, const nlohmann::json& json) const;
 
 	public:
 
-		[[nodiscard]] ViewAndEditResult ViewAndEditData(DataTypeID aDataTypeID, void* aDataPtr, const bool aViewAndEditMembers = false) const;
-		void ViewData(DataTypeID aDataTypeID, const void* aDataPtr) const;
-		bool SaveData(DataTypeID aDataTypeID, const void* aDataPtr, nlohmann::json& aJson) const;
-		bool LoadData(DataTypeID aDataTypeID, void* aDataPtr, const nlohmann::json& aJson) const;
+		[[nodiscard]] ViewAndEditResult ViewAndEditData(DataTypeID dataTypeID, void* dataPtr, const bool viewAndEditMembers = false) const;
+		void ViewData(DataTypeID dataTypeID, const void* dataPtr) const;
+		bool SaveData(DataTypeID dataTypeID, const void* dataPtr, nlohmann::json& json) const;
+		bool LoadData(DataTypeID dataTypeID, void* dataPtr, const nlohmann::json& json) const;
 
 		template<size_t BufferCapacity>
-		[[nodiscard]] void* AllocateData(DataTypeID aDataTypeID, MemoryArena<BufferCapacity>& aArena, const void* aDefaultValue = nullptr) const;
+		[[nodiscard]] void* AllocateData(DataTypeID dataTypeID, MemoryArena<BufferCapacity>& arena, const void* defaultValue = nullptr) const;
 
 		template<size_t BufferCapacity>
-		[[nodiscard]] StructInstance* AllocateStructInstance(StructID aStructID, MemoryArena<BufferCapacity>& aArena) const;
+		[[nodiscard]] StructInstance* AllocateStructInstance(StructID structID, MemoryArena<BufferCapacity>& arena) const;
 
 		template<size_t BufferCapacity>
-		[[nodiscard]] ClassInstance* AllocateClassInstance(ClassID aClassID, MemoryArena<BufferCapacity>& aArena) const;
+		[[nodiscard]] ClassInstance* AllocateClassInstance(ClassID classID, MemoryArena<BufferCapacity>& arena) const;
 
 
-		void ReleaseData(DataTypeID aDataTypeID, void* aDataPtr) const;
+		void ReleaseData(DataTypeID dataTypeID, void* dataPtr) const;
 
-		void CopyData(DataTypeID aDataTypeID, void* aDestination, const void* aSource) const;
-		void SwapData(DataTypeID aDataTypeID, void* aDataPtr1, void* aDataPtr2) const;
-		[[nodiscard]] bool DataEqualsTo(DataTypeID aDataTypeID, const void* aDataPtr1, const void* aDataPtr2) const;
+		void CopyData(DataTypeID dataTypeID, void* destination, const void* source) const;
+		void SwapData(DataTypeID dataTypeID, void* dataPtr1, void* dataPtr2) const;
+		[[nodiscard]] bool DataEqualsTo(DataTypeID dataTypeID, const void* dataPtr1, const void* dataPtr2) const;
 
 
-		[[nodiscard]] ViewAndEditResult ViewAndEditData(GenericDataTypeID aDataTypeID, void* aDataPtr) const;
-		void ViewData(GenericDataTypeID aDataTypeID, const void* aDataPtr) const;
-		bool SaveData(GenericDataTypeID aDataTypeID, const void* aDataPtr, nlohmann::json& aJson) const;
-		bool LoadData(GenericDataTypeID aDataTypeID, void* aDataPtr, const nlohmann::json& aJson) const;
+		[[nodiscard]] ViewAndEditResult ViewAndEditData(GenericDataTypeID dataTypeID, void* dataPtr) const;
+		void ViewData(GenericDataTypeID dataTypeID, const void* dataPtr) const;
+		bool SaveData(GenericDataTypeID dataTypeID, const void* dataPtr, nlohmann::json& json) const;
+		bool LoadData(GenericDataTypeID dataTypeID, void* dataPtr, const nlohmann::json& json) const;
 
 		template<size_t BufferCapacity>
-		[[nodiscard]] void* AllocateData(GenericDataTypeID aDataTypeID, MemoryArena<BufferCapacity>& aArena, const void* aDefaultValue = nullptr) const;
-		void ReleaseData(GenericDataTypeID aDataTypeID, void* aDataPtr) const;
+		[[nodiscard]] void* AllocateData(GenericDataTypeID dataTypeID, MemoryArena<BufferCapacity>& arena, const void* defaultValue = nullptr) const;
+		void ReleaseData(GenericDataTypeID dataTypeID, void* dataPtr) const;
 
-		void CopyData(GenericDataTypeID aDataTypeID, void* aDestination, const void* aSource) const;
-		void SwapData(GenericDataTypeID aDataTypeID, void* aDataPtr1, void* aDataPtr2) const;
-		[[nodiscard]] bool DataEqualsTo(GenericDataTypeID aDataTypeID, const void* aDataPtr1, const void* aDataPtr2) const;
+		void CopyData(GenericDataTypeID dataTypeID, void* destination, const void* source) const;
+		void SwapData(GenericDataTypeID dataTypeID, void* dataPtr1, void* dataPtr2) const;
+		[[nodiscard]] bool DataEqualsTo(GenericDataTypeID dataTypeID, const void* dataPtr1, const void* dataPtr2) const;
 
-		[[nodiscard]] bool AreDataTypesRelated(DataTypeID aDataTypeID1, DataTypeID aDataTypeID2) const;
-		[[nodiscard]] bool AreDataTypesRelated(GenericDataTypeID aDataTypeID1, GenericDataTypeID aDataTypeID2) const;
-		[[nodiscard]] eDataTypeRelation GetDataTypeRelation(DataTypeID aDataTypeID1, DataTypeID aDataTypeID2) const;
-		[[nodiscard]] eDataTypeRelation GetDataTypeRelation(GenericDataTypeID aDataTypeID1, GenericDataTypeID aDataTypeID2) const;
+		[[nodiscard]] bool AreDataTypesRelated(DataTypeID dataTypeID1, DataTypeID dataTypeID2) const;
+		[[nodiscard]] bool AreDataTypesRelated(GenericDataTypeID dataTypeID1, GenericDataTypeID dataTypeID2) const;
+		[[nodiscard]] eDataTypeRelation GetDataTypeRelation(DataTypeID dataTypeID1, DataTypeID dataTypeID2) const;
+		[[nodiscard]] eDataTypeRelation GetDataTypeRelation(GenericDataTypeID dataTypeID1, GenericDataTypeID dataTypeID2) const;
 
-		[[nodiscard]] const std::string& GetName(GenericDataTypeID aDataTypeID) const;
+		[[nodiscard]] const std::string& GetName(GenericDataTypeID dataTypeID) const;
 
-		[[nodiscard]] Color GetDataTypeColor(GenericDataTypeID aDataTypeID) const;
-		[[nodiscard]] eDataTypeTrait GetDataTypeTraits(GenericDataTypeID aDataTypeID) const;
-		[[nodiscard]] size_t GetDataTypeSize(GenericDataTypeID aDataTypeID) const;
-		[[nodiscard]] size_t GetDataTypeAlignment(GenericDataTypeID aDataTypeID) const;
+		[[nodiscard]] Color GetDataTypeColor(GenericDataTypeID dataTypeID) const;
+		[[nodiscard]] eDataTypeTrait GetDataTypeTraits(GenericDataTypeID dataTypeID) const;
+		[[nodiscard]] size_t GetDataTypeSize(GenericDataTypeID dataTypeID) const;
+		[[nodiscard]] size_t GetDataTypeAlignment(GenericDataTypeID dataTypeID) const;
 
-		[[nodiscard]] SetPinValueF GetSetPinValueFunction(DataTypeID aDataTypeID, eIODirection aIODirection) const;
-		[[nodiscard]] SetPinValueF GetSetPinValueFunction(GenericDataTypeID aDataTypeID, eIODirection aIODirection) const;
-		[[nodiscard]] SetPinValueFromPinF GetSetPinValueFromPinFunction(DataTypeID aDataTypeID, eIODirection aIODirection) const;
-		[[nodiscard]] SetPinValueFromPinF GetSetPinValueFromPinFunction(GenericDataTypeID aDataTypeID, eIODirection aIODirection) const;
+		[[nodiscard]] SetPinValueF GetSetPinValueFunction(DataTypeID dataTypeID, eIODirection ioDirection) const;
+		[[nodiscard]] SetPinValueF GetSetPinValueFunction(GenericDataTypeID dataTypeID, eIODirection ioDirection) const;
+		[[nodiscard]] SetPinValueFromPinF GetSetPinValueFromPinFunction(DataTypeID dataTypeID, eIODirection ioDirection) const;
+		[[nodiscard]] SetPinValueFromPinF GetSetPinValueFromPinFunction(GenericDataTypeID dataTypeID, eIODirection ioDirection) const;
 
-		[[nodiscard]] DataTypeID GetDataTypeIDByName(std::string_view aName) const;
-		[[nodiscard]] GenericDataTypeID GetGenericDataTypeIDByName(std::string_view aName) const;
+		[[nodiscard]] DataTypeID GetDataTypeIDByName(std::string_view name) const;
+		[[nodiscard]] GenericDataTypeID GetGenericDataTypeIDByName(std::string_view name) const;
 
 		[[nodiscard]] EditorTextFunction GetEditorTextFunction() const;
-		void SetEditorTextFunction(EditorTextFunction aTextFunction);
+		void SetEditorTextFunction(EditorTextFunction textFunction);
 
 		[[nodiscard]] const std::unordered_map<DataTypeID, DataType>& GetDataTypes() const;
 
-		[[nodiscard]] DataType* Find(DataTypeID aDataTypeID);
-		[[nodiscard]] const DataType* Find(DataTypeID aDataTypeID) const;
-		[[nodiscard]] DataType* Find(ClassID aClassID);
-		[[nodiscard]] const DataType* Find(ClassID aClassID) const;
+		[[nodiscard]] DataType* Find(DataTypeID dataTypeID);
+		[[nodiscard]] const DataType* Find(DataTypeID dataTypeID) const;
+		[[nodiscard]] DataType* Find(ClassID classID);
+		[[nodiscard]] const DataType* Find(ClassID classID) const;
 
 		template<typename T>
 		[[nodiscard]] DataType* Find();
@@ -456,13 +456,13 @@ namespace FLY_NAMESPACE
 		template<typename T>
 		[[nodiscard]] const DataType* Find() const;
 
-		[[nodiscard]] DataType* Find(GenericDataTypeID aDataTypeID);
-		[[nodiscard]] const DataType* Find(GenericDataTypeID aDataTypeID) const;
+		[[nodiscard]] DataType* Find(GenericDataTypeID dataTypeID);
+		[[nodiscard]] const DataType* Find(GenericDataTypeID dataTypeID) const;
 
 		template<Decayed T>
 		[[nodiscard]] bool IsRegistered() const;
 
-		[[nodiscard]] bool IsRegistered(DataTypeID aDataTypeID) const;
+		[[nodiscard]] bool IsRegistered(DataTypeID dataTypeID) const;
 
 		void SetDataTypeColor(GenericDataTypeID dataTypeID, const Color& color);
 		void SetDefaultColor(const Color& color);
@@ -477,7 +477,7 @@ namespace FLY_NAMESPACE
 
 		DataTypeID CreateStruct(std::string name);
 
-		ClassID CreateClass(DataTypeID aTargetID, std::string name);
+		ClassID CreateClass(DataTypeID targetID, std::string name);
 		[[nodiscard]] Class& GetClass(ClassID classID);
 		[[nodiscard]] const Class& GetClass(ClassID classID) const;
 		[[nodiscard]] ClassID GetClassIDByName(std::string_view name) const;
@@ -681,16 +681,16 @@ namespace FLY_NAMESPACE
 	template<size_t BufferCapacity>
 	inline ClassInstance* DataTypeManager::AllocateClassInstance(const ClassID classID, MemoryArena<BufferCapacity>& arena) const
 	{
-		return &arena.Allocate<ClassInstance>(classID);
+		return &arena.template Allocate<ClassInstance>(classID);
 	}
 
 	template<size_t BufferCapacity>
 	inline void* DataTypeManager::AllocateData(const GenericDataTypeID dataTypeID, MemoryArena<BufferCapacity>& arena, const void* defaultValue) const
 	{
 		return std::visit(Visitor{
-			[this, &arena, defaultValue](const DataTypeID aDataTypeID) -> void*
+			[this, &arena, defaultValue](const DataTypeID dataTypeID) -> void*
 			{
-				return AllocateData(aDataTypeID, arena, defaultValue);
+				return AllocateData(dataTypeID, arena, defaultValue);
 			},
 			[this, &arena](const StructID structID) -> void*
 			{

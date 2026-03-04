@@ -1,6 +1,6 @@
 #include <External/Catch2/catch_amalgamated.hpp>
-#include "Utility/CameraMath.hpp"
-#include "Utility/Win/WinAdapterFunctions.hpp"
+#include "Engine/Utility/CameraMath.hpp"
+#include "Engine/Utility/Win/WinAdapterFunctions.hpp"
 //#include <Windows.h>
 #include <DirectXMath.h>
 

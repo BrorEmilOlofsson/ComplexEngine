@@ -4,9 +4,9 @@
 #include "Game/ECS/Components/PlanetComponent.hpp"
 #include "Engine/ECSEngine/Components/CameraComponent.hpp"
 #include "Engine/ECSEngine/Utility/ECSTransformUtility.hpp"
-#include "Utility/CollisionFunctions.hpp"
-#include "Utility/ShapeMath.hpp"
-#include "Graphics/RenderState.hpp"
+#include "Engine/Utility/CollisionFunctions.hpp"
+#include "Engine/Math/ShapeMath.hpp"
+#include "Engine/Graphics/RenderState.hpp"
 
 using namespace Simple;
 

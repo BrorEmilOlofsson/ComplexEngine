@@ -1,6 +1,6 @@
 #pragma once
-#include "Utility/Math/UnitVector3.hpp"
-#include "Utility/Math/TransformMode.hpp"
+#include "Engine/Math/UnitVector3.hpp"
+#include "Engine/Math/TransformMode.hpp"
 
 namespace Simple
 {

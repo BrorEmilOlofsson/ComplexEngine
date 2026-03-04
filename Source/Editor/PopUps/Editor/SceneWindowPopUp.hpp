@@ -3,7 +3,7 @@
 #include "Editor/Tools/TransformEntityTool.hpp"
 #include "Editor/PopUps/Editor/SceneHierarchyPopUp.hpp"
 #include "Editor/PopUps/Editor/SceneInspectorPopUp.hpp"
-#include "Utility/Camera.hpp"
+#include "Engine/Utility/Camera.hpp"
 
 namespace Simple
 {

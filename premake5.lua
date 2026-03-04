@@ -210,59 +210,59 @@ workspace "FootballGame" -- Workspace, is not same as Project. Anything configur
 
 	--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-	group "Engine"
-		project "Utility"
-			kind "StaticLib"
-			location (dirs.Local)
-			targetdir (dirs.SimpleLib)
-			targetname("%{prj.name}_%{cfg.buildcfg}") 
-			fatalwarnings { "All" }
+	-- group "Engine"
+	-- 	project "Utility"
+	-- 		kind "StaticLib"
+	-- 		location (dirs.Local)
+	-- 		targetdir (dirs.SimpleLib)
+	-- 		targetname("%{prj.name}_%{cfg.buildcfg}") 
+	-- 		fatalwarnings { "All" }
 
-			pchheader "Utility/Precompiled/UtilityPch.hpp" -- Force all Source (.cpp) files in this project to include "Engine/Precomplier/stdafx.h"
-			pchsource "Source/Utility/Precompiled/UtilityPch.cpp" -- Telling this project to use precomplier header
+	-- 		pchheader "Utility/Precompiled/UtilityPch.hpp" -- Force all Source (.cpp) files in this project to include "Engine/Precomplier/stdafx.h"
+	-- 		pchsource "Source/Utility/Precompiled/UtilityPch.cpp" -- Telling this project to use precomplier header
 
-			files {
-				"Source/Utility/**.h",
-				"Source/Utility/**.hpp",
-				"Source/Utility/**.cpp",
-				"Source/Utility/**.ixx"
-			}
+	-- 		files {
+	-- 			"Source/Utility/**.h",
+	-- 			"Source/Utility/**.hpp",
+	-- 			"Source/Utility/**.cpp",
+	-- 			"Source/Utility/**.ixx"
+	-- 		}
 
-			includedirs {
-				"Source/",
-				"Source/External/"
-			}
+	-- 		includedirs {
+	-- 			"Source/",
+	-- 			"Source/External/"
+	-- 		}
 
 	--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	
-	group "Engine"
-		project "Graphics"
-			kind "StaticLib"
-			location (dirs.Local)
-			targetdir (dirs.SimpleLib)
-			targetname("%{prj.name}_%{cfg.buildcfg}") 
-			fatalwarnings { "All" }
+	-- group "Engine"
+	-- 	project "Graphics"
+	-- 		kind "StaticLib"
+	-- 		location (dirs.Local)
+	-- 		targetdir (dirs.SimpleLib)
+	-- 		targetname("%{prj.name}_%{cfg.buildcfg}") 
+	-- 		fatalwarnings { "All" }
 
-			pchheader "Graphics/Precompiled/GraphicsPch.hpp" -- Force all Source (.cpp) files in this project to include "Engine/Precomplier/stdafx.h"
-			pchsource "Source/Graphics/Precompiled/GraphicsPch.cpp" -- Telling this project to use precomplier header
+	-- 		pchheader "Graphics/Precompiled/GraphicsPch.hpp" -- Force all Source (.cpp) files in this project to include "Engine/Precomplier/stdafx.h"
+	-- 		pchsource "Source/Graphics/Precompiled/GraphicsPch.cpp" -- Telling this project to use precomplier header
 
-			files {
-				"Source/Graphics/**.h",
-				"Source/Graphics/**.hpp",
-				"Source/Graphics/**.cpp",
-				"Source/Graphics/**.hlsl",
-				"Source/Graphics/**.hlsli",
-				"Source/Graphics/**.ixx"
-			}
+	-- 		files {
+	-- 			"Source/Graphics/**.h",
+	-- 			"Source/Graphics/**.hpp",
+	-- 			"Source/Graphics/**.cpp",
+	-- 			"Source/Graphics/**.hlsl",
+	-- 			"Source/Graphics/**.hlsli",
+	-- 			"Source/Graphics/**.ixx"
+	-- 		}
 
-			includedirs {
-				"Source/",
-				"Source/External/"
-			}
+	-- 		includedirs {
+	-- 			"Source/",
+	-- 			"Source/External/"
+	-- 		}
 
-			links {
-				"d3d11"
-			}
+	-- 		links {
+	-- 			"d3d11"
+	-- 		}
 
 	--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	
@@ -289,7 +289,11 @@ workspace "FootballGame" -- Workspace, is not same as Project. Anything configur
 				"Source/Engine/**.hpp", 
 				"Source/Engine/**.cpp",
 				"Source/Engine/**.ixx"
-			} 
+			}
+
+			links {
+				"d3d11"
+			}
 
 	--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	
@@ -411,9 +415,9 @@ workspace "FootballGame" -- Workspace, is not same as Project. Anything configur
 
 		links {
 			"External", 
-			"Utility",
+			--"Utility",
 			"NodeScript",
-			"Graphics", 
+			--"Graphics", 
 			"Engine",
 			"Shader",
 			"Game",
@@ -476,8 +480,8 @@ workspace "FootballGame" -- Workspace, is not same as Project. Anything configur
 			links {
 				"External",
 				"NodeScript",
-				"Utility",
-				"Graphics", 
+				--"Utility",
+				--"Graphics", 
 				"Engine",
 				"Editor"
 			}
@@ -538,9 +542,9 @@ workspace "FootballGame" -- Workspace, is not same as Project. Anything configur
 
 			links {
 				"External",
-				"Utility",
+				--"Utility",
 				"NodeScript",
-				"Graphics", 
+				--"Graphics", 
 				"Engine"
 			}
 

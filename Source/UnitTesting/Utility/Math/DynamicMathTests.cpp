@@ -1,9 +1,9 @@
 #include <External/Catch2/catch_amalgamated.hpp>
-#include "Utility/Math/DynamicPoint.hpp"
-#include "Utility/Math/DynamicVector.hpp"
-#include "Utility/Math/DynamicMath.hpp"
-#include "Utility/Math/DynamicUnitVector.hpp"
-#include "Utility/Math/Math.hpp"
+#include "Engine/Math/DynamicPoint.hpp"
+#include "Engine/Math/DynamicVector.hpp"
+#include "Engine/Math/DynamicMath.hpp"
+#include "Engine/Math/DynamicUnitVector.hpp"
+#include "Engine/Math/Math.hpp"
 
 using namespace Simple;
 

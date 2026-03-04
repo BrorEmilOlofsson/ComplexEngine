@@ -1,7 +1,7 @@
 #include "Editor/Precompiled/EditorPch.hpp"
 #include "CameraSettingsWindow.hpp"
 #include "Engine/Utility/BlackboardKeys.hpp"
-#include "Utility/Camera.hpp"
+#include "Engine/Utility/Camera.hpp"
 #include "Engine/Camera/CameraMovement.hpp"
 
 namespace Simple

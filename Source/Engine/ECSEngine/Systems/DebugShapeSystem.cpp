@@ -1,9 +1,9 @@
 #include "Engine/Precompiled/EnginePch.hpp"
 #include "DebugShapeSystem.hpp"
 #include "Engine/ECS/ECS.hpp"
-#include "Graphics/RenderState.hpp"
+#include "Engine/Graphics/RenderState.hpp"
 #include "Engine/ECSEngine/Components/CylinderComponent.hpp"
-#include "Utility/ShapeMath.hpp"
+#include "Engine/Math/ShapeMath.hpp"
 
 namespace Simple
 {

@@ -1,6 +1,6 @@
 #include <External/Catch2/catch_amalgamated.hpp>
 
-#include "Utility/ShapeMath.hpp"
+#include "Engine/Math/ShapeMath.hpp"
 
 using namespace Simple;
 

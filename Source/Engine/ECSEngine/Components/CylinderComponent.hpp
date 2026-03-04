@@ -1,6 +1,6 @@
 #pragma once
-#include "Utility/Shapes/Cylinder.hpp"
-#include "Utility/RGBColor.hpp"
+#include "Engine/Math/Shapes/Cylinder.hpp"
+#include "Engine/Utility/RGBColor.hpp"
 
 namespace Simple
 {

@@ -3,10 +3,10 @@
 #include "Engine/ECS/ECS.hpp"
 #include "Editor/PopUps/Editor/SceneHierarchyPopUp.hpp"
 #include "Editor/PopUps/Editor/SceneInspectorPopUp.hpp"
-#include "Utility/Camera.hpp"
-#include "Graphics/RenderState.hpp"
+#include "Engine/Utility/Camera.hpp"
+#include "Engine/Graphics/RenderState.hpp"
 #include "Editor/Tools/TransformEntityTool.hpp"
-#include "Utility/Asset/EntityCompositionAsset.hpp"
+#include "Engine/Asset/EntityCompositionAsset.hpp"
 
 namespace Simple
 {

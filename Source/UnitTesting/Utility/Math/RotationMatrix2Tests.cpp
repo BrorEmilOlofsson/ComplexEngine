@@ -1,6 +1,6 @@
 #include <External/Catch2/catch_amalgamated.hpp>
-#include "Utility/Math/RotationMatrix2.hpp"
-#include "Utility/Approximation.hpp"
+#include "Engine/Math/RotationMatrix2.hpp"
+#include "Engine/Utility/Approximation.hpp"
 
 using namespace Simple;
 

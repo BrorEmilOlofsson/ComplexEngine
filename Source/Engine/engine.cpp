@@ -8,10 +8,10 @@
 #include "Engine/ECSEngine/Systems/NavmeshSystem.hpp"
 #include "Engine/ECSEngine/Systems/DebugShapeSystem.hpp"
 #include "Engine/ECSEngine/Components/AllEngineComponents.hpp"
-#include "Utility/File/FileUtility.hpp"
+#include "Engine/Utility/File/FileUtility.hpp"
 #include "Engine/Reflection/EngineReflectionRegistration.hpp"
-#include "Utility/GraphicsBufferData.hpp"
-#include "Utility/EngineDirectories.hpp"
+#include "Engine/Utility/GraphicsBufferData.hpp"
+#include "Engine/Utility/EngineDirectories.hpp"
 #include "Engine/ECS/EntityComposition.hpp"
 #include "Engine/ECS/ECSSerializer.hpp"
 #include <External/nlohmann/json.hpp>

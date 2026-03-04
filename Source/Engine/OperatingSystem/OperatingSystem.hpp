@@ -1,9 +1,9 @@
 #pragma once
 #include "Engine/OperatingSystem/WindowView.hpp"
 #include "Engine/OperatingSystem/WindowHandle.hpp"
-#include "Utility/GraphicsBufferData.hpp"
-#include "Graphics/GraphicsFoundation.hpp"
-#include "Graphics/RenderState.hpp"
+#include "Engine/Utility/GraphicsBufferData.hpp"
+#include "Engine/Graphics/GraphicsFoundation.hpp"
+#include "Engine/Graphics/RenderState.hpp"
 
 namespace Simple
 {

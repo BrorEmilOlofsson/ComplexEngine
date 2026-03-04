@@ -2,8 +2,8 @@
 #include "NavmeshData.hpp"
 #include "Pathfinder.hpp"
 
-#include "Utility/Shapes/LineSegment3.hpp"
-#include "Utility/Shapes/AABB2.hpp"
+#include "Engine/Math/Shapes/LineSegment3.hpp"
+#include "Engine/Math/Shapes/AABB2.hpp"
 
 #include <vector>
 #include <queue>
@@ -11,10 +11,10 @@
 #include <optional>
 #include <filesystem>
 
-#include "Utility/Shapes/LineSegment2.hpp"
-#include "Utility/Shapes/Triangle3.hpp"
-#include "Utility/Grid/Grid2.hpp"
-#include "Utility/Shapes/Ray3.hpp"
+#include "Engine/Math/Shapes/LineSegment2.hpp"
+#include "Engine/Math/Shapes/Triangle3.hpp"
+#include "Engine/Utility/Grid/Grid2.hpp"
+#include "Engine/Math/Shapes/Ray3.hpp"
 
 namespace Simple
 {

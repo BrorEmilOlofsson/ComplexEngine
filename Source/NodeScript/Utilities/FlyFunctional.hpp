@@ -48,10 +48,10 @@ namespace FLY_NAMESPACE
 
 		[[nodiscard]] explicit operator bool() const
 		{
-			return !Empty();
+			return !IsEmpty();
 		}
 
-		[[nodiscard]] bool Empty() const
+		[[nodiscard]] bool IsEmpty() const
 		{
 			return mFunction == nullptr;
 		}

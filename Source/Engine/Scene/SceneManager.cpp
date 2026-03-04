@@ -4,7 +4,7 @@
 #include "External/profiler.h"
 #include "External/nlohmann/json.hpp"
 #include "Engine/Scene/SceneLoader.hpp"
-#include "Utility/Algorithm.hpp"
+#include "Engine/Utility/Algorithm.hpp"
 #include <fstream>
 
 namespace Simple

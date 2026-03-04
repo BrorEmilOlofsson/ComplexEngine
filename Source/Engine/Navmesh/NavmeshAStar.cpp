@@ -1,7 +1,7 @@
 #include "Engine/Precompiled/EnginePch.hpp"
 #include "NavmeshAStar.hpp"
 #include "Navmesh.hpp"
-#include "Utility/ShapeMath.hpp"
+#include "Engine/Math/ShapeMath.hpp"
 #include <ranges>
 
 #define COMMENTS_ENABLED 0

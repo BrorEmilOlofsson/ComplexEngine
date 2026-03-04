@@ -1,5 +1,5 @@
 #include <External/Catch2/catch_amalgamated.hpp>
-#include "Utility/Math/CubicBezierCurve2.hpp"
+#include "Engine/Math/CubicBezierCurve2.hpp"
 
 using namespace Simple;
 

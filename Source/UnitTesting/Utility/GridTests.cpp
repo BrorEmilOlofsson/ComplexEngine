@@ -1,7 +1,7 @@
 #include <External/Catch2/catch_amalgamated.hpp>
 
-#include "Utility/Grid/Grid2.hpp"
-#include "Utility/Grid/Grid3.hpp"
+#include "Engine/Utility/Grid/Grid2.hpp"
+#include "Engine/Utility/Grid/Grid3.hpp"
 
 using namespace Simple;
 

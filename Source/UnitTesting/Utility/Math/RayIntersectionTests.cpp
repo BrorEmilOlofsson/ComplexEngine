@@ -1,6 +1,6 @@
 #include <External/Catch2/catch_amalgamated.hpp>
 
-#include "Utility/Intersection.hpp"
+#include "Engine/Utility/Intersection.hpp"
 
 using namespace Simple;
 

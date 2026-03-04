@@ -1,8 +1,8 @@
 #include "Engine/Precompiled/EnginePch.hpp"
 #include "DebugShapes.hpp"
-#include "Utility/Shapes/Sphere.hpp"
-#include "Utility/Shapes/Ray3.hpp"
-#include "Graphics/RenderList.hpp"
+#include "Engine/Math/Shapes/Sphere.hpp"
+#include "Engine/Math/Shapes/Ray3.hpp"
+#include "Engine/Graphics/RenderList.hpp"
 
 namespace Simple
 {

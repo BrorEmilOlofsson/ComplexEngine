@@ -1,8 +1,8 @@
 #pragma once
 #include "Editor/Core/PopUp.hpp"
-#include "Utility/Math/Vector2.hpp"
-#include "Graphics/GraphicsDeclarations.hpp"
-#include "Utility/ManualTimer.hpp"
+#include "Engine/Math/Vector2.hpp"
+#include "Engine/Graphics/GraphicsDeclarations.hpp"
+#include "Engine/Utility/ManualTimer.hpp"
 #include <vector>
 #include <string>
 #include <optional>

@@ -1,5 +1,5 @@
 #include <External/Catch2/catch_amalgamated.hpp>
-#include "Utility/Shapes/Sphere.hpp"
+#include "Engine/Math/Shapes/Sphere.hpp"
 
 using namespace Simple;
 

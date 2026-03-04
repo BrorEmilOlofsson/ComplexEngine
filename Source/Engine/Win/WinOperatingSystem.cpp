@@ -1,7 +1,7 @@
 #include "Engine/Precompiled/EnginePch.hpp"
 #include "WinOperatingSystem.hpp"
-#include "Utility/Win/WinException.hpp"
-#include "Graphics/DX11/DX11Foundation.hpp"
+#include "Engine/Utility/Win/WinException.hpp"
+#include "Engine/Graphics/DX11/DX11Foundation.hpp"
 
 #ifdef _WIN32
 

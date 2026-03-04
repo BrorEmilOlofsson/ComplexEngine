@@ -1,9 +1,9 @@
 #pragma once
 #include <vector>
-#include "Utility/Math/Point2.hpp"
-#include "Utility/Math/Point3.hpp"
+#include "Engine/Math/Point2.hpp"
+#include "Engine/Math/Point3.hpp"
 #include "NavmeshDefines.hpp"
-#include "Utility/Shapes/Plane.hpp"
+#include "Engine/Math/Shapes/Plane.hpp"
 
 namespace Simple
 {

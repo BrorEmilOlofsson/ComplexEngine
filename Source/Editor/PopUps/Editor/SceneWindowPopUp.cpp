@@ -3,14 +3,14 @@
 #include "Editor/Functions/ECSEditorFunctions.hpp"
 #include "Editor/Editor.hpp"
 #include "Editor/Functions/EditorFunctions.hpp"
-#include "Utility/AssetPath.hpp"
+#include "Engine/Utility/AssetPath.hpp"
 #include "Engine/Navmesh/NavmeshLoader.hpp"
 #include "Engine/Scene/SceneManager.hpp"
 #include "Engine/Utility/BlackboardKeys.hpp"
 #include "Engine/OperatingSystem/OperatingSystem.hpp"
 #include "Editor/EditorSceneSettings.hpp"
 #include "Engine/Utility/DebugShapes.hpp"
-#include "Utility/Asset/AssetManager.hpp"
+#include "Engine/Asset/AssetManager.hpp"
 #include <External/AwsomeFontIcons/IconFontDefines.h>
 
 namespace Simple

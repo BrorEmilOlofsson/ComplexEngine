@@ -73,9 +73,9 @@ namespace FLY_NAMESPACE
 		function.SetName(std::move(name));
 	}
 
-	void FunctionProxy::AddPin(GenericDataTypeProxy aDataTypeProxy, eIODirection aIODirection, std::string name, CommandTracker* commandTracker)
+	void FunctionProxy::AddPin(GenericDataTypeProxy aDataTypeProxy, eIODirection ioDirection, std::string name, CommandTracker* commandTracker)
 	{
-		Internal::AddPinTypeToFunction(mFunctionID, aDataTypeProxy.GetID(), aIODirection, std::move(name), commandTracker);
+		Internal::AddPinTypeToFunction(mFunctionID, aDataTypeProxy.GetID(), ioDirection, std::move(name), commandTracker);
 	}
 
 	void FunctionProxy::SetPinNameAtIndex(std::string name, size_t index, eIODirection ioDirection, CommandTracker* commandTracker)
@@ -83,9 +83,9 @@ namespace FLY_NAMESPACE
 		Internal::SetPinNameAtIndexFunction(mFunctionID, std::move(name), index, ioDirection, commandTracker);
 	}
 
-	void FunctionProxy::SetPinDataTypeAtIndex(GenericDataTypeProxy aDataTypeProxy, size_t aIndex, eIODirection ioDirection, CommandTracker* commandTracker)
+	void FunctionProxy::SetPinDataTypeAtIndex(GenericDataTypeProxy dataTypeProxy, std::size_t index, eIODirection ioDirection, CommandTracker* commandTracker)
 	{
-		Internal::SetPinDataTypeAtIndexFunction(mFunctionID, aDataTypeProxy.GetID(), aIndex, ioDirection, commandTracker);
+		Internal::SetPinDataTypeAtIndexFunction(mFunctionID, dataTypeProxy.GetID(), index, ioDirection, commandTracker);
 	}
 
 	FunctionProxy::operator bool() const

@@ -1,8 +1,8 @@
 #include <Catch2/catch_amalgamated.hpp>
 
-#include "Utility/Math/Quaternion.hpp"
-#include "Utility/Math/Matrix4x4.hpp"
-#include "Utility/Math/RotationMath.hpp"
+#include "Engine/Math/Quaternion.hpp"
+#include "Engine/Math/Matrix4x4.hpp"
+#include "Engine/Math/RotationMath.hpp"
 
 using namespace Simple;
 

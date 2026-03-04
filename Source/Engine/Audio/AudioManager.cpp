@@ -1,6 +1,6 @@
 #include "Engine/Precompiled/EnginePch.hpp"
 #include "AudioManager.hpp"
-#include "Utility/Algorithm.hpp"
+#include "Engine/Utility/Algorithm.hpp"
 #include <External/TheGameAssembly/SoundEngine/SoundEngine.h>
 #include <External/TheGameAssembly/SoundEngine/SoundEngineImpl.hpp>
 

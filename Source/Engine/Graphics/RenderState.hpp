@@ -1,0 +1,137 @@
+#pragma once
+#include <vector>
+#include <optional>
+#include "Engine/Graphics/RenderList.hpp"
+#include "Engine/Utility/Camera.hpp"
+#include "Engine/Graphics/SkyBox/Skybox.hpp"
+#include "Engine/Graphics/Light/DirectionalLight.hpp"
+#include "Engine/Graphics/Light/PointLight.hpp"
+#include "Engine/Graphics/Light/AmbientLight.hpp"
+#include "Engine/Graphics/RenderTarget/RenderTargetView.hpp"
+#include "Engine/Graphics/DepthBuffer/DepthStencilViewHandle.hpp"
+#include "Engine/Graphics/RenderContext.hpp"
+
+namespace Simple
+{
+
+	class RenderState final
+	{
+	public:
+
+		constexpr RenderState() = default;
+
+		[[nodiscard]] constexpr RenderList& GetRenderList() noexcept;
+		[[nodiscard]] constexpr const RenderList& GetRenderList() const noexcept;
+		[[nodiscard]] constexpr const std::optional<Camera>& GetCamera() const noexcept;
+		[[nodiscard]] constexpr const std::optional<SkyBox>& GetSkyBox() const noexcept;
+		[[nodiscard]] constexpr const std::optional<DirectionalLight>& GetDirectionalLight() const noexcept;
+		[[nodiscard]] constexpr const std::optional<AmbientLight>& GetAmbientLight() const noexcept;
+		[[nodiscard]] constexpr const std::optional<AABB2i>& GetRenderRect() const noexcept;
+		[[nodiscard]] constexpr RenderContext* GetRenderContext() noexcept;
+		[[nodiscard]] constexpr const RenderContext* GetRenderContext() const noexcept;
+		
+		constexpr void SetSkyBox(const SkyBox& skyBox) noexcept;
+		constexpr void SetDirectionalLight(const DirectionalLight& directionalLight) noexcept;
+		constexpr void SetAmbientLight(const AmbientLight& ambientLight) noexcept;
+		constexpr void SetCamera(const Camera& camera) noexcept;
+		constexpr void SetRenderRect(const AABB2i& renderRect) noexcept;
+		constexpr void SetRenderContext(RenderContext&& renderContext);
+
+		constexpr void Reset();
+
+	private:
+
+		RenderList mRenderList;
+		std::optional<Camera> mCamera;
+		std::optional<SkyBox> mSkyBox;
+		std::optional<DirectionalLight> mDirectionalLight;
+		std::optional<AmbientLight> mAmbientLight;
+		std::optional<AABB2i> mRenderRect;
+		std::unique_ptr<RenderContext> mRenderContext;
+	};
+
+	constexpr RenderList& RenderState::GetRenderList() noexcept
+	{
+		return mRenderList;
+	}
+
+	constexpr const RenderList& RenderState::GetRenderList() const noexcept
+	{
+		return mRenderList;
+	}
+
+	constexpr const std::optional<Camera>& RenderState::GetCamera() const noexcept
+	{
+		return mCamera;
+	}
+
+	constexpr const std::optional<SkyBox>& RenderState::GetSkyBox() const noexcept
+	{
+		return mSkyBox;
+	}
+
+	constexpr const std::optional<DirectionalLight>& RenderState::GetDirectionalLight() const noexcept
+	{
+		return mDirectionalLight;
+	}
+
+	constexpr const std::optional<AmbientLight>& RenderState::GetAmbientLight() const noexcept
+	{
+		return mAmbientLight;
+	}
+
+	constexpr const std::optional<AABB2i>& RenderState::GetRenderRect() const noexcept
+	{
+		return mRenderRect;
+	}
+
+	constexpr RenderContext* RenderState::GetRenderContext() noexcept
+	{
+		return mRenderContext.get();
+	}
+
+	constexpr const RenderContext* RenderState::GetRenderContext() const noexcept
+	{
+		return mRenderContext.get();
+	}
+
+	constexpr void RenderState::SetSkyBox(const SkyBox& skyBox) noexcept
+	{
+		mSkyBox = skyBox;
+	}
+
+	constexpr void RenderState::SetDirectionalLight(const DirectionalLight& directionalLight) noexcept
+	{
+		mDirectionalLight = directionalLight;
+	}
+
+	constexpr void RenderState::SetAmbientLight(const AmbientLight& ambientLight) noexcept
+	{
+		mAmbientLight = ambientLight;
+	}
+
+	constexpr void RenderState::SetCamera(const Camera& camera) noexcept
+	{
+		mCamera = camera;
+	}
+
+	constexpr void RenderState::SetRenderRect(const AABB2i& renderRect) noexcept
+	{
+		mRenderRect = renderRect;
+	}
+
+	constexpr void RenderState::SetRenderContext(RenderContext&& renderContext)
+	{
+		mRenderContext = std::make_unique<RenderContext>(std::move(renderContext));
+	}
+
+	constexpr void RenderState::Reset()
+	{
+		mRenderList.Clear();
+		mSkyBox.reset();
+		mDirectionalLight.reset();
+		mAmbientLight.reset();
+		//mRenderRect.reset();
+		mCamera.reset();
+	}
+}

@@ -10,7 +10,7 @@
 #include "Engine/ECSEngine/Utility/ECSTransformUtility.hpp"
 #include "Engine/ECSEngine/Utility/ECSTransformHierarchyUtility.hpp"
 #include "Engine/ECS/ECSSerializer.hpp"
-#include "Utility/Asset/AssetManager.hpp"
+#include "Engine/Asset/AssetManager.hpp"
 
 namespace Simple
 {

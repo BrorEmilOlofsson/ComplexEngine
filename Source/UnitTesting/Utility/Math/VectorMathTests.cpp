@@ -1,6 +1,6 @@
 #include <External/Catch2/catch_amalgamated.hpp>
 
-#include "Utility/Math/VectorMath.hpp"
+#include "Engine/Math/VectorMath.hpp"
 
 using namespace Simple;
 

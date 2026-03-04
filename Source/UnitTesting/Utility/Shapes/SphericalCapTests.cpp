@@ -1,5 +1,5 @@
 #include <External/Catch2/catch_amalgamated.hpp>
-#include "Utility/Shapes/SphericalCap.hpp"
+#include "Engine/Math/Shapes/SphericalCap.hpp"
 
 using namespace Simple;
 

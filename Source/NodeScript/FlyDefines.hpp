@@ -62,7 +62,7 @@ namespace FLY_NAMESPACE
 
 	private:
 
-		static constexpr IDType Initialize()
+		static constexpr IDType GetInitialized()
 		{
 			if constexpr (std::is_fundamental_v<IDType>)
 			{
@@ -75,7 +75,7 @@ namespace FLY_NAMESPACE
 		}
 
 	public:
-		IDType mID = Initialize();
+		IDType mID = GetInitialized();
 	};
 
 	template<typename IDWrapperType> requires std::is_base_of_v<IDWrapper<typename IDWrapperType::value_type>, IDWrapperType>

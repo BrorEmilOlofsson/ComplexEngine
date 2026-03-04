@@ -10,8 +10,8 @@
 #include "EntityID.hpp"
 #include "ComponentPool.hpp"
 #include "ECSSystem.hpp"
-#include "Utility/Blackboard.hpp"
-#include "Utility/TypeList.hpp"
+#include "Engine/Utility/Blackboard.hpp"
+#include "Engine/Utility/TypeList.hpp"
 
 namespace Simple
 {

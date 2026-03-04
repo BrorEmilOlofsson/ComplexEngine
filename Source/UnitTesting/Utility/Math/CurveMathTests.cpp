@@ -1,5 +1,5 @@
 #include <External/Catch2/catch_amalgamated.hpp>
-#include "Utility/Math/CurveMath.hpp"
+#include "Engine/Math/CurveMath.hpp"
 
 using namespace Simple;
 

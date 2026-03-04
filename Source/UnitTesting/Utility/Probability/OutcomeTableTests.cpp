@@ -1,4 +1,4 @@
-#include "Utility/Probability/OutcomeTable.hpp"
+#include "Engine/Utility/Probability/OutcomeTable.hpp"
 #include <External/Catch2/catch_amalgamated.hpp>
 
 using namespace Simple;

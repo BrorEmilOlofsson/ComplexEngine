@@ -1,5 +1,5 @@
 #include <External/Catch2/catch_amalgamated.hpp>
-#include "Utility/Math/Point3.hpp"
+#include "Engine/Math/Point3.hpp"
 
 using namespace Simple;
 

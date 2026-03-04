@@ -1,7 +1,7 @@
 #pragma once
-#include "Utility/Math/Point2.hpp"
-#include "Utility/Math/Vector2.hpp"
-#include "Utility/Input/InputMouseState.hpp"
+#include "Engine/Math/Point2.hpp"
+#include "Engine/Math/Vector2.hpp"
+#include "Engine/Input/InputMouseState.hpp"
 
 #ifdef _WIN32
 

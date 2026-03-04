@@ -35,7 +35,14 @@ namespace FLY_NAMESPACE
 	{
 	public:
 
-		PinType(std::string name, GenericDataTypeID dataTypeID, SetPinValueF setPinValueFunction, SetPinValueFromPinF setPinValueFromPinFunction, MemoryPoolID defaultValueMemoryID, eIODirection ioDirection);
+		
+		[[nodiscard]] static PinType Create(std::string name,
+			GenericDataTypeID dataTypeID,
+			SetPinValueF setPinValueFunction,
+			SetPinValueFromPinF setPinValueFromPinFunction,
+			MemoryPoolID defaultValueMemoryID,
+			eIODirection ioDirection,
+			PinTypeID parentID);
 
 		[[nodiscard]] const std::string& GetName() const;
 		[[nodiscard]] constexpr GenericDataTypeID GetDataTypeID() const;
@@ -44,9 +51,21 @@ namespace FLY_NAMESPACE
 		[[nodiscard]] constexpr MemoryPoolID GetDefaultValueMemoryID() const;
 		[[nodiscard]] constexpr const std::vector<PinTypeID>& GetSplitPinTypeIDs() const;
 		[[nodiscard]] constexpr eIODirection GetIODirection() const;
+		[[nodiscard]] constexpr PinTypeID GetParentID() const;
 		
 		void SetName(std::string name);
 		void AddSplitPinTypeID(PinTypeID pinTypeID);
+
+	private:
+
+		PinType(std::string name,
+			GenericDataTypeID dataTypeID,
+			SetPinValueF setPinValueFunction,
+			SetPinValueFromPinF setPinValueFromPinFunction,
+			MemoryPoolID defaultValueMemoryID,
+			eIODirection ioDirection,
+			PinTypeID parentID
+		);
 
 	private:
 
@@ -57,6 +76,7 @@ namespace FLY_NAMESPACE
 		SetPinValueFromPinF mSetPinValueFromPinFunction;
 		MemoryPoolID mDefaultValueID = InvalidID<MemoryPoolID>();
 		std::vector<PinTypeID> mSplitPinTypeIDs;
+        PinTypeID mParentID = InvalidID<PinTypeID>();
 		eIODirection mIODirection = eIODirection::Input;
 	};
 
@@ -91,22 +111,8 @@ namespace FLY_NAMESPACE
 		return mIODirection;
 	}
 
-	[[nodiscard]] constexpr eIODirection InvertIODirection(const eIODirection ioDirection)
+	constexpr PinTypeID PinType::GetParentID() const
 	{
-		return ioDirection == eIODirection::Input ? eIODirection::Output : eIODirection::Input;
-	}
-
-	[[nodiscard]] std::string IODirectionToString(const eIODirection ioDirection);
-
-	[[nodiscard]] eIODirection StringToIODirection(const std::string& name);
-
-	[[nodiscard]] constexpr decltype(auto) SelectByIODirection(eIODirection ioDirection, auto&& inputValue, auto&& outputValue)
-	{
-		return ioDirection == eIODirection::Input ? inputValue : outputValue;
-	}
-
-	[[nodiscard]] constexpr decltype(auto) SelectByIODirection(eIODirection ioDirection, const auto& inputValue, const auto& outputValue)
-	{
-		return ioDirection == eIODirection::Input ? inputValue : outputValue;
-	}
+		return mParentID;
+    }
 }

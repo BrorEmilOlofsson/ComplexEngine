@@ -1,8 +1,8 @@
 #pragma once
 #include "WindowFrameBuffer.hpp"
-#include "Utility/Shapes/AABB2.hpp"
-#include "Utility/Input/InputState.hpp"
-#include "Utility/SystemTimer.hpp"
+#include "Engine/Math/Shapes/AABB2.hpp"
+#include "Engine/Input/InputState.hpp"
+#include "Engine/Utility/SystemTimer.hpp"
 
 namespace Simple
 {

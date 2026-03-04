@@ -1,6 +1,6 @@
 #include <External/Catch2/catch_amalgamated.hpp>
 
-#include "Utility/Math/Point2.hpp"
+#include "Engine/Math/Point2.hpp"
 
 using namespace Simple;
 

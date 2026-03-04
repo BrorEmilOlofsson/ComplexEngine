@@ -1,6 +1,6 @@
 #pragma once
-#include "Graphics/Text/Text2D.hpp"
-#include "Utility/Shapes/AABB2.hpp"
+#include "Engine/Graphics/Text/Text2D.hpp"
+#include "Engine/Math/Shapes/AABB2.hpp"
 #include <functional>
 #include <string>
 

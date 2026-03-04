@@ -1,7 +1,7 @@
 #pragma once
-#include "Utility/Asset/AnimatedModelAsset.hpp"
-#include "Graphics/Animation/AnimationPlayer.hpp"
-#include "Utility/Asset/TextureAsset.hpp"
+#include "Engine/Asset/AnimatedModelAsset.hpp"
+#include "Engine/Graphics/Animation/AnimationPlayer.hpp"
+#include "Engine/Asset/TextureAsset.hpp"
 
 namespace Simple
 {

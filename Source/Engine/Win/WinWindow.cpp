@@ -1,10 +1,10 @@
 #include "Engine/Precompiled/EnginePch.hpp"
 #include "WinWindow.hpp"
-#include "Utility/Win/WinAdapterFunctions.hpp"
+#include "Engine/Utility/Win/WinAdapterFunctions.hpp"
 #include <External/imgui/imgui.h>
-#include "Utility/Win/WinUtility.hpp"
-#include "Utility/Win/WinConsole.hpp"
-#include "Utility/Win/WinException.hpp"
+#include "Engine/Utility/Win/WinUtility.hpp"
+#include "Engine/Utility/Win/WinConsole.hpp"
+#include "Engine/Utility/Win/WinException.hpp"
 
 #ifdef _WIN32
 

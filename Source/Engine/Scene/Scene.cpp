@@ -1,9 +1,9 @@
 #include "Engine/Precompiled/EnginePch.hpp"
 #include "Scene.hpp"
-#include "Utility/CameraMath.hpp"
-#include "Utility/ShapeMath.hpp"
-#include "Utility/Blackboard.hpp"
 #include <memory>
+#include "Engine/Utility/CameraMath.hpp"
+#include "Engine/Math/ShapeMath.hpp"
+#include "Engine/Utility/Blackboard.hpp"
 #include "Engine/ECS/ECSRegistry.hpp"
 
 namespace Simple

@@ -1,5 +1,5 @@
 #include <External/Catch2/catch_amalgamated.hpp>
-#include "Utility/Shapes/Ray3.hpp"
+#include "Engine/Math/Shapes/Ray3.hpp"
 
 using namespace Simple;
 

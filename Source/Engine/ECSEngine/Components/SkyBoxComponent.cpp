@@ -1,7 +1,7 @@
 #include "Engine/Precompiled/EnginePch.hpp"
 #include "SkyBoxComponent.hpp"
 #include "Engine/Reflection/Reflection.hpp"
-#include "Utility/Asset/AssetManager.hpp"
+#include "Engine/Asset/AssetManager.hpp"
 
 namespace Simple
 {

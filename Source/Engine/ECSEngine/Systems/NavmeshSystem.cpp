@@ -4,9 +4,9 @@
 #include "Engine/Utility/DebugShapes.hpp"
 #include "Engine/Navmesh/NavmeshRenderSettings.hpp"
 #include "Engine/Scene/SceneSettings.hpp"
-#include "Graphics/RenderState.hpp"
+#include "Engine/Graphics/RenderState.hpp"
 #include "Engine/Scene/SceneManager.hpp"
-#include "Utility/Input/InputState.hpp"
+#include "Engine/Input/InputState.hpp"
 #include <External/fmt/core.h>
 
 namespace Simple

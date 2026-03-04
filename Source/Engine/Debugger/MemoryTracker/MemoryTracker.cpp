@@ -1,7 +1,7 @@
 #include "Engine/Precompiled/EnginePch.hpp"
 #include "Engine/Debugger/MemoryTracker/MemoryTracker.h"
-#include "Utility/Algorithm.hpp"
-#include "External/nlohmann/json.hpp"
+#include "Engine/Utility/Algorithm.hpp"
+#include <External/nlohmann/json.hpp>
 #include <fstream>
 #include <iostream>
 #include "External/TheGameAssembly/StackTrace/StackTrace.h"

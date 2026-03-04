@@ -1,10 +1,10 @@
 #include "Engine/Precompiled/EnginePch.hpp"
 #include "Navmesh.hpp"
 #include "NavmeshCreator.hpp"
-#include "Utility/Math/UnitVector2.hpp"
-#include "Utility/Shapes/Triangle2.hpp"
-#include "Utility/ShapeMath.hpp"
-#include "Utility/Intersection.hpp"
+#include "Engine/Math/UnitVector2.hpp"
+#include "Engine/Math/Shapes/Triangle2.hpp"
+#include "Engine/Math/ShapeMath.hpp"
+#include "Engine/Utility/Intersection.hpp"
 
 #include <assert.h>
 #include <limits>

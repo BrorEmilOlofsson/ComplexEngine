@@ -1,8 +1,8 @@
 #include "Engine/Precompiled/EnginePch.hpp"
 #include "MeshComponent.hpp"
 #include "Engine/Reflection/Reflection.hpp"
-#include "Utility/Asset/AssetManager.hpp"
-#include "Graphics/GraphicsConstants.hpp"
+#include "Engine/Asset/AssetManager.hpp"
+#include "Engine/Graphics/GraphicsConstants.hpp"
 
 namespace Simple
 {

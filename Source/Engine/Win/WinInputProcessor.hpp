@@ -1,7 +1,7 @@
 #pragma once
-#include "Utility/Math/Vector2.hpp"
+#include "Engine/Math/Vector2.hpp"
 #include "Engine/Win/WinMouseInput.hpp"
-#include "Utility/Input/InputState.hpp"
+#include "Engine/Input/InputState.hpp"
 #include <bitset>
 #include <string>
 

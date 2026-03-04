@@ -1,8 +1,8 @@
 #pragma once
 #include "Engine/ECS/ECS.hpp"
-#include "Graphics/RenderState.hpp"
+#include "Engine/Graphics/RenderState.hpp"
 #include "Engine/Navmesh/Navmesh.hpp"
-#include "Utility/Shapes/Ray3.hpp"
+#include "Engine/Math/Shapes/Ray3.hpp"
 
 namespace Simple
 {

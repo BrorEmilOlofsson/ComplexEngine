@@ -3,7 +3,7 @@
 #include <string>
 #include <filesystem>
 #include "Engine/Scene/Scene.hpp"
-#include "Utility/EventDispatcher.hpp"
+#include "Engine/Utility/EventDispatcher.hpp"
 #include "Engine/Scene/SceneSettings.hpp"
 
 namespace Simple

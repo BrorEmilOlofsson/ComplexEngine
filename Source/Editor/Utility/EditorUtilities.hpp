@@ -1,9 +1,9 @@
 #pragma once
 #include <concepts>
 #include <limits>
-#include "Utility/Math/Point2.hpp"
-#include "Utility/Shapes/AABB2.hpp"
-#include "Utility/ShapeMath.hpp"
+#include "Engine/Math/Point2.hpp"
+#include "Engine/Math/Shapes/AABB2.hpp"
+#include "Engine/Math/ShapeMath.hpp"
 
 namespace Simple
 {

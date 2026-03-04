@@ -1,5 +1,5 @@
 #pragma once
-#include "Utility/Asset/EntityCompositionAsset.hpp"
+#include "Engine/Asset/EntityCompositionAsset.hpp"
 
 namespace Simple
 {

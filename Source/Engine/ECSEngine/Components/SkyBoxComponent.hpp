@@ -1,9 +1,9 @@
 #pragma once
-#include "Utility/Math/Transform3.hpp"
-#include "Utility/Asset/TextureAsset.hpp"
-#include "Utility/Asset/MeshAsset.hpp"
-#include "Utility/Asset/PixelShaderAsset.hpp"
-#include "Utility/Asset/VertexShaderAsset.hpp"
+#include "Engine/Math/Transform3.hpp"
+#include "Engine/Asset/TextureAsset.hpp"
+#include "Engine/Asset/MeshAsset.hpp"
+#include "Engine/Asset/PixelShaderAsset.hpp"
+#include "Engine/Asset/VertexShaderAsset.hpp"
 
 namespace Simple
 {

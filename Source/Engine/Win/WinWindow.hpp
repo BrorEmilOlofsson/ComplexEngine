@@ -1,11 +1,10 @@
 #pragma once
-#include "Utility/Shapes/AABB2.hpp"
+#include "Engine/Math/Shapes/AABB2.hpp"
 #include "Engine/Win/WinInputProcessor.hpp"
 #include "WinWindowClass.hpp"
 #include "Engine/OperatingSystem/WindowFrameBuffer.hpp"
-#include "Graphics/DX11/DX11Window.hpp"
-#include "Utility/Asset/AssetLoader.hpp"
-#include "Graphics/GraphicsWindowView.hpp"
+#include "Engine/Graphics/DX11/DX11Window.hpp"
+#include "Engine/Graphics/GraphicsWindowView.hpp"
 #include <memory>
 #include <string>
 

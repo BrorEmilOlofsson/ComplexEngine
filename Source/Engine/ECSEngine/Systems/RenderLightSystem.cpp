@@ -3,7 +3,7 @@
 #include "Engine/ECS/ECS.hpp"
 #include "Engine/ECSEngine/Components/PointLightComponent.hpp"
 #include "Engine/ECSEngine/Components/TransformComponent.hpp"
-#include "Graphics/RenderState.hpp"
+#include "Engine/Graphics/RenderState.hpp"
 #include "Engine/ECSEngine/Utility/ECSTransformUtility.hpp"
 
 namespace Simple

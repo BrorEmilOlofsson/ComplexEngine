@@ -2,12 +2,12 @@
 #include "CameraSystem.hpp"
 #include "Engine/ECSEngine/Components/CameraComponent.hpp"
 #include "Engine/ECSEngine/Components/TransformComponent.hpp"
-#include "Utility/Win/WinConsole.hpp"
+#include "Engine/Utility/Win/WinConsole.hpp"
 #include "Engine/ECS/ECS.hpp"
 #include "Engine/Camera/CameraMovement.hpp"
 #include "Engine/ECSEngine/Utility/ECSTransformUtility.hpp"
-#include "Utility/Input/InputState.hpp"
-#include "Graphics/RenderState.hpp"
+#include "Engine/Input/InputState.hpp"
+#include "Engine/Graphics/RenderState.hpp"
 #include "Engine/Utility/DebugShapes.hpp"
 
 namespace Simple

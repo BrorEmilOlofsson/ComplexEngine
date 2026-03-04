@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/ECS/EntityID.hpp"
-#include "Utility/Blackboard.hpp"
-#include "Utility/Asset/EntityCompositionAsset.hpp"
+#include "Engine/Utility/Blackboard.hpp"
+#include "Engine/Asset/EntityCompositionAsset.hpp"
 #include <string>
 #include <set>
 

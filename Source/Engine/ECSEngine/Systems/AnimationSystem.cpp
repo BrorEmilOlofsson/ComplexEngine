@@ -2,11 +2,11 @@
 #include "AnimationSystem.hpp"
 #include "Engine/ECS/ECS.hpp"
 #include "Engine/ECSEngine/Components/AnimatedModelComponent.hpp"
-#include "Graphics/Model/AnimatedModel.hpp"
-#include "Utility/Asset/AssetManager.hpp"
-#include "Graphics/Animation/Animation.hpp"
-#include "Graphics/Animation/AnimationUtility.hpp"
-#include "Graphics/RenderState.hpp"
+#include "Engine/Graphics/Model/AnimatedModel.hpp"
+#include "Engine/Asset/AssetManager.hpp"
+#include "Engine/Graphics/Animation/Animation.hpp"
+#include "Engine/Graphics/Animation/AnimationUtility.hpp"
+#include "Engine/Graphics/RenderState.hpp"
 #include <External/imgui/imgui.h>
 
 namespace Simple

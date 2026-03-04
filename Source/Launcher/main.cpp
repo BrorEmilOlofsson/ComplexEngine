@@ -1,5 +1,5 @@
 #include "Engine/Debugger/MemoryTracker/MemoryTracker.h"
-#include "Utility/EasyProfilerOutput.hpp"
+#include "Engine/Utility/EasyProfilerOutput.hpp"
 #include "Editor/EditorApplication.hpp"
 #include "Game/GameMain.hpp"
 #include "Engine/OperatingSystem/OperatingSystem.hpp"

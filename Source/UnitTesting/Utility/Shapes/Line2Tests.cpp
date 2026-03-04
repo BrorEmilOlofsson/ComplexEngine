@@ -1,5 +1,5 @@
 #include <External/Catch2/catch_amalgamated.hpp>
-#include "Utility/Shapes/Line2.hpp"
+#include "Engine/Math/Shapes/Line2.hpp"
 
 using namespace Simple;
 

@@ -1,8 +1,8 @@
 #include "Editor/Precompiled/EditorPch.hpp"
 #include "GraphicsSettingsWindow.hpp"
 #include "Engine/Utility/BlackboardKeys.hpp"
-#include "Utility/Math/Vector2.hpp"
-#include "Graphics/GraphicsSettings.hpp"
+#include "Engine/Math/Vector2.hpp"
+#include "Engine/Graphics/GraphicsSettings.hpp"
 #include "Editor/ImGui/ImGuiStyleManager.hpp"
 #include "Engine/OperatingSystem/WindowView.hpp"
 #include <array>

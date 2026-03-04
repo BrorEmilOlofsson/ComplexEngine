@@ -227,13 +227,19 @@ namespace FLY_NAMESPACE
             PinTypeManager& pinTypeManager = GetPinTypeManager();
             const DataTypeManager& dataTypeManager = GetDataTypeManager();
             const eIODirection ioDirection = pinTypeManager.GetPinType(pinTypeID).GetIODirection();
-            if (const DataType* dataType = dataTypeManager.Find(pinTypeManager.GetPinType(pinTypeID).GetDataTypeID()))
+            if (const DataType* parentDataType = dataTypeManager.Find(pinTypeManager.GetPinType(pinTypeID).GetDataTypeID()))
             {
-                for (const Variable& variable : dataType->GetVariableContainer())
+                for (const Variable& variable : parentDataType->GetVariableContainer())
                 {
-                    if (const DataType* dataType2 = dataTypeManager.Find(variable.GetDataTypeID()))
+                    if (const DataType* childDataType = dataTypeManager.Find(variable.GetDataTypeID()))
                     {
-                        const PinTypeID newSubPinTypeID = pinTypeManager.CreatePinType(variable.Name(), ioDirection, variable.GetDataTypeID(), dataTypeManager.GetSetPinValueFunction(variable.GetDataTypeID(), ioDirection), dataTypeManager.GetSetPinValueFromPinFunction(variable.GetDataTypeID(), ioDirection));
+                        const PinTypeID newSubPinTypeID = pinTypeManager.CreatePinType(
+                            variable.Name(), 
+                            ioDirection, 
+                            variable.GetDataTypeID(), 
+                            dataTypeManager.GetSetPinValueFunction(variable.GetDataTypeID(), ioDirection), 
+                            dataTypeManager.GetSetPinValueFromPinFunction(variable.GetDataTypeID(), ioDirection), 
+                            pinTypeID);
 
                         pinTypeManager.GetPinType(pinTypeID).AddSplitPinTypeID(newSubPinTypeID);
                     }
@@ -250,13 +256,19 @@ namespace FLY_NAMESPACE
 
             for (const PinTypeID pinTypeID : pinTypeIDs)
             {
-                if (const DataType* dataType = dataTypeManager.Find(pinTypeManager.GetPinType(pinTypeID).GetDataTypeID()))
+                if (const DataType* parentDataType = dataTypeManager.Find(pinTypeManager.GetPinType(pinTypeID).GetDataTypeID()))
                 {
-                    for (const Variable& variable : dataType->GetVariableContainer())
+                    for (const Variable& variable : parentDataType->GetVariableContainer())
                     {
-                        if (const DataType* dataType2 = dataTypeManager.Find(variable.GetDataTypeID()))
+                        if (const DataType* childDataType = dataTypeManager.Find(variable.GetDataTypeID()))
                         {
-                            const PinTypeID newSubPinTypeID = pinTypeManager.CreatePinType(variable.Name(), ioDirection, variable.GetDataTypeID(), dataTypeManager.GetSetPinValueFunction(variable.GetDataTypeID(), ioDirection), dataTypeManager.GetSetPinValueFromPinFunction(variable.GetDataTypeID(), ioDirection));
+                            const PinTypeID newSubPinTypeID = pinTypeManager.CreatePinType(
+                                variable.Name(), 
+                                ioDirection, 
+                                variable.GetDataTypeID(), 
+                                dataTypeManager.GetSetPinValueFunction(variable.GetDataTypeID(), ioDirection), 
+                                dataTypeManager.GetSetPinValueFromPinFunction(variable.GetDataTypeID(), ioDirection),
+                                pinTypeID);
 
                             pinTypeManager.GetPinType(pinTypeID).AddSplitPinTypeID(newSubPinTypeID);
                         }
@@ -283,9 +295,14 @@ namespace FLY_NAMESPACE
             const DataTypeManager& dataTypeManager = GetDataTypeManager();
             PinTypeManager& pinTypeManager = GetPinTypeManager();
 
-            const PinTypeID newPinTypeID = pinTypeManager.CreatePinType(name, ioDirection, dataTypeID,
+            const PinTypeID newPinTypeID = pinTypeManager.CreatePinType(
+                name, 
+                ioDirection, 
+                dataTypeID,
                 dataTypeManager.GetSetPinValueFunction(dataTypeID, ioDirection),
-                dataTypeManager.GetSetPinValueFromPinFunction(dataTypeID, ioDirection));
+                dataTypeManager.GetSetPinValueFromPinFunction(dataTypeID, ioDirection),
+                InvalidID<PinTypeID>()
+            );
 
             InitializeSubPinsForPin(newPinTypeID);
 
@@ -1628,22 +1645,22 @@ namespace FLY_NAMESPACE
 
             struct DestroyVariableData
             {
-                VarID mVarID = InvalidID<VarID>();
-                VariableContainer* mVariableContainer = nullptr;
+                VarID varID = InvalidID<VarID>();
+                VariableContainer* variableContainer = nullptr;
             } data;
 
-            data.mVarID = varID;
-            data.mVariableContainer = &variableContainer;
+            data.varID = varID;
+            data.variableContainer = &variableContainer;
 
             auto doCommandFunction = [](const DestroyVariableData& data) -> void
                 {
-                    data.mVariableContainer->GetVariable(data.mVarID).SetIsDestroyed(true);
+                    data.variableContainer->GetVariable(data.varID).SetIsDestroyed(true);
                 };
 
 
             auto undoCommandFunction = [](const DestroyVariableData& data) -> void
                 {
-                    data.mVariableContainer->GetVariable(data.mVarID).SetIsDestroyed(false);
+                    data.variableContainer->GetVariable(data.varID).SetIsDestroyed(false);
                 };
 
             if (!commandTracker)
@@ -1801,6 +1818,15 @@ namespace FLY_NAMESPACE
         }
 
 
+        static void UpdatePinDataType(NodeRef nodeRef, PinTypeID newPinTypeID, std::size_t index, eIODirection ioDirection)
+        {
+            Node& node = nodeRef.GetNodeGraph().GetNode(nodeRef.GetNodeID());
+
+            std::vector<PinID>& pinIDs = SelectByIODirection(ioDirection, node.GetInputPins(), node.GetOutputPins());
+            const PinID createdPinID = CreatePin(nodeRef.GetNodeGraph(), nodeRef.GetNodeID(), newPinTypeID, CreateNodeCreationContext());
+            pinIDs.at(index) = createdPinID;
+        }
+
         static void SetPinAtIndexNodeType(const NodeTypeID nodeTypeID, const std::size_t index, const GenericDataTypeID dataTypeID, const eIODirection ioDirection)
         {
             NodeTypeManager& nodeTypeManager = GetNodeTypeManager();
@@ -1818,12 +1844,12 @@ namespace FLY_NAMESPACE
             const std::vector<NodeRef>& nodeRefs = GetNodeRefs(nodeTypeID);
             for (const NodeRef& nodeRef : nodeRefs)
             {
-                Node& node = nodeRef.GetNodeGraph().GetNode(nodeRef.GetNodeID());
-
-                std::vector<PinID>& pinIDs = SelectByIODirection(ioDirection, node.GetInputPins(), node.GetOutputPins());
-                const PinID createdPinID = CreatePin(nodeRef.GetNodeGraph(), nodeRef.GetNodeID(), newPinTypeID, CreateNodeCreationContext());
-                pinIDs.at(index) = createdPinID;
+                UpdatePinDataType(nodeRef, newPinTypeID, index, ioDirection);
             }
+
+            const bool isSplitPin = oldPinType.GetParentID() != InvalidID<PinTypeID>();
+            isSplitPin;
+            throw isSplitPin;
         }
 
         static void DeletePinAtIndexNodeType(const NodeTypeID nodeTypeID, const std::size_t index, const eIODirection ioDirection)
@@ -1858,7 +1884,7 @@ namespace FLY_NAMESPACE
             AddPinTypeToNodeType(inputOutputNodeTypeID, dataTypeID, InvertIODirection(ioDirection), pinName);
         }
 
-        void SetPinDataTypeAtIndexFunction(const FunctionID functionID, const GenericDataTypeID dataTypeID, const size_t index, const eIODirection ioDirection, [[maybe_unused]] CommandTracker* const commandTracker)
+        void SetPinDataTypeAtIndexFunction(const FunctionID functionID, const GenericDataTypeID dataTypeID, const std::size_t index, const eIODirection ioDirection, [[maybe_unused]] CommandTracker* const commandTracker)
         {
             const Function& function = GetNodeTypeManager().GetFunction(functionID);
 

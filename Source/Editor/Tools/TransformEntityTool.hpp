@@ -1,8 +1,8 @@
 #pragma once
 #include "Editor/Command/Commands/SetEntityTransformCommand.hpp"
-#include "Utility/Math/TransformMode.hpp"
-#include "Utility/Camera.hpp"
-#include "Utility/Shapes/AABB2.hpp"
+#include "Engine/Math/TransformMode.hpp"
+#include "Engine/Utility/Camera.hpp"
+#include "Engine/Math/Shapes/AABB2.hpp"
 
 namespace Simple
 {

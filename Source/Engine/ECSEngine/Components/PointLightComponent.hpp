@@ -1,5 +1,5 @@
 #pragma once
-#include "Graphics/Light/PointLight.hpp"
+#include "Engine/Graphics/Light/PointLight.hpp"
 
 namespace Simple
 {

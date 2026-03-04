@@ -1,7 +1,7 @@
 #pragma once
-#include "Utility/StrongType.hpp"
+#include "Engine/Utility/StrongType.hpp"
 #include "Height.hpp"
-#include "Utility/Clamper.hpp"
+#include "Engine/Utility/Clamper.hpp"
 
 using FootballPlayerStat = Simple::StrongCheckedType<float, Simple::Clamper_f<0.f, 100.f>, struct STFootballPlayerStat>;
 
