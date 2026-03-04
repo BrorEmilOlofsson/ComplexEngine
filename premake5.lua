@@ -266,38 +266,36 @@ workspace "FootballGame" -- Workspace, is not same as Project. Anything configur
 
 	--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	
-	group "Engine"
-		project "Engine"
-			kind "StaticLib" -- Build type ".lib"
-			location (dirs.Local) -- I only know that this is for where vcxproj, vcxproj.filter and vcxproj.user will be generated
-			targetdir (dirs.SimpleLib) -- Location of where the build will be. Example -> C:\Users\panda\Desktop\SimpleEngine\Lib
-			targetname("%{prj.name}_%{cfg.buildcfg}") -- Name of the Build plus Active Configuration type. Example -> "Engine_Debug"
-			-- dependson { "External" } -- Ensure that "External" is built before this project
-			fatalwarnings { "All" }
+	project "Engine"
+		kind "StaticLib" -- Build type ".lib"
+		location (dirs.Local) -- I only know that this is for where vcxproj, vcxproj.filter and vcxproj.user will be generated
+		targetdir (dirs.SimpleLib) -- Location of where the build will be. Example -> C:\Users\panda\Desktop\SimpleEngine\Lib
+		targetname("%{prj.name}_%{cfg.buildcfg}") -- Name of the Build plus Active Configuration type. Example -> "Engine_Debug"
+		-- dependson { "External" } -- Ensure that "External" is built before this project
+		fatalwarnings { "All" }
 
-			pchheader "Engine/Precompiled/EnginePch.hpp" -- Force all Source (.cpp) files in this project to include "Engine/Precomplier/stdafx.h"
-			pchsource "Source/Engine/Precompiled/EnginePch.cpp" -- Telling this project to use precomplier header
+		pchheader "Engine/Precompiled/EnginePch.hpp" -- Force all Source (.cpp) files in this project to include "Engine/Precomplier/stdafx.h"
+		pchsource "Source/Engine/Precompiled/EnginePch.cpp" -- Telling this project to use precomplier header
 
-			includedirs { -- Included "Source/" so that we do not need "../../Engine/Graphics/Test.h" and instead can do "Engine/Graphics/Test.h" or just "Graphics/Test.h" or just "Test.h"
-				"Source/",
-				"Source/External/",
-				"Source/External/**"
-			} 
+		includedirs { -- Included "Source/" so that we do not need "../../Engine/Graphics/Test.h" and instead can do "Engine/Graphics/Test.h" or just "Graphics/Test.h" or just "Test.h"
+			"Source/",
+			"Source/External/",
+			"Source/External/**"
+		} 
 
-			files { -- Files that shown in Visual Studio's Solution
-				"Source/Engine/**.h", 
-				"Source/Engine/**.hpp", 
-				"Source/Engine/**.cpp",
-				"Source/Engine/**.ixx"
-			}
+		files { -- Files that shown in Visual Studio's Solution
+			"Source/Engine/**.h", 
+			"Source/Engine/**.hpp", 
+			"Source/Engine/**.cpp",
+			"Source/Engine/**.ixx"
+		}
 
-			links {
-				"d3d11"
-			}
+		links {
+			"d3d11"
+		}
 
 	--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	
-	group ""
 	project "Shader"
 		kind "StaticLib"
 		location (dirs.Local)
