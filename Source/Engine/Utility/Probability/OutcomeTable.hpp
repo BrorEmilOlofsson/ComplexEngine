@@ -2,6 +2,7 @@
 #include <vector>
 #include <stdexcept>
 #include <numeric>
+#include <concepts>
 
 namespace CLX
 {

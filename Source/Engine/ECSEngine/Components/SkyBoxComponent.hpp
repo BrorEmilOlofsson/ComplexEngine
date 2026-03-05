@@ -1,9 +1,9 @@
 #pragma once
 #include "Engine/Math/Transform3.hpp"
-#include "Engine/Asset/TextureAsset.hpp"
-#include "Engine/Asset/MeshAsset.hpp"
-#include "Engine/Asset/PixelShaderAsset.hpp"
-#include "Engine/Asset/VertexShaderAsset.hpp"
+#include "Engine/Asset/AssetTypes/TextureAsset.hpp"
+#include "Engine/Asset/AssetTypes/MeshAsset.hpp"
+#include "Engine/Asset/AssetTypes/PixelShaderAsset.hpp"
+#include "Engine/Asset/AssetTypes/VertexShaderAsset.hpp"
 
 namespace CLX
 {

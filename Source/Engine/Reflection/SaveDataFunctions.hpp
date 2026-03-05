@@ -1,4 +1,7 @@
 #pragma once
+#include <External/nlohmann/json.hpp>
+#include <string>
+#include <array>
 #include "Engine/Math/Vector2.hpp"
 #include "Engine/Math/Vector3.hpp"
 #include "Engine/Math/Vector4.hpp"
@@ -11,12 +14,9 @@
 #include "Engine/Math/Shapes/Cylinder.hpp"
 #include "Engine/ECS/EntityID.hpp"
 #include "Engine/Reflection/DataTypeID.hpp"
-#include "Engine/Asset/AssetTypes.hpp"
+#include "Engine/Asset/AssetTypes/AssetTypes.hpp"
 #include "Engine/Graphics/Light/PointLight.hpp"
 #include "Engine/Graphics/Light/DirectionalLight.hpp"
-#include <External/nlohmann/json.hpp>
-#include <string>
-#include <array>
 
 [[nodiscard]] nlohmann::json ToJSON(const bool& value);
 [[nodiscard]] nlohmann::json ToJSON(const char& value);

@@ -1,9 +1,0 @@
-#pragma once
-#include "Engine/Asset/TextureAsset.hpp"
-#include "Engine/Asset/MeshAsset.hpp"
-#include "Engine/Asset/ModelAsset.hpp"
-#include "Engine/Asset/AnimatedModelAsset.hpp"
-#include "Engine/Asset/AnimationAsset.hpp"
-#include "Engine/Asset/PixelShaderAsset.hpp"
-#include "Engine/Asset/VertexShaderAsset.hpp"
-#include "Engine/Asset/EntityCompositionAsset.hpp"

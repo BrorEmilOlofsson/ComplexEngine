@@ -11,7 +11,7 @@
 #include "Engine/Math/Shapes/Cylinder.hpp"
 #include "Engine/ECS/EntityID.hpp"
 #include "Engine/Reflection/DataTypeID.hpp"
-#include "Engine/Asset/AssetTypes.hpp"
+#include "Engine/Asset/AssetTypes/AssetTypes.hpp"
 #include "Engine/Graphics/Light/PointLight.hpp"
 #include "Engine/Graphics/Light/DirectionalLight.hpp"
 #include <External/nlohmann/json.hpp>

@@ -1,5 +1,5 @@
 #pragma once
-#include "Engine/Asset/EntityCompositionAsset.hpp"
+#include "Engine/Asset/AssetTypes/EntityCompositionAsset.hpp"
 
 namespace CLX
 {

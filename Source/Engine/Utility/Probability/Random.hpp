@@ -45,7 +45,7 @@ namespace CLX
 	{
 		return GetRandomNumber(engine, 0, 1) == 1;
 	}
-	
+
 	template<typename ValueType, typename WeightType, typename Rand>
 	[[nodiscard]] constexpr const ValueType& GetRandomValue(const OutcomeTable<ValueType, WeightType>& table, Rand&& randomEngine)
 	{
@@ -53,7 +53,7 @@ namespace CLX
 		return table.GetOutcome(GetRandomNumber(randomEngine, WeightType{ 0 }, sum));
 	}
 
-	template<typename ValueType, typename WeightType>
+	template<typename ValueType, typename WeightType> 
 	[[nodiscard]] constexpr const ValueType& GetRandomValue(const OutcomeTable<ValueType, WeightType>& table)
 	{
 		const WeightType sum = table.WeightSum();

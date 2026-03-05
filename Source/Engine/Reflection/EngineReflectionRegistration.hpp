@@ -19,9 +19,9 @@
 #include "Engine/Graphics/Sprite/Sprite2D.hpp"
 #include "Engine/Graphics/Light/PointLight.hpp"
 #include "Engine/Graphics/Light/DirectionalLight.hpp"
-#include "Engine/Asset/TextureAsset.hpp"
-#include "Engine/Asset/MeshAsset.hpp"
-#include "Engine/Asset/AnimationAsset.hpp"
+#include "Engine/Asset/AssetTypes/TextureAsset.hpp"
+#include "Engine/Asset/AssetTypes/MeshAsset.hpp"
+#include "Engine/Asset/AssetTypes/AnimationAsset.hpp"
 
 #include <string>
 #include <array>

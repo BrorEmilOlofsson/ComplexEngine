@@ -79,11 +79,4 @@ namespace CLX
 			Point3<T>(min.x, max.y, max.z)
 		};
 	}
-
-	template<typename T>
-	std::ostream& operator<<(std::ostream& os, const AABB3<T>& aabb)
-	{
-		os << "Min: " << aabb.GetMin() << ", Max: " << aabb.GetMax();
-		return os;
-	}
 }

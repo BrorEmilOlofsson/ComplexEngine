@@ -16,7 +16,7 @@
 #include "Engine/Utility/Blackboard.hpp"
 #include "Engine/Utility/EnumUtility.hpp"
 #include "Engine/Reflection/ViewAndEditResult.hpp"
-#include "Engine/Asset/AssetTypes.hpp"
+#include "Engine/Asset/AssetTypes/AssetTypes.hpp"
 #include "Engine/Graphics/Light/PointLight.hpp"
 #include "Engine/Graphics/Light/DirectionalLight.hpp"
 #include "Engine/Utility/Camera.hpp"

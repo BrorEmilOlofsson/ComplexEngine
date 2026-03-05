@@ -6,7 +6,7 @@
 #include "Engine/Utility/Camera.hpp"
 #include "Engine/Graphics/RenderState.hpp"
 #include "Editor/Tools/TransformEntityTool.hpp"
-#include "Engine/Asset/EntityCompositionAsset.hpp"
+#include "Engine/Asset/AssetTypes/EntityCompositionAsset.hpp"
 
 namespace CLX
 {

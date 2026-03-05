@@ -9,7 +9,7 @@
 #include "Engine/Utility/Camera.hpp"
 #include "Engine/Utility/BlackboardKeys.hpp"
 #include "Engine/Reflection/DataTypeRegistry.hpp"
-#include "Engine/Asset/EntityCompositionAsset.hpp"
+#include "Engine/Asset/AssetTypes/EntityCompositionAsset.hpp"
 #include "Engine/ECS/EntityComposition.hpp"
 #include "Engine/ECSEngine/Components/EntityCompositionComponent.hpp"
 #include "Engine/ECSEngine/Utility/ECSEntityCompositionUtility.hpp"

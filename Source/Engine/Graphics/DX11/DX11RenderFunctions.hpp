@@ -2,8 +2,8 @@
 #include "Engine/Graphics/Shader/PixelShader.hpp"
 #include "Engine/Graphics/Shader/VertexShader.hpp"
 #include "Engine/Utility/MeshData.hpp"
-#include "Engine/Asset/PixelShaderAsset.hpp"
-#include "Engine/Asset/VertexShaderAsset.hpp"
+#include "Engine/Asset/AssetTypes/PixelShaderAsset.hpp"
+#include "Engine/Asset/AssetTypes/VertexShaderAsset.hpp"
 #include "Engine/Graphics/RenderTarget/RenderTargetView.hpp"
 #include "Engine/Graphics/DX11/DX11SamplerState.hpp"
 

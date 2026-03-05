@@ -1,7 +1,7 @@
 #pragma once
-#include "Engine/Asset/AnimatedModelAsset.hpp"
+#include "Engine/Asset/AssetTypes/AnimatedModelAsset.hpp"
 #include "Engine/Graphics/Animation/AnimationPlayer.hpp"
-#include "Engine/Asset/TextureAsset.hpp"
+#include "Engine/Asset/AssetTypes/TextureAsset.hpp"
 
 namespace CLX
 {

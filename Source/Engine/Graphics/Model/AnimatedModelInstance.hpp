@@ -1,10 +1,12 @@
 #pragma once
-#include "Engine/Math/Transform3.hpp"
-#include "Engine/Asset/TextureAsset.hpp"
-#include "Engine/Asset/MeshAsset.hpp"
-#include "Engine/Asset/AnimatedModelAsset.hpp"
-#include "Engine/Graphics/GraphicsConstants.hpp"
 #include <limits>
+#include <array>
+#include "Engine/Math/Transform3.hpp"
+#include "Engine/Asset/AssetTypes/TextureAsset.hpp"
+#include "Engine/Asset/AssetTypes/MeshAsset.hpp"
+#include "Engine/Asset/AssetTypes/AnimatedModelAsset.hpp"
+#include "Engine/Graphics/GraphicsConstants.hpp"
+#include "Engine/Math/Matrix4x4.hpp"
 
 namespace CLX
 {

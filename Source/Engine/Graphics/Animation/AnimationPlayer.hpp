@@ -1,6 +1,6 @@
 #pragma once
 #include "Engine/Graphics/GraphicsConstants.hpp"
-#include "Engine/Asset/AnimationAsset.hpp"
+#include "Engine/Asset/AssetTypes/AnimationAsset.hpp"
 #include "Engine/Graphics/Model/Bone.hpp"
 #include <span>
 

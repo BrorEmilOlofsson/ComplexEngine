@@ -11,8 +11,8 @@
 #include "Engine/Utility/Color.hpp"
 #include "Engine/Graphics/DX11/ConstantBuffer/DX11ConstantBuffer.hpp"
 #include "Engine/Graphics/ConstantBufferData.hpp"
-#include "Engine/Asset/PixelShaderAsset.hpp"
-#include "Engine/Asset/VertexShaderAsset.hpp"
+#include "Engine/Asset/AssetTypes/PixelShaderAsset.hpp"
+#include "Engine/Asset/AssetTypes/VertexShaderAsset.hpp"
 #include "Engine/Utility/DrawPrimitives/DrawPrimitives.hpp"
 
 #include <d3d11.h>

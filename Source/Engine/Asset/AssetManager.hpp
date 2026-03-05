@@ -3,7 +3,7 @@
 #include <filesystem>
 #include <functional>
 #include <unordered_map>
-#include "Engine/Asset/AssetTypes.hpp"
+#include "Engine/Asset/AssetTypes/AssetTypes.hpp"
 #include "Engine/Asset/AssetLoader.hpp"
 
 namespace CLX

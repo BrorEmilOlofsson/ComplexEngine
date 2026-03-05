@@ -14,7 +14,7 @@
 #include "Engine/Graphics/GraphicsSettings.hpp"
 #include "Engine/Graphics/SkyBox/SkyBox.hpp"
 #include "Engine/Graphics/RenderState.hpp"
-#include "Engine/Asset/MeshAsset.hpp"
+#include "Engine/Asset/AssetTypes/MeshAsset.hpp"
 #include "Engine/Graphics/Mesh/Mesh.hpp"
 #include "Engine/Graphics/Model/Model.hpp"
 #include "Engine/Graphics/GraphicsConstants.hpp"

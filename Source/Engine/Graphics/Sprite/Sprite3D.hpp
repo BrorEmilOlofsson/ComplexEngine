@@ -3,7 +3,7 @@
 #include "Engine/Math/Angle.hpp"
 #include "Engine/Utility/Color.hpp"
 #include "Engine/Math/Shapes/AABB2.hpp"
-#include "Engine/Asset/TextureAsset.hpp"
+#include "Engine/Asset/AssetTypes/TextureAsset.hpp"
 //#include <External/DirectXTK/SpriteBatch.h>
 
 namespace CLX
