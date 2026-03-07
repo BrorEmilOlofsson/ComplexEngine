@@ -4,107 +4,121 @@
 #include "Engine/Scene/SceneLoader.hpp"
 #include "Engine/Scene/SceneManager.hpp"
 #include "Engine/Utility/Algorithm.hpp"
+#include "Engine/Asset/AssetManager.hpp"
 #include <functional>
 #include <fstream>
 
 namespace CLX
 {
-	class SceneFileFunctions
-	{
-	public:
+    class SceneFileFunctions
+    {
+    public:
 
-		static std::function<void()> Save(const SceneManager* sceneManager, const class DataTypeRegistry* dataTypeRegistry)
-		{
-			return [sceneManager, dataTypeRegistry]() -> void
-				{
-					const SceneInfo* sceneInfo = sceneManager->GetCurrentSceneInfo();
-					SceneLoader::SaveScene(sceneManager->GetCurrentScene(), sceneInfo->absolutePath, *dataTypeRegistry);
+        static std::function<void()> Save(const SceneManager* sceneManager, const class DataTypeRegistry* dataTypeRegistry)
+        {
+            return [sceneManager, dataTypeRegistry]() -> void
+                {
+                    auto sceneAsset = sceneManager->GetActiveScene();
+                    if (!sceneAsset)
+                    {
+                        Console::Print("Failed to save the scene! No active scene found.", ConsoleTextColor::Red, true);
+                        return;
+                    }
 
-					Console::Print("Scene ", ConsoleTextColor::White, false);
-					Console::Print(sceneInfo->name.c_str(), ConsoleTextColor::Green, false);
-					Console::Print(" has been saved!", ConsoleTextColor::White, true);
-				};
-		}
+                    const Scene& activeScene = *sceneAsset.Get();
+                    SceneLoader::SaveScene(activeScene, activeScene.GetRelativePath(), *dataTypeRegistry);
 
-		static std::function<void(const std::string&)> Load(SceneManager* sceneManager)
-		{
-			return [sceneManager](const std::string& aString) -> void
-				{
-					const std::filesystem::path scenePath = std::filesystem::path(SIMPLE_DIR_SCENES) / aString;
-					sceneManager->ChangeScene(scenePath);
-					Console::Print("Loaded scene ", ConsoleTextColor::White, false);
-					Console::Print(aString.c_str(), ConsoleTextColor::Green, false);
-					Console::Print("!", ConsoleTextColor::White, true);
-				};
-		}
 
-		static std::function<void()> CreateNew(SceneManager* sceneManager)
-		{
-			return [sceneManager]() -> void
-				{
-					const std::filesystem::path absolutePath = std::filesystem::absolute(AppendCounterIfAlreadyExist(std::string(SIMPLE_DIR_SCENES) + "\\" + std::string(SIMPLE_FILENAME_NEWSCENE)));
-					
-					sceneManager->CreateNewScene(absolutePath);
-					sceneManager->ChangeScene(absolutePath);
+                    Console::Print("Scene ", ConsoleTextColor::White, false);
+                    Console::Print(activeScene.GetName(), ConsoleTextColor::Green, false);
+                    Console::Print(" has been saved!", ConsoleTextColor::White, true);
+                };
+        }
 
-					Console::Print("New scene ", ConsoleTextColor::White, false);
-					Console::Print(sceneManager->GetCurrentSceneInfo()->name.c_str(), ConsoleTextColor::Green, false);
-					Console::Print(" has been created!", ConsoleTextColor::White, true);
-				};
-		}
+        static std::function<void(const std::string&)> Load(SceneManager* sceneManager, std::weak_ptr<AssetManager> assetManager)
+        {
+            return [sceneManager, assetManager](const std::string& name) -> void
+                {
+                    const std::filesystem::path scenePath = std::filesystem::path(SIMPLE_DIR_SCENES) / name;
+                    sceneManager->ChangeScene(assetManager.lock()->GetScene(scenePath));
+                    Console::Print("Loaded scene ", ConsoleTextColor::White, false);
+                    Console::Print(name, ConsoleTextColor::Green, false);
+                    Console::Print("!", ConsoleTextColor::White, true);
+                };
+        }
 
-		static std::function<void()> CreateCopy(SceneManager* sceneManager)
-		{
-			return [sceneManager]() -> void
-				{
-					const std::filesystem::path absolutePath = sceneManager->GetCurrentSceneInfo()->absolutePath;
-					const std::filesystem::path newCopyName = absolutePath.parent_path() / std::filesystem::path(absolutePath.stem().string() + "_Copy" + absolutePath.extension().string());
-					const std::filesystem::path newFileName = AppendCounterIfAlreadyExist(newCopyName);
+        static std::function<void()> CreateNew(SceneManager* sceneManager, std::weak_ptr<AssetManager> assetManager)
+        {
+            return [sceneManager, assetManager]() -> void
+                {
+                    const std::filesystem::path absolutePath = std::filesystem::absolute(AppendCounterIfAlreadyExist(std::filesystem::path(SIMPLE_DIR_SCENES) / std::filesystem::path(SIMPLE_FILENAME_NEWSCENE)));
 
-					std::filesystem::copy_file(absolutePath, newFileName, std::filesystem::copy_options::overwrite_existing);
-					sceneManager->ChangeScene(newFileName);
+                    SceneAssetHandle sceneAsset = assetManager.lock()->CreateScene(absolutePath);
+                    //sceneManager->CreateNewScene(absolutePath);
+                    sceneManager->ChangeScene(sceneAsset);
 
-					Console::Print("New scene ", ConsoleTextColor::White, false);
-					Console::Print(sceneManager->GetCurrentSceneInfo()->name, ConsoleTextColor::Green, false);
-					Console::Print(" has been created!", ConsoleTextColor::White, true);
-				};
-		}
+                    Console::Print("New scene ", ConsoleTextColor::White, false);
+                    Console::Print(sceneManager->GetActiveScene()->GetName(), ConsoleTextColor::Green, false);
+                    Console::Print(" has been created!", ConsoleTextColor::White, true);
+                };
+        }
 
-		static std::function<void()> Reload(SceneManager* sceneManager)
-		{
-			return [sceneManager]() -> void
-				{
-					sceneManager->ReloadSceneFromFile(sceneManager->GetCurrentSceneInfo()->name);
+        static std::function<void()> CreateCopy(SceneManager* sceneManager, std::weak_ptr<AssetManager> assetManager)
+        {
+            return [sceneManager, assetManager]() -> void
+                {
+                    const std::filesystem::path absolutePath = std::filesystem::absolute(sceneManager->GetActiveScene()->GetRelativePath());
+                    const std::filesystem::path newCopyName = absolutePath.parent_path() / std::filesystem::path(absolutePath.stem().string() + "_Copy" + absolutePath.extension().string());
+                    const std::filesystem::path newFilePath = AppendCounterIfAlreadyExist(newCopyName);
 
-					Console::Print("Scene ", ConsoleTextColor::White, false);
-					Console::Print(sceneManager->GetCurrentSceneInfo()->name, ConsoleTextColor::Green, false);
-					Console::Print(" has been reloaded!", ConsoleTextColor::White, true);
-				};
-		}
+                    std::filesystem::copy_file(absolutePath, newFilePath, std::filesystem::copy_options::overwrite_existing);
+                    assetManager.lock()->LoadAsset(newFilePath);
+                    SceneAssetHandle sceneAsset = assetManager.lock()->GetScene(newFilePath);
+                    sceneManager->ChangeScene(sceneAsset);
 
-		static std::function<void()> SetAsActive(SceneManager* sceneManager)
-		{
-			return [sceneManager]() -> void
-				{
-					const SceneInfo* sceneInfo = sceneManager->GetCurrentSceneInfo();
-					std::optional<nlohmann::json> jsonData = FileUtility::GetDataAsJson(std::filesystem::absolute(SIMPLE_SETTINGS_GAME));
+                    Console::Print("New scene ", ConsoleTextColor::White, false);
+                    Console::Print(sceneManager->GetActiveScene()->GetName(), ConsoleTextColor::Green, false);
+                    Console::Print(" has been created!", ConsoleTextColor::White, true);
+                };
+        }
 
-					if (!jsonData.has_value())
-					{
-						return;
-					}
+        static std::function<void()> Reload(SceneManager* sceneManager, std::weak_ptr<AssetManager> assetManager)
+        {
+            return [sceneManager, assetManager]() -> void
+                {
+                    const Scene& activeScene = *sceneManager->GetActiveScene().Get();
+                    assetManager.lock()->LoadAsset(activeScene.GetRelativePath());
 
-					jsonData.value()["Game_Settings"]["Start_Scene_RelativePath"] = std::filesystem::relative(sceneInfo->absolutePath);
+                    Console::Print("Scene ", ConsoleTextColor::White, false);
+                    Console::Print(sceneManager->GetActiveScene()->GetName(), ConsoleTextColor::Green, false);
+                    Console::Print(" has been reloaded!", ConsoleTextColor::White, true);
+                };
+        }
 
-					std::ofstream writeFile(std::filesystem::absolute(SIMPLE_SETTINGS_GAME));
-					assert(writeFile.is_open() && "Failed to open the file");
+        static std::function<void()> SetAsActive(SceneManager* sceneManager)
+        {
+            return [sceneManager]() -> void
+                {
+                    const Scene& activeScene = *sceneManager->GetActiveScene().Get();
+                    std::filesystem::path relativePath = activeScene.GetRelativePath();
+                    std::optional<nlohmann::json> jsonData = FileUtility::GetDataAsJson(std::filesystem::absolute(SIMPLE_SETTINGS_GAME));
 
-					writeFile << jsonData.value();
+                    if (!jsonData.has_value())
+                    {
+                        return;
+                    }
 
-					Console::Print("Scene ", ConsoleTextColor::White, false);
-					Console::Print(sceneInfo->name.c_str(), ConsoleTextColor::Green, false);
-					Console::Print(" has been set as start!", ConsoleTextColor::White, true);
-				};
-		}
-	};
+                    jsonData.value()["Game_Settings"]["Start_Scene_RelativePath"] = relativePath;
+
+                    std::ofstream writeFile(std::filesystem::absolute(SIMPLE_SETTINGS_GAME));
+                    assert(writeFile.is_open() && "Failed to open the file");
+
+                    writeFile << jsonData.value();
+
+                    Console::Print("Scene ", ConsoleTextColor::White, false);
+                    Console::Print(activeScene.GetName().c_str(), ConsoleTextColor::Green, false);
+                    Console::Print(" has been set as start!", ConsoleTextColor::White, true);
+                };
+        }
+    };
 }

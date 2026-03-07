@@ -121,8 +121,8 @@ namespace CLX
 		{
 			const Navmesh& navmesh = *navmeshRef;
 			RenderState& renderState = blackboard.Get<Key_SceneRenderState>();
-			const SceneSettings& sceneSettings = blackboard.Get<Key_SceneSettings>();
-			const Ray3f mouseRay = blackboard.Get<Key_SceneManager>().GetCurrentScene().GetMouseRay();
+			const SceneSettings& sceneSettings = blackboard.Get<Key_SceneManager>().GetSceneSettings();
+			const Ray3f mouseRay = blackboard.Get<Key_SceneManager>().GetActiveScene()->GetMouseRay();
 			RenderNavmesh(navmesh, renderState.GetRenderList(), sceneSettings.navmeshRenderSettings);
 			DebugFindPath(navmesh, blackboard.Get<Key_InputState>(), renderState.GetRenderList(), mouseRay);
 		}

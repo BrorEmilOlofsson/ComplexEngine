@@ -6,4 +6,5 @@
 #include "Engine/Asset/AssetTypes/AnimationAsset.hpp"
 #include "Engine/Asset/AssetTypes/PixelShaderAsset.hpp"
 #include "Engine/Asset/AssetTypes/VertexShaderAsset.hpp"
+#include "Engine/Asset/AssetTypes/SceneAsset.hpp"
 #include "Engine/Asset/AssetTypes/EntityCompositionAsset.hpp"

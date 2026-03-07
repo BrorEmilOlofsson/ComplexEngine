@@ -43,7 +43,7 @@ namespace CLX
 		[[nodiscard]] OperatingSystem& GetOperatingSystem() { return mOperatingSystem; }
 		[[nodiscard]] const OperatingSystem& GetOperatingSystem() const { return mOperatingSystem; }
 		[[nodiscard]] WindowView GetMainWindow();
-		[[nodiscard]] AssetManager& GetAssetManager() { return *mAssetManager; }
+		[[nodiscard]] std::weak_ptr<AssetManager> GetAssetManager() { return mAssetManager; }
 		[[nodiscard]] GraphicsSettings& GetGraphicsSettings() { return *mGraphicsSettings; }
 		[[nodiscard]] class DataTypeRegistry& GetDataTypeRegistry();
 		[[nodiscard]] const class DataTypeRegistry& GetDataTypeRegistry() const;
@@ -63,6 +63,7 @@ namespace CLX
 
 		OperatingSystem mOperatingSystem;
 		[[no_unique_address]] Console mConsole;
+		std::shared_ptr<AssetManager> mAssetManager;
 		AudioManager mAudioManager;
 		SceneManager mSceneManager;
 
@@ -77,11 +78,11 @@ namespace CLX
 		std::filesystem::path mCurrentDropPath;
 		std::atomic_bool mShouldExit;
 		std::shared_ptr<Blackboard> mBlackboard;
-		std::shared_ptr<AssetManager> mAssetManager;
 		std::shared_ptr<GraphicsSettings> mGraphicsSettings;
 
 		DataTypeRegistry mDataTypeRegistry;
         ECSRegistry mECSRegistry;
 		InputManager mInputManager;
+		
 	};
 }

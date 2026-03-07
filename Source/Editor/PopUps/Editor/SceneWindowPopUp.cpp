@@ -20,7 +20,7 @@ namespace CLX
     {
         if (ImGui::Begin("Scene Data"))
         {
-            Navmesh& navmesh = sceneManager.GetCurrentScene().GetNavmesh();
+            Navmesh& navmesh = sceneManager.GetActiveScene()->GetNavmesh();
 
             ImGui::Text("Drag Navmesh Here");
             auto objAsset = ObjectTarget<AssetPath_OBJ>();
@@ -28,10 +28,10 @@ namespace CLX
             {
                 const std::filesystem::path navmeshPath = std::filesystem::path(objAsset->Value().view());
                 navmesh = Navmesh(NavmeshLoader::LoadMesh(navmeshPath));
-                sceneManager.GetCurrentScene().SetNavmeshPath(navmeshPath);
+                sceneManager.GetActiveScene()->SetNavmeshPath(navmeshPath);
             }
 
-            SceneSettings& sceneSettings = sceneManager.GetSettings();
+            SceneSettings& sceneSettings = sceneManager.GetSceneSettings();
             NavmeshRenderSettings& navmeshRenderSettings = sceneSettings.navmeshRenderSettings;
 
             if (ImGui::Button("Toggle Navmesh Render"))
@@ -101,11 +101,11 @@ namespace CLX
                 if (startPlaying)
                 {
                     sceneManager.BeginPlay();
-                    editor.OnSceneBeginPlay(sceneManager.GetCurrentScene());
+                    editor.OnSceneBeginPlay(*sceneManager.GetActiveScene().Get());
                 }
                 else
                 {
-                    editor.OnSceneEndPlay(sceneManager.GetCurrentScene());
+                    editor.OnSceneEndPlay(*sceneManager.GetActiveScene().Get());
                     sceneManager.EndPlay();
                 }
             }
@@ -181,7 +181,7 @@ namespace CLX
         
         SceneManager& sceneManager = blackboard.Get<Key_SceneManager>();
 
-        RenderState& sceneRenderState = sceneManager.GetCurrentScene().GetRenderState();
+        RenderState& sceneRenderState = sceneManager.GetActiveScene()->GetRenderState();
         const EditorSceneSettings& editorSceneSettings = blackboard.Get<Key_EditorSceneSettings>();
 
 
@@ -227,7 +227,7 @@ namespace CLX
 
             if (input.IsKeyPressed(eInputKey::F))
             {
-                TeleportCameraToEntity(sceneManager.GetCurrentScene().GetECS(), mHierarchyPopUp.GetSelectedEntityID(), mCamera, false);
+                TeleportCameraToEntity(sceneManager.GetActiveScene()->GetECS(), mHierarchyPopUp.GetSelectedEntityID(), mCamera, false);
             }
 
         }
@@ -240,8 +240,9 @@ namespace CLX
         PROFILER_FUNCTION(profiler::colors::Yellow900);
 
         SceneManager& sceneManager = blackboard.Get<Key_SceneManager>();
+        Scene& activeScene = *sceneManager.GetActiveScene().Get();
         Blackboard newBlackboard = blackboard;
-        newBlackboard.Insert<Key_CurrentRenderState>(sceneManager.GetCurrentScene().GetRenderState());
+        newBlackboard.Insert<Key_CurrentRenderState>(activeScene.GetRenderState());
         EditorCommandTracker& commandTracker = blackboard.Get<Key_CommandTracker>();
         const InputState& input = blackboard.Get<Key_InputState>();
         OperatingSystem& os = blackboard.Get<Key_OperatingSystem>();
@@ -249,8 +250,8 @@ namespace CLX
         EditorSceneSettings& editorSceneSettings = blackboard.Get<Key_EditorSceneSettings>();
 
         const WindowView windowView = blackboard.Get<Key_WindowView>();
-        void* sceneTextureID = sceneManager.GetCurrentScene().GetRenderState().GetRenderContext()->GetOutputSRV();
-        RenderState& sceneRenderState = sceneManager.GetCurrentScene().GetRenderState();
+        void* sceneTextureID = activeScene.GetRenderState().GetRenderContext()->GetOutputSRV();
+        RenderState& sceneRenderState = activeScene.GetRenderState();
         mHierarchyPopUp.Render(newBlackboard);
         mInspectorPopUp.Render(newBlackboard);
 
@@ -267,7 +268,7 @@ namespace CLX
             //assert(renderRect == sceneRenderState.GetRenderRect().value());
 
             CheckForEntityCompositionDrops(
-                sceneManager.GetCurrentScene().GetECS(),
+                activeScene.GetECS(),
                 assetManager,
                 mHierarchyPopUp.GetRootEntities(),
                 mHierarchyPopUp.GetSelectedEntityID(),
@@ -275,7 +276,7 @@ namespace CLX
             );
 
             mTransformEntityTool.ShowEntityImGuizmo(
-                sceneManager.GetCurrentScene().GetECS(),
+                activeScene.GetECS(),
                 mHierarchyPopUp.GetSelectedEntityID(),
                 editorSceneSettings.transformMode,
                 sceneRenderState.GetRenderRect().value(),

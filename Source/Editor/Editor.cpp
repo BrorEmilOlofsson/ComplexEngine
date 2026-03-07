@@ -89,10 +89,10 @@ namespace CLX
         }
 
         sceneSaveButton->SetCallback(SceneFileFunctions::Save(&engine.GetSceneManager(), &engine.GetDataTypeRegistry()));
-        sceneLoadSelectable->SetCallback(SceneFileFunctions::Load(&engine.GetSceneManager()));
-        sceneCreateNewButton->SetCallback(SceneFileFunctions::CreateNew(&engine.GetSceneManager()));
-        sceneCreateCopyButton->SetCallback(SceneFileFunctions::CreateCopy(&engine.GetSceneManager()));
-        sceneReloadButton->SetCallback(SceneFileFunctions::Reload(&engine.GetSceneManager()));
+        sceneLoadSelectable->SetCallback(SceneFileFunctions::Load(&engine.GetSceneManager(), engine.GetAssetManager()));
+        sceneCreateNewButton->SetCallback(SceneFileFunctions::CreateNew(&engine.GetSceneManager(), engine.GetAssetManager()));
+        sceneCreateCopyButton->SetCallback(SceneFileFunctions::CreateCopy(&engine.GetSceneManager(), engine.GetAssetManager()));
+        sceneReloadButton->SetCallback(SceneFileFunctions::Reload(&engine.GetSceneManager(), engine.GetAssetManager()));
         sceneSetAsActiveButton->SetCallback(SceneFileFunctions::SetAsActive(&engine.GetSceneManager()));
 
         settingsCameraButton->AddCallback([&isCameraSettingsPopUpActive]()
@@ -143,7 +143,7 @@ namespace CLX
 
         mNodeScriptingWindow.Init();
 
-        mEngine->GetSceneManager().AddOnScenePostLoadFunction([this](Scene& scene)
+        mEngine->GetSceneManager().RegisterOnSceneLoadedFunction([this](Scene& scene)
             {
                 mSceneWindow.OnSceneLoaded(scene);
                 for (auto& popup : mPopUpWindows)
@@ -202,7 +202,7 @@ namespace CLX
         editorBlackboard.Insert<Key_DeltaTime>(mEngine->GetDeltaTime());
         editorBlackboard.Insert<Key_Editor>(*this);
         editorBlackboard.Insert<Key_WindowView>(mEngine->GetMainWindow());
-        editorBlackboard.Insert<Key_AssetManager>(mEngine->GetAssetManager());
+        editorBlackboard.Insert<Key_AssetManager>(*mEngine->GetAssetManager().lock());
         editorBlackboard.Insert<Key_DataTypeRegistry>(mEngine->GetDataTypeRegistry());
         editorBlackboard.Insert<Key_ECSRegistry>(mEngine->GetECSRegistry());
         editorBlackboard.Insert<Key_ImGuiStyleManager>(GetImGuiStyleManager());
@@ -236,7 +236,7 @@ namespace CLX
         editorBlackboard.Insert<Key_DeltaTime>(mEngine->GetDeltaTime());
         editorBlackboard.Insert<Key_Editor>(*this);
         editorBlackboard.Insert<Key_WindowView>(mEngine->GetMainWindow());
-        editorBlackboard.Insert<Key_AssetManager>(mEngine->GetAssetManager());
+        editorBlackboard.Insert<Key_AssetManager>(*mEngine->GetAssetManager().lock());
         editorBlackboard.Insert<Key_DataTypeRegistry>(mEngine->GetDataTypeRegistry());
         editorBlackboard.Insert<Key_ECSRegistry>(mEngine->GetECSRegistry());
         editorBlackboard.Insert<Key_ImGuiStyleManager>(GetImGuiStyleManager());

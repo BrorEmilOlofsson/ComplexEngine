@@ -34,6 +34,17 @@ namespace CLX
 
 		[[nodiscard]] constexpr const Ray3f& GetMouseRay() const noexcept;
 
+        [[nodiscard]] constexpr const std::filesystem::path& GetRelativePath() const noexcept { return mRelativePath; }
+		void SetRelativePath(std::filesystem::path path) 
+		{
+			mRelativePath = std::move(path);
+		}
+
+		[[nodiscard]] std::string GetName() const
+		{
+            return mRelativePath.stem().string();
+		}
+
 	private:
 
 		ECS mECS;
@@ -43,6 +54,8 @@ namespace CLX
 		RenderState mRenderState;
 		std::weak_ptr<Blackboard> mBlackboard;
 		Ray3f mMouseRay;
+
+		std::filesystem::path mRelativePath;
 	};
 
 	constexpr ECS& Scene::GetECS()

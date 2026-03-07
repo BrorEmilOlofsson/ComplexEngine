@@ -233,11 +233,17 @@ namespace CLX
 				PROFILER_END();
 			};
 
-		loaderMap[L".ecomp"] = [](const std::filesystem::path& path, AssetManager& assetManager)
+		loaderMap[AssetExtensions::EntityComposition] = [](const std::filesystem::path& path, AssetManager& assetManager)
 			{
 				EntityCompositionAsset asset = assetManager.GetAssetLoader().LoadEntityComposition(path);
-				assetManager.AddEntityCompositionAsset(path, std::move(asset));
+				assetManager.AddEntityComposition(path, std::move(asset));
 			};
+
+		loaderMap[AssetExtensions::Scene] = [](const std::filesystem::path& path, AssetManager& assetManager)
+			{
+				SceneAsset asset = assetManager.GetAssetLoader().LoadScene(path);
+				assetManager.AddScene(path, std::move(asset));
+            };
 
 		return loaderMap;
 	}

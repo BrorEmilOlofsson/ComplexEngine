@@ -64,7 +64,7 @@ namespace CLX
 		else if (textureID == GetSRVFromIconType(eIconType::Scene, assetManager))
 		{
 			const std::filesystem::path scenePath = std::filesystem::path("Assets/Scenes/") / path;
-			sceneManager.ChangeScene(scenePath);
+            sceneManager.ChangeScene(assetManager.GetScene(scenePath));
 		}
 		else if (extension == ".fly")
 		{
@@ -159,7 +159,7 @@ namespace CLX
 				EntityCompositionAsset asset(std::make_shared<EntityComposition>(ECSRegistry::Get()));
 				const std::filesystem::path path = directoryPath / (std::string(name) + ".ecomp");
 				asset->SetPath(path);
-				auto assetHandle = assetManager.AddEntityCompositionAsset(path, asset);
+				auto assetHandle = assetManager.AddEntityComposition(path, asset);
 				SaveEntityCompositionAsset(assetHandle, dataTypeRegistry);
 
 				ImGui::CloseCurrentPopup();

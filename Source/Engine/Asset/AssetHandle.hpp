@@ -48,6 +48,11 @@ namespace CLX
 			return mAsset.lock().get();
 		}
 
+		[[nodiscard]] static constexpr AssetHandle<T> Empty()
+		{
+			return AssetHandle<T>();
+        }
+
 	private:
 
 		std::weak_ptr<T> mAsset;

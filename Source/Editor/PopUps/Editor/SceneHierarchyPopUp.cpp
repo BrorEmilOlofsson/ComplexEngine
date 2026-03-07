@@ -18,11 +18,9 @@ namespace CLX
 	{
 		const std::string sceneInputWithTextButton = "Scene" + imGuiTag;
 
-		const SceneInfo* sceneInfo = sceneManager.GetCurrentSceneInfo();
-
 		char sceneName[256]{};
 		std::memset(sceneName, '\0', sizeof(sceneName));
-		strncpy_s(sceneName, sceneInfo->name.c_str(), sizeof(sceneName));
+		strncpy_s(sceneName, sceneManager.GetActiveScene()->GetRelativePath().stem().string().c_str(), sizeof(sceneName));
 		sceneName[sizeof(sceneName) - 1] = '\0';
 
 		if (ImGui::InputTextWithHint(sceneInputWithTextButton.c_str(), "Name", sceneName, sizeof(sceneName)))
@@ -30,7 +28,7 @@ namespace CLX
 			if (ImGui::IsItemFocused() && input.IsKeyPressed(eInputKey::Enter))
 			{
 				std::string newSceneName(sceneName);
-				sceneManager.ChangeSceneName(newSceneName);
+				//sceneManager.ChangeSceneName(newSceneName);
 			}
 		}
 	}
@@ -90,7 +88,7 @@ namespace CLX
 		PROFILER_FUNCTION(profiler::colors::Olive);
 		EditorCommandTracker& commandTracker = blackboard.Get<Key_CommandTracker>();
 		SceneManager& sceneManager = blackboard.Get<Key_SceneManager>();
-		ECS& ecs = sceneManager.GetCurrentScene().GetECS();
+		ECS& ecs = sceneManager.GetActiveScene()->GetECS();
 		ECS& ecsBuffer = blackboard.Get<Key_ECSBuffer>();
 		const InputState& input = blackboard.Get<Key_InputState>();
 
@@ -112,7 +110,7 @@ namespace CLX
 			if (ImGui::Button("Instantiate"))
 			{
 				EntityCompositionPopUp& popup = blackboard.Get<Key_EntityCompositionPopUp>();
-				InstantiateEntityComposition(sceneManager.GetCurrentScene().GetECS(), popup.GetCompositionAsset(), mRootEntities, commandTracker);
+				InstantiateEntityComposition(sceneManager.GetActiveScene()->GetECS(), popup.GetCompositionAsset(), mRootEntities, commandTracker);
 			}
 		}
 

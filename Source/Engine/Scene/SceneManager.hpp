@@ -1,76 +1,49 @@
 #pragma once
-#include <unordered_map>
-#include <string>
-#include <filesystem>
+#include "Engine/Asset/AssetTypes/SceneAsset.hpp"
 #include "Engine/Scene/Scene.hpp"
-#include "Engine/Utility/EventDispatcher.hpp"
 #include "Engine/Scene/SceneSettings.hpp"
 
 namespace CLX
 {
 
-	using SceneID = std::size_t;
-
-	struct SceneInfo
-	{
-		SceneID id = static_cast<size_t>(-1);
-		std::string name;
-		std::filesystem::path absolutePath;
-	};
+	class AssetManager;
 
 	class SceneManager final
 	{
 	public:
 
-		SceneManager() = default;
+		explicit SceneManager(std::weak_ptr<AssetManager> assetManager);
 
-		void Init(std::weak_ptr<Blackboard> blackboard);
-		void Update(const float deltaTime);
-		void Render();
+		[[nodiscard]] SceneAssetHandle GetActiveScene() const noexcept;
+		[[nodiscard]] const SceneSettings& GetSceneSettings() const noexcept { return mSceneSettings; }
+        [[nodiscard]] SceneSettings& GetSceneSettings() noexcept { return mSceneSettings; }
 
-		void BeginPlay();
+        void BeginPlay();
 		void EndPlay();
 
-		void ReloadSceneFromFile(const std::filesystem::path& sceneName);
+        void Update(float deltaTime);
+		void BeginFrame(Vector2ui windowSize, Point2i mouseScreenPos);
 
-		void ChangeScene(const std::filesystem::path& sceneName);
-		void ChangeSceneName(const std::string& newSceneName);
-		void CreateNewScene(const std::filesystem::path& filePath);
+		void ChangeScene(SceneAssetHandle scene);
+		void ChangeSceneDirectly(SceneAssetHandle scene);
 
-		void AddOnScenePreLoadFunction(std::function<void()> function);
-		void AddOnScenePostLoadFunction(std::function<void(Scene&)> function);
-
-	public:
-
-		[[nodiscard]] const SceneInfo* GetCurrentSceneInfo() const;
-		[[nodiscard]] Scene& GetCurrentScene();
-		[[nodiscard]] const Scene& GetCurrentScene() const;
-		[[nodiscard]] bool IsPlaying() const;
-
-		[[nodiscard]] SceneSettings& GetSettings();
-		[[nodiscard]] const SceneSettings& GetSettings() const;
+        [[nodiscard]] bool IsPlaying() const noexcept { return mIsPlaying; }
+        void SetIsPlaying(bool isPlaying) noexcept { mIsPlaying = isPlaying; }
+		void RegisterOnSceneLoadedFunction(std::function<void(Scene&)> function)
+		{
+			mOnSceneLoadedFunctions.push_back(std::move(function));
+		}
 
 	private:
 
-		void LoadSettingsFromJson();
-		void LoadDefaultScene(const std::filesystem::path& defaultScenePath);
-		bool LoadAndInitScene(const std::filesystem::path& sceneName);
+        SceneAssetHandle mActiveScene;
 
-	private:
+		std::weak_ptr<AssetManager> mAssetManager;
 
-		bool AddScene(const std::filesystem::path& sceneName);
-		void Clear();
+        std::vector<std::function<void(Scene&)>> mOnSceneLoadedFunctions;
 
-	private:
-
-		std::unordered_map<std::filesystem::path, SceneInfo> mSceneInfos;
-		std::unordered_map<SceneID, Scene> mScenes;
-		SceneInfo* mCurrentSceneInfo = nullptr;
-		size_t mNextSceneID = std::numeric_limits<size_t>::max();
-		bool mIsPlaying = false;
-		EventDispatcher<> mOnScenePreLoad;
-		EventDispatcher<Scene&> mOnScenePostLoad;
-		SceneSettings mSettings;
-		std::weak_ptr<Blackboard> mBlackboard;
+        SceneSettings mSceneSettings;
+        bool mIsPlaying = false;
+		SceneAssetHandle mSceneToLoadNextFrame;
 	};
 }

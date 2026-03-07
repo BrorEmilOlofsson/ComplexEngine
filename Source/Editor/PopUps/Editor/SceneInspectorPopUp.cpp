@@ -23,7 +23,7 @@ namespace CLX
 				return;
 			}
 
-			ECS& ecs = sceneManager.GetCurrentScene().GetECS();
+			ECS& ecs = sceneManager.GetActiveScene()->GetECS();
 			
 			ShowEntityName(ecs, selectedEntityID, input);
 
@@ -31,7 +31,7 @@ namespace CLX
 
 			Blackboard newBlackboard = blackboard;
 			newBlackboard.Insert<Key_CurrentCamera>(camera);
-			newBlackboard.Insert<Key_SceneRenderState>(sceneManager.GetCurrentScene().GetRenderState());
+			newBlackboard.Insert<Key_SceneRenderState>(sceneManager.GetActiveScene()->GetRenderState());
 			newBlackboard.Insert<Key_ReferenceTransform>(worldTransform);
 			ShowEntityInspector(ecs, selectedEntityID, anyItemActiveLastFrame, ecsBuffer, copyEntityID, newBlackboard, commandTracker);
 		}

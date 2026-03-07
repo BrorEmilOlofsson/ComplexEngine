@@ -46,7 +46,7 @@ namespace CLX
 			return mAsset != nullptr;
 		}
 
-		static Asset<T> Empty()
+		[[nodiscard]] static constexpr Asset<T> Empty()
 		{
 			return Asset<T>();
 		}
