@@ -268,35 +268,49 @@ namespace CLX
 		return FromJSON(animationAsset, json, blackboard.Get<Key_AssetManager>());
 	}
 
-	static void FromJSON(PixelShaderAssetHandle& shader, const nlohmann::json& json, AssetManager& assetManager)
+	static void FromJSON(PixelShaderAssetHandle& shaderAsset, const nlohmann::json& json, AssetManager& assetManager)
 	{
 		std::filesystem::path pixelShaderPath = std::filesystem::path(std::string(json["PixelShader"]));
 
 		if (!pixelShaderPath.empty())
 		{
-			shader = assetManager.GetPixelShader(pixelShaderPath);
+			shaderAsset = assetManager.GetPixelShader(pixelShaderPath);
 		}
 	}
 
-	void FromJSON(PixelShaderAssetHandle& shader, const nlohmann::json& json, const Blackboard& blackboard)
+	void FromJSON(PixelShaderAssetHandle& shaderAsset, const nlohmann::json& json, const Blackboard& blackboard)
 	{
-		FromJSON(shader, json, blackboard.Get<Key_AssetManager>());
+		FromJSON(shaderAsset, json, blackboard.Get<Key_AssetManager>());
 	}
 
-	static void FromJSON(VertexShaderAssetHandle& shader, const nlohmann::json& json, AssetManager& assetManager)
+	static void FromJSON(VertexShaderAssetHandle& shaderAsset, const nlohmann::json& json, AssetManager& assetManager)
 	{
 		std::filesystem::path vertexShaderPath = std::filesystem::path(std::string(json["VertexShader"]));
 
 		if (!vertexShaderPath.empty())
 		{
-			shader = assetManager.GetVertexShader(vertexShaderPath);
+			shaderAsset = assetManager.GetVertexShader(vertexShaderPath);
 		}
 	}
 
-	void FromJSON(VertexShaderAssetHandle& shader, const nlohmann::json& json, const Blackboard& blackboard)
+	void FromJSON(VertexShaderAssetHandle& shaderAsset, const nlohmann::json& json, const Blackboard& blackboard)
 	{
-		FromJSON(shader, json, blackboard.Get<Key_AssetManager>());
+		FromJSON(shaderAsset, json, blackboard.Get<Key_AssetManager>());
 	}
+
+    static void FromJSON(SceneAssetHandle& sceneAsset, const nlohmann::json& json, AssetManager& assetManager)
+	{
+		std::filesystem::path scenePath = std::filesystem::path(std::string(json["ScenePath"]));
+		if (!scenePath.empty())
+		{
+			sceneAsset = assetManager.GetScene(scenePath);
+		}
+	}
+
+	void FromJSON(SceneAssetHandle& sceneAsset, const nlohmann::json& json, const Blackboard& blackboard)
+	{
+		FromJSON(sceneAsset, json, blackboard.Get<Key_AssetManager>());
+    }
 
 	constexpr std::string_view GetNameBySlot(const std::size_t slot)
 	{

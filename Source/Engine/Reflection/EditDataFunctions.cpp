@@ -6,19 +6,15 @@
 #include "Engine/Graphics/RenderState.hpp"
 #include "Engine/Graphics/Shader/PixelShader.hpp"
 #include "Engine/Graphics/Shader/VertexShader.hpp"
+#include "Engine/Scene/Scene.hpp"
 #include "Engine/Asset/AssetManager.hpp"
 #include "Engine/OperatingSystem/WindowView.hpp"
-#include "Engine/Utility/Algorithm.hpp"
 #include "Engine/Graphics/Mesh/Mesh.hpp"
 #include "Engine/Graphics/Model/Model.hpp"
 #include "Engine/Graphics/Model/AnimatedModel.hpp"
 #include "Engine/Graphics/Texture/Texture.hpp"
 #include "Engine/Graphics/Animation/Animation.hpp"
-#include "Engine/Graphics/Model/Skeleton.hpp"
 #include "Engine/Reflection/DataTypeRegistry.hpp"
-
-#include "NodeScript/Fly.hpp"
-#include "NodeScript/Instance/FlyClassInstance.hpp"
 
 #include "Engine/Utility/ImGui/ImGuiUtility.hpp"
 #include "Engine/Utility/File/FileUtility.hpp"
@@ -891,11 +887,11 @@ namespace CLX
 	static ViewAndEditResult ViewAndEditValue(AnimationAssetHandle& animationAsset, AssetManager& assetManager)
 	{
 		ViewAndEditResult viewAndEditResult;
-		std::filesystem::path name;
+		std::filesystem::path filePath;
 
 		if (animationAsset)
 		{
-			name = animationAsset->path;
+			filePath = animationAsset->path;
 		}
 
 		ImGui::AlignTextToFramePadding();
@@ -903,7 +899,7 @@ namespace CLX
 		ImGui::Text("Animation:");
 		ImGui::SameLine();
 		ImGui::BeginDisabled();
-		ImGui::InputText("", name.string().data(), name.string().size());
+		ImGui::InputText("", filePath.string().data(), filePath.string().size());
 		ImGui::EndDisabled();
 
 		if (const ImGuiPayload* currentPayload = ImGui::GetDragDropPayload())
@@ -932,6 +928,47 @@ namespace CLX
 	ViewAndEditResult ViewAndEditValue(AnimationAssetHandle& animationAsset, const Blackboard& blackboard)
 	{
 		return ViewAndEditValue(animationAsset, blackboard.Get<Key_AssetManager>());
+	}
+
+	static ViewAndEditResult ViewAndEditValue(SceneAssetHandle& sceneAsset, AssetManager& assetManager)
+	{
+		ViewAndEditResult viewAndEditResult;
+        const std::filesystem::path filePath = sceneAsset ? sceneAsset->GetRelativePath() : std::filesystem::path();
+
+		ImGui::AlignTextToFramePadding();
+
+		ImGui::Text("Scene:");
+		ImGui::SameLine();
+		ImGui::BeginDisabled();
+		ImGui::InputText("", filePath.string().data(), filePath.string().size());
+		ImGui::EndDisabled();
+
+		if (const ImGuiPayload* currentPayload = ImGui::GetDragDropPayload())
+		{
+			const std::filesystem::path path = std::filesystem::path(reinterpret_cast<const char*>(currentPayload->Data));
+			const std::filesystem::path extension = path.extension();
+
+			if (std::wstring_view(extension.c_str()) == AssetExtensions::Scene)
+			{
+				if (ImGui::BeginDragDropTarget())
+				{
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Asset"))
+					{
+						sceneAsset = assetManager.GetScene(path);
+						viewAndEditResult.isEdited = true;
+						viewAndEditResult.isActive = true;
+					}
+					ImGui::EndDragDropTarget();
+				}
+			}
+		}
+
+		return viewAndEditResult;
+	}
+
+	ViewAndEditResult ViewAndEditValue(SceneAssetHandle& sceneAsset, const Blackboard& blackboard)
+	{
+		return ViewAndEditValue(sceneAsset, blackboard.Get<Key_AssetManager>());
 	}
 
 	/*ViewAndEditResult ViewAndEditValue(Fly::ClassInstanceProxy& aClassInstance, [[maybe_unused]] const std::string&)

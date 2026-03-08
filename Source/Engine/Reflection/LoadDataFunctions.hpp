@@ -154,8 +154,9 @@ namespace CLX
 	void FromJSON(AnimatedModelAssetHandle& animatedModelAsset, const nlohmann::json& json, const Blackboard& blackboard);
 	void FromJSON(TextureAssetHandle& textureAsset, const nlohmann::json& json, const Blackboard& blackboard);
 	void FromJSON(AnimationAssetHandle& animationAsset, const nlohmann::json& json, const Blackboard& blackboard);
-	void FromJSON(PixelShaderAssetHandle& shader, const nlohmann::json& json, const Blackboard& blackboard);
-	void FromJSON(VertexShaderAssetHandle& shader, const nlohmann::json& json, const Blackboard& blackboard);
+	void FromJSON(PixelShaderAssetHandle& shaderAsset, const nlohmann::json& json, const Blackboard& blackboard);
+	void FromJSON(VertexShaderAssetHandle& shaderAsset, const nlohmann::json& json, const Blackboard& blackboard);
+	void FromJSON(SceneAssetHandle& sceneAsset, const nlohmann::json& json, const Blackboard& blackboard);
 
 	void CustomFromJSON(std::array<TextureAssetHandle, 3>& textureAssets, const nlohmann::json& json, const Blackboard& blackboard);
 

@@ -75,6 +75,5 @@ namespace CLX
 	REGISTER_DATATYPE(AnimatedModelAssetHandle);
 	REGISTER_DATATYPE(TextureAssetHandle);
 	REGISTER_DATATYPE(AnimationAssetHandle);
-	REGISTER_DATATYPE_POINTER(PixelShader);
-	REGISTER_DATATYPE_POINTER(VertexShader);
+	REGISTER_DATATYPE(SceneAssetHandle);
 }

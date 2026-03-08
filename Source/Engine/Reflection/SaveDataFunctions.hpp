@@ -178,6 +178,7 @@ namespace CLX
 	[[nodiscard]] nlohmann::json ToJSON(const VertexShaderAssetHandle& shaderAsset);
 	[[nodiscard]] nlohmann::json ToJSON(const TextureAssetHandle& textureAsset);
 	[[nodiscard]] nlohmann::json ToJSON(const AnimationAssetHandle& animationAsset);
+	[[nodiscard]] nlohmann::json ToJSON(const SceneAssetHandle& sceneAsset);
 
 	[[nodiscard]] nlohmann::json CustomToJSON(const std::array<TextureAssetHandle, 3>& textureAssets);
 
@@ -192,8 +193,6 @@ namespace CLX
 	{
 		return ::ToJSON(static_cast<int>(value));
 	}
-
-
 }
 
 namespace std
@@ -206,7 +205,7 @@ namespace std
 		{
 			nlohmann::json element = CLX::SaveDataPtr(CLX::GetDataTypeID<T>(), &data);
 
-			arrayJson.push_back(element);
+			arrayJson.push_back(std::move(element));
 		}
 		return arrayJson;
 	}

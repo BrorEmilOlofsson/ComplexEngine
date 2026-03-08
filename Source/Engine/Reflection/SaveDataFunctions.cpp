@@ -1,5 +1,5 @@
 #include "Engine/Precompiled/EnginePch.hpp"
-#include "Engine/Reflection/SaveDataFunctions.hpp"
+#include "SaveDataFunctions.hpp"
 #include "Engine/Math/Transform3.hpp"
 #include "Engine/Graphics/Model/Skeleton.hpp"
 #include "Engine/Graphics/Animation/Animation.hpp"
@@ -12,6 +12,7 @@
 #include "Engine/Graphics/Model/AnimatedModel.hpp"
 #include "Engine/Graphics/GraphicsConstants.hpp"
 #include "Engine/Reflection/DataTypeRegistry.hpp"
+#include "Engine/Scene/Scene.hpp"
 
 namespace CLX
 {
@@ -320,6 +321,18 @@ namespace CLX
 
 		return json;
 	}
+
+	nlohmann::json ToJSON(const SceneAssetHandle& sceneAsset)
+	{
+		nlohmann::json json;
+		std::filesystem::path sceneRelativePath;
+		if (sceneAsset)
+		{
+			sceneRelativePath = sceneAsset->GetRelativePath();
+		}
+		json["ScenePath"] = sceneRelativePath;
+		return json;
+    }
 
 	nlohmann::json CustomToJSON(const std::array<TextureAssetHandle, 3>& textureAssets)
 	{
