@@ -26,7 +26,7 @@ namespace CLX
                     }
 
                     const Scene& activeScene = *sceneAsset.Get();
-                    SceneLoader::SaveScene(activeScene, activeScene.GetRelativePath(), *dataTypeRegistry);
+                    SceneLoader::SaveScene(activeScene, sceneAsset.GetRelativePath(), *dataTypeRegistry);
 
 
                     Console::Print("Scene ", ConsoleTextColor::White, false);
@@ -67,7 +67,7 @@ namespace CLX
         {
             return [sceneManager, assetManager]() -> void
                 {
-                    const std::filesystem::path absolutePath = std::filesystem::absolute(sceneManager->GetActiveScene()->GetRelativePath());
+                    const std::filesystem::path absolutePath = std::filesystem::absolute(sceneManager->GetActiveScene().GetRelativePath());
                     const std::filesystem::path newCopyName = absolutePath.parent_path() / std::filesystem::path(absolutePath.stem().string() + "_Copy" + absolutePath.extension().string());
                     const std::filesystem::path newFilePath = AppendCounterIfAlreadyExist(newCopyName);
 
@@ -86,8 +86,8 @@ namespace CLX
         {
             return [sceneManager, assetManager]() -> void
                 {
-                    const Scene& activeScene = *sceneManager->GetActiveScene().Get();
-                    assetManager.lock()->LoadAsset(activeScene.GetRelativePath());
+                    const SceneAssetHandle activeSceneAsset = sceneManager->GetActiveScene();
+                    assetManager.lock()->LoadAsset(activeSceneAsset.GetRelativePath());
 
                     Console::Print("Scene ", ConsoleTextColor::White, false);
                     Console::Print(sceneManager->GetActiveScene()->GetName(), ConsoleTextColor::Green, false);
@@ -99,8 +99,8 @@ namespace CLX
         {
             return [sceneManager]() -> void
                 {
-                    const Scene& activeScene = *sceneManager->GetActiveScene().Get();
-                    std::filesystem::path relativePath = activeScene.GetRelativePath();
+                    const SceneAssetHandle activeSceneAsset = sceneManager->GetActiveScene();
+                    std::filesystem::path relativePath = activeSceneAsset.GetRelativePath();
                     std::optional<nlohmann::json> jsonData = FileUtility::GetDataAsJson(std::filesystem::absolute(SIMPLE_SETTINGS_GAME));
 
                     if (!jsonData.has_value())
@@ -116,7 +116,7 @@ namespace CLX
                     writeFile << jsonData.value();
 
                     Console::Print("Scene ", ConsoleTextColor::White, false);
-                    Console::Print(activeScene.GetName().c_str(), ConsoleTextColor::Green, false);
+                    Console::Print(relativePath.stem().string().c_str(), ConsoleTextColor::Green, false);
                     Console::Print(" has been set as start!", ConsoleTextColor::White, true);
                 };
         }

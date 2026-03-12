@@ -30,7 +30,7 @@ namespace CLX
         {
             std::shared_ptr<EntityComposition> ec = std::make_shared<EntityComposition>(blackboard.Get<Key_ECSRegistry>());
             const std::filesystem::path defaultPath = std::filesystem::absolute(SIMPLE_DIR_ASSETS) / "EntityCompositions" / "Test.json";
-            blackboard.Get<Key_AssetManager>().AddEntityComposition(defaultPath, EntityCompositionAsset(ec));
+            blackboard.Get<Key_AssetManager>().AddEntityComposition(EntityCompositionAsset(ec, defaultPath));
 
             mEntityCompositionAsset = blackboard.Get<Key_AssetManager>().GetEntityComposition(defaultPath);
             mRootEntities = GetRootEntities(mEntityCompositionAsset->GetECS());
@@ -118,7 +118,6 @@ namespace CLX
         {
             if (ImGui::Button("Save"))
             {
-                mEntityCompositionAsset->SetPath(std::filesystem::path(SIMPLE_DIR_ASSETS) / "EntityCompositions/Test.json");
                 SaveEntityCompositionAsset(mEntityCompositionAsset, blackboard.Get<Key_DataTypeRegistry>());
             }
             ShowEntityHierarchyWithAddButtons(

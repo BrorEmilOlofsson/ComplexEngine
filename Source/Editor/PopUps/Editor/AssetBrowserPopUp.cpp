@@ -156,10 +156,9 @@ namespace CLX
 
 			if (ImGui::Button("Create"))
 			{
-				EntityCompositionAsset asset(std::make_shared<EntityComposition>(ECSRegistry::Get()));
 				const std::filesystem::path path = directoryPath / (std::string(name) + ".ecomp");
-				asset->SetPath(path);
-				auto assetHandle = assetManager.AddEntityComposition(path, asset);
+				EntityCompositionAsset asset(std::make_shared<EntityComposition>(ECSRegistry::Get()), path);
+				auto assetHandle = assetManager.AddEntityComposition(asset);
 				SaveEntityCompositionAsset(assetHandle, dataTypeRegistry);
 
 				ImGui::CloseCurrentPopup();

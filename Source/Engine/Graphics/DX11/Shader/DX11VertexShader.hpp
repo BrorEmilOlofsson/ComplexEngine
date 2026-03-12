@@ -20,14 +20,8 @@ namespace CLX
 
 		void Bind();
 
-		const std::filesystem::path& GetPath() const
-		{
-			return mPath;
-		}
-
 	private:
 
-		std::filesystem::path mPath;
 		Microsoft::WRL::ComPtr<ID3D11VertexShader> mVertexShader;
 		Microsoft::WRL::ComPtr<ID3D11InputLayout> mInputLayout;
 

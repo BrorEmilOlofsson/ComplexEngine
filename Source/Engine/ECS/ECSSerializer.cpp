@@ -176,7 +176,7 @@ namespace CLX
 	{
 		if (asset)
 		{
-			SaveEntityComposition(asset->GetPath(), *asset.Get(), dataTypeRegistry);
+			SaveEntityComposition(asset.GetRelativePath(), *asset.Get(), dataTypeRegistry);
 		}
 	}
 
@@ -188,8 +188,6 @@ namespace CLX
 		}
 
 		entityComposition.GetECS() = ECS(entityComposition.GetECS().GetRegistry());
-
-		entityComposition.SetPath(path);
 
 		std::ifstream file(path);
 

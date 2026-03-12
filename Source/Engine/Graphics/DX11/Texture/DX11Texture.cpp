@@ -11,11 +11,9 @@
 
 namespace CLX
 {
-	DX11Texture::DX11Texture(Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv, Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, const std::filesystem::path& relativePath)
+	DX11Texture::DX11Texture(Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv, Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext)
 		: mShaderResourceView(srv)
 		, mDeviceContext(deviceContext)
-		, mRelativePath(relativePath)
-		, mName(relativePath.stem().string())
 	{
 	}
 
@@ -43,16 +41,6 @@ namespace CLX
 	unsigned int DX11Texture::GetSlot() const
 	{
 		return mSlot;
-	}
-
-	const std::string& DX11Texture::GetName() const
-	{
-		return mName;
-	}
-
-	const std::filesystem::path& DX11Texture::GetRelativePath() const
-	{
-		return mRelativePath;
 	}
 
 	ID3D11ShaderResourceView* DX11Texture::GetShaderResourceView()

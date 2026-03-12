@@ -713,7 +713,7 @@ namespace CLX
 	{
 		ViewAndEditResult viewAndEditResult;
 
-		std::string textureName = textureAsset ? textureAsset->GetName() : "None";
+		std::string textureName = textureAsset ? textureAsset.GetRelativePath().stem().string() : "None";
 
 		ImGui::AlignTextToFramePadding();
 
@@ -773,7 +773,7 @@ namespace CLX
 
 		if (shader)
 		{
-			currentPath = shader->GetPath();
+			currentPath = shader.GetRelativePath();
 		}
 
 		for (std::filesystem::path& shaderFilePath : shaderFilePaths)
@@ -834,7 +834,7 @@ namespace CLX
 
 		if (shaderAsset)
 		{
-			currentPath = shaderAsset->GetPath();
+			currentPath = shaderAsset.GetRelativePath();
 		}
 
 		for (std::filesystem::path& shaderFilePath : shaderFilePaths)
@@ -933,7 +933,7 @@ namespace CLX
 	static ViewAndEditResult ViewAndEditValue(SceneAssetHandle& sceneAsset, AssetManager& assetManager)
 	{
 		ViewAndEditResult viewAndEditResult;
-        const std::filesystem::path filePath = sceneAsset ? sceneAsset->GetRelativePath() : std::filesystem::path();
+        const std::filesystem::path filePath = sceneAsset ? sceneAsset.GetRelativePath() : std::filesystem::path();
 
 		ImGui::AlignTextToFramePadding();
 
@@ -1061,7 +1061,7 @@ namespace CLX
 
 			if (textureAssets[i])
 			{
-				textureName = textureAssets[i]->GetName();
+				textureName = textureAssets[i].GetRelativePath().stem().string();
 			}
 
 			ImTextureID textureID = nullptr;

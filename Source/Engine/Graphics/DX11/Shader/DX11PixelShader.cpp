@@ -9,11 +9,10 @@ namespace CLX
 	DX11PixelShader::DX11PixelShader(
 		Microsoft::WRL::ComPtr<ID3D11Device> device,
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext> context,
-		Microsoft::WRL::ComPtr<ID3D11PixelShader> pixelShader, const std::filesystem::path& path)
+		Microsoft::WRL::ComPtr<ID3D11PixelShader> pixelShader)
 		: mDevice(device)
 		, mContext(context)
 		, mPixelShader(pixelShader)
-		, mPath(path)
 	{
 	}
 

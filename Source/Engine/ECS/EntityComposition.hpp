@@ -16,8 +16,6 @@ namespace CLX
 
 		[[nodiscard]] EntityID GetRootEntity() const noexcept;
 
-		[[nodiscard]] const std::filesystem::path& GetPath() const noexcept;
-
 		[[nodiscard]] bool HasChanged() const noexcept
 		{
 			return mHasChanged;
@@ -28,17 +26,11 @@ namespace CLX
 			mHasChanged = hasChanged;
 		}
 
-		void SetPath(const std::filesystem::path& path)
-		{
-			mPath = path;
-		}
-
 	private:
 
 		ECS mECS;
 		EntityID mRootEntityID = InvalidEntityID;
-		
-		std::filesystem::path mPath;
+
 		bool mHasChanged = false;
 	};
 

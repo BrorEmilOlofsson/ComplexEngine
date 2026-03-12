@@ -19,11 +19,6 @@ namespace CLX
 			mConcept->Bind();
 		}
 
-		[[nodiscard]] const std::filesystem::path& GetPath() const
-		{
-			return mConcept->GetPath();
-		}
-
 
 	private:
 
@@ -34,7 +29,6 @@ namespace CLX
 			virtual ~Concept() = default;
 
 			virtual void Bind() = 0;
-			virtual const std::filesystem::path& GetPath() const = 0;
 		};
 
 		template<typename T>
@@ -51,11 +45,6 @@ namespace CLX
 			void Bind() override
 			{
 				mObject.Bind();
-			}
-
-			const std::filesystem::path& GetPath() const override
-			{
-				return mObject.GetPath();
 			}
 
 		private:

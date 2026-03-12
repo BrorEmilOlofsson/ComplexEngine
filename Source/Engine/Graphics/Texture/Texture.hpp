@@ -45,15 +45,6 @@ namespace CLX
 			return mConcept->GetSlot();
 		}
 
-		const std::string& GetName() const
-		{
-			return mConcept->GetName();
-		}
-
-		const std::filesystem::path& GetRelativePath() const
-		{
-			return mConcept->GetRelativePath();
-		}
 	private:
 
 		class TextureConcept
@@ -66,8 +57,6 @@ namespace CLX
 			virtual void Bind(unsigned int slot) = 0;
 			virtual void Bind() = 0;
 			virtual void* GetShaderResourceView() = 0;
-			virtual const std::string& GetName() const = 0;
-			virtual const std::filesystem::path& GetRelativePath() const = 0;
 		};
 
 		template<typename T>
@@ -105,15 +94,6 @@ namespace CLX
 				return mTexture.GetShaderResourceView();
 			}
 
-			[[nodiscard]] const std::string& GetName() const override
-			{
-				return mTexture.GetName();
-			}
-
-			[[nodiscard]] const std::filesystem::path& GetRelativePath() const override
-			{
-				return mTexture.GetRelativePath();
-			}
 		private:
 
 			T mTexture;

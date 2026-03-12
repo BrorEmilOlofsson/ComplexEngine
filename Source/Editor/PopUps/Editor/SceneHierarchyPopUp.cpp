@@ -20,7 +20,7 @@ namespace CLX
 
 		char sceneName[256]{};
 		std::memset(sceneName, '\0', sizeof(sceneName));
-		strncpy_s(sceneName, sceneManager.GetActiveScene()->GetRelativePath().stem().string().c_str(), sizeof(sceneName));
+		strncpy_s(sceneName, sceneManager.GetActiveScene().GetRelativePath().stem().string().c_str(), sizeof(sceneName));
 		sceneName[sizeof(sceneName) - 1] = '\0';
 
 		if (ImGui::InputTextWithHint(sceneInputWithTextButton.c_str(), "Name", sceneName, sizeof(sceneName)))

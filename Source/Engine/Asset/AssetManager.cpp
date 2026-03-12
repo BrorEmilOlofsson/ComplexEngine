@@ -236,7 +236,7 @@ namespace CLX
 		loaderMap[AssetExtensions::EntityComposition] = [](const std::filesystem::path& path, AssetManager& assetManager)
 			{
 				EntityCompositionAsset asset = assetManager.GetAssetLoader().LoadEntityComposition(path);
-				assetManager.AddEntityComposition(path, std::move(asset));
+				assetManager.AddEntityComposition(std::move(asset));
 			};
 
 		loaderMap[AssetExtensions::Scene] = [](const std::filesystem::path& path, AssetManager& assetManager)

@@ -1,6 +1,7 @@
 #pragma once
-#include <string_view>
 #include <memory>
+#include <utility>
+#include <filesystem>
 #include "Engine/Asset/Asset.hpp"
 
 namespace CLX
@@ -13,13 +14,15 @@ namespace CLX
 
 		constexpr AssetHandle() = default;
 
-		constexpr explicit AssetHandle(std::weak_ptr<T> asset)
+		constexpr explicit AssetHandle(std::weak_ptr<T> asset, std::filesystem::path relativePath)
 			: mAsset(std::move(asset))
+			, mRelativePath(std::move(relativePath))
 		{
 		}
 
 		constexpr explicit AssetHandle(Asset<T> asset)
 			: mAsset(std::move(asset.Get()))
+			, mRelativePath(std::move(asset.GetRelativePath()))
 		{
 		}
 
@@ -32,6 +35,11 @@ namespace CLX
 		{
 			return mAsset.lock();
 		}
+
+		[[nodiscard]] constexpr const std::filesystem::path& GetRelativePath() const noexcept
+		{
+			return mRelativePath;
+        }
 
 		[[nodiscard]] constexpr bool IsValid() const noexcept
 		{
@@ -56,6 +64,7 @@ namespace CLX
 	private:
 
 		std::weak_ptr<T> mAsset;
+		std::filesystem::path mRelativePath;
 	};
 
 	template<typename T>

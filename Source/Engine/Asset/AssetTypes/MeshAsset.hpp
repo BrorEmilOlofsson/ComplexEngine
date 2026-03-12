@@ -38,7 +38,7 @@ namespace CLX
 		}
 	}
 
-	constexpr std::filesystem::path GetPathByPrimitiveMeshType(const ePrimitiveShape type)
+	inline std::filesystem::path GetPathByPrimitiveMeshType(const ePrimitiveShape type)
 	{
 		switch (type)
 		{

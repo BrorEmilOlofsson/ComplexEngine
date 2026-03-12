@@ -71,7 +71,7 @@ namespace CLX
 
 
 		}
-		return AnimationAsset(std::make_shared<Animation>(animation));
+		return AnimationAsset(std::make_shared<Animation>(animation), std::filesystem::path());
 	}
 
 	std::array<Bone, GlobalMaxBones> CreateBonesTest()

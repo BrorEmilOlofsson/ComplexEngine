@@ -1,5 +1,7 @@
 #pragma once
 #include <memory>
+#include <utility>
+#include <filesystem>
 
 namespace CLX
 {
@@ -11,13 +13,9 @@ namespace CLX
 
 		constexpr Asset() = default;
 
-		constexpr explicit Asset(const std::shared_ptr<T>& asset)
-			: mAsset(asset)
-		{
-		}
-
-		constexpr explicit Asset(std::shared_ptr<T>&& asset)
+		constexpr explicit Asset(std::shared_ptr<T> asset, std::filesystem::path relativePath)
 			: mAsset(std::move(asset))
+			,  mRelativePath(std::move(relativePath))
 		{
 		}
 
@@ -30,6 +28,11 @@ namespace CLX
 		{
 			return mAsset;
 		}
+
+		[[nodiscard]] constexpr const std::filesystem::path& GetRelativePath() const
+		{
+			return mRelativePath;
+        }
 
 		[[nodiscard]] constexpr T* operator->() noexcept
 		{
@@ -54,6 +57,7 @@ namespace CLX
 	private:
 
 		std::shared_ptr<T> mAsset;
+        std::filesystem::path mRelativePath;
 	};
 
 }

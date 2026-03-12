@@ -178,12 +178,13 @@ namespace CLX
             mSceneAssets[std::filesystem::absolute(path)] = std::move(asset);
         }
 
-        EntityCompositionAssetHandle AddEntityComposition(const std::filesystem::path& path, EntityCompositionAsset asset)
+        EntityCompositionAssetHandle AddEntityComposition(EntityCompositionAsset asset)
         {
             if (!asset)
             {
                 throw std::invalid_argument("Asset is invalid");
             }
+            const std::filesystem::path path = asset.GetRelativePath();
             mEntityCompositionAssets[std::filesystem::absolute(path)] = std::move(asset);
             return GetEntityComposition(path);
         }
@@ -221,7 +222,7 @@ namespace CLX
             if (extension == AssetExtensions::EntityComposition)
             {
                 EntityCompositionAsset asset = mAssetLoader.LoadEntityComposition(path);
-                AddEntityComposition(path, std::move(asset));
+                AddEntityComposition(std::move(asset));
             }
             else if (extension == AssetExtensions::Scene)
             {

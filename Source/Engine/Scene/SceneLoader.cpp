@@ -19,7 +19,7 @@ namespace CLX
 		SaveECS(scene.GetECS(), sceneJson, dataTypeRegistry);
 		sceneJson["NavmeshPath"] = std::filesystem::relative(scene.GetNavmeshPath(), std::filesystem::path(SIMPLE_DIR_ASSETS));
 
-		std::ofstream writeFile(std::filesystem::absolute(filePath));
+		std::ofstream writeFile(std::filesystem::path(SIMPLE_DIR_ASSETS) / std::filesystem::absolute(filePath));
 		assert(writeFile.is_open() && "Failed to open the file");
 
 		writeFile << sceneJson.dump(-1);

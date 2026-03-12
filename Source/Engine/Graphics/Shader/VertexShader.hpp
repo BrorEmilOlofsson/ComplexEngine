@@ -19,11 +19,6 @@ namespace CLX
 			mConcept->Bind();
 		}
 
-		[[nodiscard]] const std::filesystem::path& GetPath() const
-		{
-			return mConcept->GetPath();
-		}
-
 	private:
 
 		class VertexShaderConcept
@@ -33,7 +28,6 @@ namespace CLX
 			virtual ~VertexShaderConcept() = default;
 
 			virtual void Bind() = 0;
-			virtual const std::filesystem::path& GetPath() const = 0;
 		};
 
 		template<typename T>
@@ -50,11 +44,6 @@ namespace CLX
 			void Bind()
 			{
 				mObject.Bind();
-			}
-
-			const std::filesystem::path& GetPath() const override
-			{
-				return mObject.GetPath();
 			}
 
 		private:

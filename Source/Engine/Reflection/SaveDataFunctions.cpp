@@ -266,7 +266,7 @@ namespace CLX
 
 		if (textureAsset)
 		{
-			textureName = textureAsset->GetRelativePath();
+			textureName = textureAsset.GetRelativePath();
 		}
 
 		json = textureName;
@@ -282,7 +282,7 @@ namespace CLX
 
 		if (pixelShader)
 		{
-			pixelShaderPath = pixelShader->GetPath();
+			pixelShaderPath = pixelShader.GetRelativePath();
 		}
 
 		json["PixelShader"] = pixelShaderPath;
@@ -298,7 +298,7 @@ namespace CLX
 
 		if (vertexShader)
 		{
-			vertexShaderPath = vertexShader->GetPath();
+			vertexShaderPath = vertexShader.GetRelativePath();
 		}
 
 		json["VertexShader"] = vertexShaderPath;
@@ -328,7 +328,7 @@ namespace CLX
 		std::filesystem::path sceneRelativePath;
 		if (sceneAsset)
 		{
-			sceneRelativePath = sceneAsset->GetRelativePath();
+			sceneRelativePath = sceneAsset.GetRelativePath();
 		}
 		json["ScenePath"] = sceneRelativePath;
 		return json;
@@ -341,9 +341,9 @@ namespace CLX
 		TextureAssetHandle albedoTextureHandle = textureAssets[TextureSlots::Albedo];
 		TextureAssetHandle normalTextureHandle = textureAssets[TextureSlots::Normal];
 		TextureAssetHandle materialTextureHandle = textureAssets[TextureSlots::Material];
-		const std::filesystem::path albedoTexture = albedoTextureHandle ? albedoTextureHandle->GetRelativePath() : std::filesystem::path();
-		const std::filesystem::path normalTexture = normalTextureHandle ? normalTextureHandle->GetRelativePath() : std::filesystem::path();
-		const std::filesystem::path materialTexture = materialTextureHandle ? materialTextureHandle->GetRelativePath() : std::filesystem::path();
+		const std::filesystem::path albedoTexture = albedoTextureHandle ? albedoTextureHandle.GetRelativePath() : std::filesystem::path();
+		const std::filesystem::path normalTexture = normalTextureHandle ? normalTextureHandle.GetRelativePath() : std::filesystem::path();
+		const std::filesystem::path materialTexture = materialTextureHandle ? materialTextureHandle.GetRelativePath() : std::filesystem::path();
 
 		json["Albedo"] = albedoTexture;
 		json["Normal"] = normalTexture;

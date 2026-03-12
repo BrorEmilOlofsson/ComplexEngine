@@ -17,7 +17,7 @@ namespace CLX
 	public:
 
 		DX11Texture() = default;
-		explicit DX11Texture(Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv, Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext, const std::filesystem::path& relativePath);
+		explicit DX11Texture(Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv, Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext);
 
 		void Bind(const unsigned int slot);
 		void Bind();
@@ -26,16 +26,12 @@ namespace CLX
 		void SetSlot(const unsigned int slot);
 
 		unsigned int GetSlot() const;
-		const std::string& GetName() const;
-		const std::filesystem::path& GetRelativePath() const;
 		ID3D11ShaderResourceView* GetShaderResourceView();
 
 	private:
 
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext> mDeviceContext;
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> mShaderResourceView;
-		std::string mName;
-		std::filesystem::path mRelativePath;
 		unsigned int mSlot = 0;
 	};
 }
