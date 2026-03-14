@@ -13,6 +13,7 @@ namespace CLX
 		CameraSystem() = delete;
 
 		static void Update(ECS& ecs, const float, const Blackboard& blackboard);
+		static void EditorUpdate(ECS& ecs, const Blackboard& blackboard);
 		static void Render(const ECS& ecs, const Blackboard& blackboard);
 	};
 }

@@ -1849,7 +1849,7 @@ namespace FLY_NAMESPACE
 
             const bool isSplitPin = oldPinType.GetParentID() != InvalidID<PinTypeID>();
             isSplitPin;
-            throw isSplitPin;
+            //throw isSplitPin;
         }
 
         static void DeletePinAtIndexNodeType(const NodeTypeID nodeTypeID, const std::size_t index, const eIODirection ioDirection)

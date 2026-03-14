@@ -16,7 +16,7 @@ namespace CLX
 	static void SetCamera(ECS& ecs, RenderState& renderState)
 	{
 
-		auto cameraComponentView = ecs.ViewUsingEntityID<CameraComponent, TransformComponent>();
+		auto cameraComponentView = ecs.View<CameraComponent>();
 
 		if (cameraComponentView.IsEmpty())
 		{
@@ -25,21 +25,26 @@ namespace CLX
 			return;
 		}
 
-		auto [entityID, cameraComponent, transformComponent] = *cameraComponentView.begin();
+		auto [cameraComponent] = *cameraComponentView.begin();
 
-		Transform worldTransform = GetWorldTransform(ecs, entityID);
-		cameraComponent.camera.SetPosition(worldTransform.GetPosition());
-		cameraComponent.camera.SetRotation(worldTransform.GetRotation());
 		renderState.SetCamera(cameraComponent.camera);
+	}
+
+	static void UpdateCameraTransforms(ECS& ecs)
+	{
+		ecs.ForEach([&ecs](const EntityID entityID, CameraComponent& cameraComponent)
+			{
+				cameraComponent.camera.SetTransform(GetWorldTransform(ecs, entityID));
+			});
 	}
 
 	static void PushCameraLines(const ECS& ecs, RenderList& renderList)
 	{
-		auto cameraComponentView = ecs.View<CameraComponent, TransformComponent>();
+		auto cameraComponentView = ecs.ViewUsingEntityID<CameraComponent>();
 
 		if (!cameraComponentView.IsEmpty())
 		{
-			auto [cameraComponent, transformComponent] = *cameraComponentView.begin();
+			auto [entityID, cameraComponent] = *cameraComponentView.begin();
 
 			const UnitVector3f forward = cameraComponent.camera.GetForward();
 			
@@ -80,8 +85,15 @@ namespace CLX
 
 	void CameraSystem::Update(ECS& ecs, const float deltaTime, const Blackboard& blackboard)
 	{
+		UpdateCameraTransforms(ecs);
 		SetCamera(ecs, blackboard.Get<Key_CurrentRenderState>());
 		HandleFreeFly(ecs, deltaTime, blackboard.Get<Key_InputState>());
+	}
+
+	void CameraSystem::EditorUpdate(ECS& ecs, const Blackboard&)
+	{
+		UpdateCameraTransforms(ecs);
+
 	}
 
 	void CameraSystem::Render(const ECS& ecs, const Blackboard& blackboard)

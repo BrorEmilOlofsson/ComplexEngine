@@ -40,6 +40,7 @@ namespace CLX
 		constexpr void SetPosition(const Point3f& position);
 		constexpr void SetRotation(const Rotatorf& rotationInDegree);
 		constexpr void SetRotation(const RotationMatrix3f& rotationMatrix);
+        constexpr void SetTransform(const Transform& transform);
 		constexpr void SetNearPlane(const float nearPlane, const Vector2ui& resolution);
 		constexpr void SetFarPlane(const float farPlane, const Vector2ui& resolution);
 		constexpr void SetHorizontalFOV(const Radiansf horizontalFoVRad, const Vector2ui& resolution);
@@ -232,6 +233,11 @@ namespace CLX
 	{
 		mTransform.SetRotation(rotationMatrix);
 	}
+
+	constexpr void Camera::SetTransform(const Transform& transform)
+	{
+		mTransform = transform;
+    }
 
 	constexpr void Camera::UpdateProjection(const Vector2ui& resolution)
 	{

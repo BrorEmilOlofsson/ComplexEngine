@@ -181,7 +181,8 @@ namespace CLX
 					}
 					else
 					{
-						return *mECS->GetComponent<std::tuple_element_t<0, std::tuple<Ts...>>>(entityID);
+						return std::tuple<Ts&...>{ (*mECS->GetComponent<Ts>(entityID))... };
+						//return *mECS->GetComponent<std::tuple_element_t<0, std::tuple<Ts...>>>(entityID);
 					}
 				}
 
