@@ -683,6 +683,8 @@ namespace CLX
 		template<typename T>
 		[[nodiscard]] bool HasComponent(const EntityID entityID) const;
 
+        bool HasComponent(const EntityID entityID, const std::type_index& typeIndex) const;
+
 		template<typename T>
 		[[nodiscard]] bool HasComponent2(const EntityID entityID) const;
 
@@ -843,6 +845,16 @@ namespace CLX
 	bool ECS::HasComponent(const EntityID entityID) const
 	{
 		const std::size_t componentTypeIndex = GetComponentTypeIndex<T>();
+		return GetComponentPool(componentTypeIndex).HasComponent(entityID);
+	}
+
+    inline bool ECS::HasComponent(const EntityID entityID, const std::type_index& typeIndex) const
+	{
+		const std::size_t componentTypeIndex = mRegistry.GetComponentTypeIndex(typeIndex);
+		if (componentTypeIndex == 0)
+		{
+			return false;
+		}
 		return GetComponentPool(componentTypeIndex).HasComponent(entityID);
 	}
 

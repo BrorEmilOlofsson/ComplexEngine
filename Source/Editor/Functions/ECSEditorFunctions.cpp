@@ -830,7 +830,7 @@ namespace CLX
                         nameComponent->name = data.mOldName;
                     };
 
-                 commandTracker.ExecuteCommand(EditorCommand(data, doCommand, undoCommand, "Set Entity Name"));
+                commandTracker.ExecuteCommand(EditorCommand(data, doCommand, undoCommand, "Set Entity Name"));
             }
         }
 
@@ -911,26 +911,92 @@ namespace CLX
         anyItemActiveLastFrame = anyActiveItem;
     }
 
+    constexpr bool CaseInsensitiveContains(const std::string& str, const std::string& searchString)
+    {
+        auto it = std::search(
+            str.begin(), str.end(),
+            searchString.begin(), searchString.end(),
+            [](char ch1, char ch2) { return std::tolower(ch1) == std::tolower(ch2); }
+        );
+        return (it != str.end());
+    }
+
     void ShowEntityAddComponentButtons(ECS& ecs, const EntityID entityID, const DataTypeRegistry& dataTypeRegistry, EditorCommandTracker& commandTracker)
     {
+        const std::string popupID = "Add Component##" + std::to_string(entityID.id);
+
         if (ImGui::Button("Add Component"))
         {
-            ImGui::OpenPopup("Add Component");
+            ImGui::OpenPopup(popupID.c_str());
         }
 
-        if (ImGui::BeginPopup("Add Component"))
+        static uint32_t selectedIndex = 0;
+        if (ImGui::BeginPopup(popupID.c_str()))
         {
-            auto componentDataTypes = dataTypeRegistry.GetDataTypesFiltered([&ecs](const DataType& dataType) { return dataType.isComponent && !ecs.GetRegistry().GetComponentType(*dataType.typeInfo).isDefault; });
-            for (const auto& [_, dataType] : componentDataTypes)
+
+            char searchBuffer[256]{};
+
+            if (ImGui::InputTextWithHint("Search##Component", "Search", searchBuffer, IM_ARRAYSIZE(searchBuffer), ImGuiInputTextFlags_AutoSelectAll))
+            {
+                selectedIndex = 0;
+            }
+
+            const std::string searchString(searchBuffer);
+
+            auto nameMatchesInput = [&searchString](const DataType& dataType)
+                {
+                    return searchString.empty() || CaseInsensitiveContains(dataType.prettyName, searchString);
+                };
+
+            auto isValidComponentDataType = [&ecs, entityID](const DataType& dataType)
+                {
+                    return dataType.isComponent
+                        && !ecs.GetRegistry().GetComponentType(*dataType.typeInfo).isDefault
+                        && !ecs.HasComponent(entityID, std::type_index(*dataType.typeInfo));
+                };
+
+            auto componentDataTypes = dataTypeRegistry.GetDataTypesFiltered(isValidComponentDataType)
+                | std::views::values
+                | std::views::filter(nameMatchesInput)
+                | std::ranges::to<std::vector>();
+
+            std::ranges::sort(componentDataTypes, [](const auto& a, const auto& b) { return a.prettyName < b.prettyName; });
+
+            uint32_t indexCounter = 0;
+            for (const auto& dataType : componentDataTypes)
             {
                 const std::string componentNameLabel = dataType.prettyName + "##Component";
-                if (ImGui::Selectable(componentNameLabel.c_str()))
+                if (ImGui::Selectable(componentNameLabel.c_str(), selectedIndex == indexCounter))
                 {
                     AddComponentToEntity(ecs, entityID, std::type_index(*dataType.typeInfo), dataType.prettyName, commandTracker);
+                    selectedIndex = 0;
+                    ImGui::CloseCurrentPopup();
                 }
+
+                indexCounter++;
+            }
+
+            if (ImGui::IsKeyPressed(ImGuiKey_UpArrow))
+            {
+                selectedIndex = (selectedIndex == 0) ? static_cast<uint32_t>(componentDataTypes.size() - 1) : selectedIndex - 1;
+            }
+            else if (ImGui::IsKeyPressed(ImGuiKey_DownArrow))
+            {
+                selectedIndex = (selectedIndex + 1) % static_cast<uint32_t>(componentDataTypes.size());
+            }
+            else if (ImGui::IsKeyPressed(ImGuiKey_Enter) && !componentDataTypes.empty())
+            {
+                const auto& dataType = componentDataTypes[selectedIndex];
+                AddComponentToEntity(ecs, entityID, std::type_index(*dataType.typeInfo), dataType.prettyName, commandTracker);
+                selectedIndex = 0;
+                ImGui::CloseCurrentPopup();
             }
 
             ImGui::EndPopup();
+        }
+        else
+        {
+            selectedIndex = 0;
         }
     }
 
@@ -972,6 +1038,10 @@ namespace CLX
 
     void TeleportCameraToEntity(const ECS& ecs, const EntityID entityID, Camera& camera, const bool changeRotation, const float offsetDistance)
     {
+        if (entityID == InvalidEntityID)
+        {
+            return;
+        }
         const Point3f entityPos = GetWorldTransform(ecs, entityID).GetPosition();
         const Point3f oldCamPos = camera.GetTransform().GetPosition();
         if (entityPos == oldCamPos)

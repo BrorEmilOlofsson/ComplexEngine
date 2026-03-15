@@ -227,7 +227,7 @@ namespace CLX
                 }
             }
 
-            if (input.IsKeyPressed(eInputKey::F))
+            if (input.IsKeyPressed(eInputKey::F) && isFocused)
             {
                 TeleportCameraToEntity(sceneManager.GetActiveScene()->GetECS(), mHierarchyPopUp.GetSelectedEntityID(), mCamera, false);
             }
