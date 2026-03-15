@@ -7,25 +7,25 @@ namespace CLX
 
 	void AIAgent::Update(const float deltaTime)
 	{
-		if (myCurrentAction == nullptr)
+		if (mCurrentAction == nullptr)
 		{
 			MakeDecision();
 		}
-		if (myNewAction != nullptr && myNewAction != myCurrentAction)
+		if (mNewAction != nullptr && mNewAction != mCurrentAction)
 		{
-			if (myCurrentAction)
+			if (mCurrentAction)
 			{
-				myCurrentAction->Interrupt();
+				mCurrentAction->Interrupt();
 			}
-			myNewAction->Enter();
-			myCurrentAction = myNewAction;
-			myNewAction = nullptr;
+			mNewAction->Enter();
+			mCurrentAction = mNewAction;
+			mNewAction = nullptr;
 		}
-		const eAIUpdateResult updateResult = myCurrentAction->Update(deltaTime);
+		const eAIUpdateResult updateResult = mCurrentAction->Update(deltaTime);
 		if (updateResult == eAIUpdateResult::Finished)
 		{
-			myCurrentAction->Exit();
-			myCurrentAction = nullptr;
+			mCurrentAction->Exit();
+			mCurrentAction = nullptr;
 		}
 	}
 
@@ -35,11 +35,11 @@ namespace CLX
 			{
 				AIAction* newAction = nullptr;
 				float min = std::numeric_limits<float>::max();
-				for (AIAction& action : myActions)
+				for (AIAction& action : mActions)
 				{
 					const float evaluation = DistanceSquared(action.GetPoint(), mPoint, 
-						[](const auto& a) -> float { return a ? a.value().Get() : 0.f; },
-						[](const auto& b) -> float { return b.Get(); });
+						[](const auto& a) -> float { return a ? a->Value() : 0.f; },
+						[](const auto& b) -> float { return b.Value(); });
 					if (evaluation < min)
 					{
 						min = evaluation;
@@ -49,9 +49,9 @@ namespace CLX
 				return newAction;
 			}();
 
-		if (newAction != myCurrentAction)
+		if (newAction != mCurrentAction)
 		{
-			myNewAction = newAction;
+			mNewAction = newAction;
 		}
 	}
 
@@ -59,18 +59,18 @@ namespace CLX
 	{
 		for (size_t i = 0; i < mPoint.GetDimensionCount(); i++)
 		{
-			mPoint[i] = myAttributes[i].GetValue();
+			mPoint[i] = SaturatedFloat(mAttributes[i].GetValue());
 		}
 	}
 
-	void AIAgent::AddAction(const AIActionParams& aParams)
+	void AIAgent::AddAction(const AIActionParams& params)
 	{
-		myActions.push_back(AIAction(aParams));
+		mActions.push_back(AIAction(params));
 	}
 
-	void AIAgent::AddAttribute(std::function<float()> aModifierFunction, const float aInitialValue)
+	void AIAgent::AddAttribute(std::function<float()> modifierFunction, const float initialValue)
 	{
-		mPoint.AddDimension(aInitialValue);
-		myAttributes.emplace_back(aModifierFunction);
+		mPoint.AddDimension(SaturatedFloat(initialValue));
+		mAttributes.emplace_back(std::move(modifierFunction));
 	}
 }

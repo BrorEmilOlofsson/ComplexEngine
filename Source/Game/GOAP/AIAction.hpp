@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
-#include "AIMath.hpp"
-#include "AICheckedValue.hpp"
+#include "Engine/Utility/StrongType.hpp"
+#include "Engine/Math/DynamicPoint.hpp"
 
 namespace CLX
 {
@@ -17,17 +17,17 @@ namespace CLX
 			return std::clamp(aValue, T{0}, T{1});
 		});
 
-	using SaturatedFloat = CheckedValue<float, Saturate<float>>;
+	using SaturatedFloat = StrongCheckedType<float, Saturate<float>, struct SaturatedFloatTag>;
 
 	using DynamicPointOptf = DynamicPoint<std::optional<SaturatedFloat>>;
 
 	struct AIActionParams
 	{
 		DynamicPointOptf mPoint;
-		std::function<eAIUpdateResult(float deltaTime)> myUpdateFunction;
-		std::function<void()> myEnterFunction;
-		std::function<void()> myExitFunction;
-		std::function<void()> myInterruptFunction;
+		std::function<eAIUpdateResult(float deltaTime)> mUpdateFunction;
+		std::function<void()> mEnterFunction;
+		std::function<void()> mExitFunction;
+		std::function<void()> mInterruptFunction;
 	};
 
 	class AIAction final
@@ -46,10 +46,10 @@ namespace CLX
 	private:
 
 		DynamicPointOptf mPoint;
-		std::function<void()> myEnterFunction;
-		std::function<eAIUpdateResult(float)> myUpdateFunction;
-		std::function<void()> myExitFunction;
-		std::function<void()> myInterruptFunction;
+		std::function<void()> mEnterFunction;
+		std::function<eAIUpdateResult(float)> mUpdateFunction;
+		std::function<void()> mExitFunction;
+		std::function<void()> mInterruptFunction;
 	};
 
 	constexpr const DynamicPointOptf& AIAction::GetPoint() const

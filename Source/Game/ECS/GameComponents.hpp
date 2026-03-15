@@ -1,9 +1,9 @@
 #pragma once
-#include "Game/ECS/Components/PlayerMovementComponent.hpp"
-#include "Game/ECS/Components/PlanetComponent.hpp"
+#include "Game/ECS/Components/DuckComponent.hpp"
+#include "Game/ECS/Components/DucklingComponent.hpp"
 
 inline void RegisterGameComponents()
 {
-	RegisterPlayerMovementComponent();
-	RegisterPlanetComponent();
+    RegisterDuckComponent();
+    RegisterDucklingComponent();
 }

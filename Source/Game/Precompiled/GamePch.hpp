@@ -28,11 +28,14 @@
 
 #include "Engine/Math/Shapes/Ray3.hpp"
 #include "Engine/Math/Shapes/Plane.hpp"
+#include "Engine/Math/ShapeMath.hpp"
 #include "Engine/Utility/Bounds.hpp"
 #include "Engine/Utility/Algorithm.hpp"
 #include "Engine/Input/InputState.hpp"
 
 #include "Engine/Utility/BlackboardKeys.hpp"
 #include "Engine/ECSEngine/Components/TransformComponent.hpp"
+#include "Engine/ECSEngine/Components/TransformHierarchyComponent.hpp"
 #include "Engine/ECSEngine/Components/NameComponent.hpp"
 #include "Engine/ECSEngine/Components/MeshComponent.hpp"
+#include "Engine/ECSEngine/Utility/ECSTransformUtility.hpp"

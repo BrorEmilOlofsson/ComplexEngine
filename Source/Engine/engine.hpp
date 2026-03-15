@@ -80,7 +80,7 @@ namespace CLX
 		std::shared_ptr<Blackboard> mBlackboard;
 		std::shared_ptr<GraphicsSettings> mGraphicsSettings;
 
-		DataTypeRegistry mDataTypeRegistry;
+		DataTypeRegistry* mDataTypeRegistry;
         ECSRegistry mECSRegistry;
 		InputManager mInputManager;
 		

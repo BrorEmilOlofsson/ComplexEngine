@@ -65,6 +65,26 @@ namespace CLX
 			mValues.push_back(std::move(value));
 		}
 
+		[[nodiscard]] constexpr auto begin() noexcept
+		{
+			return mValues.begin();
+		}
+
+		[[nodiscard]] constexpr auto end() noexcept
+		{
+			return mValues.end();
+		}
+
+		[[nodiscard]] constexpr auto begin() const noexcept
+		{
+			return mValues.begin();
+		}
+
+		[[nodiscard]] constexpr auto end() const noexcept
+		{
+			return mValues.end();
+        }
+
 	private:
 
 		constexpr explicit DynamicPoint(const std::size_t dimensionCount)

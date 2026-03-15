@@ -1,5 +1,6 @@
 #pragma once
 #include <functional>
+#include <utility>
 
 namespace CLX
 {
@@ -8,23 +9,23 @@ namespace CLX
 	{
 	public:
 
-		explicit AIAttribute(const std::function<float()>& aModifierFunction);
+		explicit AIAttribute(std::function<float()> modifierFunction);
 
 		[[nodiscard]] float GetValue() const;
 
 	private:
 
-		std::function<float()> myModifierFunction;
+		std::function<float()> mModifierFunction;
 		
 	};
 
-	inline AIAttribute::AIAttribute(const std::function<float()>& aModifierFunction)
-		: myModifierFunction(aModifierFunction)
+	inline AIAttribute::AIAttribute(std::function<float()> modifierFunction)
+		: mModifierFunction(std::move(modifierFunction))
 	{
 	}
 
 	inline float AIAttribute::GetValue() const
 	{
-		return myModifierFunction();
+		return mModifierFunction();
 	}
 }

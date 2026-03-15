@@ -25,7 +25,7 @@ namespace CLX
 
 			ECS& ecs = sceneManager.GetActiveScene()->GetECS();
 			
-			ShowEntityName(ecs, selectedEntityID, input);
+			ShowEntityName(ecs, selectedEntityID, input, commandTracker);
 
 			const Transform worldTransform = GetWorldTransform(ecs, selectedEntityID);
 

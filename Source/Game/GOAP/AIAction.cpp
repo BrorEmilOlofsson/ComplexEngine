@@ -4,41 +4,41 @@
 namespace CLX
 {
 
-	AIAction::AIAction(const AIActionParams& aParams)
-		: mPoint(aParams.mPoint)
-		, myUpdateFunction(aParams.myUpdateFunction)
-		, myEnterFunction(aParams.myEnterFunction)
-		, myExitFunction(aParams.myExitFunction)
-		, myInterruptFunction(aParams.myInterruptFunction)
+	AIAction::AIAction(const AIActionParams& params)
+		: mPoint(params.mPoint)
+		, mUpdateFunction(params.mUpdateFunction)
+		, mEnterFunction(params.mEnterFunction)
+		, mExitFunction(params.mExitFunction)
+		, mInterruptFunction(params.mInterruptFunction)
 	{
 	}
 
 	eAIUpdateResult AIAction::Update(const float deltaTime)
 	{
-		return myUpdateFunction(deltaTime);
+		return mUpdateFunction(deltaTime);
 	}
 
 	void AIAction::Enter()
 	{
-		if (myEnterFunction)
+		if (mEnterFunction)
 		{
-			myEnterFunction();
+			mEnterFunction();
 		}
 	}
 
 	void AIAction::Exit()
 	{
-		if (myExitFunction)
+		if (mExitFunction)
 		{
-			myExitFunction();
+			mExitFunction();
 		}
 	}
 
 	void AIAction::Interrupt()
 	{
-		if (myInterruptFunction)
+		if (mInterruptFunction)
 		{
-			myInterruptFunction();
+			mInterruptFunction();
 		}
 	}
 }

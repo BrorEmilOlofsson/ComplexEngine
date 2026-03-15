@@ -100,11 +100,13 @@ namespace CLX
 
                 if (startPlaying)
                 {
+                    sceneManager.SetIsPlaying(true);
                     sceneManager.BeginPlay();
                     editor.OnSceneBeginPlay(*sceneManager.GetActiveScene().Get());
                 }
                 else
                 {
+                    sceneManager.SetIsPlaying(false);
                     editor.OnSceneEndPlay(*sceneManager.GetActiveScene().Get());
                     sceneManager.EndPlay();
                 }

@@ -142,7 +142,7 @@ namespace CLX
                 newBlackboard.Insert<Key_ReferenceTransform>(transform);
             }
 
-            ShowEntityName(mEntityCompositionAsset->GetECS(), mSelectedEntityID, input);
+            ShowEntityName(mEntityCompositionAsset->GetECS(), mSelectedEntityID, input, commandTracker);
 
             ShowEntityInspector(
                 mEntityCompositionAsset->GetECS(),

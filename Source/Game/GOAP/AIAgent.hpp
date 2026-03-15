@@ -2,7 +2,6 @@
 #include <vector>
 #include "AIAttribute.hpp"
 #include "AIAction.hpp"
-#include "AIDynamicGrid.hpp"
 
 namespace CLX
 {
@@ -16,17 +15,15 @@ namespace CLX
 		void MakeDecision();
 		void UpdateAttributes();
 
-		void AddAttribute(std::function<float()> aModifierFunction, const float aInitialValue = 0.f);
-		void AddAction(const AIActionParams& aParams);
+		void AddAttribute(std::function<float()> modifierFunction, const float initialValue = 0.f);
+		void AddAction(const AIActionParams& params);
 
 	private:
 
 		DynamicPoint<SaturatedFloat> mPoint;
-		std::vector<AIAttribute> myAttributes;
-		std::vector<AIAction> myActions;
-		AIAction* myCurrentAction = nullptr;
-		AIAction* myNewAction = nullptr;
-
-		AIDynamicGrid<AIAction*> myGrid;
+		std::vector<AIAttribute> mAttributes;
+		std::vector<AIAction> mActions;
+		AIAction* mCurrentAction = nullptr;
+		AIAction* mNewAction = nullptr;
 	};
 }
