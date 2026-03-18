@@ -128,7 +128,8 @@ namespace CLX
                 "##EntityComposition",
                 mSelectedEntityID,
                 mEntityCompositionAsset->GetRootEntity(),
-                { mEntityCompositionAsset->GetRootEntity() }
+                { mEntityCompositionAsset->GetRootEntity() },
+                mEntitySearchBuffer
             );
         }
 

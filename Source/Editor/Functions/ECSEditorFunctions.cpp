@@ -20,6 +20,18 @@ namespace CLX
 {
 
 
+
+    constexpr bool CaseInsensitiveContains(const std::string& str, const std::string& searchString)
+    {
+        auto it = std::search(
+            str.begin(), str.end(),
+            searchString.begin(), searchString.end(),
+            [](char ch1, char ch2) { return std::tolower(ch1) == std::tolower(ch2); }
+        );
+        return (it != str.end());
+    }
+
+
     static std::size_t GetEntityIndexInParent(const ECS& ecs, const EntityID entityID, std::vector<EntityID>& rootEntities)
     {
         const EntityID parentID = GetParentEntity(ecs, entityID);
@@ -521,14 +533,6 @@ namespace CLX
         }
     }
 
-    static void SelectEntityIfClicked(const EntityID entityID, EntityID& selectedEntityID, EditorCommandTracker& commandTracker)
-    {
-        if (ImGui::IsItemClicked(ImGuiMouseButton_Left) && !ImGui::IsItemToggledOpen())
-        {
-            SelectEntity(entityID, selectedEntityID, commandTracker);
-        }
-    }
-
     static ImGuiTreeNodeFlags GetHierarchyTreeNodeFlags(const bool isSelected, const bool isLeaf, const bool shouldBeOpen)
     {
         ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_OpenOnArrow;
@@ -598,21 +602,15 @@ namespace CLX
 
     static void ShowEntityChildren(ECS& ecs, const EntityID entityID, EntityID& selectedEntityID, ECS& ecsBuffer,
         std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker,
-        const std::span<const EntityID> parentEntities, const std::string& imGuiTag, const std::set<EntityID>& uneditableEntities)
+        const std::span<const EntityID> parentEntities, const std::string& imGuiTag, const std::set<EntityID>& uneditableEntities, const std::function<bool(EntityID)>& filter)
     {
+
         const bool isSelected = selectedEntityID == entityID;
         const NameComponent* nameComponent = ecs.GetComponent<NameComponent>(entityID);
 
-        if (nameComponent == nullptr)
-        {
-            throw std::runtime_error("Entity has no NameComponent");
-        }
-
+        ASSERT(nameComponent != nullptr);
         const TransformHierarchyComponent* hierarchyComponent = ecs.GetComponent<TransformHierarchyComponent>(entityID);
-        if (hierarchyComponent == nullptr)
-        {
-            throw std::runtime_error("Entity has no TransformHierarchyComponent");
-        }
+        ASSERT(hierarchyComponent != nullptr);
         const bool isLeaf = hierarchyComponent->children.empty();
         const bool shouldBeDefaultOpen = std::ranges::find(parentEntities, entityID) != end(parentEntities);
 
@@ -632,7 +630,8 @@ namespace CLX
         ImGui::PopStyleVar();
         ImGui::PopID();
 
-        const bool isRightClicked = ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right);
+        const bool isLeftClicked = ImGui::IsItemHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Left);
+        const bool isRightClicked = ImGui::IsItemHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Right);
         if (isRightClicked)
         {
             SelectEntity(entityID, selectedEntityID, commandTracker);
@@ -643,7 +642,7 @@ namespace CLX
             ImGui::SetItemDefaultFocus();
 
             const std::string entityOptionsPopUpName = "Entity Settings" + imGuiTag;
-            if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right) && !isUneditable)
+            if (isRightClicked && !isUneditable)
             {
                 ImGui::OpenPopup(entityOptionsPopUpName.c_str());
             }
@@ -652,29 +651,59 @@ namespace CLX
         }
 
         ShowEntityPayload(ecs, entityID, rootEntities, commandTracker);
-        SelectEntityIfClicked(entityID, selectedEntityID, commandTracker);
+
+        if (isLeftClicked && !ImGui::IsItemToggledOpen())
+        {
+            SelectEntity(entityID, selectedEntityID, commandTracker);
+        }
+
         if (isOpen)
         {
             for (const EntityID childEntityID : hierarchyComponent->children)
             {
-                if (childEntityID == InvalidEntityID)
+                ASSERT(childEntityID != InvalidEntityID);
+                if (!filter(childEntityID))
                 {
                     continue;
                 }
-                ShowEntityChildren(ecs, childEntityID, selectedEntityID, ecsBuffer, rootEntities, commandTracker, parentEntities, imGuiTag, uneditableEntities);
+                ShowEntityChildren(ecs, childEntityID, selectedEntityID, ecsBuffer, rootEntities, commandTracker, parentEntities, imGuiTag, uneditableEntities, filter);
             }
 
             ImGui::TreePop();
         }
     }
 
+
+
+   
+
     void ShowEntityHierarchy(ECS& ecs, ECS& ecsBuffer, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker,
-        const std::string& imGuiTag, EntityID& selectedEntityID, const std::set<EntityID>& uneditableEntities)
+        const std::string& imGuiTag, EntityID& selectedEntityID, const std::set<EntityID>& uneditableEntities, std::string& entitySearchBuffer)
     {
         ImGui::PushStyleColor(ImGuiCol_ChildBg, ImColor(0.18f, 0.18f, 0.18f, 0.80f).Value);
         ImGui::PushStyleColor(ImGuiCol_FrameBg, ImColor(0.12f, 0.12f, 0.12f, 0.0f).Value);
         ImGui::PushStyleColor(ImGuiCol_Border, ImColor(0.12f, 0.12f, 0.12f, 0.0f).Value);
         ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
+
+        auto filter = [&](EntityID entityID)
+            {
+                if (entitySearchBuffer.empty())
+                {
+                    return true;
+                }
+                auto nameSearch = [&](EntityID childID)
+                    {
+                        const NameComponent* nameComponent = ecs.GetComponent<NameComponent>(childID);
+                        ASSERT(nameComponent != nullptr);
+                        return CaseInsensitiveContains(nameComponent->name, entitySearchBuffer);
+                    };
+                if (nameSearch(entityID))
+                {
+                    return true;
+                }
+                auto allEntityChildren = GetAllEntityChildren(ecs, entityID);
+                return std::ranges::any_of(allEntityChildren, nameSearch);
+            };
 
         const std::string listBoxName = "" + imGuiTag;
 
@@ -689,6 +718,10 @@ namespace CLX
             }
             for (const EntityID rootEntityID : rootEntities)
             {
+                if (!filter(rootEntityID))
+                {
+                    continue;
+                }
                 ShowEntityChildren(
                     ecs,
                     rootEntityID,
@@ -698,7 +731,9 @@ namespace CLX
                     commandTracker,
                     parentEntites,
                     imGuiTag,
-                    uneditableEntities);
+                    uneditableEntities,
+                    filter
+                );
             }
 
             ImGui::EndListBox();
@@ -710,22 +745,31 @@ namespace CLX
         ImGui::PopStyleColor();
     }
 
+    static void ShowEntitySearchBar(std::string& entitySearchString)
+    {
+        char searchBufferArray[256]{};
+        if (ImGui::InputTextWithHint("##EntitySearch", "Search...", &searchBufferArray[0], sizeof(searchBufferArray)))
+        {
+            entitySearchString = searchBufferArray;
+        }
+        entitySearchString = searchBufferArray;
+    }
+
     void ShowEntityHierarchyWithAddButtons(ECS& ecs, ECS& ecsBuffer, std::vector<EntityID>& rootEntities,
-        EditorCommandTracker& commandTracker, const std::string& imGuiTag, EntityID& selectedEntityID, const EntityID defaultParent, const std::set<EntityID>& uneditableEntities)
+        EditorCommandTracker& commandTracker, const std::string& imGuiTag, EntityID& selectedEntityID, const EntityID defaultParent, const std::set<EntityID>& uneditableEntities, std::string& entitySearchBuffer)
     {
         ShowEntityAddButtons(ecs, selectedEntityID, rootEntities, commandTracker, imGuiTag, defaultParent);
         ImGui::Separator();
-        ShowEntityHierarchy(ecs, ecsBuffer, rootEntities, commandTracker, imGuiTag, selectedEntityID, uneditableEntities);
+        ShowEntitySearchBar(entitySearchBuffer);
+        ImGui::Separator();
+        ShowEntityHierarchy(ecs, ecsBuffer, rootEntities, commandTracker, imGuiTag, selectedEntityID, uneditableEntities, entitySearchBuffer);
     }
 
     static void ShowComponentData(ECS& ecs, const EntityID entityID, const std::type_info& typeInfo, void* componentPtr, bool& anyActiveItem, ECS& ecsBuffer, const DataTypeRegistry& dataTypeRegistry, EditorCommandTracker& commandTracker, const Blackboard& blackboard)
     {
         PROFILER_FUNCTION(profiler::colors::Lime400);
 
-        if (!componentPtr)
-        {
-            throw std::exception("Component is nullptr");
-        }
+        ASSERT(componentPtr != nullptr);
         ImGui::AlignTextToFramePadding();
 
         const DataTypeID componentDataTypeID = DataTypeID{ typeInfo.hash_code() };
@@ -909,16 +953,6 @@ namespace CLX
         }
 
         anyItemActiveLastFrame = anyActiveItem;
-    }
-
-    constexpr bool CaseInsensitiveContains(const std::string& str, const std::string& searchString)
-    {
-        auto it = std::search(
-            str.begin(), str.end(),
-            searchString.begin(), searchString.end(),
-            [](char ch1, char ch2) { return std::tolower(ch1) == std::tolower(ch2); }
-        );
-        return (it != str.end());
     }
 
     void ShowEntityAddComponentButtons(ECS& ecs, const EntityID entityID, const DataTypeRegistry& dataTypeRegistry, EditorCommandTracker& commandTracker)

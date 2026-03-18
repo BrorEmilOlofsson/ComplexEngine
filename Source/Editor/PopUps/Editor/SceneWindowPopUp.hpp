@@ -1,5 +1,4 @@
 #pragma once
-#include "Editor/Core/PopUp.hpp"
 #include "Editor/Tools/TransformEntityTool.hpp"
 #include "Editor/PopUps/Editor/SceneHierarchyPopUp.hpp"
 #include "Editor/PopUps/Editor/SceneInspectorPopUp.hpp"

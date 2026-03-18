@@ -72,7 +72,7 @@ TEST_CASE("Add Child Entity")
 		rootEntities.push_back(entityID);
 	}
 
-	SetParentEntity(ecs, EntityID{ 0 }, EntityID{ 4 }, rootEntities, commandTracker);
+	SetParentEntity(ecs, EntityID{ 0 }, EntityID{ 4 }, rootEntities, commandTracker, LastIndex{});
 
 	REQUIRE(rootEntities.size() == 9);
 	REQUIRE(commandTracker.GetUndoSize() == 1);
@@ -93,7 +93,7 @@ TEST_CASE("Add Child Entity")
 	REQUIRE(ecs.GetComponent<TransformHierarchyComponent>(EntityID{ 4 })->parent == EntityID{ 0 });
 	REQUIRE(ecs.GetComponent<TransformHierarchyComponent>(EntityID{ 0 })->children.size() == 1);
 
-	SetParentEntity(ecs, EntityID{ 1 }, EntityID{ 4 }, rootEntities, commandTracker);
+	SetParentEntity(ecs, EntityID{ 1 }, EntityID{ 4 }, rootEntities, commandTracker, LastIndex{});
 
 	REQUIRE(rootEntities.size() == 9);
 	REQUIRE(commandTracker.GetUndoSize() == 2);
@@ -101,7 +101,7 @@ TEST_CASE("Add Child Entity")
 	REQUIRE(ecs.GetComponent<TransformHierarchyComponent>(EntityID{ 0 })->children.size() == 0);
 	REQUIRE(ecs.GetComponent<TransformHierarchyComponent>(EntityID{ 1 })->children.size() == 1);
 
-	SetParentEntity(ecs, EntityID{ 1 }, EntityID{ 0 }, rootEntities, commandTracker);
+	SetParentEntity(ecs, EntityID{ 1 }, EntityID{ 0 }, rootEntities, commandTracker, LastIndex{});
 
 	REQUIRE(rootEntities.size() == 8);
 	REQUIRE(commandTracker.GetUndoSize() == 3);

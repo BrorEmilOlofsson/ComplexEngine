@@ -104,7 +104,8 @@ namespace CLX
 				mImGuiTag, 
 				mSelectedEntityID, 
 				InvalidEntityID,
-				{}
+				{},
+				mEntitySearchBuffer
 			);
 
 			if (ImGui::Button("Instantiate"))

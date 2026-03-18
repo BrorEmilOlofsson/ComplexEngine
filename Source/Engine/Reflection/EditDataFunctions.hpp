@@ -263,8 +263,6 @@ namespace CLX
 				ImGui::PopID();
 			}
 
-
-
 			if (vectorElementBtnWasPressed)
 			{
 				ImGui::OpenPopup(VectorElementPopupStrID);

@@ -21,5 +21,7 @@ namespace CLX
 		bool mAnyItemActiveLastFrame = false;
 		EntityID mCopyEntityID;
 		class Camera* mSceneCamera = nullptr;
+
+		std::function<void(EntityID)> mEntitySelectedCallback;
 	};
 }

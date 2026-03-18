@@ -1,8 +1,8 @@
 #pragma once
+#include <string>
+#include <functional>
 #include "Engine/Utility/Blackboard.hpp"
 #include "Engine/Math/Transform3.hpp"
-#include <string>
-#include <Engine/ECS/ECSRegistry.hpp>
 
 namespace CLX
 {
@@ -25,4 +25,5 @@ namespace CLX
 	using Key_OperatingSystem = BlackboardKey<class OperatingSystem&, "OperatingSystem">;
 	using Key_AudioManager = BlackboardKey<class AudioManager&, "AudioManager">;
     using Key_ECSRegistry = BlackboardKey<class ECSRegistry&, "ECSRegistry">;
+    using Key_OnEntitySelected = BlackboardKey<std::function<void(struct EntityID)>&, "OnEntitySelected">;
 }

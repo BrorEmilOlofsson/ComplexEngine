@@ -10,7 +10,7 @@ namespace CLX
 	{
 	public:
 
-		SceneHierarchyPopUp(const std::string& name);
+		explicit SceneHierarchyPopUp(const std::string& name);
 
 		void UpdateInternal(const Blackboard& blackboard) override;
 		void Render(const Blackboard& blackboard) override;
@@ -30,6 +30,7 @@ namespace CLX
 		EntityID mSelectedEntityID;
 		EntityID mCopiedEntityID;
 		std::vector<EntityID> mRootEntities;
+        std::string mEntitySearchBuffer;
 
 		EntityID mStoredSelectedEntityID;
 	};

@@ -49,9 +49,9 @@ namespace CLX
 			const bool hasSaveFunction = dataType.toJSON;
 			const bool hasLoadFunction = dataType.fromJSON;
 
-			const short n = static_cast<short>(hasEditFunction) +
-				static_cast<short>(hasSaveFunction) +
-				static_cast<short>(hasLoadFunction);
+			const uint8_t n = static_cast<uint8_t>(hasEditFunction) +
+				static_cast<uint8_t>(hasSaveFunction) +
+				static_cast<uint8_t>(hasLoadFunction);
 
 			if (n != 0 && n != 3)
 			{

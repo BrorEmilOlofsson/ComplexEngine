@@ -23,9 +23,9 @@ namespace CLX
 
 	void ShowEntityAddButtons(ECS& ecs, EntityID& selectedEntityID, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker, const std::string& imGuiTag, EntityID defaultParentID);
 	void ShowEntityHierarchy(ECS& ecs, ECS& ecsBuffer, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker, const std::string& imGuiTag,
-		EntityID& selectedEntityID, const std::set<EntityID>& uneditableEntities);
+		EntityID& selectedEntityID, const std::set<EntityID>& uneditableEntities, std::string& entitySearchBuffer);
 	void ShowEntityHierarchyWithAddButtons(ECS& ecs, ECS& ecsBuffer, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker,
-		const std::string& imGuiTag, EntityID& selectedEntityID, EntityID defaultParentID, const std::set<EntityID>& uneditableEntities);
+		const std::string& imGuiTag, EntityID& selectedEntityID, EntityID defaultParentID, const std::set<EntityID>& uneditableEntities, std::string& entitySearchBuffer);
 	
 	void ShowEntityName(ECS& ecs, const EntityID selectedEntityID, const InputState& input, EditorCommandTracker& commandTracker);
 	void ShowEntityComponents(ECS& ecs, EntityID entityID, bool& anyItemActiveLastFrame,

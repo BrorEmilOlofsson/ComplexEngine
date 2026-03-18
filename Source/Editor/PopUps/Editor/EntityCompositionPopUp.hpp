@@ -37,6 +37,7 @@ namespace CLX
 		RenderState mRenderState;
 		TransformEntityTool mTransformEntityTool;
 		bool mIsOpen = false;
+        std::string mEntitySearchBuffer;
 		static constexpr const char* PopUpName = "Entity Composition Viewer";
 	};
 }
