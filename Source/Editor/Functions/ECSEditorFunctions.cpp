@@ -355,22 +355,44 @@ namespace CLX
         }
     }
 
-    void ReorderEntity(ECS& ecs, const EntityID entityID, std::vector<EntityID>& rootEntities, const std::size_t newIndex, EditorCommandTracker& commandTracker)
+    static void ReorderInternal(std::vector<EntityID>& entities, const std::size_t oldIndex, const std::size_t newIndex)
+    {
+        auto first = entities.begin();
+        auto from = first + oldIndex;
+        auto to = first + newIndex;
+
+        if (oldIndex < newIndex)
+        {
+            std::rotate(from, from + 1, to + 1);
+        }
+        else
+        {
+            std::rotate(to, from, from + 1);
+        }
+    }
+
+    void ReorderEntity(ECS& ecs, const EntityID entityID, std::vector<EntityID>& rootEntities, std::size_t newIndex, EditorCommandTracker& commandTracker)
     {
         ASSERT(entityID != InvalidEntityID);
 
         struct ReorderEntityData final
         {
-            ECS* mECS = nullptr;
-            EntityID mEntityID;
-            std::vector<EntityID>* mRootEntities = nullptr;
-            std::size_t mNewIndex = std::numeric_limits<std::size_t>::max();
-            std::size_t mOldIndex = std::numeric_limits<std::size_t>::max();
+            std::reference_wrapper<ECS> ecs;
+            EntityID entityID;
+            std::reference_wrapper<std::vector<EntityID>> rootEntities;
+            std::size_t newIndex = std::numeric_limits<std::size_t>::max();
+            std::size_t oldIndex = std::numeric_limits<std::size_t>::max();
         };
 
         const EntityID parentID = GetParentEntity(ecs, entityID);
 
         const std::size_t oldIndex = GetEntityIndexInParent(ecs, entityID, rootEntities);
+
+        if (oldIndex < newIndex)
+        {
+            // Because the entity will be removed from the old index before being inserted at the new index, we need to adjust the new index accordingly
+            newIndex -= 1;
+        }
 
         if (oldIndex == newIndex)
         {
@@ -379,29 +401,46 @@ namespace CLX
 
         ReorderEntityData data
         {
-            .mECS = &ecs,
-            .mEntityID = entityID,
-            .mRootEntities = &rootEntities,
-            .mNewIndex = newIndex,
-            .mOldIndex = oldIndex
+            .ecs = ecs,
+            .entityID = entityID,
+            .rootEntities = rootEntities,
+            .newIndex = newIndex,
+            .oldIndex = oldIndex
         };
 
         auto doCommand = [](const ReorderEntityData& data)
             {
-                const EntityID parentID = GetParentEntity(*data.mECS, data.mEntityID);
+                const EntityID parentID = GetParentEntity(data.ecs, data.entityID);
+                auto& rootEntities = data.rootEntities;
 
                 if (parentID != InvalidEntityID)
                 {
-                    TransformHierarchyComponent* parentTransformComponent = data.mECS->GetComponent<TransformHierarchyComponent>(parentID);
-                    std::iter_swap(begin(parentTransformComponent->children) + data.mOldIndex, begin(parentTransformComponent->children) + data.mNewIndex);
+                    TransformHierarchyComponent* parentTransformComponent = data.ecs.get().GetComponent<TransformHierarchyComponent>(parentID);
+                    ASSERT(parentTransformComponent != nullptr);
+                    ReorderInternal(parentTransformComponent->children, data.oldIndex, data.newIndex);
                 }
                 else
                 {
-                    std::iter_swap(begin(*data.mRootEntities) + data.mOldIndex, begin(*data.mRootEntities) + data.mNewIndex);
+                    ReorderInternal(rootEntities, data.oldIndex, data.newIndex);
                 }
             };
 
-        auto undoCommand = doCommand;
+        auto undoCommand = [](const ReorderEntityData& data)
+            {
+                const EntityID parentID = GetParentEntity(data.ecs, data.entityID);
+                auto& rootEntities = data.rootEntities;
+
+                if (parentID != InvalidEntityID)
+                {
+                    TransformHierarchyComponent* parentTransformComponent = data.ecs.get().GetComponent<TransformHierarchyComponent>(parentID);
+                    ASSERT(parentTransformComponent != nullptr);
+                    ReorderInternal(parentTransformComponent->children, data.oldIndex, data.newIndex);
+                }
+                else
+                {
+                    ReorderInternal(rootEntities, data.newIndex, data.oldIndex);
+                }
+            };
 
         commandTracker.ExecuteCommand(EditorCommand(data, doCommand, undoCommand, "Reorder Entity"));
     }
@@ -418,25 +457,27 @@ namespace CLX
 
         struct SetParentEntityData final
         {
-            ECS* mECS = nullptr;
-            EntityID mParentID;
-            EntityID mChildID;
-            EntityID mOldParentID;
-            std::vector<EntityID>* mRootEntities = nullptr;
-            std::size_t mChildIndex = 0;
-            ChildIndexSetting mIndexSetting;
+            std::reference_wrapper<ECS> ecs;
+            EntityID parentID;
+            EntityID childID;
+            EntityID oldParentID;
+            std::reference_wrapper<std::vector<EntityID>> rootEntities;
+            std::size_t childIndex = 0;
+            ChildIndexSetting indexSetting;
         };
 
         const EntityID oldParent = GetParentEntity(ecs, childID);
-        SetParentEntityData data{};
-        data.mECS = &ecs;
-        data.mParentID = parentID;
-        data.mChildID = childID;
-        data.mOldParentID = oldParent;
-        data.mRootEntities = &rootEntities;
-        data.mIndexSetting = indexSetting;
+        SetParentEntityData data
+        {
+            .ecs = ecs,
+            .parentID = parentID,
+            .childID = childID,
+            .oldParentID = oldParent,
+            .rootEntities = rootEntities,
+            .indexSetting = indexSetting
+        };
 
-        if (data.mOldParentID == data.mParentID)
+        if (data.oldParentID == data.parentID)
         {
             return;
         }
@@ -449,7 +490,7 @@ namespace CLX
                 throw std::runtime_error("Child entity not found in root entities");
             }
 
-            data.mChildIndex = std::ranges::distance(begin(rootEntities), it);
+            data.childIndex = std::ranges::distance(begin(rootEntities), it);
         }
         else
         {
@@ -460,77 +501,107 @@ namespace CLX
                 throw std::runtime_error("Child entity not found in parent's children");
             }
 
-            data.mChildIndex = std::ranges::distance(begin(parentTransformComponent->children), it);
+            data.childIndex = std::ranges::distance(begin(parentTransformComponent->children), it);
         }
 
         auto doCommand = [](const SetParentEntityData& data)
             {
-                SetParentEntity(*data.mECS, data.mChildID, data.mParentID, data.mIndexSetting);
+                SetParentEntity(data.ecs, data.childID, data.parentID, data.indexSetting);
 
-                if (data.mOldParentID == InvalidEntityID)
+                if (data.oldParentID == InvalidEntityID)
                 {
-                    data.mRootEntities->erase(data.mRootEntities->begin() + data.mChildIndex);
+                    data.rootEntities.get().erase(data.rootEntities.get().begin() + data.childIndex);
                 }
-                else if (data.mParentID == InvalidEntityID)
+                else if (data.parentID == InvalidEntityID)
                 {
                     std::visit(Visitor
                         {
                             [&](const Index& index)
                             {
-                                data.mRootEntities->insert(begin(*data.mRootEntities) + index.mIndex, data.mChildID);
+                                data.rootEntities.get().insert(begin(data.rootEntities.get()) + index.mIndex, data.childID);
                             },
                             [&](const FirstIndex&)
                             {
-                                data.mRootEntities->insert(data.mRootEntities->begin(), data.mChildID);
+                                data.rootEntities.get().insert(data.rootEntities.get().begin(), data.childID);
                             },
                             [&](const LastIndex&)
                             {
-                                data.mRootEntities->push_back(data.mChildID);
+                                data.rootEntities.get().push_back(data.childID);
                             }
-                        }, data.mIndexSetting);
+                        }, data.indexSetting);
                 }
             };
 
         auto undoCommand = [](const SetParentEntityData& data)
             {
-                SetParentEntity(*data.mECS, data.mChildID, data.mOldParentID, Index{ data.mChildIndex });
+                SetParentEntity(data.ecs, data.childID, data.oldParentID, Index{ data.childIndex });
 
-                if (data.mOldParentID == InvalidEntityID)
+                if (data.oldParentID == InvalidEntityID)
                 {
-                    data.mRootEntities->insert(data.mRootEntities->begin() + data.mChildIndex, data.mChildID);
+                    data.rootEntities.get().insert(data.rootEntities.get().begin() + data.childIndex, data.childID);
                 }
-                else if (data.mParentID == InvalidEntityID)
+                else if (data.parentID == InvalidEntityID)
                 {
                     std::visit(Visitor
                         {
                             [&](const Index& index)
                             {
-                                data.mRootEntities->erase(begin(*data.mRootEntities) + index.mIndex);
+                                data.rootEntities.get().erase(begin(data.rootEntities.get()) + index.mIndex);
                             },
                             [&](const FirstIndex&)
                             {
-                                data.mRootEntities->erase(data.mRootEntities->begin());
+                                data.rootEntities.get().erase(data.rootEntities.get().begin());
                             },
                             [&](const LastIndex&)
                             {
-                                data.mRootEntities->pop_back();
+                                data.rootEntities.get().pop_back();
                             }
-                        }, data.mIndexSetting);
+                        }, data.indexSetting);
                 }
             };
 
         commandTracker.ExecuteCommand(EditorCommand(data, doCommand, undoCommand, "Add Child Entity"));
     }
 
+    using EditorAction = std::function<void(EditorCommandTracker&)>;
 
-    static void ShowEntityPayload(ECS& ecs, const EntityID entityID, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker)
+    [[nodiscard]] EditorAction CreateSetParentEntityAction(ECS& ecs, const EntityID parentID, const EntityID childID, std::vector<EntityID>& rootEntities)
+    {
+        return [&ecs, parentID, childID, &rootEntities](EditorCommandTracker& commandTracker)
+            {
+                SetParentEntity(ecs, parentID, childID, rootEntities, commandTracker);
+            };
+    }
+
+
+    [[nodiscard]] void OnEntityDroppedOnEntity(ECS& ecs, const EntityID parentID, const EntityID childID, std::vector<EntityID>& rootEntities, EntityID& selectedEntityID, EditorCommandTracker& commandTracker)
+    {
+        commandTracker.BeginComposite("Set Parent Entity + Select Entity");
+        SetParentEntity(ecs, parentID, childID, rootEntities, commandTracker);
+        SelectEntity(childID, selectedEntityID, commandTracker);
+        commandTracker.EndComposite();
+    }
+
+    [[nodiscard]] EditorAction CreateEntityDroppedOnEntityAction(ECS& ecs, const EntityID parentID, const EntityID childID, std::vector<EntityID>& rootEntities, EntityID& selectedEntityID)
+    {
+        return [&ecs, parentID, childID, &rootEntities, &selectedEntityID](EditorCommandTracker& commandTracker)
+            {
+                OnEntityDroppedOnEntity(ecs, parentID, childID, rootEntities, selectedEntityID, commandTracker);
+            };
+    }
+
+    [[nodiscard]] static std::vector<EditorAction> ShowEntityPayload(ECS& ecs, const EntityID entityID, std::vector<EntityID>& rootEntities, EntityID& selectedEntityID)
     {
         ObjectSource(entityID, "EntityID");
 
         if (const std::optional<EntityID> childEntityID = ObjectTarget<EntityID>())
         {
-            SetParentEntity(ecs, entityID, childEntityID.value(), rootEntities, commandTracker);
+            return
+            {
+                CreateEntityDroppedOnEntityAction(ecs, entityID, childEntityID.value(), rootEntities, selectedEntityID)
+            };
         }
+        return {};
     }
 
     static ImGuiTreeNodeFlags GetHierarchyTreeNodeFlags(const bool isSelected, const bool isLeaf, const bool shouldBeOpen)
@@ -543,90 +614,132 @@ namespace CLX
         return treeNodeFlags;
     }
 
-    static void ShowEntityOptionsPopUp(const std::string& entityOptionsPopUpName, ECS& ecs, EntityID selectedEntityID,
-        std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker, const std::string& imGuiTag)
+    [[nodiscard]] static std::vector<std::function<void(EditorCommandTracker&)>> ShowEntityOptionsPopUp(const std::string& entityOptionsPopUpName, ECS& ecs, EntityID& selectedEntityID,
+        std::vector<EntityID>& rootEntities, const std::string& imGuiTag)
     {
+        std::vector<std::function<void(EditorCommandTracker&)>> editorActions;
         if (ImGui::BeginPopup(entityOptionsPopUpName.c_str()))
         {
             const std::string removeItem = "Remove" + imGuiTag;
             if (ImGui::MenuItem(removeItem.c_str()))
             {
-                commandTracker.BeginComposite("Destroy Entity Composite");
-                DestroyEntity(ecs, selectedEntityID, rootEntities, commandTracker);
-                SelectEntity(InvalidEntityID, selectedEntityID, commandTracker);
-                commandTracker.EndComposite();
+                editorActions.push_back([&](EditorCommandTracker& commandTracker)
+                    {
+                        commandTracker.BeginComposite("Destroy Entity Composite");
+                        DestroyEntity(ecs, selectedEntityID, rootEntities, commandTracker);
+                        SelectEntity(InvalidEntityID, selectedEntityID, commandTracker);
+                        commandTracker.EndComposite();
+                    });
             }
 
             std::string moveUpString = "Move Up" + imGuiTag;
+            const EntityID parentID = GetParentEntity(ecs, selectedEntityID);
+            ImGui::BeginDisabled(parentID == InvalidEntityID);
             if (ImGui::MenuItem(moveUpString.c_str()))
             {
-                commandTracker.BeginComposite("Move Entity Up");
-                const EntityID parentID = GetParentEntity(ecs, selectedEntityID);
                 const EntityID parentOfParentID = GetParentEntity(ecs, parentID);
 
                 const std::size_t insertionIndex = GetEntityIndexInParent(ecs, parentID, rootEntities);
 
-
-                SetParentEntity(ecs, parentOfParentID, selectedEntityID, rootEntities, commandTracker, Index{ insertionIndex });
-                commandTracker.EndComposite();
+                editorActions.push_back([&, selectedEntityID, parentOfParentID, insertionIndex](EditorCommandTracker& commandTracker)
+                    {
+                        SetParentEntity(ecs, parentOfParentID, selectedEntityID, rootEntities, commandTracker, Index{ insertionIndex });
+                    });
             }
+            ImGui::EndDisabled();
 
             ImGui::EndPopup();
         }
+
+        return editorActions;
     }
 
 
-    static void OnEntityDroppedBetween(ECS& ecs, const EntityID droppedEntityID, const EntityID droppedAfterEntityID, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker)
+    static void OnEntityDroppedBetween(ECS& ecs, const EntityID droppedEntityID, const EntityID droppedBeforeEntityID, std::vector<EntityID>& rootEntities, EntityID& selectedEntityID, const bool droppedAfter, EditorCommandTracker& commandTracker)
     {
         ASSERT(droppedEntityID != InvalidEntityID);
-        ASSERT(droppedAfterEntityID != InvalidEntityID);
-        if (droppedEntityID == droppedAfterEntityID)
+        ASSERT(droppedBeforeEntityID != InvalidEntityID);
+        if (droppedEntityID == droppedBeforeEntityID)
         {
             return;
         }
 
-        const std::size_t insertionIndex = GetEntityIndexInParent(ecs, droppedAfterEntityID, rootEntities);
+        const std::size_t insertionIndex = GetEntityIndexInParent(ecs, droppedBeforeEntityID, rootEntities);
 
-        const EntityID parentID = GetParentEntity(ecs, droppedAfterEntityID);
+        const EntityID parentID = GetParentEntity(ecs, droppedBeforeEntityID);
         const EntityID currentParentID = GetParentEntity(ecs, droppedEntityID);
 
+        commandTracker.BeginComposite("Move Entity + Select Entity");
         if (parentID == currentParentID)
         {
-            ReorderEntity(ecs, droppedEntityID, rootEntities, insertionIndex, commandTracker);
+            ReorderEntity(ecs, droppedEntityID, rootEntities, insertionIndex + (droppedAfter ? 1 : 0), commandTracker);
         }
         else
         {
-            SetParentEntity(ecs, parentID, droppedEntityID, rootEntities, commandTracker, Index{ insertionIndex });
+            SetParentEntity(ecs, parentID, droppedEntityID, rootEntities, commandTracker, Index{ insertionIndex + (droppedAfter ? 1 : 0) });
         }
+
+        SelectEntity(droppedEntityID, selectedEntityID, commandTracker);
+        commandTracker.EndComposite();
     }
 
-    static void ShowEntityChildren(ECS& ecs, const EntityID entityID, EntityID& selectedEntityID, ECS& ecsBuffer,
-        std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker,
-        const std::span<const EntityID> parentEntities, const std::string& imGuiTag, const std::set<EntityID>& uneditableEntities, const std::function<bool(EntityID)>& filter)
+    [[nodiscard]] EditorAction CreateEntityDropAction(ECS& ecs, const EntityID droppedEntityID, const EntityID droppedBeforeEntityID, bool droppedAfter, std::vector<EntityID>& rootEntities, EntityID& selectedEntityID)
     {
+        return [&ecs, &rootEntities, droppedEntityID, droppedBeforeEntityID, &selectedEntityID, droppedAfter](EditorCommandTracker& commandTracker)
+            {
+                OnEntityDroppedBetween(ecs, droppedEntityID, droppedBeforeEntityID, rootEntities, selectedEntityID, droppedAfter, commandTracker);
+            };
+    }
 
-        const bool isSelected = selectedEntityID == entityID;
-        const NameComponent* nameComponent = ecs.GetComponent<NameComponent>(entityID);
-
-        ASSERT(nameComponent != nullptr);
-        const TransformHierarchyComponent* hierarchyComponent = ecs.GetComponent<TransformHierarchyComponent>(entityID);
-        ASSERT(hierarchyComponent != nullptr);
-        const bool isLeaf = hierarchyComponent->children.empty();
-        const bool shouldBeDefaultOpen = std::ranges::find(parentEntities, entityID) != end(parentEntities);
-
-        const bool isUneditable = uneditableEntities.contains(entityID);
-        ImGui::PushID(entityID.id);
+    [[nodiscard]] static std::vector<EditorAction> ShowEntityDropSpaceTarget(ECS& ecs, const EntityID droppedBesideEntityID, const bool droppedAfter, std::vector<EntityID>& rootEntities, EntityID& selectedEntityID)
+    {
+        std::vector<EditorAction> editorActions;
+        ImGui::PushID(droppedBesideEntityID.id);
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
-        ImGui::InvisibleButton(std::to_string(entityID.id).c_str(), ImVec2{ ImGui::GetContentRegionAvail().x, 3 });
+        ImGui::InvisibleButton(std::to_string(droppedBesideEntityID.id).c_str(), ImVec2{ ImGui::GetContentRegionAvail().x, 3 });
         ImGui::PopStyleVar();
         if (std::optional<EntityID> droppedEntityID = ObjectTarget<EntityID>())
         {
-            OnEntityDroppedBetween(ecs, droppedEntityID.value(), entityID, rootEntities, commandTracker);
+            editorActions.push_back(CreateEntityDropAction(ecs, droppedEntityID.value(), droppedBesideEntityID, droppedAfter, rootEntities, selectedEntityID));
         }
         ImGui::PopID();
+
+        return editorActions;
+    }
+
+    [[nodiscard]] static const std::string& GetEntityName(const ECS& ecs, const EntityID entityID)
+    {
+        const NameComponent* nameComponent = ecs.GetComponent<NameComponent>(entityID);
+        ASSERT(nameComponent != nullptr);
+        return nameComponent->name;
+    }
+
+    void InsertRange(std::ranges::range auto& range, std::ranges::range auto&& range2)
+    {
+        range.insert(range.end(), range2.begin(), range2.end());
+    }
+
+    [[nodiscard]] EditorAction CreateSelectEntityAction(const EntityID entityID, EntityID& selectedEntityID)
+    {
+        return [entityID, &selectedEntityID](EditorCommandTracker& commandTracker)
+            {
+                SelectEntity(entityID, selectedEntityID, commandTracker);
+            };
+    }
+
+    [[nodiscard]] static std::vector<EditorAction> ShowEntityChildren(ECS& ecs, const EntityID entityID, EntityID& selectedEntityID, ECS& ecsBuffer,
+        std::vector<EntityID>& rootEntities, const std::span<const EntityID> parentEntities, const std::string& imGuiTag, const std::set<EntityID>& uneditableEntities, const std::function<bool(EntityID)>& filter)
+    {
+        std::vector<EditorAction> editorActions;
+        const bool isSelected = selectedEntityID == entityID;
+        const bool isLeaf = GetEntityChildren(ecs, entityID).empty();
+        const bool shouldBeDefaultOpen = std::ranges::find(parentEntities, entityID) != end(parentEntities);
+
+        const bool isUneditable = uneditableEntities.contains(entityID);
+        InsertRange(editorActions, ShowEntityDropSpaceTarget(ecs, entityID, false, rootEntities, selectedEntityID));
         ImGui::PushID(entityID.id);
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 3 });
-        const bool isOpen = ImGui::TreeNodeEx(nameComponent->name.c_str(), GetHierarchyTreeNodeFlags(isSelected, isLeaf, shouldBeDefaultOpen));
+        const bool isOpen = ImGui::TreeNodeEx(GetEntityName(ecs, entityID).c_str(), GetHierarchyTreeNodeFlags(isSelected, isLeaf, shouldBeDefaultOpen));
         ImGui::PopStyleVar();
         ImGui::PopID();
 
@@ -634,7 +747,7 @@ namespace CLX
         const bool isRightClicked = ImGui::IsItemHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Right);
         if (isRightClicked)
         {
-            SelectEntity(entityID, selectedEntityID, commandTracker);
+            editorActions.push_back(CreateSelectEntityAction(entityID, selectedEntityID));
         }
 
         if (selectedEntityID == entityID)
@@ -647,35 +760,40 @@ namespace CLX
                 ImGui::OpenPopup(entityOptionsPopUpName.c_str());
             }
 
-            ShowEntityOptionsPopUp(entityOptionsPopUpName, ecs, selectedEntityID, rootEntities, commandTracker, imGuiTag);
+            InsertRange(editorActions, ShowEntityOptionsPopUp(entityOptionsPopUpName, ecs, selectedEntityID, rootEntities, imGuiTag));
         }
 
-        ShowEntityPayload(ecs, entityID, rootEntities, commandTracker);
+        InsertRange(editorActions, ShowEntityPayload(ecs, entityID, rootEntities, selectedEntityID));
 
         if (isLeftClicked && !ImGui::IsItemToggledOpen())
         {
-            SelectEntity(entityID, selectedEntityID, commandTracker);
+            editorActions.push_back(CreateSelectEntityAction(entityID, selectedEntityID));
         }
 
         if (isOpen)
         {
-            for (const EntityID childEntityID : hierarchyComponent->children)
+            auto children = GetEntityChildren(ecs, entityID);
+            for (const EntityID childEntityID : children)
             {
                 ASSERT(childEntityID != InvalidEntityID);
                 if (!filter(childEntityID))
                 {
                     continue;
                 }
-                ShowEntityChildren(ecs, childEntityID, selectedEntityID, ecsBuffer, rootEntities, commandTracker, parentEntities, imGuiTag, uneditableEntities, filter);
+                InsertRange(editorActions, ShowEntityChildren(ecs, childEntityID, selectedEntityID, ecsBuffer, rootEntities, parentEntities, imGuiTag, uneditableEntities, filter));
+            }
+
+            if (!children.empty())
+            {
+                InsertRange(editorActions, ShowEntityDropSpaceTarget(ecs, children.back(), true, rootEntities, selectedEntityID));
             }
 
             ImGui::TreePop();
         }
+
+        return editorActions;
     }
 
-
-
-   
 
     void ShowEntityHierarchy(ECS& ecs, ECS& ecsBuffer, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker,
         const std::string& imGuiTag, EntityID& selectedEntityID, const std::set<EntityID>& uneditableEntities, std::string& entitySearchBuffer)
@@ -709,6 +827,7 @@ namespace CLX
 
         const ImVec2 parentSize = ImGui::GetContentRegionAvail();
 
+        std::vector<std::function<void(EditorCommandTracker&)>> editorActions;
         if (ImGui::BeginListBox(listBoxName.c_str(), parentSize))
         {
             std::vector<EntityID> parentEntites;
@@ -722,18 +841,22 @@ namespace CLX
                 {
                     continue;
                 }
-                ShowEntityChildren(
+                InsertRange(editorActions, ShowEntityChildren(
                     ecs,
                     rootEntityID,
                     selectedEntityID,
                     ecsBuffer,
                     rootEntities,
-                    commandTracker,
                     parentEntites,
                     imGuiTag,
                     uneditableEntities,
                     filter
-                );
+                ));
+            }
+
+            if (!rootEntities.empty())
+            {
+                InsertRange(editorActions, ShowEntityDropSpaceTarget(ecs, rootEntities.back(), true, rootEntities, selectedEntityID));
             }
 
             ImGui::EndListBox();
@@ -743,16 +866,22 @@ namespace CLX
         ImGui::PopStyleColor();
         ImGui::PopStyleColor();
         ImGui::PopStyleColor();
+
+        for (auto& action : editorActions)
+        {
+            action(commandTracker);
+        }
     }
 
     static void ShowEntitySearchBar(std::string& entitySearchString)
     {
         char searchBufferArray[256]{};
+
+        CopyString(searchBufferArray, entitySearchString);
         if (ImGui::InputTextWithHint("##EntitySearch", "Search...", &searchBufferArray[0], sizeof(searchBufferArray)))
         {
             entitySearchString = searchBufferArray;
         }
-        entitySearchString = searchBufferArray;
     }
 
     void ShowEntityHierarchyWithAddButtons(ECS& ecs, ECS& ecsBuffer, std::vector<EntityID>& rootEntities,
