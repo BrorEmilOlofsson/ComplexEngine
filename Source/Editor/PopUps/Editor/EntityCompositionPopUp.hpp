@@ -38,6 +38,8 @@ namespace CLX
 		TransformEntityTool mTransformEntityTool;
 		bool mIsOpen = false;
         std::string mEntitySearchBuffer;
+        uint32_t mSelectedComponentPopupIndex = 0;
+		std::string mComponentSearchBuffer;
 		static constexpr const char* PopUpName = "Entity Composition Viewer";
 	};
 }

@@ -1,8 +1,9 @@
 #pragma once
 #include "Engine/Asset/Asset.hpp"
 #include "Engine/Asset/AssetHandle.hpp"
-#include <exception>
 #include <filesystem>
+
+#include "Engine/Graphics/Mesh/Mesh.hpp"
 
 namespace CLX
 {

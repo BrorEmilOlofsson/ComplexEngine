@@ -2,11 +2,10 @@
 #include "Engine/Asset/Asset.hpp"
 #include "Engine/Asset/AssetHandle.hpp"
 
+#include "Engine/Scene/Scene.hpp"
+
 namespace CLX
 {
-
-    class Scene;
-
     using SceneAsset = Asset<Scene>;
     using SceneAssetHandle = AssetHandle<Scene>;
 }

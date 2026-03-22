@@ -1,5 +1,7 @@
 #pragma once
 #include "Editor/Core/PopUp.hpp"
+#include "Engine/Utility/Blackboard.hpp"
+#include "Engine/Utility/File/FileUtility.hpp"
 
 namespace CLX
 {
@@ -22,12 +24,14 @@ namespace CLX
 		std::string mFilePopUpID;
 		std::filesystem::path mFileToRemove;
 
-		MenuTabWindow* mNodeScriptParentTab;
-		MenuItemPopUp* mNodeScriptButton;
+		MenuTabWindow* mNodeScriptParentTab = nullptr;
+		MenuItemPopUp* mNodeScriptButton = nullptr;
 
 		bool mCanOpenPopup = false;
 
-		std::filesystem::path mCurrentDirectory = std::filesystem::absolute(SIMPLE_DIR_ASSETS);
+		std::filesystem::path mCurrentDirectory = GetAbsoluteAssetPath();
+
+        std::string mRenameBuffer;
 	};
 
 }

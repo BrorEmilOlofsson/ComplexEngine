@@ -102,12 +102,12 @@ namespace CLX
                 {
                     sceneManager.SetIsPlaying(true);
                     sceneManager.BeginPlay();
-                    editor.OnSceneBeginPlay(*sceneManager.GetActiveScene().Get());
+                    editor.OnSceneBeginPlay(sceneManager.GetActiveScene().Get());
                 }
                 else
                 {
                     sceneManager.SetIsPlaying(false);
-                    editor.OnSceneEndPlay(*sceneManager.GetActiveScene().Get());
+                    editor.OnSceneEndPlay(sceneManager.GetActiveScene().Get());
                     sceneManager.EndPlay();
                 }
             }
@@ -129,7 +129,7 @@ namespace CLX
             if (const ImGuiPayload* data = ImGui::AcceptDragDropPayload("Asset"))
             {
                 const std::filesystem::path path = std::filesystem::path(reinterpret_cast<const char*>(data->Data));
-                if (path.extension() == ".ecomp")
+                if (path.extension() == AssetExtensions::EntityComposition)
                 {
                     commandTracker.BeginComposite("Instantiate Entity Composition + Select Root");
 
@@ -242,7 +242,7 @@ namespace CLX
         PROFILER_FUNCTION(profiler::colors::Yellow900);
 
         SceneManager& sceneManager = blackboard.Get<Key_SceneManager>();
-        Scene& activeScene = *sceneManager.GetActiveScene().Get();
+        Scene& activeScene = sceneManager.GetActiveScene().Get();
         Blackboard newBlackboard = blackboard;
         newBlackboard.Insert<Key_CurrentRenderState>(activeScene.GetRenderState());
         EditorCommandTracker& commandTracker = blackboard.Get<Key_CommandTracker>();

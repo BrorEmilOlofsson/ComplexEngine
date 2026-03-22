@@ -71,7 +71,7 @@ namespace CLX
 
 
 		}
-		return AnimationAsset(std::make_shared<Animation>(animation), std::filesystem::path());
+		return AnimationAsset(std::move(animation), std::filesystem::path());
 	}
 
 	std::array<Bone, GlobalMaxBones> CreateBonesTest()
@@ -157,7 +157,7 @@ namespace CLX
 
 	void AnimationSystem::Update(ECS& ecs, const float deltaTime, const Blackboard& blackboard)
 	{
-		AnimationTest(deltaTime);
+		//AnimationTest(deltaTime);
 		AssetManager& assetManager = blackboard.Get<Key_AssetManager>();
 		ecs.ForEach([deltaTime, &assetManager](AnimatedModelComponent& animationComponent)
 			{
@@ -187,11 +187,11 @@ namespace CLX
 		{
 			return;
 		}
-		ImGui::Begin("Animation System Debug");
+		/*ImGui::Begin("Animation System Debug");
 
 		ImGui::SliderFloat("Animation Time", &animTest.mAnimationPlayer.mCurrentTime, 0.0f, animTest.mAnimationAsset->duration);
 		ImGui::Checkbox("Pause Animation", &pause);
-		ImGui::End();
+		ImGui::End();*/
 		RenderList& renderList = blackboard.Get<Key_CurrentRenderState>().GetRenderList();
 
 		auto globalBoneMatrices = ComputeGlobalTransforms(

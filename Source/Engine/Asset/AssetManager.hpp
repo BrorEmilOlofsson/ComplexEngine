@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include "Engine/Asset/AssetTypes/AssetTypes.hpp"
 #include "Engine/Asset/AssetLoader.hpp"
+#include "Engine/Utility/File/FileUtility.hpp"
 
 namespace CLX
 {
@@ -148,7 +149,7 @@ namespace CLX
             {
                 throw std::invalid_argument("Asset is invalid");
             }
-            mMeshAssets[std::filesystem::absolute(path)] = std::move(asset);
+            mMeshAssets[GetAbsoluteAssetPath(path)] = std::move(asset);
         }
 
         void AddPixelShader(const std::filesystem::path& path, PixelShaderAsset asset)
@@ -261,6 +262,44 @@ namespace CLX
             else if (extension == AssetExtensions::EntityComposition)
             {
                 remove(mEntityCompositionAssets, path);
+            }
+            else
+            {
+                ASSERT(false);
+            }
+        }
+
+        void Rename(const std::filesystem::path& path, const std::string& newName)
+        {
+            const std::filesystem::path extension = path.extension();
+            const std::filesystem::path newPath = path.parent_path() / (newName + extension.string());
+
+            if (path == newPath)
+            {
+                return;
+            }
+
+            auto rename = [](auto&& map, const std::filesystem::path & oldPath, const std::filesystem::path & newPath)
+            {
+                auto entityCompositionAsset = MapFind(map, oldPath);
+
+                if (entityCompositionAsset)
+                {
+                    entityCompositionAsset.SetRelativePath(newPath);
+                    map.erase(oldPath);
+                    map[newPath] = std::move(entityCompositionAsset);
+                }
+
+                std::filesystem::rename(oldPath, newPath);
+            };
+
+            if (extension == AssetExtensions::EntityComposition)
+            {
+                rename(mEntityCompositionAssets, path, newPath);
+            }
+            else
+            {
+                ASSERT(false);
             }
         }
 

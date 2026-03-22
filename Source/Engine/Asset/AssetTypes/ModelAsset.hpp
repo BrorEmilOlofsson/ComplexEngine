@@ -2,10 +2,10 @@
 #include "Engine/Asset/Asset.hpp"
 #include "Engine/Asset/AssetHandle.hpp"
 
+#include "Engine/Graphics/Model/Model.hpp"
+
 namespace CLX
 {
-	class Model;
-
 	using ModelAsset = Asset<Model>;
 	using ModelAssetHandle = AssetHandle<Model>;
 }

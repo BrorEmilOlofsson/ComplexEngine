@@ -15,6 +15,8 @@ namespace CLX
 	class InputState;
 	class EditorCommandTracker;
 
+	using EditorAction = std::function<void(EditorCommandTracker&)>;
+
 	EntityID CreateEntity(ECS& ecs, std::vector<EntityID>& rootEntities, const EntityID parentID, EditorCommandTracker& commandTracker);
 	void DestroyEntity(ECS& ecs, const EntityID entityID, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker);
 	void SelectEntity(EntityID entityID, EntityID& selectedEntityID, EditorCommandTracker& commandTracker);
@@ -28,12 +30,12 @@ namespace CLX
 	void ShowEntityHierarchyWithAddButtons(ECS& ecs, ECS& ecsBuffer, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker,
 		const std::string& imGuiTag, EntityID& selectedEntityID, EntityID defaultParentID, const std::set<EntityID>& uneditableEntities, std::string& entitySearchBuffer);
 	
-	void ShowEntityName(ECS& ecs, const EntityID selectedEntityID, const InputState& input, EditorCommandTracker& commandTracker);
-	void ShowEntityComponents(ECS& ecs, EntityID entityID, bool& anyItemActiveLastFrame,
-		ECS& ecsBuffer, EntityID& copyEntityID, const Blackboard& blackboard, EditorCommandTracker& commandTracker);
-	void ShowEntityAddComponentButtons(ECS& ecs, EntityID entityID, const class DataTypeRegistry& dataTypeRegistry, EditorCommandTracker& commandTracker);
-	void ShowEntityInspector(ECS& ecs, EntityID selectedEntityID, bool& anyItemActiveLastFrame,
-		ECS& ecsBuffer, EntityID& copyEntityID, const Blackboard& blackboard, EditorCommandTracker& commandTracker);
+	[[nodiscard]] std::optional<EditorAction> ShowEntityName(ECS& ecs, const EntityID selectedEntityID, const InputState& input);
+	[[nodiscard]] std::vector<EditorAction> ShowEntityComponents(ECS& ecs, EntityID entityID, bool& anyItemActiveLastFrame,
+		ECS& ecsBuffer, EntityID& copyEntityID, const Blackboard& blackboard);
+	[[nodiscard]] std::optional<EditorAction> ShowEntityAddComponentButtons(ECS& ecs, EntityID entityID, uint32_t& selectedIndex, std::string& searchBuffer, const class DataTypeRegistry& dataTypeRegistry);
+	[[nodiscard]] std::vector<EditorAction> ShowEntityInspector(ECS& ecs, EntityID selectedEntityID, bool& anyItemActiveLastFrame,
+		ECS& ecsBuffer, EntityID& copyEntityID, uint32_t& selectedComponentPopupIndex, std::string& componentSearchString, const Blackboard& blackboard);
 
 	// Returns root entity of instantiated entity composition
 	EntityID InstantiateEntityComposition(ECS& targetECS, const EntityCompositionAssetHandle& compositionAsset, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker);

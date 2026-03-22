@@ -41,7 +41,7 @@ namespace CLX
 						return;
 					}
 
-					ReplaceHierarchy(ecs, entityID, *asset.Get().get());
+					ReplaceHierarchy(ecs, entityID, asset.Get());
 					
 				}
 			});

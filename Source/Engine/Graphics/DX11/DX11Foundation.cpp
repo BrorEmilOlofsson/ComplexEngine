@@ -23,7 +23,7 @@ namespace CLX
 		auto textureLoader = [context, device](const std::filesystem::path& path) -> TextureAsset
 			{
 				Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv = DX11Factory::LoadDDS(*device.Get(), *context.Get(), path);
-				return TextureAsset(std::make_shared<Texture>(DX11Texture(srv, context)), std::filesystem::relative(path));
+				return TextureAsset(Texture(DX11Texture(srv, context)), std::filesystem::relative(path));
 			};
 
 		auto meshLoader = [device, context](const std::filesystem::path& path) -> MeshAsset
@@ -31,7 +31,7 @@ namespace CLX
 				std::expected<DX11Mesh, std::string> meshResult = LoadDX11Mesh(path, *device.Get(), context);
 				if (meshResult.has_value())
 				{
-					return MeshAsset(std::make_shared<Mesh>(std::move(meshResult.value())), path);
+					return MeshAsset(Mesh(std::move(meshResult.value())), path);
 				}
 				return MeshAsset::Empty();
 			};
@@ -44,11 +44,11 @@ namespace CLX
 				{
 					if (DX11Model* model = std::get_if<DX11Model>(&meshResult.value().model))
 					{
-						result.model = ModelAsset(std::make_shared<Model>(std::move(*model)), path);
+						result.model = ModelAsset(Model(std::move(*model)), path);
 					}
 					else if (DX11AnimatedModel* animatedModel = std::get_if<DX11AnimatedModel>(&meshResult.value().model))
 					{
-						result.model = AnimatedModelAsset(std::make_shared<AnimatedModel>(std::move(*animatedModel)), path);
+						result.model = AnimatedModelAsset(AnimatedModel(std::move(*animatedModel)), path);
 					}
 					else
 					{
@@ -59,7 +59,7 @@ namespace CLX
 					{
 						for (auto& animation : meshResult.value().animations)
 						{
-							result.animations.	emplace_back(std::make_shared<Animation>(std::move(animation)), path);
+							result.animations.push_back(AnimationAsset(Animation(std::move(animation)), path));
 						}
 					}
 				}
@@ -70,14 +70,14 @@ namespace CLX
 		auto pixelShaderLoader = [device, context](const std::filesystem::path& path) -> PixelShaderAsset
 			{
 				auto ps = DX11Factory::CreatePixelShader(path, *device.Get());
-				return PixelShaderAsset(std::make_shared<PixelShader>(DX11PixelShader(device, context, ps)), path);
+				return PixelShaderAsset(PixelShader(DX11PixelShader(device, context, ps)), path);
 			};
 
 		auto vertexShaderLoader = [device, context](const std::filesystem::path& path) -> VertexShaderAsset
 			{
 				Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;
 				auto dx11Vs = DX11Factory::CreateVertexShaderAndInputLayout(path, *device.Get(), inputLayout);
-				return VertexShaderAsset(std::make_shared<VertexShader>(DX11VertexShader(device, context, dx11Vs, inputLayout)), path);
+				return VertexShaderAsset(VertexShader(DX11VertexShader(device, context, dx11Vs, inputLayout)), path);
 			};
 
 		assetLoader.SetTextureLoader(std::move(textureLoader));
@@ -272,16 +272,16 @@ namespace CLX
 
 	static void AddMesh(AssetManager& assetManager, MeshData<Vertex>&& meshData, const std::string_view meshName, ID3D11Device& device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
 	{
-		std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>(DX11Mesh(meshData, meshName, meshName, device, context));
-		assetManager.AddMesh(meshName, MeshAsset(mesh, meshName));
+		Mesh mesh = Mesh(DX11Mesh(meshData, meshName, meshName, device, context));
+		assetManager.AddMesh(meshName, MeshAsset(std::move(mesh), meshName));
 	}
 
 	static void AddModel(AssetManager& assetManager, MeshData<Vertex>&& meshData, const std::string_view meshName, ID3D11Device& device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
 	{
 		std::vector<DX11Mesh> v;
 		v.push_back(DX11Mesh(std::move(meshData), meshName, meshName, device, context));
-		std::shared_ptr<Model> model = std::make_shared<Model>(DX11Model(std::move(v), std::string(meshName), meshName, device, context));
-		assetManager.AddModel(meshName, ModelAsset(model, meshName));
+		Model model = Model(DX11Model(std::move(v), std::string(meshName), meshName, device, context));
+		assetManager.AddModel(meshName, ModelAsset(std::move(model), meshName));
 	}
 
 	std::function<void(AssetManager&)> DX11Foundation::GetDefaultAssetLoader()

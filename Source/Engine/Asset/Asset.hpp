@@ -7,46 +7,57 @@ namespace CLX
 {
 
 	template<typename T>
+	struct AssetData
+	{
+		T object;
+        std::filesystem::path relativePath;
+	};
+
+	template<typename T>
 	class Asset final
 	{
 	public:
 
 		constexpr Asset() = default;
 
-		constexpr explicit Asset(std::shared_ptr<T> asset, std::filesystem::path relativePath)
-			: mAsset(std::move(asset))
-			,  mRelativePath(std::move(relativePath))
+		constexpr explicit Asset(T asset, std::filesystem::path relativePath)
+			: mAssetData(std::make_shared<AssetData<T>>(AssetData<T>{std::move(asset), std::move(relativePath)}))
 		{
 		}
 
-		[[nodiscard]] constexpr std::shared_ptr<T> Get()
+		[[nodiscard]] constexpr std::shared_ptr<AssetData<T>> Get()
 		{
-			return mAsset;
+			return mAssetData;
 		}
 
-		[[nodiscard]] constexpr std::shared_ptr<const T> Get() const
+		[[nodiscard]] constexpr std::shared_ptr<const AssetData<T>> Get() const
 		{
-			return mAsset;
+			return mAssetData;
 		}
 
 		[[nodiscard]] constexpr const std::filesystem::path& GetRelativePath() const
 		{
-			return mRelativePath;
+			return mAssetData->relativePath;
+        }
+
+		constexpr void SetRelativePath(std::filesystem::path relativePath)
+		{
+			mAssetData->relativePath = std::move(relativePath);
         }
 
 		[[nodiscard]] constexpr T* operator->() noexcept
 		{
-			return mAsset.get();
+			return &mAssetData->object;
 		}
 
 		[[nodiscard]] constexpr const T* operator->() const noexcept
 		{
-			return mAsset.get();
+			return &mAssetData->object;
 		}
 
 		[[nodiscard]] constexpr operator bool() const
 		{
-			return mAsset != nullptr;
+			return mAssetData != nullptr;
 		}
 
 		[[nodiscard]] static constexpr Asset<T> Empty()
@@ -56,8 +67,7 @@ namespace CLX
 
 	private:
 
-		std::shared_ptr<T> mAsset;
-        std::filesystem::path mRelativePath;
+		std::shared_ptr<AssetData<T>> mAssetData;
 	};
 
 }

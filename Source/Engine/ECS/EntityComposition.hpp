@@ -1,6 +1,5 @@
 #pragma once
 #include "Engine/ECS/ECS.hpp"
-#include <filesystem>
 
 namespace CLX
 {

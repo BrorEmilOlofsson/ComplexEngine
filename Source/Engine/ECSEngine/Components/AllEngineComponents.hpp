@@ -3,6 +3,7 @@
 #include "Engine/ECSEngine/Components/TransformComponent.hpp"
 #include "Engine/ECSEngine/Components/TransformHierarchyComponent.hpp"
 #include "Engine/ECSEngine/Components/EntityCompositionComponent.hpp"
+#include "Engine/ECSEngine/Components/EditorComponent.hpp"
 #include "Engine/ECSEngine/Components/MeshComponent.hpp"
 #include "Engine/ECSEngine/Components/ModelComponent.hpp"
 #include "Engine/ECSEngine/Components/AnimatedModelComponent.hpp"
@@ -28,6 +29,7 @@ namespace CLX
 		RegisterTransformComponent();
 		RegisterTransformHierarchyComponent();
 		RegisterEntityCompositionComponent();
+		RegisterEditorComponent();
 		RegisterMeshComponent();
 		RegisterModelComponent();
 		RegisterAnimatedModelComponent();

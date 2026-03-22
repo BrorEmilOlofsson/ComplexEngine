@@ -44,8 +44,8 @@ namespace CLX
         ECSRegistry* ecsRegistry = &mECSRegistry;
         auto a = [blackboard, ecsRegistry](const std::filesystem::path& path)
             {
-                std::shared_ptr<EntityComposition> entityComposition = std::make_shared<EntityComposition>(*ecsRegistry);
-                LoadEntityComposition(path, *entityComposition, *blackboard);
+                EntityComposition entityComposition(*ecsRegistry);
+                LoadEntityComposition(path, entityComposition, *blackboard);
                 return EntityCompositionAsset(std::move(entityComposition), path);
             };
         mAssetManager->GetAssetLoader().SetEntityCompositionLoader(a);
@@ -85,7 +85,7 @@ namespace CLX
                 Scene scene(mBlackboard);
                 SceneLoader::LoadScene(scene, path, *mBlackboard);
                 
-                return SceneAsset(std::make_shared<Scene>(std::move(scene)), path);
+                return SceneAsset(std::move(scene), path);
             });
 
         mAssetManager->LoadAssets();

@@ -17,9 +17,9 @@ namespace CLX
 		}
 
 		~Mesh() = default;
-		Mesh(Mesh&&) noexcept = delete;
+		Mesh(Mesh&&) noexcept = default;
 		Mesh(const Mesh&) = delete;
-		Mesh& operator=(Mesh&&) noexcept = delete;
+		Mesh& operator=(Mesh&&) noexcept = default;
 		Mesh& operator=(const Mesh&) = delete;
 
 		[[nodiscard]] const MeshData<Vertex>& GetMeshData() const

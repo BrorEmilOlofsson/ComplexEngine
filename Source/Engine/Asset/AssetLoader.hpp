@@ -3,7 +3,6 @@
 #include <filesystem>
 #include <variant>
 #include <vector>
-#include "Asset.hpp"
 #include "Engine/Asset/AssetTypes/AssetTypes.hpp"
 
 namespace CLX

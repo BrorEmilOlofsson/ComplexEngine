@@ -176,7 +176,7 @@ namespace CLX
 	{
 		if (asset)
 		{
-			SaveEntityComposition(asset.GetRelativePath(), *asset.Get(), dataTypeRegistry);
+			SaveEntityComposition(asset.GetRelativePath(), asset.Get(), dataTypeRegistry);
 		}
 	}
 

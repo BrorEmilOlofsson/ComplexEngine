@@ -1,7 +1,5 @@
 #pragma once
 #include <memory>
-#include <string>
-#include <filesystem>
 
 namespace CLX
 {
@@ -16,16 +14,16 @@ namespace CLX
 		}
 
 		Texture(const Texture&) = delete;
-		Texture(Texture&&) = delete;
+		Texture(Texture&&) = default;
 		Texture& operator=(const Texture&) = delete;
-		Texture& operator=(Texture&&) = delete;
+		Texture& operator=(Texture&&) = default;
 
-		void SetSlot(unsigned int slot)
+		void SetSlot(uint32_t slot)
 		{
 			mConcept->SetSlot(slot);
 		}
 
-		void Bind(unsigned int slot)
+		void Bind(uint32_t slot)
 		{
 			mConcept->SetSlot(slot);
 		}
@@ -40,7 +38,7 @@ namespace CLX
 			return mConcept->GetShaderResourceView();
 		}
 
-		int GetSlot() const
+		uint32_t GetSlot() const
 		{
 			return mConcept->GetSlot();
 		}
@@ -52,9 +50,9 @@ namespace CLX
 		public:
 
 			virtual ~TextureConcept() = default;
-			virtual void SetSlot(unsigned int slot) = 0;
-			virtual unsigned int GetSlot() const = 0;
-			virtual void Bind(unsigned int slot) = 0;
+			virtual void SetSlot(uint32_t slot) = 0;
+			virtual uint32_t GetSlot() const = 0;
+			virtual void Bind(uint32_t slot) = 0;
 			virtual void Bind() = 0;
 			virtual void* GetShaderResourceView() = 0;
 		};
@@ -74,12 +72,12 @@ namespace CLX
 				mTexture.SetSlot(slot);
 			}
 
-			unsigned int GetSlot() const override
+			uint32_t GetSlot() const override
 			{
 				return mTexture.GetSlot();
 			}
 
-			void Bind(unsigned int slot) override
+			void Bind(uint32_t slot) override
 			{
 				mTexture.Bind(slot);
 			}

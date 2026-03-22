@@ -55,7 +55,7 @@ namespace CLX
 		NodeScriptingWindow& nodeScriptingWindow, MenuTabWindow& nodeScriptParentTab, MenuItemPopUp& nodeScriptButton,
 		SceneManager& sceneManager, AssetManager& assetManager, EntityCompositionPopUp& entityCompositionPopUp, const ImTextureID textureID)
 	{
-		const std::string& extension = path.extension().string();
+		const std::wstring extension = path.extension().wstring();
 		if (std::filesystem::is_directory(path))
 		{
 			currentDirectory = path;
@@ -66,14 +66,14 @@ namespace CLX
 			const std::filesystem::path scenePath = std::filesystem::path("Assets/Scenes/") / path;
             sceneManager.ChangeScene(assetManager.GetScene(scenePath));
 		}
-		else if (extension == ".fly")
+		else if (extension == L".fly")
 		{
 			if (nodeScriptingWindow.OpenClassByName(path.stem().string()))
 			{
 				nodeScriptParentTab.ActivateWindow(&nodeScriptButton, true);
 			}
 		}
-		else if (extension == ".ecomp")
+		else if (extension == AssetExtensions::EntityComposition)
 		{
 			EntityCompositionAssetHandle entityCompositionAsset = assetManager.GetEntityComposition(path);
 			if (entityCompositionAsset.IsValid())
@@ -92,6 +92,21 @@ namespace CLX
 			Console::Print("Removed ", ConsoleTextColor::White, false);
 			Console::Print(path.string(), ConsoleTextColor::Green, true);
 		}
+	}
+
+	static void RenameAsset(const std::filesystem::path& path, const std::string& newName, AssetManager& assetManager)
+	{
+		if (path.empty())
+		{
+			return;
+		}
+
+		if (newName.empty())
+		{
+			return;
+		}
+
+		assetManager.Rename(path, newName);
 	}
 
 	static void ShowAssetCreationPopUp(const std::filesystem::path& directoryPath, bool& canOpenPopUp, AssetManager& assetManager, const DataTypeRegistry& dataTypeRegistry)
@@ -157,7 +172,7 @@ namespace CLX
 			if (ImGui::Button("Create"))
 			{
 				const std::filesystem::path path = directoryPath / (std::string(name) + ".ecomp");
-				EntityCompositionAsset asset(std::make_shared<EntityComposition>(ECSRegistry::Get()), path);
+				EntityCompositionAsset asset(EntityComposition(ECSRegistry::Get()), path);
 				auto assetHandle = assetManager.AddEntityComposition(asset);
 				SaveEntityCompositionAsset(assetHandle, dataTypeRegistry);
 
@@ -179,14 +194,14 @@ namespace CLX
 		EntityCompositionPopUp& entityCompositionPopUp;
 		bool& canOpenPopup;
 		std::string& filePopUpID;
-		std::filesystem::path& fileToRemove;
+		std::filesystem::path& selectedFilePath;
 		std::filesystem::path& currentDirectory;
+		std::string& renameBuffer;
 	};
 
 	static void DrawFilesInFolder(const std::filesystem::path& directory, const DrawFilesInFolderData& data)
 	{
 		PROFILER_FUNCTION(profiler::colors::Blue300);
-		const std::vector<std::filesystem::path> paths = FileUtility::GetPathsFromDirectory(directory, true);
 
 		static constexpr float padding = 16.0f;
 		static constexpr float thumbnailSize = 64.0f;
@@ -204,6 +219,9 @@ namespace CLX
 
 		ImGui::PushStyleColor(ImGuiCol_Button, ImColor(0.12f, 0.12f, 0.12f, 0.0f).Value);
 
+		std::filesystem::path renamePath;
+
+		const std::vector<std::filesystem::path> paths = FileUtility::GetPathsFromDirectory(directory, true);
 		for (const std::filesystem::path& path : paths)
 		{
 			const std::filesystem::path extension = path.extension();
@@ -260,7 +278,7 @@ namespace CLX
 				else if (ImGui::IsMouseClicked(ImGuiMouseButton_Right) && !std::filesystem::is_directory(path))
 				{
 					data.filePopUpID = "Delete##" + path.string();
-					data.fileToRemove = directory / path;
+					data.selectedFilePath = directory / path;
 					ImGui::OpenPopup(data.filePopUpID.c_str());
 				}
 			}
@@ -273,12 +291,17 @@ namespace CLX
 
 		ImGui::PopStyleColor();
 
+        bool openRenamePopup = false;
 
 		if (ImGui::BeginPopup(data.filePopUpID.c_str()))
 		{
 			if (ImGui::MenuItem("Delete##FileUtilityPopUp"))
 			{
-				DeleteAsset(data.fileToRemove, data.assetManager);
+				DeleteAsset(data.selectedFilePath, data.assetManager);
+			}
+            if (ImGui::MenuItem("Rename##FileUtilityPopUp"))
+			{
+				openRenamePopup = true;
 			}
 
 			data.canOpenPopup = false;
@@ -288,6 +311,45 @@ namespace CLX
 		else
 		{
 			data.canOpenPopup = true;
+		}
+
+		if (openRenamePopup)
+		{
+			ImGui::OpenPopup("RenameAssetPopup##FileUtilityPopUp");
+		}
+
+        if (ImGui::BeginPopup("RenameAssetPopup##FileUtilityPopUp"))
+		{
+            ImGui::Text("Rename Asset");
+			// Never come in here
+            const std::string currentName = data.selectedFilePath.stem().string();
+
+            char buffer[256]{};
+            CopyString(buffer, currentName);
+
+			if (ImGui::InputText("##Name", buffer, 256))
+			{
+                data.renameBuffer = buffer;
+			}
+
+			if (ImGui::Button("Save Name"))
+			{
+                RenameAsset(data.selectedFilePath, data.renameBuffer, data.assetManager);
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::SameLine();
+
+            if (ImGui::Button("Cancel"))
+			{
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::EndPopup();
+		}
+		else
+		{
+			data.renameBuffer.clear();
 		}
 
 		ShowAssetCreationPopUp(directory, data.canOpenPopup, data.assetManager, data.dataTypeRegistry);
@@ -404,7 +466,8 @@ namespace CLX
 			mCanOpenPopup,
 			mFilePopUpID,
 			mFileToRemove,
-			mCurrentDirectory
+			mCurrentDirectory,
+            mRenameBuffer
 		};
 		RenderAssetBrowserPopup(data, GetImGuiName());
 	}

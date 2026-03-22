@@ -3,6 +3,8 @@
 #include "Engine/Asset/AssetHandle.hpp"
 #include <filesystem>
 
+#include "Engine/Graphics/Texture/Texture.hpp"
+
 namespace CLX
 {
 

@@ -12,7 +12,8 @@ namespace CLX
 {
 
 	static void ShowInspector(SceneManager& sceneManager, Camera& camera, const InputState& input, ECS& ecsBuffer, EditorCommandTracker& commandTracker,
-		const Blackboard& blackboard, const std::string& imguiName, bool& isActive, const EntityID selectedEntityID, bool& anyItemActiveLastFrame, EntityID& copyEntityID,
+        const Blackboard& blackboard, const std::string& imguiName, bool& isActive, const EntityID selectedEntityID, bool& anyItemActiveLastFrame, EntityID& copyEntityID,
+		uint32_t& selectedComponentPopupIndex, std::string& componentSearchString,
 		std::function<void(EntityID)>& onEntitySelected)
 	{
 		if (ImGui::Begin(imguiName.c_str(), &isActive))
@@ -26,7 +27,7 @@ namespace CLX
 
 			ECS& ecs = sceneManager.GetActiveScene()->GetECS();
 			
-			ShowEntityName(ecs, selectedEntityID, input, commandTracker);
+			auto entityNameAction = ShowEntityName(ecs, selectedEntityID, input);
 
 			const Transform worldTransform = GetWorldTransform(ecs, selectedEntityID);
 
@@ -35,7 +36,25 @@ namespace CLX
 			newBlackboard.Insert<Key_SceneRenderState>(sceneManager.GetActiveScene()->GetRenderState());
 			newBlackboard.Insert<Key_ReferenceTransform>(worldTransform);
 			newBlackboard.Insert<Key_OnEntitySelected>(onEntitySelected);
-			ShowEntityInspector(ecs, selectedEntityID, anyItemActiveLastFrame, ecsBuffer, copyEntityID, newBlackboard, commandTracker);
+			auto editorActions = ShowEntityInspector(
+				ecs, 
+				selectedEntityID, 
+				anyItemActiveLastFrame, 
+				ecsBuffer, 
+				copyEntityID, 
+				selectedComponentPopupIndex,
+				componentSearchString,
+				newBlackboard
+			);
+
+			if (entityNameAction)
+			{
+				entityNameAction.value()(commandTracker);
+			}
+			for (auto& action : editorActions)
+			{
+				action(commandTracker);
+			}
 		}
 
 		ImGui::End();
@@ -68,6 +87,8 @@ namespace CLX
 			mHierarchyPopUp->GetSelectedEntityID(),
 			mAnyItemActiveLastFrame,
 			mCopyEntityID,
+			mSelectedComponentPopupIndex,
+			mComponentSearchBuffer,
 			mEntitySelectedCallback
 		);
 	}

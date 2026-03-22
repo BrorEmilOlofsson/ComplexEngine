@@ -23,5 +23,8 @@ namespace CLX
 		class Camera* mSceneCamera = nullptr;
 
 		std::function<void(EntityID)> mEntitySelectedCallback;
+
+        uint32_t mSelectedComponentPopupIndex = 0;
+        std::string mComponentSearchBuffer;
 	};
 }

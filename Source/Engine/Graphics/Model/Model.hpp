@@ -18,9 +18,9 @@ namespace CLX
 		}
 
 		~Model() = default;
-		Model(Model&&) noexcept = delete;
+		Model(Model&&) noexcept = default;
 		Model(const Model&) = delete;
-		Model& operator=(Model&&) noexcept = delete;
+		Model& operator=(Model&&) noexcept = default;
 		Model& operator=(const Model&) = delete;
 
 		[[nodiscard]] const std::string& GetName() const

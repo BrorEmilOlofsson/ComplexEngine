@@ -72,20 +72,6 @@ namespace CLX
 			}
 		}
 
-		/*template<IsBlackboardKey<KeyType> T>
-		[[nodiscard]] constexpr T GetOr(T&& defaultValue) const
-		{
-			using Type = typename T::type;
-			constexpr KeyType key = T::key;
-			auto it = mMap.find(key);
-			if (it != end(mMap))
-			{
-				return it->second;
-			}
-
-			return defaultValue;
-		}*/
-
 		template<IsBlackboardKey<KeyType> T>
 		[[nodiscard]] constexpr auto TryGet() const
 		{

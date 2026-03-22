@@ -13,5 +13,17 @@ namespace CLX
 		// Returns absolute paths
 		static std::vector<std::filesystem::path> GetPathsFromDirectory(const std::filesystem::path& absolutePath, const bool includeFolders = false);
 		static std::optional<nlohmann::json> GetDataAsJson(const std::filesystem::path& absolutePath);
+
+		
 	};
+
+	inline std::filesystem::path GetAbsoluteAssetPath(const std::filesystem::path& relativePath)
+	{
+        return std::filesystem::absolute(SIMPLE_DIR_ASSETS / relativePath);
+	}
+
+	inline std::filesystem::path GetAbsoluteAssetPath()
+	{
+		return std::filesystem::absolute(SIMPLE_DIR_ASSETS);
+	}
 }

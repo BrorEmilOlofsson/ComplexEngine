@@ -129,7 +129,7 @@ namespace CLX
 		{
 			return;
 		}
-		const Animation& animation = *mAnimationAsset.Get();
+		const Animation& animation = mAnimationAsset.Get();
 		mCurrentTime += deltaTime;
 
 		if (mCurrentTime > animation.duration)
@@ -150,7 +150,7 @@ namespace CLX
 			return;
 		}
 
-		const Animation& animation = *mAnimationAsset.Get();
+		const Animation& animation = mAnimationAsset.Get();
 
 		for (std::size_t boneIndex = 0; boneIndex < animation.boneKeyFrames.size(); boneIndex++)
 		{

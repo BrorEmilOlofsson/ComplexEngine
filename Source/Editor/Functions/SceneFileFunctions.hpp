@@ -25,7 +25,7 @@ namespace CLX
                         return;
                     }
 
-                    const Scene& activeScene = *sceneAsset.Get();
+                    const Scene& activeScene = sceneAsset.Get();
                     SceneLoader::SaveScene(activeScene, sceneAsset.GetRelativePath(), *dataTypeRegistry);
 
 

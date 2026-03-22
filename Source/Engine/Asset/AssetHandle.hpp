@@ -14,36 +14,34 @@ namespace CLX
 
 		constexpr AssetHandle() = default;
 
-		constexpr explicit AssetHandle(std::weak_ptr<T> asset, std::filesystem::path relativePath)
-			: mAsset(std::move(asset))
-			, mRelativePath(std::move(relativePath))
+		constexpr explicit AssetHandle(std::weak_ptr<AssetData<T>> asset)
+			: mAssetData(std::move(asset))
 		{
 		}
 
 		constexpr explicit AssetHandle(Asset<T> asset)
-			: mAsset(std::move(asset.Get()))
-			, mRelativePath(std::move(asset.GetRelativePath()))
+			: mAssetData(std::move(asset.Get()))
 		{
 		}
 
-		[[nodiscard]] std::shared_ptr<T> Get() noexcept
+		[[nodiscard]] T& Get() noexcept
 		{
-			return mAsset.lock();
+			return mAssetData.lock()->object;
 		}
 
-		[[nodiscard]] std::shared_ptr<const T> Get() const noexcept
+		[[nodiscard]] const T& Get() const noexcept
 		{
-			return mAsset.lock();
+			return mAssetData.lock()->object;
 		}
 
 		[[nodiscard]] constexpr const std::filesystem::path& GetRelativePath() const noexcept
 		{
-			return mRelativePath;
+			return mAssetData.lock()->relativePath;
         }
 
 		[[nodiscard]] constexpr bool IsValid() const noexcept
 		{
-			return !mAsset.expired();
+			return !mAssetData.expired();
 		}
 
 		[[nodiscard]] constexpr explicit operator bool() const noexcept
@@ -53,7 +51,7 @@ namespace CLX
 
 		[[nodiscard]] T* operator->() const
 		{
-			return mAsset.lock().get();
+			return &mAssetData.lock()->object;
 		}
 
 		[[nodiscard]] static constexpr AssetHandle<T> Empty()
@@ -63,8 +61,7 @@ namespace CLX
 
 	private:
 
-		std::weak_ptr<T> mAsset;
-		std::filesystem::path mRelativePath;
+		std::weak_ptr<AssetData<T>> mAssetData;
 	};
 
 	template<typename T>
@@ -75,7 +72,7 @@ namespace CLX
 			return false;
 		}
 
-		return a.Get().get() == b.Get().get();
+		return &a.Get() == &b.Get();
 	}
 
 }
