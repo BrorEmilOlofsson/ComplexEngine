@@ -123,7 +123,8 @@ namespace CLX
 			{
 				const nlohmann::json& componentDataJSON = entityData["Components"][j];
 
-				const DataTypeID dataTypeID = dataTypeRegistry.Find(std::string_view(componentDataJSON["Name"]));
+				const std::string componentName = componentDataJSON["Name"];
+				const DataTypeID dataTypeID = dataTypeRegistry.Find(componentName);
 				if (dataTypeID == InvalidDataTypeID)
 				{
 					EraseMissingElementFromJSON(jsonData, path, i, j); //NOTE(v11.3.2): Maybe not needed but works for now

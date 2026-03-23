@@ -62,6 +62,167 @@ namespace CLX
         ecs2.DestroyEntity(tempCopy);
     }
 
+    static void DestroyEntityAndChildren(ECS& ecs, const EntityID entityID)
+    {
+        auto children = GetAllEntityChildren(ecs, entityID);
+        for (auto child : children)
+        {
+            ecs.DestroyEntity(child);
+        }
+        ecs.DestroyEntity(entityID);
+    }
+
+    [[nodiscard]] bool HasVariableEntity(const std::type_info& typeInfo)
+    {
+        return typeInfo == typeid(EntityID) || typeInfo == typeid(std::vector<EntityID>);
+    }
+
+    static void RemapEntityIDs(ECS& ecs, const EntityID newEntityID, const std::map<EntityID, EntityID>& oldToNewEntityIDMap, const DataTypeRegistry& dataTypeRegistry)
+    {
+        for (auto [typeinfo, componentPtr] : ECS::EntityView(&ecs, newEntityID))
+        {
+            const DataType* dataType = dataTypeRegistry.Find(GetDataTypeID(typeinfo));
+            ASSERT(dataType != nullptr);
+            auto& members = dataType->memberVariables;
+
+            auto membersFiltered = members | std::views::filter([&dataTypeRegistry](const DataTypeMemberVariable& member)
+                {
+                    const auto& dataType = dataTypeRegistry.Find(member.dataTypeID);
+                    ASSERT(dataType != nullptr);
+                    return HasVariableEntity(dataType->typeInfo);
+                });
+
+            auto memberPair = membersFiltered | std::views::transform([&dataTypeRegistry, &componentPtr](const DataTypeMemberVariable& member)
+                {
+                    return std::pair<const std::type_info&, void*>{ dataTypeRegistry.Find(member.dataTypeID)->typeInfo.get(), static_cast<char*>(componentPtr) + member.byteOffset };
+                })
+                | std::ranges::to<std::vector>();
+
+            for (const auto& [memberTypeInfo, memberPtr] : memberPair)
+            {
+                if (memberTypeInfo == typeid(EntityID))
+                {
+                    EntityID& entityRef = *static_cast<EntityID*>(memberPtr);
+                    if (oldToNewEntityIDMap.contains(entityRef))
+                    {
+                        entityRef = oldToNewEntityIDMap.at(entityRef);
+                    }
+                }
+                else if (memberTypeInfo == typeid(std::vector<EntityID>))
+                {
+                    std::vector<EntityID>& entityVectorRef = *static_cast<std::vector<EntityID>*>(memberPtr);
+                    for (EntityID& entityIDInVector : entityVectorRef)
+                    {
+                        if (oldToNewEntityIDMap.contains(entityIDInVector))
+                        {
+                            entityIDInVector = oldToNewEntityIDMap.at(entityIDInVector);
+                        }
+                    }
+                }
+                else
+                {
+                    ASSERT_NEW(false, "Unexpected type info for member variable when duplicating entity and children");
+                }
+            }
+        }
+    }
+
+    static std::map<EntityID, EntityID> DuplicateEntityAndChildren(ECS& ecs, const EntityID entityID)
+    {
+        const EntityID createdEntityID = ecs.DuplicateEntity(entityID);
+        std::map<EntityID, EntityID> oldToNewEntityIDMap;
+        oldToNewEntityIDMap[entityID] = createdEntityID;
+        auto children = GetAllEntityChildren(ecs, entityID);
+
+        for (auto child : children)
+        {
+            const EntityID createdChildEntityID = ecs.DuplicateEntity(child);
+            oldToNewEntityIDMap[child] = createdChildEntityID;
+        }
+
+        const DataTypeRegistry& dataTypeRegistry = DataTypeRegistry::GetInstance();
+
+        // Remap parent-child relationships in the duplicated entities
+        RemapEntityIDs(ecs, createdEntityID, oldToNewEntityIDMap, dataTypeRegistry);
+
+        for (auto child : children)
+        {
+            const EntityID createdChildEntityID = oldToNewEntityIDMap.at(child);
+            RemapEntityIDs(ecs, createdChildEntityID, oldToNewEntityIDMap, dataTypeRegistry);
+        }
+
+        return oldToNewEntityIDMap;
+    }
+
+    void AddEntityToRootEntities(const EntityID entityID, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker)
+    {
+        if (std::ranges::find(rootEntities, entityID) != end(rootEntities))
+        {
+            return;
+        }
+        struct AddEntityToRootEntitiesData final
+        {
+            EntityID entityID;
+            std::reference_wrapper<std::vector<EntityID>> rootEntities;
+        };
+
+        AddEntityToRootEntitiesData data
+        {
+            .entityID = entityID,
+            .rootEntities = rootEntities
+        };
+
+        auto doCommand = [](const AddEntityToRootEntitiesData& data)
+            {
+                data.rootEntities.get().push_back(data.entityID);
+            };
+
+        auto undoCommand = [](const AddEntityToRootEntitiesData& data)
+            {
+                data.rootEntities.get().pop_back();
+            };
+
+        commandTracker.ExecuteCommand(EditorCommand(data, doCommand, undoCommand, "Add Entity To Root Entities"));
+    }
+
+
+    static EntityID DuplicateEntityAndChildren(ECS& ecs, const EntityID entityID, EditorCommandTracker& commandTracker)
+    {
+
+        std::map<EntityID, EntityID> oldToNewEntityIDMap = DuplicateEntityAndChildren(ecs, entityID);
+        const EntityID newEntityID = oldToNewEntityIDMap.at(entityID);
+
+
+        struct DuplicateEntityAndChildrenData final
+        {
+            EntityID entityID;
+            EntityID duplicatedEntityID;
+            std::reference_wrapper<ECS> ecs;
+        };
+
+
+        DuplicateEntityAndChildrenData data
+        {
+            .entityID = entityID,
+            .duplicatedEntityID = newEntityID,
+            .ecs = ecs
+        };
+
+        auto doCommand = [](const DuplicateEntityAndChildrenData& data)
+            {
+                DuplicateEntityAndChildren(data.ecs.get(), data.entityID);
+            };
+
+        auto undoCommand = [](const DuplicateEntityAndChildrenData& data)
+            {
+                DestroyEntityAndChildren(data.ecs.get(), data.duplicatedEntityID);
+            };
+
+        commandTracker.RegisterCommand(EditorCommand(data, doCommand, undoCommand, "Duplicate Entity and Children"));
+
+        return newEntityID;
+    }
+
     static EntityID CreateRootEntity(ECS& ecs, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker)
     {
         const EntityID createdEntityID = ecs.CreateEntity();
@@ -654,6 +815,28 @@ namespace CLX
             }
             ImGui::EndDisabled();
 
+            if (ImGui::MenuItem(("Duplicate" + imGuiTag).c_str()))
+            {
+                editorActions.push_back([&ecs, &selectedEntityID, &rootEntities](EditorCommandTracker& commandTracker)
+                    {
+                        commandTracker.BeginComposite("Duplicate Entity Composite");
+                        const EntityID newEntityID = DuplicateEntityAndChildren(ecs, selectedEntityID, commandTracker);
+                        const EntityID parentID = GetParentEntity(ecs, selectedEntityID);
+                        if (parentID == InvalidEntityID)
+                        {
+                            rootEntities.push_back(newEntityID);
+                        }
+                        else
+                        {
+                            TransformHierarchyComponent* parentTransformComponent = ecs.GetComponent<TransformHierarchyComponent>(parentID);
+                            ASSERT(parentTransformComponent != nullptr);
+                            parentTransformComponent->children.push_back(newEntityID);
+                        }
+                        SelectEntity(newEntityID, selectedEntityID, commandTracker);
+                        commandTracker.EndComposite();
+                    });
+            }
+
             ImGui::EndPopup();
         }
 
@@ -1197,8 +1380,8 @@ namespace CLX
         auto isValidComponentDataType = [&ecs, entityID](const DataType& dataType)
             {
                 return dataType.isComponent
-                    && !ecs.GetRegistry().GetComponentType(*dataType.typeInfo).isDefault
-                    && !ecs.HasComponent(entityID, std::type_index(*dataType.typeInfo));
+                    && !ecs.GetRegistry().GetComponentType(std::type_index(dataType.typeInfo)).isDefault
+                    && !ecs.HasComponent(entityID, std::type_index(dataType.typeInfo));
             };
 
         auto componentDataTypes = dataTypeRegistry.GetDataTypesFiltered(isValidComponentDataType)
@@ -1215,7 +1398,7 @@ namespace CLX
             const std::string componentNameLabel = dataType.prettyName + "##Component";
             if (ImGui::Selectable(componentNameLabel.c_str(), selectedIndex == indexCounter))
             {
-                addComponentAction = CreateAddComponentToEntityAction(ecs, entityID, std::type_index(*dataType.typeInfo), dataType.prettyName);
+                addComponentAction = CreateAddComponentToEntityAction(ecs, entityID, std::type_index(dataType.typeInfo), dataType.prettyName);
                 selectedIndex = 0;
                 ImGui::CloseCurrentPopup();
             }
@@ -1236,7 +1419,7 @@ namespace CLX
             else if (ImGui::IsKeyPressed(ImGuiKey_Enter) && !componentDataTypes.empty())
             {
                 const auto& dataType = componentDataTypes[selectedIndex];
-                addComponentAction = CreateAddComponentToEntityAction(ecs, entityID, std::type_index(*dataType.typeInfo), dataType.prettyName);
+                addComponentAction = CreateAddComponentToEntityAction(ecs, entityID, std::type_index(dataType.typeInfo), dataType.prettyName);
                 selectedIndex = 0;
                 ImGui::CloseCurrentPopup();
             }

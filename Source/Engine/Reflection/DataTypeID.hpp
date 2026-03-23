@@ -20,10 +20,15 @@ namespace CLX
 		return a.myID < b.myID;
 	}
 
-	template<typename T>
-	[[nodiscard]] constexpr DataTypeID GetDataTypeID()
+	[[nodiscard]] inline DataTypeID GetDataTypeID(const std::type_info& typeInfo)
 	{
-		return DataTypeID{ typeid(T).hash_code() };
+		return DataTypeID{ typeInfo.hash_code() };
+	}
+
+	template<typename T>
+	[[nodiscard]] inline DataTypeID GetDataTypeID()
+	{
+        return GetDataTypeID(typeid(T));
 	}
 }
 
