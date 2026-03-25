@@ -182,7 +182,6 @@ namespace CLX
 					else
 					{
 						return std::tuple<Ts&...>{ (*mECS->GetComponent<Ts>(entityID))... };
-						//return *mECS->GetComponent<std::tuple_element_t<0, std::tuple<Ts...>>>(entityID);
 					}
 				}
 
@@ -423,10 +422,10 @@ namespace CLX
 				return mECS->GetComponent<T>(mEntityID);
 			}
 
-			void SetIsActive(const bool isActive)
+			/*void SetIsActive(const bool isActive)
 			{
 				mECS->mEntityData[mEntityID.id].isActive = isActive;
-			}
+			}*/
 
 		private:
 
@@ -645,6 +644,7 @@ namespace CLX
 		struct EntityData
 		{
 			ComponentMask mask;
+            uint32_t generation = 0;
 			bool isActive = true;
 		};
 
@@ -659,6 +659,11 @@ namespace CLX
 		EntityID CopyEntity(const EntityID entityID, ECS& targetECS) const;
 		EntityID DuplicateEntity(const EntityID entityID);
 		void ReplaceEntity(const EntityID replaceEntityID, const ECS& sourceECS, const EntityID sourceEntityID);
+
+        void ActivateEntity(const EntityID entityID);
+        void DeactivateEntity(const EntityID entityID);
+
+        [[nodiscard]] constexpr bool IsEntityValid(const EntityID entityID) const;
 
 		template<typename T>
 		T& AddComponent(const EntityID entityID);
@@ -683,7 +688,7 @@ namespace CLX
 		template<typename T>
 		[[nodiscard]] bool HasComponent(const EntityID entityID) const;
 
-        bool HasComponent(const EntityID entityID, const std::type_index& typeIndex) const;
+		[[nodiscard]] bool HasComponent(const EntityID entityID, const std::type_index& typeIndex) const;
 
 		template<typename T>
 		[[nodiscard]] bool HasComponent2(const EntityID entityID) const;
@@ -781,10 +786,15 @@ namespace CLX
 		std::unordered_map<ComponentMask, std::vector<EntityID>> mEntitiesByMask;
 		std::vector<EntityData> mEntityData;
 		std::vector<System> mSystems;
-		std::queue<EntityID> mFreeEntityIDs;
+		std::queue<uint32_t> mFreeEntityIDs;
 		ECSRegistry mRegistry;
 		std::vector<EntityID> mIterationList;
 	};
+
+	constexpr bool ECS::IsEntityValid(const EntityID entityID) const
+	{
+        return entityID.id < size(mEntityData) && mEntityData[entityID.id].generation == entityID.generation;
+	}
 
 	template<typename T>
 	T& ECS::AddComponent(const EntityID entityID)
@@ -830,6 +840,10 @@ namespace CLX
 	template<typename T>
 	T* ECS::GetComponent(const EntityID entityID)
 	{
+		if (!IsEntityValid(entityID))
+		{
+            return nullptr;
+		}
 		const std::size_t componentTypeIndex = GetComponentTypeIndex<T>();
 		return GetComponentPool(componentTypeIndex).GetComponent<T>(entityID);
 	}
@@ -837,6 +851,10 @@ namespace CLX
 	template<typename T>
 	const T* ECS::GetComponent(const EntityID entityID) const
 	{
+		if (!IsEntityValid(entityID))
+		{
+			return nullptr;
+		}
 		const std::size_t componentTypeIndex = GetComponentTypeIndex<T>();
 		return GetComponentPool(componentTypeIndex).GetComponent<T>(entityID);
 	}
@@ -1096,10 +1114,6 @@ namespace CLX
 
 		for (const EntityID entityID : entities)
 		{
-			if (!mEntityData[entityID.id].isActive)
-			{
-				continue;
-			}
 			CallWithComponents(entityID, func);
 		}
 	}
@@ -1123,10 +1137,6 @@ namespace CLX
 
 		for (const EntityID entityID : entities)
 		{
-			if (!mEntityData[entityID.id].isActive)
-			{
-				continue;
-			}
 			CallWithComponents(entityID, func);
 		}
 	}

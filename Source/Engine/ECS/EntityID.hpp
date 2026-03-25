@@ -1,6 +1,6 @@
 #pragma once
 #include <limits>
-#include <stdint.h>
+#include <cstdint>
 
 namespace CLX
 {
@@ -14,7 +14,7 @@ namespace CLX
 
 		[[nodiscard]] friend constexpr bool operator==(const EntityID& a, const EntityID& b)
 		{
-			return a.id == b.id;
+			return a.id == b.id && a.generation == b.generation;
 		}
 
 		[[nodiscard]] friend constexpr bool operator<(const EntityID& a, const EntityID& b)
@@ -24,6 +24,7 @@ namespace CLX
 
 
 		uint32_t id = std::numeric_limits<uint32_t>::max();
+        uint32_t generation = 0;
 	};
 
 	constexpr EntityID InvalidEntityID = EntityID{};

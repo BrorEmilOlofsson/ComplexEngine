@@ -322,7 +322,7 @@ namespace CLX
 		template<typename T>
 		class Model final : public Concept
 		{
-			static constexpr unsigned int InvalidComponentIndex = std::numeric_limits<unsigned int>::max();
+			static constexpr uint32_t InvalidComponentIndex = std::numeric_limits<uint32_t>::max();
 		public:
 
 			Model() = default;
@@ -330,14 +330,14 @@ namespace CLX
 			void* AddComponent(const EntityID entityID, const void* defaultValuePtr) override
 			{
 				T defaultValue = defaultValuePtr == nullptr ? T() : *reinterpret_cast<const T*>(defaultValuePtr);
-				const unsigned int previousComponentIndex = mEntityIDToComponentIndex[entityID.id];
+				const uint32_t previousComponentIndex = mEntityIDToComponentIndex[entityID.id];
 				if (previousComponentIndex != InvalidComponentIndex)
 				{
 					mComponents[previousComponentIndex] = std::move(defaultValue);
 					return &mComponents[previousComponentIndex];
 				}
 
-				const unsigned int componentIndex = static_cast<unsigned int>(mComponents.size());
+				const uint32_t componentIndex = static_cast<uint32_t>(mComponents.size());
 				mEntityIDToComponentIndex[entityID.id] = componentIndex;
 				mComponents.emplace_back(std::move(defaultValue));
 				mComponentIndexToEntityID[componentIndex] = entityID;
@@ -346,7 +346,7 @@ namespace CLX
 
 			[[nodiscard]] void* GetComponent(const EntityID entityID) override
 			{
-				const unsigned int componentIndex = mEntityIDToComponentIndex[entityID.id];
+				const uint32_t componentIndex = mEntityIDToComponentIndex[entityID.id];
 				if (componentIndex == InvalidComponentIndex)
 				{
 					return nullptr;
@@ -356,7 +356,7 @@ namespace CLX
 
 			[[nodiscard]] const void* GetComponent(const EntityID entityID) const override
 			{
-				const unsigned int componentIndex = mEntityIDToComponentIndex[entityID.id];
+				const uint32_t componentIndex = mEntityIDToComponentIndex[entityID.id];
 				if (componentIndex == InvalidComponentIndex)
 				{
 					return nullptr;
@@ -366,7 +366,7 @@ namespace CLX
 
 			void RemoveComponent(const EntityID entityID) override
 			{
-				const unsigned int componentIndex = mEntityIDToComponentIndex[entityID.id];
+				const uint32_t componentIndex = mEntityIDToComponentIndex[entityID.id];
 				const std::size_t lastIndex = mComponents.size() - 1;
 				mComponents[componentIndex] = std::move(mComponents[lastIndex]);
 				mComponents.pop_back();
@@ -400,7 +400,7 @@ namespace CLX
 		private:
 
 			std::vector<T> mComponents;
-			std::vector<unsigned int> mEntityIDToComponentIndex;
+			std::vector<uint32_t> mEntityIDToComponentIndex;
 			std::vector<EntityID> mComponentIndexToEntityID;
 		};
 

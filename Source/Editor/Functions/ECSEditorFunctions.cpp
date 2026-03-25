@@ -225,6 +225,9 @@ namespace CLX
 
     static EntityID CreateRootEntity(ECS& ecs, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker)
     {
+        ecs;
+        rootEntities;
+        commandTracker;
         const EntityID createdEntityID = ecs.CreateEntity();
 
         struct CreateEntityData final
@@ -243,16 +246,16 @@ namespace CLX
              .rootIndex = rootEntities.size()
         };
 
-        auto doCommand = [](const CreateEntityData& data)
+        auto doCommand = [](const CreateEntityData& data) 
             {
                 data.rootEntities.get().insert(begin(data.rootEntities.get()) + data.rootIndex, data.createdEntityID);
-                ECS::EntityView(&data.ecs.get(), data.createdEntityID).SetIsActive(true);
+                data.ecs.get().ActivateEntity(data.createdEntityID);
             };
 
         auto undoCommand = [](const CreateEntityData& data)
             {
                 data.rootEntities.get().erase(begin(data.rootEntities.get()) + data.rootIndex);
-                ECS::EntityView(&data.ecs.get(), data.createdEntityID).SetIsActive(false);
+                data.ecs.get().DeactivateEntity(data.createdEntityID);
             };
 
         commandTracker.ExecuteCommand(EditorCommand(data, doCommand, undoCommand, "Create Root Entity"));
@@ -262,6 +265,10 @@ namespace CLX
 
     EntityID CreateChildEntity(ECS& ecs, const EntityID parentID, EditorCommandTracker& commandTracker)
     {
+        ecs;
+        parentID;
+        commandTracker;
+        //ASSERT(false);
         const EntityID createdEntityID = ecs.CreateEntity();
         struct CreateEntityData final
         {
@@ -285,7 +292,7 @@ namespace CLX
                 parentComponent->children.insert(begin(parentComponent->children) + data.index, data.createdEntityID);
                 TransformHierarchyComponent* childComponent = data.ecs.get().GetComponent<TransformHierarchyComponent>(data.createdEntityID);
                 childComponent->parent = data.parentID;
-                ECS::EntityView(&data.ecs.get(), data.createdEntityID).SetIsActive(true);
+                data.ecs.get().ActivateEntity(data.createdEntityID);
             };
 
         auto undoCommand = [](const CreateEntityData& data)
@@ -294,7 +301,7 @@ namespace CLX
                 parentComponent->children.erase(begin(parentComponent->children) + data.index);
                 TransformHierarchyComponent* childComponent = data.ecs.get().GetComponent<TransformHierarchyComponent>(data.createdEntityID);
                 childComponent->parent = InvalidEntityID;
-                ECS::EntityView(&data.ecs.get(), data.createdEntityID).SetIsActive(false);
+                data.ecs.get().DeactivateEntity(data.createdEntityID);
             };
 
         commandTracker.ExecuteCommand(EditorCommand(data, doCommand, undoCommand, "Create Entity"));
@@ -371,14 +378,14 @@ namespace CLX
             {
                 TransformHierarchyComponent* parentChildrenTransformComponent = data.ecs.get().GetComponent<TransformHierarchyComponent>(data.parentID);
                 std::erase(parentChildrenTransformComponent->children, data.childID);
-                ECS::EntityView(&data.ecs.get(), data.childID).SetIsActive(false);
+                data.ecs.get().DeactivateEntity(data.childID);
             };
 
         auto undoCommand = [](const DestroyEntityData& data)
             {
                 TransformHierarchyComponent* parentChildrenTransformComponent = data.ecs.get().GetComponent<TransformHierarchyComponent>(data.parentID);
                 parentChildrenTransformComponent->children.insert(begin(parentChildrenTransformComponent->children) + data.index, data.childID);
-                ECS::EntityView(&data.ecs.get(), data.childID).SetIsActive(true);
+                data.ecs.get().ActivateEntity(data.childID);
             };
 
         commandTracker.ExecuteCommand(EditorCommand(data, doCommand, undoCommand, "Destroy Child Entity"));
@@ -787,6 +794,18 @@ namespace CLX
         std::vector<EditorAction> editorActions;
         if (ImGui::BeginPopup(entityOptionsPopUpName.c_str()))
         {
+
+            if (ImGui::MenuItem(("Create Child Entity" + imGuiTag).c_str()))
+            {
+                editorActions.push_back([&ecs, &selectedEntityID](EditorCommandTracker& commandTracker)
+                    {
+                        commandTracker.BeginComposite("Create Child Entity Composite");
+                        const EntityID newEntityID = CreateChildEntity(ecs, selectedEntityID, commandTracker);
+                        SelectEntity(newEntityID, selectedEntityID, commandTracker);
+                        commandTracker.EndComposite();
+                    });
+            }
+
             const std::string removeItem = "Remove" + imGuiTag;
             if (ImGui::MenuItem(removeItem.c_str()))
             {

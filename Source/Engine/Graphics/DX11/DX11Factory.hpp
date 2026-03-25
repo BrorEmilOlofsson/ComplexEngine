@@ -1,11 +1,13 @@
 #pragma once
-#include "Engine/Math/Vector2.hpp"
-#include <filesystem>
-
 #ifdef _WIN32
+
+#include <filesystem>
 
 #include <wrl/client.h>
 #include <d3d11.h>
+
+#include "Engine/Math/Vector2.hpp"
+
 
 namespace CLX
 {

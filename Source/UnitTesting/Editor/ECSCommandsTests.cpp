@@ -121,7 +121,7 @@ TEST_CASE("Add Child Entity")
 
 	commandTracker.RedoCommand();
 
-	SetParentEntity(ecs, EntityID{ 2 }, EntityID{ 4 }, rootEntities, commandTracker);
+	SetParentEntity(ecs, EntityID{ 2 }, EntityID{ 4 }, rootEntities, commandTracker, LastIndex{});
 
 	REQUIRE(rootEntities.size() == 8);
 	REQUIRE(commandTracker.GetUndoSize() == 4);
