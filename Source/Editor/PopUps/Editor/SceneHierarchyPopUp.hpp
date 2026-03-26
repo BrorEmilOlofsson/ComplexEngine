@@ -2,6 +2,7 @@
 #include "Editor/Core/PopUp.hpp"
 #include "Engine/ECS/EntityID.hpp"
 #include <vector>
+#include <set>
 
 namespace CLX
 {
@@ -19,20 +20,20 @@ namespace CLX
 		void OnSceneBeginPlay(Scene& scene) override;
 		void OnSceneEndPlay(Scene& scene) override;
 
-		EntityID& GetSelectedEntityID();
-		EntityID GetSelectedEntityID() const;
+		[[nodiscard]] std::set<EntityID>& GetSelectedEntityIDs();
+		[[nodiscard]] const std::set<EntityID>& GetSelectedEntityIDs() const;
 
-		std::vector<EntityID>& GetRootEntities();
-		const std::vector<EntityID>& GetRootEntities() const;
+		[[nodiscard]] std::vector<EntityID>& GetRootEntities();
+		[[nodiscard]] const std::vector<EntityID>& GetRootEntities() const;
 
 	private:
 
-		EntityID mSelectedEntityID;
+		std::set<EntityID> mSelectedEntityIDs;
 		EntityID mCopiedEntityID;
 		std::vector<EntityID> mRootEntities;
         std::string mEntitySearchBuffer;
 
-		EntityID mStoredSelectedEntityID;
+		std::set<EntityID> mStoredSelectedEntityIDs;
 	};
 
 }

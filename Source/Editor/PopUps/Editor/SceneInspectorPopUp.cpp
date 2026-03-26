@@ -12,13 +12,13 @@ namespace CLX
 {
 
 	static void ShowInspector(SceneManager& sceneManager, Camera& camera, const InputState& input, ECS& ecsBuffer, EditorCommandTracker& commandTracker,
-        const Blackboard& blackboard, const std::string& imguiName, bool& isActive, const EntityID selectedEntityID, bool& anyItemActiveLastFrame, EntityID& copyEntityID,
+        const Blackboard& blackboard, const std::string& imguiName, bool& isActive, const std::set<EntityID>& selectedEntityIDs, bool& anyItemActiveLastFrame, EntityID& copyEntityID,
 		uint32_t& selectedComponentPopupIndex, std::string& componentSearchString,
 		std::function<void(EntityID)>& onEntitySelected)
 	{
 		if (ImGui::Begin(imguiName.c_str(), &isActive))
 		{
-
+            const EntityID selectedEntityID = selectedEntityIDs.size() == 1 ? *selectedEntityIDs.begin() : InvalidEntityID;
 			if (selectedEntityID == InvalidEntityID)
 			{
 				ImGui::End();
@@ -84,7 +84,7 @@ namespace CLX
 			blackboard,
 			mImGuiName,
 			mIsActive,
-			mHierarchyPopUp->GetSelectedEntityID(),
+			mHierarchyPopUp->GetSelectedEntityIDs(),
 			mAnyItemActiveLastFrame,
 			mCopyEntityID,
 			mSelectedComponentPopupIndex,

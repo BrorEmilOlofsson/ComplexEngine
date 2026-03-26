@@ -122,7 +122,7 @@ namespace CLX
     }
 
 
-    static void CheckForEntityCompositionDrops(ECS& ecs, AssetManager& assetManager, std::vector<EntityID>& rootEntities, EntityID& selectedEntity, EditorCommandTracker& commandTracker)
+    static void CheckForEntityCompositionDrops(ECS& ecs, AssetManager& assetManager, std::vector<EntityID>& rootEntities, std::set<EntityID>& selectedEntityIDs, EditorCommandTracker& commandTracker)
     {
         if (ImGui::BeginDragDropTarget())
         {
@@ -140,7 +140,7 @@ namespace CLX
                         commandTracker
                     );
 
-                    SelectEntity(rootEntity, selectedEntity, commandTracker);
+                    SetEntitySelection({ rootEntity }, selectedEntityIDs, commandTracker);
 
                     commandTracker.EndComposite();
                 }
@@ -180,7 +180,7 @@ namespace CLX
         OperatingSystem& os = blackboard.Get<Key_OperatingSystem>();
         EditorCommandTracker& commandTracker = blackboard.Get<Key_CommandTracker>();
         FreeFlyCameraSettings& cameraSettings = blackboard.Get<Key_FreeFlyCameraSettings>();
-        
+
         SceneManager& sceneManager = blackboard.Get<Key_SceneManager>();
 
         RenderState& sceneRenderState = sceneManager.GetActiveScene()->GetRenderState();
@@ -222,14 +222,18 @@ namespace CLX
                     const EntityID entityID{ id };
                     if (entityID != InvalidEntityID)
                     {
-                        SelectEntity(entityID, mHierarchyPopUp.GetSelectedEntityID(), commandTracker);
+                        SetEntitySelection(entityID, mHierarchyPopUp.GetSelectedEntityIDs(), commandTracker);
                     }
                 }
             }
 
             if (input.IsKeyPressed(eInputKey::F) && isFocused)
             {
-                TeleportCameraToEntity(sceneManager.GetActiveScene()->GetECS(), mHierarchyPopUp.GetSelectedEntityID(), mCamera, false);
+                if (mHierarchyPopUp.GetSelectedEntityIDs().size() == 1)
+                {
+                    const EntityID entityID = *mHierarchyPopUp.GetSelectedEntityIDs().begin();
+                    TeleportCameraToEntity(sceneManager.GetActiveScene()->GetECS(), entityID, mCamera, false);
+                }
             }
 
         }
@@ -273,22 +277,27 @@ namespace CLX
                 activeScene.GetECS(),
                 assetManager,
                 mHierarchyPopUp.GetRootEntities(),
-                mHierarchyPopUp.GetSelectedEntityID(),
+                mHierarchyPopUp.GetSelectedEntityIDs(),
                 commandTracker
             );
 
-            mTransformEntityTool.ShowEntityImGuizmo(
-                activeScene.GetECS(),
-                mHierarchyPopUp.GetSelectedEntityID(),
-                editorSceneSettings.transformMode,
-                sceneRenderState.GetRenderRect().value(),
-                editorSceneSettings.useSnap,
-                editorSceneSettings.snapValue,
-                mCamera,
-                input,
-                os.IsCursorVisible(),
-                commandTracker
-            );
+
+            if (mHierarchyPopUp.GetSelectedEntityIDs().size() == 1)
+            {
+
+                mTransformEntityTool.ShowEntityImGuizmo(
+                    activeScene.GetECS(),
+                    *mHierarchyPopUp.GetSelectedEntityIDs().begin(),
+                    editorSceneSettings.transformMode,
+                    sceneRenderState.GetRenderRect().value(),
+                    editorSceneSettings.useSnap,
+                    editorSceneSettings.snapValue,
+                    mCamera,
+                    input,
+                    os.IsCursorVisible(),
+                    commandTracker
+                );
+            }
 
             ImGui::PopStyleVar();
             ImGui::PopStyleVar();

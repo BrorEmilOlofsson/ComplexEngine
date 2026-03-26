@@ -22,11 +22,6 @@ namespace CLX
 			return;
 		}
 
-		if (!ImGui::IsWindowHovered())
-		{
-			return;
-		}
-
 		ImGuizmo::AllowAxisFlip(false);
 
 		ImGuizmo::SetOrthographic(false);
@@ -35,12 +30,7 @@ namespace CLX
 		ImGuizmo::SetRect((float)renderRect.GetMin().x, (float)renderRect.GetMin().y, (float)renderRect.GetExtent().x, (float)renderRect.GetExtent().y);
 
 		TransformComponent* transformComponent = ecs.GetComponent<TransformComponent>(selectedEntityID);
-
-		if (transformComponent == nullptr)
-		{
-			assert(false);
-			return;
-		}
+		ASSERT_NEW(transformComponent != nullptr, "Selected entity does not have a TransformComponent.");
 
 		Matrix4x4f objectMatrix = GetWorldTransform(ecs, selectedEntityID).GetMatrix();
 		const Matrix4x4f view = camera.GetViewMatrix();

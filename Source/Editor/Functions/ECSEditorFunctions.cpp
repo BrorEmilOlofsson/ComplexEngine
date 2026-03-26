@@ -403,7 +403,51 @@ namespace CLX
         }
     }
 
-    void SelectEntity(EntityID entityID, EntityID& selectedEntityID, EditorCommandTracker& commandTracker)
+    void SetEntitySelection(const std::set<EntityID>& entityIDs, std::set<EntityID>& selectedEntityIDs, EditorCommandTracker& commandTracker)
+    {
+        SetDataPtrCommand<std::set<EntityID>> command;
+        command.mNewValue = entityIDs;
+        command.mOldValue = selectedEntityIDs;
+        command.mPtr = &selectedEntityIDs;
+
+        commandTracker.ExecuteCommand(EditorCommand(command, "Select Entities"));
+    }
+
+    void SetEntitySelection(const EntityID entityIDs, std::set<EntityID>& selectedEntityIDs, EditorCommandTracker& commandTracker)
+    {
+        SetEntitySelection(std::set<EntityID>{ entityIDs }, selectedEntityIDs, commandTracker);
+    }
+
+    void ClearEntitySelection(std::set<EntityID>& selectedEntityIDs, EditorCommandTracker& commandTracker)
+    {
+        SetEntitySelection(std::set<EntityID>{}, selectedEntityIDs, commandTracker);
+    }
+
+    void AppendEntitySelection(const EntityID entityID, std::set<EntityID>& selectedEntityIDs, EditorCommandTracker& commandTracker)
+    {
+        if (selectedEntityIDs.contains(entityID))
+        {
+            return;
+        }
+
+        std::set newSelectedEntities = selectedEntityIDs;
+        newSelectedEntities.insert(entityID);
+        SetEntitySelection(newSelectedEntities, selectedEntityIDs, commandTracker);
+    }
+
+    void AppendEntitySelection(const std::set<EntityID>& entityIDs, std::set<EntityID>& selectedEntityIDs, EditorCommandTracker& commandTracker)
+    {
+        std::size_t selectedEntityCount = selectedEntityIDs.size();
+        std::set newSelectedEntities = selectedEntityIDs;
+        newSelectedEntities.insert(entityIDs.begin(), entityIDs.end());
+        if (newSelectedEntities.size() == selectedEntityCount)
+        {
+            return;
+        }
+        SetEntitySelection(newSelectedEntities, selectedEntityIDs, commandTracker);
+    }
+
+    /*void SelectEntity(const EntityID entityID, EntityID& selectedEntityID, EditorCommandTracker& commandTracker)
     {
         if (entityID == selectedEntityID)
         {
@@ -417,7 +461,7 @@ namespace CLX
         command.mPtr = &selectedEntityID;
 
         commandTracker.ExecuteCommand(EditorCommand(command, "Select Entity"));
-    }
+    }*/
 
     static void AddComponentToEntity(ECS& ecs, const EntityID entityID, const std::type_index typeIndex, const std::string& componentName/*, ECS& ecsBuffer*/, EditorCommandTracker& commandTracker)
     {
@@ -487,7 +531,7 @@ namespace CLX
         commandTracker.RegisterCommand(EditorCommand(data, command, command, "Remove Component"));
     }
 
-    void ShowEntityAddButtons(ECS& ecs, EntityID& selectedEntityID, std::vector<EntityID>& rootEntities,
+    void ShowEntityAddButtons(ECS& ecs, std::set<EntityID>& selectedEntityIDs, std::vector<EntityID>& rootEntities,
         EditorCommandTracker& commandTracker, const std::string& imGuiTag, const EntityID defaultParent)
     {
         const std::string addButton = "Add" + imGuiTag;
@@ -508,7 +552,7 @@ namespace CLX
 
                 const EntityID createdEntityID = CreateEntity(ecs, rootEntities, defaultParent, commandTracker);
 
-                SelectEntity(createdEntityID, selectedEntityID, commandTracker);
+                SetEntitySelection(createdEntityID, selectedEntityIDs, commandTracker);
 
                 commandTracker.EndComposite();
             }
@@ -522,7 +566,7 @@ namespace CLX
 
                 AddComponentToEntity(ecs, createdEntityID, std::type_index(typeid(MeshComponent)), "Mesh Component", commandTracker);
 
-                SelectEntity(createdEntityID, selectedEntityID, commandTracker);
+                SetEntitySelection(createdEntityID, selectedEntityIDs, commandTracker);
 
                 commandTracker.EndComposite();
             }
@@ -748,23 +792,23 @@ namespace CLX
     }
 
 
-    [[nodiscard]] void OnEntityDroppedOnEntity(ECS& ecs, const EntityID parentID, const EntityID childID, std::vector<EntityID>& rootEntities, EntityID& selectedEntityID, EditorCommandTracker& commandTracker)
+    [[nodiscard]] void OnEntityDroppedOnEntity(ECS& ecs, const EntityID parentID, const EntityID childID, std::vector<EntityID>& rootEntities, std::set<EntityID>& selectedEntityIDs, EditorCommandTracker& commandTracker)
     {
         commandTracker.BeginComposite("Set Parent Entity + Select Entity");
         SetParentEntity(ecs, parentID, childID, rootEntities, commandTracker);
-        SelectEntity(childID, selectedEntityID, commandTracker);
+        SetEntitySelection(childID, selectedEntityIDs, commandTracker);
         commandTracker.EndComposite();
     }
 
-    [[nodiscard]] EditorAction CreateEntityDroppedOnEntityAction(ECS& ecs, const EntityID parentID, const EntityID childID, std::vector<EntityID>& rootEntities, EntityID& selectedEntityID)
+    [[nodiscard]] EditorAction CreateEntityDroppedOnEntityAction(ECS& ecs, const EntityID parentID, const EntityID childID, std::vector<EntityID>& rootEntities, std::set<EntityID>& selectedEntityIDs)
     {
-        return [&ecs, parentID, childID, &rootEntities, &selectedEntityID](EditorCommandTracker& commandTracker)
+        return [&ecs, parentID, childID, &rootEntities, &selectedEntityIDs](EditorCommandTracker& commandTracker)
             {
-                OnEntityDroppedOnEntity(ecs, parentID, childID, rootEntities, selectedEntityID, commandTracker);
+                OnEntityDroppedOnEntity(ecs, parentID, childID, rootEntities, selectedEntityIDs, commandTracker);
             };
     }
 
-    [[nodiscard]] static std::vector<EditorAction> ShowEntityPayload(ECS& ecs, const EntityID entityID, std::vector<EntityID>& rootEntities, EntityID& selectedEntityID)
+    [[nodiscard]] static std::vector<EditorAction> ShowEntityPayload(ECS& ecs, const EntityID entityID, std::vector<EntityID>& rootEntities, std::set<EntityID>& selectedEntityIDs)
     {
         ObjectSource(entityID, "EntityID");
 
@@ -772,7 +816,7 @@ namespace CLX
         {
             return
             {
-                CreateEntityDroppedOnEntityAction(ecs, entityID, childEntityID.value(), rootEntities, selectedEntityID)
+                CreateEntityDroppedOnEntityAction(ecs, entityID, childEntityID.value(), rootEntities, selectedEntityIDs)
             };
         }
         return {};
@@ -788,7 +832,7 @@ namespace CLX
         return treeNodeFlags;
     }
 
-    [[nodiscard]] static std::vector<EditorAction> ShowEntityOptionsPopUp(const std::string& entityOptionsPopUpName, ECS& ecs, EntityID& selectedEntityID,
+    [[nodiscard]] static std::vector<EditorAction> ShowEntityOptionsPopUp(const std::string& entityOptionsPopUpName, ECS& ecs, const EntityID selectedEntityID, std::set<EntityID>& selectedEntities,
         std::vector<EntityID>& rootEntities, const std::string& imGuiTag)
     {
         std::vector<EditorAction> editorActions;
@@ -797,11 +841,11 @@ namespace CLX
 
             if (ImGui::MenuItem(("Create Child Entity" + imGuiTag).c_str()))
             {
-                editorActions.push_back([&ecs, &selectedEntityID](EditorCommandTracker& commandTracker)
+                editorActions.push_back([&ecs, selectedEntityID, &selectedEntities](EditorCommandTracker& commandTracker)
                     {
                         commandTracker.BeginComposite("Create Child Entity Composite");
                         const EntityID newEntityID = CreateChildEntity(ecs, selectedEntityID, commandTracker);
-                        SelectEntity(newEntityID, selectedEntityID, commandTracker);
+                        SetEntitySelection({ newEntityID }, selectedEntities, commandTracker);
                         commandTracker.EndComposite();
                     });
             }
@@ -813,7 +857,7 @@ namespace CLX
                     {
                         commandTracker.BeginComposite("Destroy Entity Composite");
                         DestroyEntity(ecs, selectedEntityID, rootEntities, commandTracker);
-                        SelectEntity(InvalidEntityID, selectedEntityID, commandTracker);
+                        ClearEntitySelection(selectedEntities, commandTracker);
                         commandTracker.EndComposite();
                     });
             }
@@ -836,7 +880,7 @@ namespace CLX
 
             if (ImGui::MenuItem(("Duplicate" + imGuiTag).c_str()))
             {
-                editorActions.push_back([&ecs, &selectedEntityID, &rootEntities](EditorCommandTracker& commandTracker)
+                editorActions.push_back([&ecs, &selectedEntityID, &rootEntities, &selectedEntities](EditorCommandTracker& commandTracker)
                     {
                         commandTracker.BeginComposite("Duplicate Entity Composite");
                         const EntityID newEntityID = DuplicateEntityAndChildren(ecs, selectedEntityID, commandTracker);
@@ -851,7 +895,7 @@ namespace CLX
                             ASSERT(parentTransformComponent != nullptr);
                             parentTransformComponent->children.push_back(newEntityID);
                         }
-                        SelectEntity(newEntityID, selectedEntityID, commandTracker);
+                        SetEntitySelection({ newEntityID }, selectedEntities, commandTracker);
                         commandTracker.EndComposite();
                     });
             }
@@ -863,7 +907,7 @@ namespace CLX
     }
 
 
-    static void OnEntityDroppedBetween(ECS& ecs, const EntityID droppedEntityID, const EntityID droppedBeforeEntityID, std::vector<EntityID>& rootEntities, EntityID& selectedEntityID, const bool droppedAfter, EditorCommandTracker& commandTracker)
+    static void OnEntityDroppedBetween(ECS& ecs, const EntityID droppedEntityID, const EntityID droppedBeforeEntityID, std::vector<EntityID>& rootEntities, std::set<EntityID>& selectedEntityIDs, const bool droppedAfter, EditorCommandTracker& commandTracker)
     {
         ASSERT(droppedEntityID != InvalidEntityID);
         ASSERT(droppedBeforeEntityID != InvalidEntityID);
@@ -887,19 +931,19 @@ namespace CLX
             SetParentEntity(ecs, parentID, droppedEntityID, rootEntities, commandTracker, Index{ insertionIndex + (droppedAfter ? 1 : 0) });
         }
 
-        SelectEntity(droppedEntityID, selectedEntityID, commandTracker);
+        SetEntitySelection(droppedEntityID, selectedEntityIDs, commandTracker);
         commandTracker.EndComposite();
     }
 
-    [[nodiscard]] EditorAction CreateEntityDropAction(ECS& ecs, const EntityID droppedEntityID, const EntityID droppedBeforeEntityID, bool droppedAfter, std::vector<EntityID>& rootEntities, EntityID& selectedEntityID)
+    [[nodiscard]] EditorAction CreateEntityDropAction(ECS& ecs, const EntityID droppedEntityID, const EntityID droppedBeforeEntityID, bool droppedAfter, std::vector<EntityID>& rootEntities, std::set<EntityID>& selectedEntityIDs)
     {
-        return [&ecs, &rootEntities, droppedEntityID, droppedBeforeEntityID, &selectedEntityID, droppedAfter](EditorCommandTracker& commandTracker)
+        return [&ecs, &rootEntities, droppedEntityID, droppedBeforeEntityID, &selectedEntityIDs, droppedAfter](EditorCommandTracker& commandTracker)
             {
-                OnEntityDroppedBetween(ecs, droppedEntityID, droppedBeforeEntityID, rootEntities, selectedEntityID, droppedAfter, commandTracker);
+                OnEntityDroppedBetween(ecs, droppedEntityID, droppedBeforeEntityID, rootEntities, selectedEntityIDs, droppedAfter, commandTracker);
             };
     }
 
-    [[nodiscard]] static std::vector<EditorAction> ShowEntityDropSpaceTarget(ECS& ecs, const EntityID droppedBesideEntityID, const bool droppedAfter, std::vector<EntityID>& rootEntities, EntityID& selectedEntityID)
+    [[nodiscard]] static std::vector<EditorAction> ShowEntityDropSpaceTarget(ECS& ecs, const EntityID droppedBesideEntityID, const bool droppedAfter, std::vector<EntityID>& rootEntities, std::set<EntityID>& selectedEntityIDs)
     {
         std::vector<EditorAction> editorActions;
         ImGui::PushID(droppedBesideEntityID.id);
@@ -908,7 +952,7 @@ namespace CLX
         ImGui::PopStyleVar();
         if (std::optional<EntityID> droppedEntityID = ObjectTarget<EntityID>())
         {
-            editorActions.push_back(CreateEntityDropAction(ecs, droppedEntityID.value(), droppedBesideEntityID, droppedAfter, rootEntities, selectedEntityID));
+            editorActions.push_back(CreateEntityDropAction(ecs, droppedEntityID.value(), droppedBesideEntityID, droppedAfter, rootEntities, selectedEntityIDs));
         }
         ImGui::PopID();
 
@@ -922,11 +966,11 @@ namespace CLX
         return nameComponent->name;
     }
 
-    [[nodiscard]] EditorAction CreateSelectEntityAction(const EntityID entityID, EntityID& selectedEntityID)
+    [[nodiscard]] EditorAction CreateSetEntitySelectionAction(const EntityID entityID, std::set<EntityID>& selectedEntityIDs)
     {
-        return [entityID, &selectedEntityID](EditorCommandTracker& commandTracker)
+        return [entityID, &selectedEntityIDs](EditorCommandTracker& commandTracker)
             {
-                SelectEntity(entityID, selectedEntityID, commandTracker);
+                SetEntitySelection(entityID, selectedEntityIDs, commandTracker);
             };
     }
 
@@ -946,16 +990,16 @@ namespace CLX
         return InvalidEntityID;
     }
 
-    [[nodiscard]] static std::vector<EditorAction> ShowEntityChildren(ECS& ecs, const EntityID entityID, EntityID& selectedEntityID, ECS& ecsBuffer,
+    [[nodiscard]] static std::vector<EditorAction> ShowEntityChildren(ECS& ecs, const EntityID entityID, std::set<EntityID>& selectedEntityIDs, ECS& ecsBuffer,
         std::vector<EntityID>& rootEntities, const std::span<const EntityID> parentEntities, const std::string& imGuiTag, const std::set<EntityID>& uneditableEntities, const std::function<bool(EntityID)>& filter)
     {
         std::vector<EditorAction> editorActions;
-        const bool isSelected = selectedEntityID == entityID;
+        const bool isSelected = selectedEntityIDs.contains(entityID);
         const bool isLeaf = GetEntityChildren(ecs, entityID).empty();
         const bool shouldBeDefaultOpen = std::ranges::find(parentEntities, entityID) != end(parentEntities);
 
         const bool isUneditable = uneditableEntities.contains(entityID);
-        InsertRange(editorActions, ShowEntityDropSpaceTarget(ecs, entityID, false, rootEntities, selectedEntityID));
+        InsertRange(editorActions, ShowEntityDropSpaceTarget(ecs, entityID, false, rootEntities, selectedEntityIDs));
         ImGui::PushID(entityID.id);
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 3 });
         const bool isOpen = ImGui::TreeNodeEx(GetEntityName(ecs, entityID).c_str(), GetHierarchyTreeNodeFlags(isSelected, isLeaf, shouldBeDefaultOpen));
@@ -966,10 +1010,10 @@ namespace CLX
         const bool isRightClicked = ImGui::IsItemHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Right);
         if (isRightClicked)
         {
-            editorActions.push_back(CreateSelectEntityAction(entityID, selectedEntityID));
+            editorActions.push_back(CreateSetEntitySelectionAction(entityID, selectedEntityIDs));
         }
 
-        if (selectedEntityID == entityID)
+        if (selectedEntityIDs.contains(entityID))
         {
             ImGui::SetItemDefaultFocus();
 
@@ -979,14 +1023,14 @@ namespace CLX
                 ImGui::OpenPopup(entityOptionsPopUpName.c_str());
             }
 
-            InsertRange(editorActions, ShowEntityOptionsPopUp(entityOptionsPopUpName, ecs, selectedEntityID, rootEntities, imGuiTag));
+            InsertRange(editorActions, ShowEntityOptionsPopUp(entityOptionsPopUpName, ecs, entityID, selectedEntityIDs, rootEntities, imGuiTag));
         }
 
-        InsertRange(editorActions, ShowEntityPayload(ecs, entityID, rootEntities, selectedEntityID));
+        InsertRange(editorActions, ShowEntityPayload(ecs, entityID, rootEntities, selectedEntityIDs));
 
         if (isLeftClicked && !ImGui::IsItemToggledOpen())
         {
-            editorActions.push_back(CreateSelectEntityAction(entityID, selectedEntityID));
+            editorActions.push_back(CreateSetEntitySelectionAction(entityID, selectedEntityIDs));
         }
 
         if (isOpen)
@@ -999,12 +1043,12 @@ namespace CLX
                 {
                     continue;
                 }
-                InsertRange(editorActions, ShowEntityChildren(ecs, childEntityID, selectedEntityID, ecsBuffer, rootEntities, parentEntities, imGuiTag, uneditableEntities, filter));
+                InsertRange(editorActions, ShowEntityChildren(ecs, childEntityID, selectedEntityIDs, ecsBuffer, rootEntities, parentEntities, imGuiTag, uneditableEntities, filter));
             }
 
             if (!children.empty())
             {
-                InsertRange(editorActions, ShowEntityDropSpaceTarget(ecs, children.back(), true, rootEntities, selectedEntityID));
+                InsertRange(editorActions, ShowEntityDropSpaceTarget(ecs, children.back(), true, rootEntities, selectedEntityIDs));
             }
 
             ImGui::TreePop();
@@ -1015,7 +1059,7 @@ namespace CLX
 
 
     void ShowEntityHierarchy(ECS& ecs, ECS& ecsBuffer, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker,
-        const std::string& imGuiTag, EntityID& selectedEntityID, const std::set<EntityID>& uneditableEntities, std::string& entitySearchBuffer)
+        const std::string& imGuiTag, std::set<EntityID>& selectedEntityIDs, const std::set<EntityID>& uneditableEntities, std::string& entitySearchBuffer)
     {
         ImGui::PushStyleColor(ImGuiCol_ChildBg, ImColor(0.18f, 0.18f, 0.18f, 0.80f).Value);
         ImGui::PushStyleColor(ImGuiCol_FrameBg, ImColor(0.12f, 0.12f, 0.12f, 0.0f).Value);
@@ -1048,9 +1092,15 @@ namespace CLX
         if (ImGui::BeginListBox(listBoxName.c_str(), parentSize))
         {
             std::vector<EntityID> parentEntites;
-            if (selectedEntityID != InvalidEntityID)
+            if (!selectedEntityIDs.empty())
             {
-                parentEntites = GetParents(ecs, selectedEntityID);
+                for (const EntityID selectedEntityID : selectedEntityIDs)
+                {
+                    if (selectedEntityID != InvalidEntityID)
+                    {
+                        InsertRange(parentEntites, GetParents(ecs, selectedEntityID));
+                    }
+                }
             }
             for (const EntityID rootEntityID : rootEntities)
             {
@@ -1061,7 +1111,7 @@ namespace CLX
                 InsertRange(editorActions, ShowEntityChildren(
                     ecs,
                     rootEntityID,
-                    selectedEntityID,
+                    selectedEntityIDs,
                     ecsBuffer,
                     rootEntities,
                     parentEntites,
@@ -1073,7 +1123,7 @@ namespace CLX
 
             if (!rootEntities.empty())
             {
-                InsertRange(editorActions, ShowEntityDropSpaceTarget(ecs, rootEntities.back(), true, rootEntities, selectedEntityID));
+                InsertRange(editorActions, ShowEntityDropSpaceTarget(ecs, rootEntities.back(), true, rootEntities, selectedEntityIDs));
             }
 
             ImGui::EndListBox();
@@ -1102,13 +1152,13 @@ namespace CLX
     }
 
     void ShowEntityHierarchyWithAddButtons(ECS& ecs, ECS& ecsBuffer, std::vector<EntityID>& rootEntities,
-        EditorCommandTracker& commandTracker, const std::string& imGuiTag, EntityID& selectedEntityID, const EntityID defaultParent, const std::set<EntityID>& uneditableEntities, std::string& entitySearchBuffer)
+        EditorCommandTracker& commandTracker, const std::string& imGuiTag, std::set<EntityID>& selectedEntityIDs, const EntityID defaultParent, const std::set<EntityID>& uneditableEntities, std::string& entitySearchBuffer)
     {
-        ShowEntityAddButtons(ecs, selectedEntityID, rootEntities, commandTracker, imGuiTag, defaultParent);
+        ShowEntityAddButtons(ecs, selectedEntityIDs, rootEntities, commandTracker, imGuiTag, defaultParent);
         ImGui::Separator();
         ShowEntitySearchBar(entitySearchBuffer);
         ImGui::Separator();
-        ShowEntityHierarchy(ecs, ecsBuffer, rootEntities, commandTracker, imGuiTag, selectedEntityID, uneditableEntities, entitySearchBuffer);
+        ShowEntityHierarchy(ecs, ecsBuffer, rootEntities, commandTracker, imGuiTag, selectedEntityIDs, uneditableEntities, entitySearchBuffer);
     }
 
     [[nodiscard]] static EditorAction CreateRemoveComponentAction(ECS& ecs, const EntityID entityID, const std::type_index& typeIndex, ECS& ecsBuffer)

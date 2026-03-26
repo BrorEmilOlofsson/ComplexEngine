@@ -29,7 +29,7 @@ namespace CLX
 	private:
 
 		EntityCompositionAssetHandle mEntityCompositionAsset;
-		EntityID mSelectedEntityID;
+		std::set<EntityID> mSelectedEntityIDs;
 		bool mAnyItemActiveLastFrame = false;
 		EntityID mCopyEntityID;
 		std::vector<EntityID> mRootEntities;

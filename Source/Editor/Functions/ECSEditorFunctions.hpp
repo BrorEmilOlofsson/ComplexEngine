@@ -1,7 +1,7 @@
 #pragma once
-#pragma once
 #include <string>
 #include <set>
+#include <functional>
 
 #include "Engine/ECS/EntityID.hpp"
 #include "Engine/Utility/Blackboard.hpp"
@@ -19,7 +19,8 @@ namespace CLX
 
 	EntityID CreateEntity(ECS& ecs, std::vector<EntityID>& rootEntities, const EntityID parentID, EditorCommandTracker& commandTracker);
 	void DestroyEntity(ECS& ecs, const EntityID entityID, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker);
-	void SelectEntity(EntityID entityID, EntityID& selectedEntityID, EditorCommandTracker& commandTracker);
+	void SetEntitySelection(const std::set<EntityID>& entityID, std::set<EntityID>& selectedEntityIDs, EditorCommandTracker& commandTracker);
+	void SetEntitySelection(EntityID entityID, std::set<EntityID>& selectedEntityIDs, EditorCommandTracker& commandTracker);
 
 	void ReorderEntity(ECS& ecs, const EntityID entityID, std::vector<EntityID>& rootEntities, const std::size_t newIndex, EditorCommandTracker& commandTracker);
 	void SetParentEntity(ECS& ecs, const EntityID parentID, const EntityID childID, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker, ChildIndexSetting indexSetting);
@@ -28,7 +29,7 @@ namespace CLX
 	void ShowEntityHierarchy(ECS& ecs, ECS& ecsBuffer, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker, const std::string& imGuiTag,
 		EntityID& selectedEntityID, const std::set<EntityID>& uneditableEntities, std::string& entitySearchBuffer);
 	void ShowEntityHierarchyWithAddButtons(ECS& ecs, ECS& ecsBuffer, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker,
-		const std::string& imGuiTag, EntityID& selectedEntityID, EntityID defaultParentID, const std::set<EntityID>& uneditableEntities, std::string& entitySearchBuffer);
+		const std::string& imGuiTag, std::set<EntityID>& selectedEntityID, EntityID defaultParentID, const std::set<EntityID>& uneditableEntities, std::string& entitySearchBuffer);
 	
 	[[nodiscard]] std::optional<EditorAction> ShowEntityName(ECS& ecs, const EntityID selectedEntityID, const InputState& input);
 	[[nodiscard]] std::vector<EditorAction> ShowEntityComponents(ECS& ecs, EntityID entityID, bool& anyItemActiveLastFrame,

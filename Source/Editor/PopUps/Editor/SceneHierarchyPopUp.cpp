@@ -32,30 +32,37 @@ namespace CLX
         }
     }
 
-    static void CheckSelectedEntity(EntityID& selectedEntityID, const ECS& ecs)
+    static void CheckSelectedEntity(std::set<EntityID>& selectedEntityIDs, const ECS& ecs)
     {
-        if (selectedEntityID == InvalidEntityID)
+        if (selectedEntityIDs.empty())
         {
             auto entityCollection = ecs.ViewEntities();
             if (!entityCollection.IsEmpty())
             {
                 const auto entityView = *entityCollection.begin();
-                selectedEntityID = entityView.GetEntityID();
+                selectedEntityIDs.insert(entityView.GetEntityID());
             }
         }
     }
 
-    static void CheckCopyInputs(const InputState& input, ECS& ecs, EntityID& selectedEntityID, ECS& ecsBuffer, EntityID& copiedEntityID, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker)
+    static void CheckCopyInputs(const InputState& input, ECS& ecs, std::set<EntityID>& selectedEntityIDs, ECS& ecsBuffer, EntityID& copiedEntityID, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker)
     {
-        if (input.IsKeyPressed(eInputKey::Delete))
+        input;
+        ecs;
+        selectedEntityIDs;
+        copiedEntityID;
+        ecsBuffer;
+        rootEntities;
+        commandTracker;
+        /*if (input.IsKeyPressed(eInputKey::Delete))
         {
             commandTracker.BeginComposite("Remove Entity + Select Entity");
-            DestroyEntity(ecs, selectedEntityID, rootEntities, commandTracker);
+            DestroyEntity(ecs, selectedEntityIDs, rootEntities, commandTracker);
             auto entityCollection = ecs.ViewEntities();
 
             const EntityID newSelectedEntityID = entityCollection.IsEmpty() ? InvalidEntityID : EntityID{ selectedEntityID.id == 0 ? selectedEntityID.id + 1 : selectedEntityID.id - 1 };
 
-            SelectEntity(newSelectedEntityID, selectedEntityID, commandTracker);
+            SetEntitySelection(newSelectedEntityID, selectedEntityIDs, commandTracker);
             commandTracker.EndComposite();
         }
         else if (input.IsKeyHeld(eInputKey::Ctrl) && input.IsKeyPressed(eInputKey::C))
@@ -74,7 +81,7 @@ namespace CLX
         else if (input.IsKeyHeld(eInputKey::Ctrl) && input.IsKeyPressed(eInputKey::D))
         {
 
-        }
+        }*/
     }
 
     void SceneHierarchyPopUp::UpdateInternal(const Blackboard& blackboard)
@@ -91,7 +98,7 @@ namespace CLX
         ECS& ecsBuffer = blackboard.Get<Key_ECSBuffer>();
         const InputState& input = blackboard.Get<Key_InputState>();
 
-        CheckSelectedEntity(mSelectedEntityID, ecs);
+        CheckSelectedEntity(mSelectedEntityIDs, ecs);
 
         if (ImGui::Begin(mImGuiName.c_str(), &IsActive()))
         {
@@ -101,7 +108,7 @@ namespace CLX
                 mRootEntities,
                 commandTracker,
                 mImGuiTag,
-                mSelectedEntityID,
+                mSelectedEntityIDs,
                 InvalidEntityID,
                 {},
                 mEntitySearchBuffer
@@ -120,34 +127,34 @@ namespace CLX
 
         ImGui::End();
 
-        CheckCopyInputs(input, ecs, mSelectedEntityID, ecsBuffer, mCopiedEntityID, mRootEntities, commandTracker);
+        CheckCopyInputs(input, ecs, mSelectedEntityIDs, ecsBuffer, mCopiedEntityID, mRootEntities, commandTracker);
     }
 
     void SceneHierarchyPopUp::OnSceneLoaded(Scene& scene)
     {
         mRootEntities = ::CLX::GetRootEntities(scene.GetECS());
-        mSelectedEntityID = InvalidEntityID;
+        mSelectedEntityIDs.clear();
     }
 
     void SceneHierarchyPopUp::OnSceneBeginPlay(Scene&)
     {
-        mStoredSelectedEntityID = mSelectedEntityID;
+        mStoredSelectedEntityIDs = mSelectedEntityIDs;
     }
 
     void SceneHierarchyPopUp::OnSceneEndPlay(Scene&)
     {
-        mSelectedEntityID = mStoredSelectedEntityID;
-        mStoredSelectedEntityID = InvalidEntityID;
+        mSelectedEntityIDs = mStoredSelectedEntityIDs;
+        mStoredSelectedEntityIDs.clear();
     }
 
-    EntityID& SceneHierarchyPopUp::GetSelectedEntityID()
+    std::set<EntityID>& SceneHierarchyPopUp::GetSelectedEntityIDs()
     {
-        return mSelectedEntityID;
+        return mSelectedEntityIDs;
     }
 
-    EntityID SceneHierarchyPopUp::GetSelectedEntityID() const
+    const std::set<EntityID>& SceneHierarchyPopUp::GetSelectedEntityIDs() const
     {
-        return mSelectedEntityID;
+        return mSelectedEntityIDs;
     }
 
     std::vector<EntityID>& SceneHierarchyPopUp::GetRootEntities()
