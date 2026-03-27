@@ -182,7 +182,7 @@ namespace CLX
 
 	ViewAndEditResult ViewAndEditValue(Ray3f& ray, const Blackboard& blackboard);
 
-	ViewAndEditResult ViewAndEditValue(EntityID& entityID, const std::string& variableName);
+	ViewAndEditResult ViewAndEditValue(EntityID& entityID, const Blackboard& blackboard);
 
 	ViewAndEditResult ViewAndEditValue(MeshAssetHandle& meshAsset, const Blackboard& blackboard);
 	ViewAndEditResult ViewAndEditValue(ModelAssetHandle& modelAsset, const Blackboard& blackboard);

@@ -116,10 +116,10 @@ namespace CLX
 
 	static void UpdateSpriteTransforms(ECS& ecs)
 	{
-		for (auto [entityID, sprite3DComponent] : ecs.ViewUsingEntityID<Sprite3DComponent>())
-		{
-			sprite3DComponent.sprite.mTransform = GetWorldTransform(ecs, entityID);
-		}
+        ecs.ForEach([&ecs](const EntityID entityID, Sprite3DComponent& sprite3DComponent)
+			{
+				sprite3DComponent.sprite.mTransform = GetWorldTransform(ecs, entityID);
+			});
 	}
 
 
@@ -251,10 +251,16 @@ namespace CLX
 
 	static void ProcessSkyBox(const ECS& ecs, RenderState& renderState)
 	{
-		auto skyBoxView = ecs.View<SkyBoxComponent>();
-		if (!skyBoxView.IsEmpty())
+        std::vector<const SkyBoxComponent*> skyBoxComponents;
+
+		ecs.ForEach([&](const SkyBoxComponent& skyBoxComp)
+			{
+				skyBoxComponents.push_back(&skyBoxComp);
+			});
+
+		if (!skyBoxComponents.empty())
 		{
-			const SkyBoxComponent& skyBoxComponent = *skyBoxView.begin();
+			const SkyBoxComponent& skyBoxComponent = *skyBoxComponents.front();
 			SkyBox skyBox;
 
 			skyBox.transform = skyBoxComponent.transform;
@@ -270,11 +276,16 @@ namespace CLX
 
 	static void ProcessDirectionalLight(const ECS& ecs, RenderState& renderState)
 	{
-		auto directionalLightView = ecs.View<DirectionalLightComponent>();
-		if (!directionalLightView.IsEmpty())
-		{
-			const DirectionalLightComponent& directionalLightComponent = *directionalLightView.begin();
+        std::vector<const DirectionalLightComponent*> directionalLightComponents;
 
+		ecs.ForEach([&](const DirectionalLightComponent& directionalLightComp)
+			{
+				directionalLightComponents.push_back(&directionalLightComp);
+			});
+
+		if (!directionalLightComponents.empty())
+		{
+			const DirectionalLightComponent& directionalLightComponent = *directionalLightComponents.front();
 			renderState.SetDirectionalLight(directionalLightComponent.directionalLight);
 		}
 	}

@@ -1,12 +1,16 @@
 #pragma once
-#include "Editor/Core/PopUp.hpp"
-#include "Engine/ECS/ECS.hpp"
-#include "Editor/PopUps/Editor/SceneHierarchyPopUp.hpp"
-#include "Editor/PopUps/Editor/SceneInspectorPopUp.hpp"
+#include <set>
+#include <vector>
+#include <string>
+
+#include "Engine/Utility/Blackboard.hpp"
+#include "Engine/ECS/EntityID.hpp"
 #include "Engine/Utility/Camera.hpp"
 #include "Engine/Graphics/RenderState.hpp"
-#include "Editor/Tools/TransformEntityTool.hpp"
 #include "Engine/Asset/AssetTypes/EntityCompositionAsset.hpp"
+#include "Engine/Reflection/JsonAny.hpp"
+
+#include "Editor/Tools/TransformEntityTool.hpp"
 
 namespace CLX
 {
@@ -40,6 +44,7 @@ namespace CLX
         std::string mEntitySearchBuffer;
         uint32_t mSelectedComponentPopupIndex = 0;
 		std::string mComponentSearchBuffer;
+        JsonAny mCopiedComponent;
 		static constexpr const char* PopUpName = "Entity Composition Viewer";
 	};
 }

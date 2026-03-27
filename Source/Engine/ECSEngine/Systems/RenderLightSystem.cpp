@@ -11,8 +11,6 @@ namespace CLX
 
 	static void ProcessPointLights(const ECS& ecs, RenderList& renderList)
 	{
-		auto pointLightComponentView = ecs.View<PointLightComponent, TransformComponent>();
-
 		ecs.ForEach([&ecs, &renderList](const EntityID entityID, const PointLightComponent& pointLightComponent)
 			{
 				PointLight p = pointLightComponent.pointLight;

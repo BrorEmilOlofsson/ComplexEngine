@@ -13,7 +13,7 @@ namespace CLX
 
 	static void ShowInspector(SceneManager& sceneManager, Camera& camera, const InputState& input, ECS& ecsBuffer, EditorCommandTracker& commandTracker,
         const Blackboard& blackboard, const std::string& imguiName, bool& isActive, const std::set<EntityID>& selectedEntityIDs, bool& anyItemActiveLastFrame, EntityID& copyEntityID,
-		uint32_t& selectedComponentPopupIndex, std::string& componentSearchString,
+        uint32_t& selectedComponentPopupIndex, std::string& componentSearchString, JsonAny& copiedComponent,
 		std::function<void(EntityID)>& onEntitySelected)
 	{
 		if (ImGui::Begin(imguiName.c_str(), &isActive))
@@ -36,6 +36,7 @@ namespace CLX
 			newBlackboard.Insert<Key_SceneRenderState>(sceneManager.GetActiveScene()->GetRenderState());
 			newBlackboard.Insert<Key_ReferenceTransform>(worldTransform);
 			newBlackboard.Insert<Key_OnEntitySelected>(onEntitySelected);
+			newBlackboard.Insert<Key_CurrentECS>(ecs);
 			auto editorActions = ShowEntityInspector(
 				ecs, 
 				selectedEntityID, 
@@ -44,6 +45,7 @@ namespace CLX
 				copyEntityID, 
 				selectedComponentPopupIndex,
 				componentSearchString,
+				copiedComponent,
 				newBlackboard
 			);
 
@@ -89,6 +91,7 @@ namespace CLX
 			mCopyEntityID,
 			mSelectedComponentPopupIndex,
 			mComponentSearchBuffer,
+			mCopiedComponent,
 			mEntitySelectedCallback
 		);
 	}

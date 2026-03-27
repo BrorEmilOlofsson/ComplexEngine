@@ -113,13 +113,15 @@ namespace CLX
     void ECS::ActivateEntity(const EntityID entityID)
     {
         mEntityData[entityID.id].isActive = true;
-        mEntitiesByMask[mEntityData[entityID.id].mask].push_back(entityID);
+        mEntitiesByMask[mEntityData[entityID.id].mask].push_back(entityID.id);
+        mEntityData[entityID.id].generation = entityID.generation;
     }
 
     void ECS::DeactivateEntity(const EntityID entityID)
     {
         mEntityData[entityID.id].isActive = false;
-        std::erase(mEntitiesByMask[mEntityData[entityID.id].mask], entityID);
+        std::erase(mEntitiesByMask[mEntityData[entityID.id].mask], entityID.id);
+        mEntityData[entityID.id].generation = entityID.generation;
     }
 
     void ECS::RemoveComponent(const EntityID entityID, const std::type_index& typeIndex)

@@ -17,7 +17,7 @@ namespace CLX
 
     static void ShowInspector(std::set<EntityID>& selectedEntityIDs, ECS& ecsBuffer, EditorCommandTracker& commandTracker,
         EntityCompositionAssetHandle entityCompositionAsset, bool& anyItemActiveLastFrame, EntityID& copyEntityID, uint32_t& selectedComponentPopupIndex,
-        std::string& componentSearchBuffer, const InputState& input, Blackboard& newBlackboard)
+        std::string& componentSearchBuffer, JsonAny& copiedComponent, const InputState& input, Blackboard& newBlackboard)
     {
         if (ImGui::Begin("Entity Composition Inspector"))
         {
@@ -44,6 +44,7 @@ namespace CLX
                 copyEntityID,
                 selectedComponentPopupIndex,
                 componentSearchBuffer,
+                copiedComponent,
                 newBlackboard
             );
 
@@ -206,6 +207,7 @@ namespace CLX
             mCopyEntityID,
             mSelectedComponentPopupIndex,
             mComponentSearchBuffer,
+            mCopiedComponent,
             input,
             newBlackboard
         );

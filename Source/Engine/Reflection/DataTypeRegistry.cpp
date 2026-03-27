@@ -253,11 +253,7 @@ namespace CLX
 		{
 			return {};
 		}
-		if (dataType->toJSON != nullptr)
-		{
-			return dataType->toJSON(dataPtr);
-		}
-
-		return {};
+		
+		return SaveDataJSON(*dataType, dataPtr);
 	}
 }

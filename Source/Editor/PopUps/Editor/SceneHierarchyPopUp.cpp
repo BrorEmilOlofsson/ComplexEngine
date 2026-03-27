@@ -54,34 +54,39 @@ namespace CLX
         ecsBuffer;
         rootEntities;
         commandTracker;
-        /*if (input.IsKeyPressed(eInputKey::Delete))
+
+        if (!ImGui::IsWindowFocused())
+        {
+            return;
+        }
+        if (input.IsKeyPressed(eInputKey::Delete))
         {
             commandTracker.BeginComposite("Remove Entity + Select Entity");
-            DestroyEntity(ecs, selectedEntityIDs, rootEntities, commandTracker);
-            auto entityCollection = ecs.ViewEntities();
+            DestroyEntitiesAndChildren(ecs, selectedEntityIDs, rootEntities, commandTracker);
+            //auto entityCollection = ecs.ViewEntities();
 
-            const EntityID newSelectedEntityID = entityCollection.IsEmpty() ? InvalidEntityID : EntityID{ selectedEntityID.id == 0 ? selectedEntityID.id + 1 : selectedEntityID.id - 1 };
+            //const EntityID newSelectedEntityID = entityCollection.IsEmpty() ? InvalidEntityID : EntityID{ selectedEntityID.id == 0 ? selectedEntityID.id + 1 : selectedEntityID.id - 1 };
 
-            SetEntitySelection(newSelectedEntityID, selectedEntityIDs, commandTracker);
+            ClearEntitySelection(selectedEntityIDs, commandTracker);
             commandTracker.EndComposite();
         }
-        else if (input.IsKeyHeld(eInputKey::Ctrl) && input.IsKeyPressed(eInputKey::C))
+        /*else if (input.IsKeyHeld(eInputKey::Ctrl) && input.IsKeyPressed(eInputKey::C))
         {
             copiedEntityID = ecs.CopyEntity(selectedEntityID, ecsBuffer);
-        }
+        }*/
         else if (input.IsKeyHeld(eInputKey::Ctrl) && input.IsKeyPressed(eInputKey::V))
         {
             if (copiedEntityID != InvalidEntityID)
             {
                 const EntityID createdEntityID = ecsBuffer.CopyEntity(copiedEntityID, ecs);
 
-                SelectEntity(createdEntityID, selectedEntityID, commandTracker);
+                SetEntitySelection(createdEntityID, selectedEntityIDs, commandTracker);
             }
         }
         else if (input.IsKeyHeld(eInputKey::Ctrl) && input.IsKeyPressed(eInputKey::D))
         {
 
-        }*/
+        }
     }
 
     void SceneHierarchyPopUp::UpdateInternal(const Blackboard& blackboard)

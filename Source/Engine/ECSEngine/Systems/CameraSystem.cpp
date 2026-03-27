@@ -13,21 +13,25 @@
 namespace CLX
 {
 
-	static void SetCamera(ECS& ecs, RenderState& renderState)
+	static void SetCamera(const ECS& ecs, RenderState& renderState)
 	{
+        std::vector<const CameraComponent*> cameraComponents;
 
-		auto cameraComponentView = ecs.View<CameraComponent>();
+		ecs.ForEach([&](const CameraComponent& cameraComp)
+			{
+				cameraComponents.push_back(&cameraComp);
+            });
 
-		if (cameraComponentView.IsEmpty())
+		if (cameraComponents.empty())
 		{
 			//renderState.SetCamera(aGraphicsEngine.GetDefaultCamera());
 			Console::Print("No Camera found in current scene", ConsoleTextColor::Red);
 			return;
 		}
 
-		auto [cameraComponent] = *cameraComponentView.begin();
+		auto cameraComponent = cameraComponents.front();
 
-		renderState.SetCamera(cameraComponent.camera);
+		renderState.SetCamera(cameraComponent->camera);
 	}
 
 	static void UpdateCameraTransforms(ECS& ecs)
@@ -40,16 +44,20 @@ namespace CLX
 
 	static void PushCameraLines(const ECS& ecs, RenderList& renderList)
 	{
-		auto cameraComponentView = ecs.ViewUsingEntityID<CameraComponent>();
+        std::vector<const CameraComponent*> cameraComponents;
 
-		if (!cameraComponentView.IsEmpty())
+        ecs.ForEach([&](const CameraComponent& cameraComp)
+			{
+                cameraComponents.push_back(&cameraComp);
+			});
+
+		if (!cameraComponents.empty())
 		{
-			auto [entityID, cameraComponent] = *cameraComponentView.begin();
+			auto& cameraComponent = *cameraComponents.front();
 
 			const UnitVector3f forward = cameraComponent.camera.GetForward();
 			
 			const Camera& camera = cameraComponent.camera;
-
 			Frustrumf frustrum;
 			frustrum.mFarPlaneV = camera.GetFarPlane();
 			frustrum.mNearPlaneV = camera.GetNearPlane();

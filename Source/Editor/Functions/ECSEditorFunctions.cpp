@@ -246,7 +246,7 @@ namespace CLX
              .rootIndex = rootEntities.size()
         };
 
-        auto doCommand = [](const CreateEntityData& data) 
+        auto doCommand = [](const CreateEntityData& data)
             {
                 data.rootEntities.get().insert(begin(data.rootEntities.get()) + data.rootIndex, data.createdEntityID);
                 data.ecs.get().ActivateEntity(data.createdEntityID);
@@ -265,10 +265,6 @@ namespace CLX
 
     EntityID CreateChildEntity(ECS& ecs, const EntityID parentID, EditorCommandTracker& commandTracker)
     {
-        ecs;
-        parentID;
-        commandTracker;
-        //ASSERT(false);
         const EntityID createdEntityID = ecs.CreateEntity();
         struct CreateEntityData final
         {
@@ -321,10 +317,11 @@ namespace CLX
         }
     }
 
-    static void DestroyRootEntity(const EntityID entityID, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker)
+    static void DestroyRootEntity(ECS& ecs, const EntityID entityID, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker)
     {
         struct DestroyEntityData
         {
+            std::reference_wrapper<ECS> ecs;
             EntityID entityID;
             std::size_t index = 0;
             std::reference_wrapper<std::vector<EntityID>> rootEntities;
@@ -332,18 +329,24 @@ namespace CLX
 
         DestroyEntityData data
         {
+            .ecs = ecs,
             .entityID = entityID,
+            
             .index = static_cast<std::size_t>(std::ranges::distance(begin(rootEntities), std::ranges::find(rootEntities, entityID))),
             .rootEntities = rootEntities
         };
         auto doCommand = [](const DestroyEntityData& data)
             {
                 data.rootEntities.get().erase(begin(data.rootEntities.get()) + data.index);
+                EntityID entityID = data.entityID;
+                entityID.generation = std::numeric_limits<uint32_t>::max();
+                data.ecs.get().DeactivateEntity(entityID);
             };
 
         auto undoCommand = [](const DestroyEntityData& data)
             {
                 data.rootEntities.get().insert(begin(data.rootEntities.get()) + data.index, data.entityID);
+                data.ecs.get().ActivateEntity(data.entityID);
             };
 
         commandTracker.ExecuteCommand(EditorCommand(data, doCommand, undoCommand, "Destroy Root Entity"));
@@ -395,12 +398,54 @@ namespace CLX
     {
         if (std::ranges::find(rootEntities, entityID) != end(rootEntities))
         {
-            DestroyRootEntity(entityID, rootEntities, commandTracker);
+            DestroyRootEntity(ecs, entityID, rootEntities, commandTracker);
         }
         else
         {
             DestroyChildEntity(ecs, entityID, commandTracker);
         }
+    }
+
+    void DestroyEntities(ECS& ecs, const std::ranges::range auto& entityIDs, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker)
+    {
+        commandTracker.BeginComposite("Destroy Entities");
+        for (const EntityID entityID : entityIDs)
+        {
+            DestroyEntity(ecs, entityID, rootEntities, commandTracker);
+        }
+        commandTracker.EndComposite();
+    }
+
+    void DestroyEntities(ECS& ecs, const std::set<EntityID>& entityIDs, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker)
+    {
+        commandTracker.BeginComposite("Destroy Entities");
+        for (const EntityID entityID : entityIDs)
+        {
+            DestroyEntity(ecs, entityID, rootEntities, commandTracker);
+        }
+        commandTracker.EndComposite();
+    }
+
+    void DestroyEntityAndChildren(ECS& ecs, const EntityID entityID, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker)
+    {
+        auto allChildren = GetAllEntityChildren(ecs, entityID);
+        allChildren.push_back(entityID);
+
+        DestroyEntities(ecs, allChildren, rootEntities, commandTracker);
+    }
+
+    void DestroyEntitiesAndChildren(ECS& ecs, const std::set<EntityID>& entityIDs, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker)
+    {
+        std::set<EntityID> allEntityIDsToDestroy;
+
+        for (EntityID entityID : entityIDs)
+        {
+            auto children = GetAllEntityChildren(ecs, entityID);
+            allEntityIDsToDestroy.insert(entityID);
+            allEntityIDsToDestroy.insert(children.begin(), children.end());
+        }
+
+        DestroyEntities(ecs, allEntityIDsToDestroy, rootEntities, commandTracker);
     }
 
     void SetEntitySelection(const std::set<EntityID>& entityIDs, std::set<EntityID>& selectedEntityIDs, EditorCommandTracker& commandTracker)
@@ -832,7 +877,7 @@ namespace CLX
         return treeNodeFlags;
     }
 
-    [[nodiscard]] static std::vector<EditorAction> ShowEntityOptionsPopUp(const std::string& entityOptionsPopUpName, ECS& ecs, const EntityID selectedEntityID, std::set<EntityID>& selectedEntities,
+    [[nodiscard]] static std::vector<EditorAction> ShowEntityOptionsPopUp(const std::string& entityOptionsPopUpName, ECS& ecs, const EntityID entityID, std::set<EntityID>& selectedEntities,
         std::vector<EntityID>& rootEntities, const std::string& imGuiTag)
     {
         std::vector<EditorAction> editorActions;
@@ -841,10 +886,10 @@ namespace CLX
 
             if (ImGui::MenuItem(("Create Child Entity" + imGuiTag).c_str()))
             {
-                editorActions.push_back([&ecs, selectedEntityID, &selectedEntities](EditorCommandTracker& commandTracker)
+                editorActions.push_back([&ecs, entityID, &selectedEntities](EditorCommandTracker& commandTracker)
                     {
                         commandTracker.BeginComposite("Create Child Entity Composite");
-                        const EntityID newEntityID = CreateChildEntity(ecs, selectedEntityID, commandTracker);
+                        const EntityID newEntityID = CreateChildEntity(ecs, entityID, commandTracker);
                         SetEntitySelection({ newEntityID }, selectedEntities, commandTracker);
                         commandTracker.EndComposite();
                     });
@@ -853,17 +898,17 @@ namespace CLX
             const std::string removeItem = "Remove" + imGuiTag;
             if (ImGui::MenuItem(removeItem.c_str()))
             {
-                editorActions.push_back([&](EditorCommandTracker& commandTracker)
+                editorActions.push_back([&ecs, entityID, &selectedEntities, &rootEntities](EditorCommandTracker& commandTracker)
                     {
                         commandTracker.BeginComposite("Destroy Entity Composite");
-                        DestroyEntity(ecs, selectedEntityID, rootEntities, commandTracker);
+                        DestroyEntity(ecs, entityID, rootEntities, commandTracker);
                         ClearEntitySelection(selectedEntities, commandTracker);
                         commandTracker.EndComposite();
                     });
             }
 
             std::string moveUpString = "Move Up" + imGuiTag;
-            const EntityID parentID = GetParentEntity(ecs, selectedEntityID);
+            const EntityID parentID = GetParentEntity(ecs, entityID);
             ImGui::BeginDisabled(parentID == InvalidEntityID);
             if (ImGui::MenuItem(moveUpString.c_str()))
             {
@@ -871,20 +916,20 @@ namespace CLX
 
                 const std::size_t insertionIndex = GetEntityIndexInParent(ecs, parentID, rootEntities);
 
-                editorActions.push_back([&, selectedEntityID, parentOfParentID, insertionIndex](EditorCommandTracker& commandTracker)
+                editorActions.push_back([&ecs, entityID, parentOfParentID, &rootEntities, insertionIndex](EditorCommandTracker& commandTracker)
                     {
-                        SetParentEntity(ecs, parentOfParentID, selectedEntityID, rootEntities, commandTracker, Index{ insertionIndex });
+                        SetParentEntity(ecs, parentOfParentID, entityID, rootEntities, commandTracker, Index{ insertionIndex });
                     });
             }
             ImGui::EndDisabled();
 
             if (ImGui::MenuItem(("Duplicate" + imGuiTag).c_str()))
             {
-                editorActions.push_back([&ecs, &selectedEntityID, &rootEntities, &selectedEntities](EditorCommandTracker& commandTracker)
+                editorActions.push_back([&ecs, entityID, &rootEntities, &selectedEntities](EditorCommandTracker& commandTracker)
                     {
                         commandTracker.BeginComposite("Duplicate Entity Composite");
-                        const EntityID newEntityID = DuplicateEntityAndChildren(ecs, selectedEntityID, commandTracker);
-                        const EntityID parentID = GetParentEntity(ecs, selectedEntityID);
+                        const EntityID newEntityID = DuplicateEntityAndChildren(ecs, entityID, commandTracker);
+                        const EntityID parentID = GetParentEntity(ecs, entityID);
                         if (parentID == InvalidEntityID)
                         {
                             rootEntities.push_back(newEntityID);
@@ -1169,8 +1214,8 @@ namespace CLX
             };
     }
 
-    [[nodiscard]] static std::optional<EditorAction> ShowComponentData(ECS& ecs, const EntityID entityID, const std::type_info& typeInfo, void* componentPtr, bool& anyActiveItem, ECS& ecsBuffer,
-        const DataTypeRegistry& dataTypeRegistry, const Blackboard& blackboard)
+    [[nodiscard]] static std::optional<EditorAction> ShowComponentData(ECS& ecs, const EntityID entityID, const std::type_info& typeInfo, void* componentPtr, bool& anyActiveItem, ECS& ecsBuffer, 
+        JsonAny& copiedComponent, const DataTypeRegistry& dataTypeRegistry, const Blackboard& blackboard)
     {
         PROFILER_FUNCTION(profiler::colors::Lime400);
 
@@ -1213,9 +1258,22 @@ namespace CLX
         if (ImGui::BeginPopup("Component Options"))
         {
             ImGui::BeginDisabled(ecs.GetRegistry().GetComponentType(typeInfo).isDefault);
-            if (ImGui::MenuItem("Remove Component"))
+            if (ImGui::MenuItem("Remove"))
             {
                 removeComponentAction = CreateRemoveComponentAction(ecs, entityID, typeInfo, ecsBuffer);
+            }
+            ImGui::EndDisabled();
+
+            if (ImGui::MenuItem("Copy"))
+            {
+                copiedComponent.dataTypeID = componentDataTypeID;
+                copiedComponent.json = dataTypeRegistry.SaveDataJSON(componentDataTypeID, componentPtr);
+            }
+
+            ImGui::BeginDisabled(copiedComponent.json.is_null() || copiedComponent.dataTypeID != componentDataTypeID);
+            if (ImGui::MenuItem("Paste"))
+            {
+                dataTypeRegistry.LoadDataJSON(componentDataTypeID, componentPtr, copiedComponent.json, blackboard);
             }
             ImGui::EndDisabled();
 
@@ -1352,7 +1410,7 @@ namespace CLX
     }
 
     [[nodiscard]] std::vector<EditorAction> ShowEntityComponents(ECS& ecs, const EntityID selectedEntityID, bool& anyItemActiveLastFrame,
-        ECS& ecsBuffer, EntityID& copyEntityID, const Blackboard& blackboard)
+        ECS& ecsBuffer, EntityID& copyEntityID, JsonAny& copiedComponent, const Blackboard& blackboard)
     {
         PROFILER_FUNCTION(profiler::colors::Brown400);
 
@@ -1380,7 +1438,17 @@ namespace CLX
                     continue;
                 }
             }
-            auto editorAction = ShowComponentData(ecs, selectedEntityID, typeInfo, componentPtr, anyActiveItem, ecsBuffer, blackboard.Get<Key_DataTypeRegistry>(), blackboard);
+            auto editorAction = ShowComponentData(
+                ecs, 
+                selectedEntityID, 
+                typeInfo, 
+                componentPtr,
+                anyActiveItem, 
+                ecsBuffer, 
+                copiedComponent, 
+                blackboard.Get<Key_DataTypeRegistry>(), 
+                blackboard
+            );
             if (editorAction)
             {
                 editorActions.push_back(std::move(editorAction.value()));
@@ -1500,7 +1568,7 @@ namespace CLX
     }
 
     [[nodiscard]] std::vector<EditorAction> ShowEntityInspector(ECS& ecs, const EntityID entityID, bool& anyItemActiveLastFrame,
-        ECS& ecsBuffer, EntityID& copyEntityID, uint32_t& selectedIndex, std::string& componentSearchString, const Blackboard& blackboard)
+        ECS& ecsBuffer, EntityID& copyEntityID, uint32_t& selectedIndex, std::string& componentSearchString, JsonAny& copiedComponent, const Blackboard& blackboard)
     {
         PROFILER_FUNCTION(profiler::colors::Pink200);
         if (entityID == InvalidEntityID)
@@ -1508,7 +1576,7 @@ namespace CLX
             return {};
         }
         std::vector<EditorAction> editorActions;
-        auto showEntityComponents = ShowEntityComponents(ecs, entityID, anyItemActiveLastFrame, ecsBuffer, copyEntityID, blackboard);
+        auto showEntityComponents = ShowEntityComponents(ecs, entityID, anyItemActiveLastFrame, ecsBuffer, copyEntityID, copiedComponent, blackboard);
         InsertRange(editorActions, showEntityComponents);
         if (auto action = ShowEntityAddComponentButtons(ecs, entityID, selectedIndex, componentSearchString, blackboard.Get<Key_DataTypeRegistry>()))
         {
