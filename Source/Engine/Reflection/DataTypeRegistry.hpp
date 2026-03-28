@@ -4,7 +4,6 @@
 #include <unordered_map>
 #include <concepts>
 #include <type_traits>
-#include <typeindex>
 #include <External/nlohmann/json.hpp>
 #include "Engine/ECS/ECS.hpp"
 #include "Engine/Reflection/DataTypeID.hpp"
@@ -53,7 +52,6 @@ namespace CLX
         std::string prettyName;
         std::vector<DataTypeMemberVariable> memberVariables;
 
-        void* (*addComponentFunctionPointer)(ECS& ecs, const EntityID entityID) = nullptr;
         ViewAndEditResult(*viewAndEdit)(void* data, const Blackboard& blackboard) = nullptr;
         nlohmann::json(*toJSON)(const void* data) = nullptr;
         void (*fromJSON)(void* data, const nlohmann::json& json, const Blackboard& blackboard) = nullptr;
@@ -67,7 +65,6 @@ namespace CLX
         std::size_t alignment = 1;
         std::reference_wrapper<const std::type_info> typeInfo;
         bool isComponent = false;
-        bool hasBeenAdded = false;
     };
 
     template<typename MemberType, typename OwnerType>
@@ -78,10 +75,6 @@ namespace CLX
 
     class DataTypeRegistry final
     {
-        friend class __RegisterMemberVariable;
-        friend class __RegisterComponent;
-        template<typename T> friend class __RegisterDataType;
-
     public:
 
         ViewAndEditResult ViewAndEditData(DataTypeID dataTypeID, void* data, const Blackboard& blackboard) const;
@@ -89,8 +82,6 @@ namespace CLX
         void LoadDataJSON(DataTypeID dataTypeID, void* dataPtr, const nlohmann::json& json, const Blackboard& blackboard) const;
         nlohmann::json SaveDataJSON(const DataType& dataType, const void* dataPtr) const;
         nlohmann::json SaveDataJSON(DataTypeID dataTypeID, const void* dataPtr) const;
-
-        void* AddComponent(DataTypeID dataTypeID, ECS& ecs, EntityID entityID) const;
 
         void InplaceAllocateData(DataTypeID dataTypeID, void* destinationPtr, const void* defaultValuePtr = nullptr) const;
         void CopyData(DataTypeID dataTypeID, void* destinationPtr, const void* sourcePtr) const;
@@ -127,20 +118,21 @@ namespace CLX
         void Assert() const;
 
         template<typename T>
-        void RegisterComponentType(const bool isDefault);
-
-        template<typename T>
-        void RegisterDataType();
+        void RegisterType(const bool isComponent);
 
         template<typename MemberType, typename ParentType>
         void RegisterMemberVariable(MemberType ParentType::* variable, const std::string& variableName, const char* customName, const bool shouldExpose, const bool canEdit);
 
     public:
+
         DataTypeRegistry();
 
     private:
+
         inline static DataTypeRegistry* sInstance = nullptr;
+
     private:
+
         std::unordered_map<DataTypeID, DataType> mDataTypes;
         std::unordered_map<std::string, DataTypeID> mNameToID;
     };
@@ -163,23 +155,21 @@ namespace CLX
         return mDataTypes | std::views::filter([filter](const auto& p) { return filter(p.second); });
     }
 
+    // Concept that matches std::vector of any type and allocator
     template<typename T>
-    void DataTypeRegistry::RegisterComponentType(const bool isDefault)
+    concept IsVector = requires
+    {
+        typename T::value_type;
+        requires std::same_as<T, std::vector<typename T::value_type, typename T::allocator_type>>;
+    };
+
+    template<typename T>
+    void DataTypeRegistry::RegisterType(const bool isComponent)
     {
         const DataTypeID dataTypeID = GetDataTypeID<T>();
         const bool alreadyExistOrHashCollision = mDataTypes.contains(dataTypeID);
 
-        if (alreadyExistOrHashCollision)
-        {
-            if (mDataTypes.contains(dataTypeID))
-            {
-                return;
-            }
-            else
-            {
-                throw std::runtime_error("Hash collision between component types");
-            }
-        }
+        ASSERT(alreadyExistOrHashCollision == false);
 
         std::string name = ConvertTypeIndexNameToPrettyName(typeid(T).name());
         std::string prettyName = RemoveSubStringIfExist(name, "Component");
@@ -193,100 +183,8 @@ namespace CLX
             .size = sizeof(T),
             .alignment = alignof(T),
             .typeInfo = typeInfo,
-            .hasBeenAdded = true,
+            .isComponent = isComponent
         };
-
-        dataType.addComponentFunctionPointer = [](ECS& ecs, const EntityID entityID) -> void*
-            {
-                return &ecs.AddComponent<T>(entityID);
-            };
-
-        dataType.inplaceAllocate = [](void* dataPtr, const void* defaultValuePtr) -> void
-            {
-                if (defaultValuePtr != nullptr)
-                {
-                    const T& defaultValue = *reinterpret_cast<const T*>(defaultValuePtr);
-                    new(dataPtr)T(defaultValue);
-                }
-                else
-                {
-                    new(dataPtr)T();
-                }
-            };
-
-        dataType.destroy = [](void* dataPtr) -> void
-            {
-                T& value = *reinterpret_cast<T*>(dataPtr);
-                value.~T();
-            };
-
-        dataType.copy = [](void* destinationPtr, const void* sourcePtr) -> void
-            {
-                if constexpr (std::is_trivially_copyable_v<T>)
-                {
-                    std::memcpy(destinationPtr, sourcePtr, sizeof(T));
-                }
-                else
-                {
-                    T& destination = *reinterpret_cast<T*>(destinationPtr);
-                    const T& source = *reinterpret_cast<const T*>(sourcePtr);
-                    destination = source;
-                }
-            };
-
-        dataType.swap = [](void* dataPtr1, void* dataPtr2) -> void
-            {
-                using std::swap;
-
-                T& value1 = *reinterpret_cast<T*>(dataPtr1);
-                T& value2 = *reinterpret_cast<T*>(dataPtr2);
-                swap(value1, value2);
-            };
-
-
-        if constexpr (Editable<T>)
-        {
-            dataType.viewAndEdit = [](void* dataPointer, const std::string& aVariableName) -> bool
-                {
-                    T* pointer = reinterpret_cast<T*>(dataPointer);
-                    return ViewAndEditValue(*pointer, aVariableName + "##" + std::to_string(reinterpret_cast<size_t>(dataPointer)));
-                };
-        }
-
-        dataType.isComponent = true;
-
-        mDataTypes.emplace(dataTypeID, dataType);
-
-        mNameToID[dataType.name] = dataTypeID;
-        ECSRegistry::Get().RegisterComponentType<T>(isDefault);
-    }
-
-    // Concept that matches std::vector of any type and allocator
-    template<typename T>
-    concept IsVector = requires
-    {
-        typename T::value_type;
-        requires std::same_as<T, std::vector<typename T::value_type, typename T::allocator_type>>;
-    };
-
-    template<typename T>
-    void DataTypeRegistry::RegisterDataType()
-    {
-        const DataTypeID dataTypeID = GetDataTypeID<T>();
-        const bool alreadyExistOrHashCollision = mDataTypes.contains(dataTypeID);
-
-        if (alreadyExistOrHashCollision)
-        {
-            assert(false && "Component already exist or has hash collision!");
-            return;
-        }
-
-        DataType dataType
-        {
-            .typeInfo = std::reference_wrapper<const std::type_info>(typeid(T)),
-        };
-
-        dataType.name = ConvertTypeIndexNameToPrettyName(typeid(T).name());
 
         if constexpr (Editable<T>)
         {
@@ -332,12 +230,12 @@ namespace CLX
                 };
         }
 
+        mNameToID[dataType.name] = dataTypeID;
         mDataTypes.emplace(dataTypeID, std::move(dataType));
-
 
         if constexpr (!IsVector<T>)
         {
-            RegisterDataType<std::vector<T>>();
+            RegisterType<std::vector<T>>(false);
         }
     }
 
@@ -362,11 +260,7 @@ namespace CLX
 
         {
             const DataType* ownerDataType = Find<OwnerType>();
-
-            if (ownerDataType == nullptr)
-            {
-                RegisterDataType<OwnerType>();
-            }
+            ASSERT(ownerDataType != nullptr);
         }
 
         auto& ownerMembers = Find<OwnerType>()->memberVariables;

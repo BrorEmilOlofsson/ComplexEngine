@@ -17,6 +17,7 @@
 
 #include "Engine/Utility/Camera.hpp"
 #include "Engine/Graphics/Sprite/Sprite2D.hpp"
+#include "Engine/Graphics/Sprite/Sprite3D.hpp"
 #include "Engine/Graphics/Light/PointLight.hpp"
 #include "Engine/Graphics/Light/DirectionalLight.hpp"
 #include "Engine/Asset/AssetTypes/TextureAsset.hpp"
@@ -31,10 +32,10 @@
 #include "Engine/Reflection/LoadDataFunctions.hpp"
 #include "Engine/Reflection/SaveDataFunctions.hpp"
 
-inline CLX::__RegisterDataType<float> Global_ECS_Registered_Datatype_float;
-inline CLX::__RegisterDataType<int> Global_ECS_Registered_Datatype_int;
-inline CLX::__RegisterDataType<bool> Global_ECS_Registered_Datatype_bool;
-inline CLX::__RegisterDataType<char> Global_ECS_Registered_Datatype_char;
+inline bool Global_ECS_Registered_Datatype_float = CLX::TypeRegistration::RegisterType<float>();
+inline bool Global_ECS_Registered_Datatype_int = CLX::TypeRegistration::RegisterType<int>();
+inline bool Global_ECS_Registered_Datatype_bool = CLX::TypeRegistration::RegisterType<bool>();
+inline bool Global_ECS_Registered_Datatype_char = CLX::TypeRegistration::RegisterType<char>();
 
 namespace std
 {
@@ -69,6 +70,7 @@ namespace CLX
 	REGISTER_DATATYPE(DirectionalLight);
 	REGISTER_DATATYPE(Camera);
 	REGISTER_DATATYPE(Sprite2D);
+	REGISTER_DATATYPE(Sprite3D);
 
 	REGISTER_DATATYPE(MeshAssetHandle);
 	REGISTER_DATATYPE(ModelAssetHandle);

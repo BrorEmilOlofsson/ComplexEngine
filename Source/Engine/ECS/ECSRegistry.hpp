@@ -7,6 +7,7 @@
 #include "ECSSystem.hpp"
 #include "ComponentPool.hpp"
 #include "EntityID.hpp"
+#include "Engine/Reflection/DataTypeID.hpp"
 
 namespace CLX
 {
@@ -51,12 +52,12 @@ namespace CLX
 			return mSystemRegistrationFunctions;
 		}
 
-		[[nodiscard]] std::size_t GetComponentTypeIndex(std::type_index typeIndex) const
+		[[nodiscard]] std::size_t GetComponentTypeIndex(DataTypeID typeIndex) const
 		{
 			return mComponentTypeToIDMap.at(typeIndex);
 		}
 
-		[[nodiscard]] const ECSComponentType& GetComponentType(std::type_index typeIndex) const
+		[[nodiscard]] const ECSComponentType& GetComponentType(DataTypeID typeIndex) const
 		{
 			const std::size_t index = mComponentTypeToIDMap.at(typeIndex);
 			return mComponentTypes[index - 1];
@@ -74,16 +75,11 @@ namespace CLX
 
 		void InitializeEntity(ECS& ecs, EntityID entityID) const
 		{
-			for (const std::type_index& typeIndex : mDefaultComponentTypeIndices)
+			for (const DataTypeID& typeIndex : mDefaultComponentTypeIndices)
 			{
 				const ECSComponentType& componentType = GetComponentType(typeIndex);
 				componentType.addComponentFunction(ecs, entityID, nullptr);
 			}
-		}
-
-		static void Destroy()
-		{
-			sInstancePtr.reset();
 		}
 
 		class ECSRegistryProxy final
@@ -96,25 +92,13 @@ namespace CLX
 			}
 		};
 
-		static ECSRegistry& Get()
-		{
-			static ECSRegistryProxy p(sInstancePtr);
-			if (sInstancePtr == nullptr)
-			{
-				throw std::runtime_error("ECSRegistry instance is not initialized.");
-            }
-			return *sInstancePtr;
-		}
-
 	private:
 
-		inline static std::unique_ptr<ECSRegistry> sInstancePtr = nullptr;
-
-		std::unordered_map<std::type_index, std::size_t> mComponentTypeToIDMap;
+		std::unordered_map<DataTypeID, std::size_t> mComponentTypeToIDMap;
 		std::vector<ECSComponentType> mComponentTypes;
 		std::vector<System(*)()> mSystemRegistrationFunctions;
 		std::size_t mCurrentID = 1;
 		std::shared_ptr<Blackboard> mBlackboard;
-		std::vector<std::type_index> mDefaultComponentTypeIndices;
+		std::vector<DataTypeID> mDefaultComponentTypeIndices;
 	};
 }

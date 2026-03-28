@@ -23,18 +23,20 @@ namespace CLX
         , mSceneManager(mAssetManager)
     {
         RegisterEngineComponents();
-        ECSRegistry::Get().RegisterSystem<RotatingMovementSystem>();
-        ECSRegistry::Get().RegisterSystem<RenderSystem>();
-        ECSRegistry::Get().RegisterSystem<RenderLightSystem>();
-        ECSRegistry::Get().RegisterSystem<CameraSystem>();
-        ECSRegistry::Get().RegisterSystem<AnimationSystem>();
-        ECSRegistry::Get().RegisterSystem<NavmeshSystem>();
-        ECSRegistry::Get().RegisterSystem<DebugShapeSystem>();
+
+
+        mECSRegistry.RegisterSystem<RotatingMovementSystem>();
+        mECSRegistry.RegisterSystem<RenderSystem>();
+        mECSRegistry.RegisterSystem<RenderLightSystem>();
+        mECSRegistry.RegisterSystem<CameraSystem>();
+        mECSRegistry.RegisterSystem<AnimationSystem>();
+        mECSRegistry.RegisterSystem<NavmeshSystem>();
+        mECSRegistry.RegisterSystem<DebugShapeSystem>();
 
         mDataTypeRegistry = &DataTypeRegistry::GetInstance();
-        //DataTypeRegistry::Destroy();
-        mECSRegistry = std::move(ECSRegistry::Get());
-        ECSRegistry::Destroy();
+
+        TypeRegistration::ExecuteRegistrations(*mDataTypeRegistry, mECSRegistry);
+
 
         mDataTypeRegistry->Assert();
         mOperatingSystem.GetGraphicsFoundation().SetAssetManager(mAssetManager);

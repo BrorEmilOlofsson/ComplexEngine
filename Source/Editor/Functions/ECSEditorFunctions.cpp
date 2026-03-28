@@ -186,7 +186,7 @@ namespace CLX
     }
 
 
-    static EntityID DuplicateEntityAndChildren(ECS& ecs, const EntityID entityID, EditorCommandTracker& commandTracker)
+    EntityID DuplicateEntityAndChildren(ECS& ecs, const EntityID entityID, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker)
     {
 
         std::map<EntityID, EntityID> oldToNewEntityIDMap = DuplicateEntityAndChildren(ecs, entityID);
@@ -198,6 +198,8 @@ namespace CLX
             EntityID entityID;
             EntityID duplicatedEntityID;
             std::reference_wrapper<ECS> ecs;
+            std::reference_wrapper<std::vector<EntityID>> rootEntities;
+            EntityID parentID;
         };
 
 
@@ -205,17 +207,42 @@ namespace CLX
         {
             .entityID = entityID,
             .duplicatedEntityID = newEntityID,
-            .ecs = ecs
+            .ecs = ecs,
+            .rootEntities = rootEntities,
+            .parentID = GetParentEntity(ecs, entityID)
         };
 
         auto doCommand = [](const DuplicateEntityAndChildrenData& data)
             {
                 DuplicateEntityAndChildren(data.ecs.get(), data.entityID);
+
+                if (data.parentID == InvalidEntityID)
+                {
+                    data.rootEntities.get().push_back(data.duplicatedEntityID);
+                }
+                else
+                {
+                    TransformHierarchyComponent* parentTransformComponent = data.ecs.get().GetComponent<TransformHierarchyComponent>(data.parentID);
+                    ASSERT(parentTransformComponent != nullptr);
+                    parentTransformComponent->children.push_back(data.duplicatedEntityID);
+                }
+
             };
 
         auto undoCommand = [](const DuplicateEntityAndChildrenData& data)
             {
                 DestroyEntityAndChildren(data.ecs.get(), data.duplicatedEntityID);
+
+                if (data.parentID == InvalidEntityID)
+                {
+                    data.rootEntities.get().pop_back();
+                }
+                else
+                {
+                    TransformHierarchyComponent* parentTransformComponent = data.ecs.get().GetComponent<TransformHierarchyComponent>(data.parentID);
+                    ASSERT(parentTransformComponent != nullptr);
+                    parentTransformComponent->children.pop_back();
+                }
             };
 
         commandTracker.RegisterCommand(EditorCommand(data, doCommand, undoCommand, "Duplicate Entity and Children"));
@@ -508,48 +535,48 @@ namespace CLX
         commandTracker.ExecuteCommand(EditorCommand(command, "Select Entity"));
     }*/
 
-    static void AddComponentToEntity(ECS& ecs, const EntityID entityID, const std::type_index typeIndex, const std::string& componentName/*, ECS& ecsBuffer*/, EditorCommandTracker& commandTracker)
+    static void AddComponentToEntity(ECS& ecs, const EntityID entityID, const DataTypeID dataTypeID, const std::string& componentName/*, ECS& ecsBuffer*/, EditorCommandTracker& commandTracker)
     {
         struct AddComponentData final
         {
             std::reference_wrapper<ECS> ecs;
             EntityID entityID;
-            std::type_index typeIndex;
+            DataTypeID dataTypeID;
         };
 
         AddComponentData data
         {
             .ecs = ecs,
             .entityID = entityID,
-            .typeIndex = typeIndex
+            .dataTypeID = dataTypeID
         };
 
         auto doCommand = [](const AddComponentData& data)
             {
-                data.ecs.get().GetRegistry().GetComponentType(data.typeIndex).addComponentFunction(data.ecs.get(), data.entityID, nullptr);
+                data.ecs.get().GetRegistry().GetComponentType(data.dataTypeID).addComponentFunction(data.ecs.get(), data.entityID, nullptr);
 
             };
 
         auto undoCommand = [](const AddComponentData& data)
             {
-                data.ecs.get().RemoveComponent(data.entityID, data.typeIndex);
+                data.ecs.get().RemoveComponent(data.entityID, data.dataTypeID);
             };
 
         commandTracker.ExecuteCommand(EditorCommand(data, doCommand, undoCommand, "Add Component (" + componentName + ")"));
     }
 
-    [[nodiscard]] EditorAction CreateAddComponentToEntityAction(ECS& ecs, const EntityID entityID, const std::type_index typeIndex, const std::string& componentName)
+    [[nodiscard]] EditorAction CreateAddComponentToEntityAction(ECS& ecs, const EntityID entityID, const DataTypeID dataTypeID, const std::string& componentName)
     {
-        return [&ecs, entityID, typeIndex, componentName](EditorCommandTracker& commandTracker)
+        return [&ecs, entityID, dataTypeID, componentName](EditorCommandTracker& commandTracker)
             {
-                AddComponentToEntity(ecs, entityID, typeIndex, componentName, commandTracker);
+                AddComponentToEntity(ecs, entityID, dataTypeID, componentName, commandTracker);
             };
     }
 
-    void RemoveComponent(ECS& ecs, const EntityID entityID, const std::type_index& typeIndex, ECS& ecsBuffer, EditorCommandTracker& commandTracker)
+    void RemoveComponent(ECS& ecs, const EntityID entityID, const DataTypeID& dataTypeID, ECS& ecsBuffer, EditorCommandTracker& commandTracker)
     {
         const EntityID copyEntityID = ecs.CopyEntity(entityID, ecsBuffer);
-        ecs.RemoveComponent(entityID, typeIndex);
+        ecs.RemoveComponent(entityID, dataTypeID);
 
 
         struct RemoveComponentData final
@@ -609,7 +636,7 @@ namespace CLX
 
                 const EntityID createdEntityID = CreateEntity(ecs, rootEntities, defaultParent, commandTracker);
 
-                AddComponentToEntity(ecs, createdEntityID, std::type_index(typeid(MeshComponent)), "Mesh Component", commandTracker);
+                AddComponentToEntity(ecs, createdEntityID, GetDataTypeID(typeid(MeshComponent)), "Mesh Component", commandTracker);
 
                 SetEntitySelection(createdEntityID, selectedEntityIDs, commandTracker);
 
@@ -928,18 +955,7 @@ namespace CLX
                 editorActions.push_back([&ecs, entityID, &rootEntities, &selectedEntities](EditorCommandTracker& commandTracker)
                     {
                         commandTracker.BeginComposite("Duplicate Entity Composite");
-                        const EntityID newEntityID = DuplicateEntityAndChildren(ecs, entityID, commandTracker);
-                        const EntityID parentID = GetParentEntity(ecs, entityID);
-                        if (parentID == InvalidEntityID)
-                        {
-                            rootEntities.push_back(newEntityID);
-                        }
-                        else
-                        {
-                            TransformHierarchyComponent* parentTransformComponent = ecs.GetComponent<TransformHierarchyComponent>(parentID);
-                            ASSERT(parentTransformComponent != nullptr);
-                            parentTransformComponent->children.push_back(newEntityID);
-                        }
+                        const EntityID newEntityID = DuplicateEntityAndChildren(ecs, entityID, rootEntities, commandTracker);
                         SetEntitySelection({ newEntityID }, selectedEntities, commandTracker);
                         commandTracker.EndComposite();
                     });
@@ -1060,7 +1076,7 @@ namespace CLX
 
         if (selectedEntityIDs.contains(entityID))
         {
-            ImGui::SetItemDefaultFocus();
+            //ImGui::SetItemDefaultFocus();
 
             const std::string entityOptionsPopUpName = "Entity Settings" + imGuiTag;
             if (isRightClicked && !isUneditable)
@@ -1206,11 +1222,11 @@ namespace CLX
         ShowEntityHierarchy(ecs, ecsBuffer, rootEntities, commandTracker, imGuiTag, selectedEntityIDs, uneditableEntities, entitySearchBuffer);
     }
 
-    [[nodiscard]] static EditorAction CreateRemoveComponentAction(ECS& ecs, const EntityID entityID, const std::type_index& typeIndex, ECS& ecsBuffer)
+    [[nodiscard]] static EditorAction CreateRemoveComponentAction(ECS& ecs, const EntityID entityID, const DataTypeID& dataTypeID, ECS& ecsBuffer)
     {
-        return [&ecs, entityID, typeIndex, &ecsBuffer](EditorCommandTracker& commandTracker)
+        return [&ecs, entityID, dataTypeID, &ecsBuffer](EditorCommandTracker& commandTracker)
             {
-                RemoveComponent(ecs, entityID, typeIndex, ecsBuffer, commandTracker);
+                RemoveComponent(ecs, entityID, dataTypeID, ecsBuffer, commandTracker);
             };
     }
 
@@ -1222,7 +1238,7 @@ namespace CLX
         ASSERT(componentPtr != nullptr);
         ImGui::AlignTextToFramePadding();
 
-        const DataTypeID componentDataTypeID = DataTypeID{ typeInfo.hash_code() };
+        const DataTypeID componentDataTypeID = GetDataTypeID(typeInfo);
 
         const DataType* dataType = dataTypeRegistry.Find(componentDataTypeID);
         if (dataType == nullptr)
@@ -1257,10 +1273,10 @@ namespace CLX
         std::optional<EditorAction> removeComponentAction;
         if (ImGui::BeginPopup("Component Options"))
         {
-            ImGui::BeginDisabled(ecs.GetRegistry().GetComponentType(typeInfo).isDefault);
+            ImGui::BeginDisabled(ecs.GetRegistry().GetComponentType(GetDataTypeID(typeInfo)).isDefault);
             if (ImGui::MenuItem("Remove"))
             {
-                removeComponentAction = CreateRemoveComponentAction(ecs, entityID, typeInfo, ecsBuffer);
+                removeComponentAction = CreateRemoveComponentAction(ecs, entityID, GetDataTypeID(typeInfo), ecsBuffer);
             }
             ImGui::EndDisabled();
 
@@ -1517,8 +1533,8 @@ namespace CLX
         auto isValidComponentDataType = [&ecs, entityID](const DataType& dataType)
             {
                 return dataType.isComponent
-                    && !ecs.GetRegistry().GetComponentType(std::type_index(dataType.typeInfo)).isDefault
-                    && !ecs.HasComponent(entityID, std::type_index(dataType.typeInfo));
+                    && !ecs.GetRegistry().GetComponentType(GetDataTypeID(dataType.typeInfo)).isDefault
+                    && !ecs.HasComponent(entityID, GetDataTypeID(dataType.typeInfo));
             };
 
         auto componentDataTypes = dataTypeRegistry.GetDataTypesFiltered(isValidComponentDataType)
@@ -1535,7 +1551,7 @@ namespace CLX
             const std::string componentNameLabel = dataType.prettyName + "##Component";
             if (ImGui::Selectable(componentNameLabel.c_str(), selectedIndex == indexCounter))
             {
-                addComponentAction = CreateAddComponentToEntityAction(ecs, entityID, std::type_index(dataType.typeInfo), dataType.prettyName);
+                addComponentAction = CreateAddComponentToEntityAction(ecs, entityID, GetDataTypeID(dataType.typeInfo), dataType.prettyName);
                 selectedIndex = 0;
                 ImGui::CloseCurrentPopup();
             }
@@ -1556,7 +1572,7 @@ namespace CLX
             else if (ImGui::IsKeyPressed(ImGuiKey_Enter) && !componentDataTypes.empty())
             {
                 const auto& dataType = componentDataTypes[selectedIndex];
-                addComponentAction = CreateAddComponentToEntityAction(ecs, entityID, std::type_index(dataType.typeInfo), dataType.prettyName);
+                addComponentAction = CreateAddComponentToEntityAction(ecs, entityID, GetDataTypeID(dataType.typeInfo), dataType.prettyName);
                 selectedIndex = 0;
                 ImGui::CloseCurrentPopup();
             }

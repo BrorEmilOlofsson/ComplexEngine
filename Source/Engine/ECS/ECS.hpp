@@ -377,8 +377,7 @@ namespace CLX
             EntityView(ECS* ecs, EntityID entityID)
                 : mECS(ecs)
                 , mEntityID(entityID)
-            {
-            }
+            {}
 
             [[nodiscard]] TypeErasedComponentIterator begin() const
             {
@@ -562,7 +561,7 @@ namespace CLX
 
             [[nodiscard]] EntityIterator end() const
             {
-                return EntityIterator(EntityID(static_cast<unsigned int>(size(mECS->mEntityData))), mECS);
+                return EntityIterator(EntityID(static_cast<uint32_t>(size(mECS->mEntityData))), mECS);
             }
 
             [[nodiscard]] bool IsEmpty() const
@@ -649,7 +648,7 @@ namespace CLX
         template<typename T>
         void RemoveComponent(const EntityID entityID);
 
-        void RemoveComponent(const EntityID entityID, const std::type_index& typeIndex);
+        void RemoveComponent(const EntityID entityID, const DataTypeID& typeIndex);
 
         template<typename T>
         [[nodiscard]] T* GetComponent(const EntityID entityID);
@@ -660,7 +659,7 @@ namespace CLX
         template<typename T>
         [[nodiscard]] bool HasComponent(const EntityID entityID) const;
 
-        [[nodiscard]] bool HasComponent(const EntityID entityID, const std::type_index& typeIndex) const;
+        [[nodiscard]] bool HasComponent(const EntityID entityID, const DataTypeID& typeIndex) const;
 
         template<typename T>
         [[nodiscard]] bool HasComponent2(const EntityID entityID) const;
@@ -718,7 +717,7 @@ namespace CLX
         template<typename... Args>
         [[nodiscard]] ComponentMask CreateComponentMaskFromTypeList(TypeList<Args...>) const;
 
-        void UpdateEntityMask(const EntityID entityID, const bool setValue, const std::type_index& typeIndex);
+        void UpdateEntityMask(const EntityID entityID, const bool setValue, const DataTypeID& typeIndex);
 
         template<typename T>
         void UpdateEntityMask(const EntityID entityID, const bool setValue);
@@ -838,7 +837,7 @@ namespace CLX
         return GetComponentPool(componentTypeIndex).HasComponent(entityID);
     }
 
-    inline bool ECS::HasComponent(const EntityID entityID, const std::type_index& typeIndex) const
+    inline bool ECS::HasComponent(const EntityID entityID, const DataTypeID& typeIndex) const
     {
         const std::size_t componentTypeIndex = mRegistry.GetComponentTypeIndex(typeIndex);
         if (componentTypeIndex == 0)
@@ -859,7 +858,7 @@ namespace CLX
     std::size_t ECS::GetComponentTypeIndex() const
     {
         const std::size_t typeIndex = ECSRegisterComponentHelper::ComponentPoolID<T>;
-        const std::size_t registeredTypeIndex = mRegistry.GetComponentTypeIndex(std::type_index(typeid(T)));
+        const std::size_t registeredTypeIndex = mRegistry.GetComponentTypeIndex(GetDataTypeID(typeid(T)));
         if (typeIndex != registeredTypeIndex)
         {
             return registeredTypeIndex;
@@ -1117,7 +1116,7 @@ namespace CLX
         }
     }
 
-    inline void ECS::UpdateEntityMask(const EntityID entityID, const bool setValue, const std::type_index& typeIndex)
+    inline void ECS::UpdateEntityMask(const EntityID entityID, const bool setValue, const DataTypeID& typeIndex)
     {
         const std::size_t componentTypeIndex = mRegistry.GetComponentTypeIndex(typeIndex);
         UpdateEntityMask(entityID, setValue, componentTypeIndex);
@@ -1161,7 +1160,7 @@ namespace CLX
     template<typename T>
     void ECSRegistry::RegisterComponentType(const bool isDefault)
     {
-        if (mComponentTypeToIDMap.contains(std::type_index(typeid(T))))
+        if (mComponentTypeToIDMap.contains(GetDataTypeID(typeid(T))))
         {
             throw std::runtime_error("Component type already registered.");
         }
@@ -1204,14 +1203,14 @@ namespace CLX
 
         mComponentTypes.push_back(componentType);
 
-        mComponentTypeToIDMap.emplace(std::type_index(typeid(T)), mCurrentID);
+        mComponentTypeToIDMap.emplace(GetDataTypeID(typeid(T)), mCurrentID);
 
         ECSRegisterComponentHelper::ComponentPoolID<T> = mCurrentID;
         mCurrentID++;
 
         if (isDefault)
         {
-            mDefaultComponentTypeIndices.push_back(std::type_index(typeid(T)));
+            mDefaultComponentTypeIndices.push_back(GetDataTypeID(typeid(T)));
         }
     }
 }

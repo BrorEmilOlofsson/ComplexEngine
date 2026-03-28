@@ -211,7 +211,7 @@ namespace CLX
 			}
 		}
 
-		[[nodiscard]] constexpr std::type_index GetTypeIndex() const
+		[[nodiscard]] constexpr const std::type_index& GetTypeIndex() const
 		{
 			return mTypeIndex;
 		}

@@ -1,6 +1,6 @@
 #pragma once
-#include <limits>
 #include <cstdint>
+#include <limits>
 
 namespace CLX
 {

@@ -47,15 +47,7 @@ namespace CLX
 
     static void CheckCopyInputs(const InputState& input, ECS& ecs, std::set<EntityID>& selectedEntityIDs, ECS& ecsBuffer, EntityID& copiedEntityID, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker)
     {
-        input;
-        ecs;
-        selectedEntityIDs;
-        copiedEntityID;
-        ecsBuffer;
-        rootEntities;
-        commandTracker;
-
-        if (!ImGui::IsWindowFocused())
+        if (!ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows))
         {
             return;
         }
@@ -63,10 +55,7 @@ namespace CLX
         {
             commandTracker.BeginComposite("Remove Entity + Select Entity");
             DestroyEntitiesAndChildren(ecs, selectedEntityIDs, rootEntities, commandTracker);
-            //auto entityCollection = ecs.ViewEntities();
-
-            //const EntityID newSelectedEntityID = entityCollection.IsEmpty() ? InvalidEntityID : EntityID{ selectedEntityID.id == 0 ? selectedEntityID.id + 1 : selectedEntityID.id - 1 };
-
+           
             ClearEntitySelection(selectedEntityIDs, commandTracker);
             commandTracker.EndComposite();
         }
@@ -85,7 +74,14 @@ namespace CLX
         }
         else if (input.IsKeyHeld(eInputKey::Ctrl) && input.IsKeyPressed(eInputKey::D))
         {
-
+            if (selectedEntityIDs.size() == 1)
+            {
+                const EntityID entityID = *selectedEntityIDs.begin();
+                commandTracker.BeginComposite("Duplicate Entity + Select Entity");
+                const EntityID newEntityID = DuplicateEntityAndChildren(ecs, entityID, rootEntities, commandTracker);
+                SetEntitySelection(newEntityID, selectedEntityIDs, commandTracker);
+                commandTracker.EndComposite();
+            }
         }
     }
 
@@ -130,9 +126,10 @@ namespace CLX
             ImGui::EndDisabled();
         }
 
+        CheckCopyInputs(input, ecs, mSelectedEntityIDs, ecsBuffer, mCopiedEntityID, mRootEntities, commandTracker);
+
         ImGui::End();
 
-        CheckCopyInputs(input, ecs, mSelectedEntityIDs, ecsBuffer, mCopiedEntityID, mRootEntities, commandTracker);
     }
 
     void SceneHierarchyPopUp::OnSceneLoaded(Scene& scene)

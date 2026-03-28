@@ -15,7 +15,7 @@ namespace CLX
 
 		for (auto [typeInfo, componentPtr] : entityView)
 		{
-			const DataType* componentDataType = dataTypeRegistry.Find(DataTypeID{ typeInfo.hash_code() });
+			const DataType* componentDataType = dataTypeRegistry.Find(GetDataTypeID(typeInfo));
 
 			nlohmann::ordered_json& componentJson = entityJson["Components"][componentCount];
 
@@ -127,12 +127,13 @@ namespace CLX
 				const DataTypeID dataTypeID = dataTypeRegistry.Find(componentName);
 				if (dataTypeID == InvalidDataTypeID)
 				{
-					EraseMissingElementFromJSON(jsonData, path, i, j); //NOTE(v11.3.2): Maybe not needed but works for now
+					EraseMissingElementFromJSON(jsonData, path, i, j);
 					continue;
 				}
 
+                const ECSRegistry& registry = ecs.GetRegistry();
 				const std::vector<DataTypeMemberVariable>& componentProperties = dataTypeRegistry.Find(dataTypeID)->memberVariables;
-				void* componentPointer = dataTypeRegistry.AddComponent(dataTypeID, ecs, newEntityID);
+				void* componentPointer = registry.GetComponentType(dataTypeID).addComponentFunction(ecs, newEntityID, nullptr);
 
 				if (!componentDataJSON.contains("Properties"))
 				{

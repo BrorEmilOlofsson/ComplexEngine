@@ -60,11 +60,6 @@ namespace CLX
 		}
 	}
 
-	void* DataTypeRegistry::AddComponent(DataTypeID dataTypeID, ECS& ecs, EntityID entityID) const
-	{
-		return mDataTypes.at(dataTypeID).addComponentFunctionPointer(ecs, entityID);
-	}
-
 	void DataTypeRegistry::InplaceAllocateData(DataTypeID dataTypeID, void* dataPtr, const void* aDefaultValuePtr) const
 	{
 		mDataTypes.at(dataTypeID).inplaceAllocate(dataPtr, aDefaultValuePtr);

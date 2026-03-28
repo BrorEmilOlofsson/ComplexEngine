@@ -97,54 +97,55 @@ namespace CLX
         if (hasValidEntityComposition)
         {
             mEntityCompositionAsset->GetECS().EditorUpdate(newBlackboard);
+        }
 
-            if (mIsOpen)
+
+        if (mIsOpen)
+        {
+            FreeFlyCameraSettings& cameraSettings = blackboard.Get<Key_FreeFlyCameraSettings>();
+            const float deltaTime = blackboard.Get<Key_DeltaTime>();
+            WindowView window = blackboard.Get<Key_WindowView>();
+            UpdateEditorCamera(mCamera, cameraSettings, deltaTime, window, input, os);
+
+
+            constexpr Spheref drawSphere = Spheref::FromCenterAndRadius(Point3f(0, 0, 10), Radiusf(5.f));
+            mRenderState.GetRenderList().AddSphere(DrawSphere{ drawSphere, Colors::Salmon }, true);
+
+            if (blackboard.Get<Key_EditorSceneSettings>().showGrid)
             {
-                FreeFlyCameraSettings& cameraSettings = blackboard.Get<Key_FreeFlyCameraSettings>();
-                const float deltaTime = blackboard.Get<Key_DeltaTime>();
-                WindowView window = blackboard.Get<Key_WindowView>();
-                UpdateEditorCamera(mCamera, cameraSettings, deltaTime, window, input, os);
-
-
-                constexpr Spheref drawSphere = Spheref::FromCenterAndRadius(Point3f(0, 0, 10), Radiusf(5.f));
-                mRenderState.GetRenderList().AddSphere(DrawSphere{ drawSphere, Colors::Salmon }, true);
-
-                if (blackboard.Get<Key_EditorSceneSettings>().showGrid)
+                const PrimitiveGrid3 grid
                 {
-                    const PrimitiveGrid3 grid
-                    {
-                        .minPos = Point3f::Zero(),
-                        .gridSize = Vector3ui(50, 0, 50),
-                        .cellSize = Vector3f(10, 0, 10),
-                        .offset = Vector3f(250.f, 0.f, 250.f),
-                    };
-                    RenderGrid3(grid, Colors::Gray, mRenderState.GetRenderList());
-                }
+                    .minPos = Point3f::Zero(),
+                    .gridSize = Vector3ui(50, 0, 50),
+                    .cellSize = Vector3f(10, 0, 10),
+                    .offset = Vector3f(250.f, 0.f, 250.f),
+                };
+                RenderGrid3(grid, Colors::Gray, mRenderState.GetRenderList());
+            }
 
-                mRenderState.SetRenderRect(renderRect);
-                mCamera.SetResolution(Vector2ui(renderRect.GetExtent()));
+            mRenderState.SetRenderRect(renderRect);
+            mCamera.SetResolution(Vector2ui(renderRect.GetExtent()));
 
 
-                if (input.IsKeyPressed(eInputKey::LMB))
+            if (input.IsKeyPressed(eInputKey::LMB))
+            {
+                const Point2i mouseScreenPosition = os.GetCursorScreenPosition();
+
+                if (IsInsideRenderRect(mouseScreenPosition, renderRect))
                 {
-                    const Point2i mouseScreenPosition = os.GetCursorScreenPosition();
+                    const Point2i mappedPos = MapToRenderRect(mouseScreenPosition, renderRect);
 
-                    if (IsInsideRenderRect(mouseScreenPosition, renderRect))
+                    const uint32_t id = mRenderState.GetRenderContext()->GetObjectIDAt(mappedPos);
+
+                    const EntityID entityID{ id };
+                    if (entityID != InvalidEntityID)
                     {
-                        const Point2i mappedPos = MapToRenderRect(mouseScreenPosition, renderRect);
-
-                        const uint32_t id = mRenderState.GetRenderContext()->GetObjectIDAt(mappedPos);
-
-                        const EntityID entityID{ id };
-                        if (entityID != InvalidEntityID)
-                        {
-                            SetEntitySelection(entityID, mSelectedEntityIDs, commandTracker);
-                        }
+                        SetEntitySelection(entityID, mSelectedEntityIDs, commandTracker);
                     }
                 }
-
-                mRenderState.SetCamera(mCamera);
             }
+
+            mRenderState.SetCamera(mCamera);
         }
     }
 
@@ -162,6 +163,11 @@ namespace CLX
         Blackboard newBlackboard = blackboard;
         newBlackboard.Insert<Key_CurrentCamera>(mCamera);
         newBlackboard.Insert<Key_CurrentRenderState>(mRenderState);
+
+        if (hasValidEntityComposition)
+        {
+            newBlackboard.Insert<Key_CurrentECS>(mEntityCompositionAsset->GetECS());
+        }
 
 
         if (mIsOpen)

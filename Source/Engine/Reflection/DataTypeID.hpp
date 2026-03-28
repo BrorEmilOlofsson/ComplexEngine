@@ -1,28 +1,28 @@
 #pragma once
-#include <limits>
+#include <typeindex>
 
 namespace CLX
 {
 	struct DataTypeID final
 	{
-		std::size_t myID = std::numeric_limits<std::size_t>::max();
+		std::type_index typeIndex = typeid(void);
 	};
 
-	constexpr DataTypeID InvalidDataTypeID = DataTypeID{};
+	inline static DataTypeID InvalidDataTypeID = DataTypeID{};
 
-	constexpr bool operator==(DataTypeID a, DataTypeID b)
+	[[nodiscard]] inline bool operator==(DataTypeID a, DataTypeID b)
 	{
-		return a.myID == b.myID;
+		return a.typeIndex == b.typeIndex;
 	}
 
-	constexpr bool operator<(DataTypeID a, DataTypeID b)
+	[[nodiscard]] inline bool operator<(DataTypeID a, DataTypeID b)
 	{
-		return a.myID < b.myID;
+		return a.typeIndex < b.typeIndex;
 	}
 
 	[[nodiscard]] inline DataTypeID GetDataTypeID(const std::type_info& typeInfo)
 	{
-		return DataTypeID{ typeInfo.hash_code() };
+		return DataTypeID{ std::type_index{ typeInfo } };
 	}
 
 	template<typename T>
@@ -39,7 +39,7 @@ namespace std
 	{
 		std::size_t operator()(CLX::DataTypeID a) const
 		{
-			return a.myID;
+			return a.typeIndex.hash_code();
 		}
 	};
 }

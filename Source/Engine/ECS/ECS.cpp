@@ -43,7 +43,7 @@ namespace CLX
         }
         else
         {
-            entityID = EntityID{ static_cast<unsigned int>(mEntityData.size()) };
+            entityID = EntityID{ static_cast<uint32_t>(mEntityData.size()) };
             mEntityData.emplace_back();
             for (auto& componentPool : mComponentPools)
             {
@@ -67,7 +67,7 @@ namespace CLX
 
         for (auto [typeInfo, _] : EntityView(this, entityID))
         {
-            const ECSComponentType& componentType = mRegistry.GetComponentType(typeInfo);
+            const ECSComponentType& componentType = mRegistry.GetComponentType(GetDataTypeID(typeInfo));
             componentType.removeComponentFunction(*this, entityID);
         }
 
@@ -83,7 +83,7 @@ namespace CLX
 
         for (auto [typeInfo, componentPtr] : entityView)
         {
-            const ECSComponentType& componentType = mRegistry.GetComponentType(typeInfo);
+            const ECSComponentType& componentType = mRegistry.GetComponentType(GetDataTypeID(typeInfo));
 
             componentType.addComponentFunction(targetECS, createdEntityID, componentPtr);
         }
@@ -104,7 +104,7 @@ namespace CLX
 
         for (auto [typeInfo, componentPtr] : sourceEntityView)
         {
-            const ECSComponentType& componentType = mRegistry.GetComponentType(typeInfo);
+            const ECSComponentType& componentType = mRegistry.GetComponentType(GetDataTypeID(typeInfo));
 
             componentType.addComponentFunction(*this, replaceEntityID, componentPtr);
         }
@@ -124,7 +124,7 @@ namespace CLX
         mEntityData[entityID.id].generation = entityID.generation;
     }
 
-    void ECS::RemoveComponent(const EntityID entityID, const std::type_index& typeIndex)
+    void ECS::RemoveComponent(const EntityID entityID, const DataTypeID& typeIndex)
     {
         const std::size_t index = mRegistry.GetComponentTypeIndex(typeIndex);
         GetComponentPool(index).RemoveComponent(entityID);

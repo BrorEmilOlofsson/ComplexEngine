@@ -5,7 +5,7 @@ namespace CLX
 	template<typename... Ts>
 	struct TypeList
 	{
-
+        constexpr static std::size_t Size = sizeof...(Ts);
 
 		template<std::size_t I>
 		struct Split
