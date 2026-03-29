@@ -18,6 +18,11 @@
 #include "Engine/Graphics/Light/PointLight.hpp"
 #include "Engine/Graphics/Light/DirectionalLight.hpp"
 
+namespace CLX
+{
+    class DataTypeRegistry;
+}
+
 [[nodiscard]] nlohmann::json ToJSON(const bool& value);
 [[nodiscard]] nlohmann::json ToJSON(const char& value);
 [[nodiscard]] nlohmann::json ToJSON(const int& value);
@@ -31,7 +36,7 @@ namespace std
 
 namespace CLX
 {
-	[[nodiscard]] nlohmann::json SaveDataPtr(const DataTypeID dataTypeID, const void* dataPtr);
+	[[nodiscard]] nlohmann::json SaveDataPtr(const DataTypeID dataTypeID, const void* dataPtr, const DataTypeRegistry& dataTypeRegistry);
 
 	[[nodiscard]] nlohmann::json ToJSON(const Transform& transform);
 
@@ -193,17 +198,29 @@ namespace CLX
 	{
 		return ::ToJSON(static_cast<int>(value));
 	}
+
+	template<typename T>
+	concept NormalSavable = requires(const T & value)
+	{
+		{ ToJSON(value) } -> std::same_as<nlohmann::json>;
+	};
+
+    template<NormalSavable T>
+	[[nodiscard]] nlohmann::json ToJSON(const T& value, const DataTypeRegistry&)
+	{
+        return ToJSON(value);
+	}
 }
 
 namespace std
 {
 	template<typename T>
-	[[nodiscard]] nlohmann::json ToJSON(const std::vector<T>& vector)
+	[[nodiscard]] nlohmann::json ToJSON(const std::vector<T>& vector, const CLX::DataTypeRegistry& dataTypeRegistry)
 	{
 		nlohmann::json arrayJson = nlohmann::json::array();
 		for (const T& data : vector)
 		{
-			nlohmann::json element = CLX::SaveDataPtr(CLX::GetDataTypeID<T>(), &data);
+			nlohmann::json element = CLX::SaveDataPtr(CLX::GetDataTypeID<T>(), &data, dataTypeRegistry);
 
 			arrayJson.push_back(std::move(element));
 		}

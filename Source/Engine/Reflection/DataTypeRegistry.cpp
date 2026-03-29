@@ -4,42 +4,6 @@
 
 namespace CLX
 {
-	DataTypeRegistry::DataTypeRegistry()
-	{
-	}
-
-	class DataTypeRegistryProxy final
-	{
-	public:
-
-		DataTypeRegistryProxy(DataTypeRegistry*& aInstancePtr)
-			: myInstancePtr(aInstancePtr)
-		{
-			aInstancePtr = new DataTypeRegistry();
-		}
-
-		~DataTypeRegistryProxy()
-		{
-			delete myInstancePtr;
-			myInstancePtr = nullptr;
-		}
-
-	private:
-
-		DataTypeRegistry*& myInstancePtr;
-	};
-
-	DataTypeRegistry& DataTypeRegistry::GetInstance()
-	{
-		static DataTypeRegistryProxy proxy(sInstance);
-		return *sInstance;
-	}
-
-	void DataTypeRegistry::Destroy()
-	{
-		delete sInstance;
-		sInstance = nullptr;
-	}
 
 	void DataTypeRegistry::Assert() const
 	{
@@ -60,14 +24,14 @@ namespace CLX
 		}
 	}
 
-	void DataTypeRegistry::InplaceAllocateData(DataTypeID dataTypeID, void* dataPtr, const void* aDefaultValuePtr) const
+	void DataTypeRegistry::InplaceAllocateData(DataTypeID dataTypeID, void* dataPtr, const void* defaultValuePtr) const
 	{
-		mDataTypes.at(dataTypeID).inplaceAllocate(dataPtr, aDefaultValuePtr);
+		mDataTypes.at(dataTypeID).inplaceAllocate(dataPtr, defaultValuePtr);
 	}
 
-	void DataTypeRegistry::CopyData(DataTypeID dataTypeID, void* aDestination, const void* aSource) const
+	void DataTypeRegistry::CopyData(DataTypeID dataTypeID, void* destination, const void* source) const
 	{
-		mDataTypes.at(dataTypeID).copy(aDestination, aSource);
+		mDataTypes.at(dataTypeID).copy(destination, source);
 	}
 
 	void DataTypeRegistry::SwapData(DataTypeID dataTypeID, void* dataPtr1, void* dataPtr2) const
@@ -131,14 +95,14 @@ namespace CLX
 		return it->second;
 	}
 
-	static void* PtrAdd(void* aPtr, const std::size_t aOffset)
+	static void* PtrAdd(void* ptr, const std::size_t offset)
 	{
-		return reinterpret_cast<char*>(aPtr) + aOffset;
+		return reinterpret_cast<char*>(ptr) + offset;
 	}
 
-	static const void* PtrAdd(const void* aPtr, const std::size_t aOffset)
+	static const void* PtrAdd(const void* ptr, const std::size_t offset)
 	{
-		return reinterpret_cast<const char*>(aPtr) + aOffset;
+		return reinterpret_cast<const char*>(ptr) + offset;
 	}
 
 	ViewAndEditResult DataTypeRegistry::ViewAndEditData(DataTypeID dataTypeID, void* dataPtr, const Blackboard& blackboard) const
@@ -221,7 +185,7 @@ namespace CLX
 	{
 		if (dataType.toJSON != nullptr)
 		{
-			return dataType.toJSON(dataPtr);
+			return dataType.toJSON(dataPtr, *this);
 		}
 
 		nlohmann::json json;

@@ -45,7 +45,8 @@ namespace CLX
         }
     }
 
-    static void CheckCopyInputs(const InputState& input, ECS& ecs, std::set<EntityID>& selectedEntityIDs, ECS& ecsBuffer, EntityID& copiedEntityID, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker)
+    static void CheckCopyInputs(const InputState& input, ECS& ecs, std::set<EntityID>& selectedEntityIDs, ECS& ecsBuffer, EntityID& copiedEntityID, 
+        std::vector<EntityID>& rootEntities, const DataTypeRegistry& dataTypeRegistry, EditorCommandTracker& commandTracker)
     {
         if (!ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows))
         {
@@ -78,7 +79,7 @@ namespace CLX
             {
                 const EntityID entityID = *selectedEntityIDs.begin();
                 commandTracker.BeginComposite("Duplicate Entity + Select Entity");
-                const EntityID newEntityID = DuplicateEntityAndChildren(ecs, entityID, rootEntities, commandTracker);
+                const EntityID newEntityID = DuplicateEntityAndChildren(ecs, entityID, rootEntities, dataTypeRegistry, commandTracker);
                 SetEntitySelection(newEntityID, selectedEntityIDs, commandTracker);
                 commandTracker.EndComposite();
             }
@@ -95,6 +96,7 @@ namespace CLX
         PROFILER_FUNCTION(profiler::colors::Olive);
         EditorCommandTracker& commandTracker = blackboard.Get<Key_CommandTracker>();
         SceneManager& sceneManager = blackboard.Get<Key_SceneManager>();
+        DataTypeRegistry& dataTypeRegistry = blackboard.Get<Key_DataTypeRegistry>();
         ECS& ecs = sceneManager.GetActiveScene()->GetECS();
         ECS& ecsBuffer = blackboard.Get<Key_ECSBuffer>();
         const InputState& input = blackboard.Get<Key_InputState>();
@@ -112,7 +114,8 @@ namespace CLX
                 mSelectedEntityIDs,
                 InvalidEntityID,
                 {},
-                mEntitySearchBuffer
+                mEntitySearchBuffer,
+                dataTypeRegistry
             );
 
 
@@ -126,7 +129,16 @@ namespace CLX
             ImGui::EndDisabled();
         }
 
-        CheckCopyInputs(input, ecs, mSelectedEntityIDs, ecsBuffer, mCopiedEntityID, mRootEntities, commandTracker);
+        CheckCopyInputs(
+            input, 
+            ecs, 
+            mSelectedEntityIDs, 
+            ecsBuffer, 
+            mCopiedEntityID, 
+            mRootEntities,
+            dataTypeRegistry,
+            commandTracker
+        );
 
         ImGui::End();
 

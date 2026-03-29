@@ -2,8 +2,9 @@
 #include <vector>
 #include <functional>
 
-#include "DataTypeRegistry.hpp"
 #include "Engine/Utility/MacroUtility.hpp"
+#include "DataTypeRegistry.hpp"
+#include "Engine/ECS/ECS.hpp"
 
 namespace CLX
 {

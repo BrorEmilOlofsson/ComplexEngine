@@ -61,6 +61,8 @@ namespace CLX
 		
 	private:
 
+		DataTypeRegistry mDataTypeRegistry;
+		ECSRegistry mECSRegistry;
 		OperatingSystem mOperatingSystem;
 		[[no_unique_address]] Console mConsole;
 		std::shared_ptr<AssetManager> mAssetManager;
@@ -80,8 +82,6 @@ namespace CLX
 		std::shared_ptr<Blackboard> mBlackboard;
 		std::shared_ptr<GraphicsSettings> mGraphicsSettings;
 
-		DataTypeRegistry* mDataTypeRegistry;
-        ECSRegistry mECSRegistry;
 		InputManager mInputManager;
 		
 	};

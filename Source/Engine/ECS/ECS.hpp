@@ -1,17 +1,19 @@
 #pragma once
 #include <unordered_map>
 #include <vector>
-#include <memory>
-#include <typeindex>
+#include <typeinfo>
 #include <span>
 #include <queue>
+
+#include "Engine/Utility/Assert.hpp"
+#include "Engine/Utility/Blackboard.hpp"
+#include "Engine/Utility/TypeList.hpp"
 
 #include "ECSRegistry.hpp"
 #include "EntityID.hpp"
 #include "ComponentPool.hpp"
 #include "ECSSystem.hpp"
-#include "Engine/Utility/Blackboard.hpp"
-#include "Engine/Utility/TypeList.hpp"
+
 
 namespace CLX
 {
@@ -1160,10 +1162,8 @@ namespace CLX
     template<typename T>
     void ECSRegistry::RegisterComponentType(const bool isDefault)
     {
-        if (mComponentTypeToIDMap.contains(GetDataTypeID(typeid(T))))
-        {
-            throw std::runtime_error("Component type already registered.");
-        }
+        bool hasBeenRegistered = mComponentTypeToIDMap.contains(GetDataTypeID<T>());
+        ASSERT(!hasBeenRegistered);
 
         ECSComponentType componentType;
 
@@ -1203,14 +1203,14 @@ namespace CLX
 
         mComponentTypes.push_back(componentType);
 
-        mComponentTypeToIDMap.emplace(GetDataTypeID(typeid(T)), mCurrentID);
+        mComponentTypeToIDMap.emplace(GetDataTypeID<T>(), mCurrentID);
 
         ECSRegisterComponentHelper::ComponentPoolID<T> = mCurrentID;
         mCurrentID++;
 
         if (isDefault)
         {
-            mDefaultComponentTypeIndices.push_back(GetDataTypeID(typeid(T)));
+            mDefaultComponentTypeIndices.push_back(GetDataTypeID<T>());
         }
     }
 }

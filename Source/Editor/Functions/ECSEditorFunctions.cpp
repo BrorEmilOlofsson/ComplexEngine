@@ -127,7 +127,7 @@ namespace CLX
         }
     }
 
-    static std::map<EntityID, EntityID> DuplicateEntityAndChildren(ECS& ecs, const EntityID entityID)
+    static std::map<EntityID, EntityID> DuplicateEntityAndChildren(ECS& ecs, const EntityID entityID, const DataTypeRegistry& dataTypeRegistry)
     {
         const EntityID createdEntityID = ecs.DuplicateEntity(entityID);
         std::map<EntityID, EntityID> oldToNewEntityIDMap;
@@ -139,8 +139,6 @@ namespace CLX
             const EntityID createdChildEntityID = ecs.DuplicateEntity(child);
             oldToNewEntityIDMap[child] = createdChildEntityID;
         }
-
-        const DataTypeRegistry& dataTypeRegistry = DataTypeRegistry::GetInstance();
 
         // Remap parent-child relationships in the duplicated entities
         RemapEntityIDs(ecs, createdEntityID, oldToNewEntityIDMap, dataTypeRegistry);
@@ -186,10 +184,10 @@ namespace CLX
     }
 
 
-    EntityID DuplicateEntityAndChildren(ECS& ecs, const EntityID entityID, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker)
+    EntityID DuplicateEntityAndChildren(ECS& ecs, const EntityID entityID, std::vector<EntityID>& rootEntities, const DataTypeRegistry& dataTypeRegistry, EditorCommandTracker& commandTracker)
     {
 
-        std::map<EntityID, EntityID> oldToNewEntityIDMap = DuplicateEntityAndChildren(ecs, entityID);
+        std::map<EntityID, EntityID> oldToNewEntityIDMap = DuplicateEntityAndChildren(ecs, entityID, dataTypeRegistry);
         const EntityID newEntityID = oldToNewEntityIDMap.at(entityID);
 
 
@@ -200,6 +198,7 @@ namespace CLX
             std::reference_wrapper<ECS> ecs;
             std::reference_wrapper<std::vector<EntityID>> rootEntities;
             EntityID parentID;
+            std::reference_wrapper<const DataTypeRegistry> dataTypeRegistry;
         };
 
 
@@ -209,12 +208,13 @@ namespace CLX
             .duplicatedEntityID = newEntityID,
             .ecs = ecs,
             .rootEntities = rootEntities,
-            .parentID = GetParentEntity(ecs, entityID)
+            .parentID = GetParentEntity(ecs, entityID),
+            .dataTypeRegistry = dataTypeRegistry
         };
 
         auto doCommand = [](const DuplicateEntityAndChildrenData& data)
             {
-                DuplicateEntityAndChildren(data.ecs.get(), data.entityID);
+                DuplicateEntityAndChildren(data.ecs.get(), data.entityID, data.dataTypeRegistry);
 
                 if (data.parentID == InvalidEntityID)
                 {
@@ -905,7 +905,7 @@ namespace CLX
     }
 
     [[nodiscard]] static std::vector<EditorAction> ShowEntityOptionsPopUp(const std::string& entityOptionsPopUpName, ECS& ecs, const EntityID entityID, std::set<EntityID>& selectedEntities,
-        std::vector<EntityID>& rootEntities, const std::string& imGuiTag)
+        std::vector<EntityID>& rootEntities, const DataTypeRegistry& dataTypeRegistry, const std::string& imGuiTag)
     {
         std::vector<EditorAction> editorActions;
         if (ImGui::BeginPopup(entityOptionsPopUpName.c_str()))
@@ -952,10 +952,10 @@ namespace CLX
 
             if (ImGui::MenuItem(("Duplicate" + imGuiTag).c_str()))
             {
-                editorActions.push_back([&ecs, entityID, &rootEntities, &selectedEntities](EditorCommandTracker& commandTracker)
+                editorActions.push_back([&ecs, entityID, &rootEntities, &selectedEntities, &dataTypeRegistry](EditorCommandTracker& commandTracker)
                     {
                         commandTracker.BeginComposite("Duplicate Entity Composite");
-                        const EntityID newEntityID = DuplicateEntityAndChildren(ecs, entityID, rootEntities, commandTracker);
+                        const EntityID newEntityID = DuplicateEntityAndChildren(ecs, entityID, rootEntities, dataTypeRegistry, commandTracker);
                         SetEntitySelection({ newEntityID }, selectedEntities, commandTracker);
                         commandTracker.EndComposite();
                     });
@@ -1052,7 +1052,8 @@ namespace CLX
     }
 
     [[nodiscard]] static std::vector<EditorAction> ShowEntityChildren(ECS& ecs, const EntityID entityID, std::set<EntityID>& selectedEntityIDs, ECS& ecsBuffer,
-        std::vector<EntityID>& rootEntities, const std::span<const EntityID> parentEntities, const std::string& imGuiTag, const std::set<EntityID>& uneditableEntities, const std::function<bool(EntityID)>& filter)
+        std::vector<EntityID>& rootEntities, const std::span<const EntityID> parentEntities, const std::string& imGuiTag, const std::set<EntityID>& uneditableEntities, 
+        const DataTypeRegistry& dataTypeRegistry, const std::function<bool(EntityID)>& filter)
     {
         std::vector<EditorAction> editorActions;
         const bool isSelected = selectedEntityIDs.contains(entityID);
@@ -1084,7 +1085,7 @@ namespace CLX
                 ImGui::OpenPopup(entityOptionsPopUpName.c_str());
             }
 
-            InsertRange(editorActions, ShowEntityOptionsPopUp(entityOptionsPopUpName, ecs, entityID, selectedEntityIDs, rootEntities, imGuiTag));
+            InsertRange(editorActions, ShowEntityOptionsPopUp(entityOptionsPopUpName, ecs, entityID, selectedEntityIDs, rootEntities, dataTypeRegistry, imGuiTag));
         }
 
         InsertRange(editorActions, ShowEntityPayload(ecs, entityID, rootEntities, selectedEntityIDs));
@@ -1104,7 +1105,7 @@ namespace CLX
                 {
                     continue;
                 }
-                InsertRange(editorActions, ShowEntityChildren(ecs, childEntityID, selectedEntityIDs, ecsBuffer, rootEntities, parentEntities, imGuiTag, uneditableEntities, filter));
+                InsertRange(editorActions, ShowEntityChildren(ecs, childEntityID, selectedEntityIDs, ecsBuffer, rootEntities, parentEntities, imGuiTag, uneditableEntities, dataTypeRegistry, filter));
             }
 
             if (!children.empty())
@@ -1120,7 +1121,7 @@ namespace CLX
 
 
     void ShowEntityHierarchy(ECS& ecs, ECS& ecsBuffer, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker,
-        const std::string& imGuiTag, std::set<EntityID>& selectedEntityIDs, const std::set<EntityID>& uneditableEntities, std::string& entitySearchBuffer)
+        const std::string& imGuiTag, std::set<EntityID>& selectedEntityIDs, const std::set<EntityID>& uneditableEntities, std::string& entitySearchBuffer, const DataTypeRegistry& dataTypeRegistry)
     {
         ImGui::PushStyleColor(ImGuiCol_ChildBg, ImColor(0.18f, 0.18f, 0.18f, 0.80f).Value);
         ImGui::PushStyleColor(ImGuiCol_FrameBg, ImColor(0.12f, 0.12f, 0.12f, 0.0f).Value);
@@ -1178,6 +1179,7 @@ namespace CLX
                     parentEntites,
                     imGuiTag,
                     uneditableEntities,
+                    dataTypeRegistry,
                     filter
                 ));
             }
@@ -1213,13 +1215,14 @@ namespace CLX
     }
 
     void ShowEntityHierarchyWithAddButtons(ECS& ecs, ECS& ecsBuffer, std::vector<EntityID>& rootEntities,
-        EditorCommandTracker& commandTracker, const std::string& imGuiTag, std::set<EntityID>& selectedEntityIDs, const EntityID defaultParent, const std::set<EntityID>& uneditableEntities, std::string& entitySearchBuffer)
+        EditorCommandTracker& commandTracker, const std::string& imGuiTag, std::set<EntityID>& selectedEntityIDs, const EntityID defaultParent, 
+        const std::set<EntityID>& uneditableEntities, std::string& entitySearchBuffer, const DataTypeRegistry& dataTypeRegistry)
     {
         ShowEntityAddButtons(ecs, selectedEntityIDs, rootEntities, commandTracker, imGuiTag, defaultParent);
         ImGui::Separator();
         ShowEntitySearchBar(entitySearchBuffer);
         ImGui::Separator();
-        ShowEntityHierarchy(ecs, ecsBuffer, rootEntities, commandTracker, imGuiTag, selectedEntityIDs, uneditableEntities, entitySearchBuffer);
+        ShowEntityHierarchy(ecs, ecsBuffer, rootEntities, commandTracker, imGuiTag, selectedEntityIDs, uneditableEntities, entitySearchBuffer, dataTypeRegistry);
     }
 
     [[nodiscard]] static EditorAction CreateRemoveComponentAction(ECS& ecs, const EntityID entityID, const DataTypeID& dataTypeID, ECS& ecsBuffer)

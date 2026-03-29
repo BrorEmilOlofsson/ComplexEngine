@@ -392,6 +392,7 @@ namespace CLX
 				::new(memory) Model(*this);
 			}
 
+			// Should not be const?
 			void Move(Concept* memory) const override
 			{
 				::new(memory) Model(std::move(*this));

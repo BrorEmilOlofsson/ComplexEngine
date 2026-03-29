@@ -16,9 +16,9 @@
 
 namespace CLX
 {
-	nlohmann::json SaveDataPtr(const DataTypeID dataTypeID, const void* dataPtr)
+	nlohmann::json SaveDataPtr(const DataTypeID dataTypeID, const void* dataPtr, const DataTypeRegistry& dataTypeRegistry)
 	{
-		return DataTypeRegistry::GetInstance().SaveDataJSON(dataTypeID, dataPtr);
+		return dataTypeRegistry.SaveDataJSON(dataTypeID, dataPtr);
 	}
 }
 

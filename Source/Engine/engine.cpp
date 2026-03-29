@@ -33,12 +33,10 @@ namespace CLX
         mECSRegistry.RegisterSystem<NavmeshSystem>();
         mECSRegistry.RegisterSystem<DebugShapeSystem>();
 
-        mDataTypeRegistry = &DataTypeRegistry::GetInstance();
-
-        TypeRegistration::ExecuteRegistrations(*mDataTypeRegistry, mECSRegistry);
+        TypeRegistration::ExecuteRegistrations(mDataTypeRegistry, mECSRegistry);
 
 
-        mDataTypeRegistry->Assert();
+        mDataTypeRegistry.Assert();
         mOperatingSystem.GetGraphicsFoundation().SetAssetManager(mAssetManager);
         mOperatingSystem.GetGraphicsFoundation().SetGraphicsSettings(mGraphicsSettings);
 
@@ -79,7 +77,7 @@ namespace CLX
         mBlackboard->Insert<Key_GraphicsSettings>(*mGraphicsSettings);
         mBlackboard->Insert<Key_AssetManager>(*mAssetManager);
         mBlackboard->Insert<Key_SceneManager>(mSceneManager);
-        mBlackboard->Insert<Key_DataTypeRegistry>(*mDataTypeRegistry);
+        mBlackboard->Insert<Key_DataTypeRegistry>(mDataTypeRegistry);
         mBlackboard->Insert<Key_InputState>(mInputState);
 
         mAssetManager->GetAssetLoader().SetSceneLoader([this](const std::filesystem::path& path)
@@ -253,12 +251,12 @@ namespace CLX
 
     DataTypeRegistry& Engine::GetDataTypeRegistry()
     {
-        return *mDataTypeRegistry;
+        return mDataTypeRegistry;
     }
 
     const DataTypeRegistry& Engine::GetDataTypeRegistry() const
     {
-        return *mDataTypeRegistry;
+        return mDataTypeRegistry;
     }
 
     GraphicsFoundation& Engine::GetGraphicsFoundation()

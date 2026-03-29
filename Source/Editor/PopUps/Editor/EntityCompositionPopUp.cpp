@@ -155,6 +155,7 @@ namespace CLX
         EditorCommandTracker& commandTracker = blackboard.Get<Key_CommandTracker>();
         const WindowView windowView = blackboard.Get<Key_WindowView>();
         OperatingSystem& os = blackboard.Get<Key_OperatingSystem>();
+        const DataTypeRegistry& dataTypeRegistry = blackboard.Get<Key_DataTypeRegistry>();
         EditorSceneSettings& editorSceneSettings = blackboard.Get<Key_EditorSceneSettings>();
         const InputState& input = blackboard.Get<Key_InputState>();
 
@@ -197,7 +198,8 @@ namespace CLX
                     mSelectedEntityIDs,
                     mEntityCompositionAsset->GetRootEntity(),
                     { mEntityCompositionAsset->GetRootEntity() },
-                    mEntitySearchBuffer
+                    mEntitySearchBuffer,
+                    dataTypeRegistry
                 );
             }
         }

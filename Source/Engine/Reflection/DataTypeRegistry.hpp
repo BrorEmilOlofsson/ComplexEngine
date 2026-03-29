@@ -4,8 +4,9 @@
 #include <unordered_map>
 #include <concepts>
 #include <type_traits>
+
 #include <External/nlohmann/json.hpp>
-#include "Engine/ECS/ECS.hpp"
+
 #include "Engine/Reflection/DataTypeID.hpp"
 #include "Engine/Reflection/ViewAndEditResult.hpp"
 #include "Engine/Utility/Algorithm.hpp"
@@ -17,6 +18,8 @@ namespace CLX
     using CopyFunction = void (*)(void* destinationPtr, const void* sourcePtr);
     using SwapFunction = void (*)(void* dataPtr1, void* dataPtr2);
 
+    class DataTypeRegistry;
+
     template<typename T>
     concept Editable = requires(T & data, const Blackboard & blackboard)
     {
@@ -24,9 +27,9 @@ namespace CLX
     };
 
     template<typename T>
-    concept Savable = requires(const T & data)
+    concept Savable = requires(const T & data, const DataTypeRegistry & dataTypeRegistry)
     {
-        { ToJSON(data) } -> std::same_as<nlohmann::json>;
+        { ToJSON(data, dataTypeRegistry) } -> std::same_as<nlohmann::json>;
     };
 
     template<typename T>
@@ -52,9 +55,9 @@ namespace CLX
         std::string prettyName;
         std::vector<DataTypeMemberVariable> memberVariables;
 
-        ViewAndEditResult(*viewAndEdit)(void* data, const Blackboard& blackboard) = nullptr;
-        nlohmann::json(*toJSON)(const void* data) = nullptr;
-        void (*fromJSON)(void* data, const nlohmann::json& json, const Blackboard& blackboard) = nullptr;
+        ViewAndEditResult(*viewAndEdit)(void* dataPtr, const Blackboard& blackboard) = nullptr;
+        nlohmann::json(*toJSON)(const void* dataPtr, const class DataTypeRegistry& dataTypeRegistry) = nullptr;
+        void (*fromJSON)(void* dataPtr, const nlohmann::json& json, const Blackboard& blackboard) = nullptr;
 
         InPlaceAllocateFunction inplaceAllocate = nullptr;
         DestroyFunction destroy = nullptr;
@@ -68,14 +71,16 @@ namespace CLX
     };
 
     template<typename MemberType, typename OwnerType>
-    [[nodiscard]] constexpr std::size_t GetByteOffset(MemberType OwnerType::* aMember)
+    [[nodiscard]] constexpr std::size_t GetByteOffset(MemberType OwnerType::* member)
     {
-        return (std::size_t) & reinterpret_cast<const volatile char&>((((OwnerType*)0)->*aMember));
+        return (std::size_t) & reinterpret_cast<const volatile char&>((((OwnerType*)0)->*member));
     }
 
     class DataTypeRegistry final
     {
     public:
+
+        DataTypeRegistry() = default;
 
         ViewAndEditResult ViewAndEditData(DataTypeID dataTypeID, void* data, const Blackboard& blackboard) const;
         void LoadDataJSON(const DataType& dataType, void* dataPtr, const nlohmann::json& json, const Blackboard& blackboard) const;
@@ -111,10 +116,6 @@ namespace CLX
 
     public:
 
-        static DataTypeRegistry& GetInstance();
-
-        static void Destroy();
-
         void Assert() const;
 
         template<typename T>
@@ -122,14 +123,6 @@ namespace CLX
 
         template<typename MemberType, typename ParentType>
         void RegisterMemberVariable(MemberType ParentType::* variable, const std::string& variableName, const char* customName, const bool shouldExpose, const bool canEdit);
-
-    public:
-
-        DataTypeRegistry();
-
-    private:
-
-        inline static DataTypeRegistry* sInstance = nullptr;
 
     private:
 
@@ -197,7 +190,7 @@ namespace CLX
 
         if constexpr (std::is_fundamental_v<T>)
         {
-            dataType.toJSON = [](const void* dataPtr) -> nlohmann::json
+            dataType.toJSON = [](const void* dataPtr, const DataTypeRegistry&) -> nlohmann::json
                 {
                     const T* pointer = reinterpret_cast<const T*>(dataPtr);
                     return ::ToJSON(*pointer);
@@ -205,11 +198,10 @@ namespace CLX
         }
         else if constexpr (Savable<T>)
         {
-
-            dataType.toJSON = [](const void* dataPtr) -> nlohmann::json
+            dataType.toJSON = [](const void* dataPtr, const DataTypeRegistry& dataTypeRegistry) -> nlohmann::json
                 {
                     const T* pointer = reinterpret_cast<const T*>(dataPtr);
-                    return ToJSON(*pointer);
+                    return ToJSON(*pointer, dataTypeRegistry);
                 };
         }
 
