@@ -718,6 +718,7 @@ namespace CLX
 	template<typename Ret = float, typename T>
 	constexpr float ToAspectRatio(const Vector2<T>& resolution)
 	{
+        ASSERT(resolution.y != 0 && "Resolution height cannot be zero when calculating aspect ratio.");
 		return static_cast<float>(resolution.x) / static_cast<float>(resolution.y);
 	}
 }

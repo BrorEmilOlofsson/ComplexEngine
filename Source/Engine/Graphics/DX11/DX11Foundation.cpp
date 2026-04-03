@@ -173,7 +173,7 @@ namespace CLX
 		Camera camera = renderState.GetCamera().value();
 		Matrix4x4f proj = camera.GetProjectionMatrix();
 		Vector2i resolution = renderState.GetRenderRect()->GetExtent();
-		Matrix4x4f expected = Camera::CreatePerspectiveProjectionMatrix(camera.GetHorizontalFOV(), camera.GetNearPlane(), camera.GetFarPlane(), Vector2ui(resolution));
+		Matrix4x4f expected = Camera::CreatePerspectiveProjectionMatrix(camera.GetHorizontalFOV(), camera.GetNearPlane(), camera.GetFarPlane(), ToAspectRatio(Vector2ui(resolution)));
 		if (proj != expected)
 		{
 			//throw std::runtime_error("Resolution in camera does not correspond to RenderState resolution");
@@ -238,7 +238,7 @@ namespace CLX
 
 			RenderState& r = const_cast<RenderState&>(renderState);
 			Camera camera = *renderState.GetCamera();
-			camera.SetResolution(renderSize);
+			camera.SetAspectRatio(ToAspectRatio(renderSize));
 			r.SetCamera(camera);
 		}
 

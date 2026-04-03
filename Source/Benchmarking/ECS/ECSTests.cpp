@@ -6,6 +6,8 @@
 #include "Engine/ECSEngine/Components/TransformHierarchyComponent.hpp"
 #include "Engine/ECSEngine/Components/NameComponent.hpp"
 
+#include "Engine/Utility/PrintStruct.hpp"
+
 using namespace CLX;
 
 template<std::size_t I>
@@ -37,7 +39,7 @@ TEST_CASE("Benchmarking 2")
 	registry.RegisterComponentType<FakeComponent<13>>();
 	ECS ecs(registry);
 
-	for (std::size_t i = 0; i < 100000; i++)
+	for (std::size_t i = 0; i < 1000; i++)
 	{
 		EntityID entityID = ecs.CreateEntity();
 		ecs.AddComponent<TransformComponent>(entityID);
@@ -101,5 +103,17 @@ TEST_CASE("Benchmarking 2")
 	BENCHMARK("Move ECS")
 	{
 		ECS ecs2 = std::move(ecs);
+	};
+
+	BENCHMARK("Move ComponentPool")
+	{
+		ComponentPoolSBO pool(std::type_identity<PrintStruct>{});
+
+		PrintStruct printStruct = PrintStruct();
+
+		pool.ResizeComponentIndices(1);
+        pool.AddComponent<PrintStruct>(EntityID(0), nullptr);
+
+		ComponentPoolSBO newPool = std::move(pool);
 	};
 }

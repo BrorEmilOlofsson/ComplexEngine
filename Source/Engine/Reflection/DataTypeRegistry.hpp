@@ -4,6 +4,11 @@
 #include <unordered_map>
 #include <concepts>
 #include <type_traits>
+#include <typeinfo>
+#include <any>
+#include <limits>
+#include <functional>
+#include <optional>
 
 #include <External/nlohmann/json.hpp>
 
@@ -40,12 +45,18 @@ namespace CLX
 
     struct DataTypeMemberVariable final
     {
-        std::string name = "Null";
-        std::string customVariableName = "Null";
+        std::string name;
+        std::string customName;
         DataTypeID dataTypeID = InvalidDataTypeID;
-        std::size_t byteOffset = 0;
+        std::size_t byteOffset = std::numeric_limits<std::size_t>::max();
         bool shouldExpose = true;
         bool canEdit = true;
+        std::any defaultValue;
+        std::optional<std::any> minValue;
+        std::optional<std::any> maxValue;
+        std::optional<float> editorSpeed;
+        std::function<void(void* ownerPtr, void* outPtr)> getFunction;
+        std::function<void(void* ownerPtr, const void* newValuePtr)> setFunction;
     };
 
     class DataType final
@@ -64,10 +75,26 @@ namespace CLX
         CopyFunction copy = nullptr;
         SwapFunction swap = nullptr;
 
-        std::size_t size = 0;
-        std::size_t alignment = 1;
+        std::size_t size = std::numeric_limits<std::size_t>::max();
+        std::size_t alignment = std::numeric_limits<std::size_t>::max();
         std::reference_wrapper<const std::type_info> typeInfo;
+        DataTypeID containingValueDataTypeID = InvalidDataTypeID;
         bool isComponent = false;
+    };
+
+    struct MemberMetaData
+    {
+        std::optional<std::string> customName;
+        bool shouldExpose = true;
+        bool canEdit = true;
+        std::optional<std::any> defaultValue;
+        std::optional<std::any> minValue;
+        std::optional<std::any> maxValue;
+        std::optional<float> editorSpeed;
+        DataTypeID dataTypeID;
+        DataTypeID ownerDataTypeID;
+        std::function<void(void* ownerPtr, void* outPtr)> getFunction;
+        std::function<void(void* ownerPtr, const void* newValuePtr)> setFunction;
     };
 
     template<typename MemberType, typename OwnerType>
@@ -122,7 +149,9 @@ namespace CLX
         void RegisterType(const bool isComponent);
 
         template<typename MemberType, typename ParentType>
-        void RegisterMemberVariable(MemberType ParentType::* variable, const std::string& variableName, const char* customName, const bool shouldExpose, const bool canEdit);
+        void RegisterMemberVariable(MemberType ParentType::* variable, const std::string& variableName, const MemberMetaData& memberMetaData);
+
+        void RegisterMemberVariable2(const std::string& variableName, const MemberMetaData& memberMetaData);
 
     private:
 
@@ -169,6 +198,17 @@ namespace CLX
 
         const std::type_info& typeInfo = typeid(T);
 
+        DataTypeID containingValueDataTypeID = InvalidDataTypeID;
+
+        constexpr bool HasContainingValue = requires (T t)
+        {
+            typename T::value_type;
+        };
+        if constexpr (HasContainingValue)
+        {
+            containingValueDataTypeID = GetDataTypeID<typename T::value_type>();
+        }
+
         DataType dataType
         {
             .name = std::move(name),
@@ -176,6 +216,7 @@ namespace CLX
             .size = sizeof(T),
             .alignment = alignof(T),
             .typeInfo = typeInfo,
+            .containingValueDataTypeID = containingValueDataTypeID,
             .isComponent = isComponent
         };
 
@@ -232,35 +273,74 @@ namespace CLX
     }
 
     template<typename MemberType, typename OwnerType>
-    void DataTypeRegistry::RegisterMemberVariable(MemberType OwnerType::* variable, const std::string& variableName, const char* customName, const bool shouldExpose, const bool canEdit)
+    void DataTypeRegistry::RegisterMemberVariable(MemberType OwnerType::* variable, const std::string& variableName, const MemberMetaData& memberMetaData)
     {
-        DataTypeMemberVariable componentProperty;
-        componentProperty.name = variableName;
-        componentProperty.dataTypeID = GetDataTypeID<MemberType>();
-        componentProperty.byteOffset = GetByteOffset(variable);
-        componentProperty.shouldExpose = shouldExpose;
-        componentProperty.canEdit = canEdit;
-
-        if (customName != nullptr)
+        DataTypeMemberVariable member
         {
-            componentProperty.customVariableName = customName;
+            .name = variableName,
+            .dataTypeID = GetDataTypeID<MemberType>(),
+            .byteOffset = GetByteOffset(variable),
+            .shouldExpose = memberMetaData.shouldExpose,
+            .canEdit = memberMetaData.canEdit,
+            .minValue = memberMetaData.minValue,
+            .maxValue = memberMetaData.maxValue,
+            .editorSpeed = memberMetaData.editorSpeed,
+            .setFunction = memberMetaData.setFunction
+        };
+        
+        if (memberMetaData.customName.has_value())
+        {
+            member.customName = std::move(memberMetaData.customName.value());
         }
         else
         {
-            componentProperty.customVariableName = ConvertAndAddSpaceToSubStringWithUpperCase(variableName);
+            member.customName = ConvertAndAddSpaceToSubStringWithUpperCase(variableName);
         }
 
-        {
-            const DataType* ownerDataType = Find<OwnerType>();
-            ASSERT(ownerDataType != nullptr);
-        }
+        ASSERT(Find<OwnerType>() != nullptr);
 
         auto& ownerMembers = Find<OwnerType>()->memberVariables;
         auto it = std::ranges::find_if(ownerMembers, [&variableName](const DataTypeMemberVariable& obj) { return obj.name == variableName; });
 
         if (it == end(ownerMembers))
         {
-            ownerMembers.push_back(componentProperty);
+            ownerMembers.push_back(member);
+        }
+    }
+
+    inline void DataTypeRegistry::RegisterMemberVariable2(const std::string& variableName, const MemberMetaData& memberMetaData)
+    {
+        DataTypeMemberVariable member
+        {
+            .name = variableName,
+            .dataTypeID = memberMetaData.dataTypeID,
+            .byteOffset = 0,
+            .shouldExpose = memberMetaData.shouldExpose,
+            .canEdit = memberMetaData.canEdit,
+            .minValue = memberMetaData.minValue,
+            .maxValue = memberMetaData.maxValue,
+            .editorSpeed = memberMetaData.editorSpeed,
+            .getFunction = memberMetaData.getFunction,
+            .setFunction = memberMetaData.setFunction
+        };
+
+        if (memberMetaData.customName.has_value())
+        {
+            member.customName = std::move(memberMetaData.customName.value());
+        }
+        else
+        {
+            member.customName = ConvertAndAddSpaceToSubStringWithUpperCase(variableName);
+        }
+
+        ASSERT(memberMetaData.ownerDataTypeID != InvalidDataTypeID);
+
+        auto& ownerMembers = Find(memberMetaData.ownerDataTypeID)->memberVariables;
+        auto it = std::ranges::find_if(ownerMembers, [&variableName](const DataTypeMemberVariable& obj) { return obj.name == variableName; });
+
+        if (it == end(ownerMembers))
+        {
+            ownerMembers.push_back(member);
         }
     }
 }

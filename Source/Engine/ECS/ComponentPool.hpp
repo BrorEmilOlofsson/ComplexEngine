@@ -316,7 +316,7 @@ namespace CLX
 			virtual void ResizeComponentIndices(const std::size_t size) = 0;
 
 			virtual void Clone(Concept* memory) const = 0;
-			virtual void Move(Concept* memory) const = 0;
+			virtual void Move(Concept* memory) = 0;
 		};
 
 		template<typename T>
@@ -329,17 +329,32 @@ namespace CLX
 
 			void* AddComponent(const EntityID entityID, const void* defaultValuePtr) override
 			{
-				T defaultValue = defaultValuePtr == nullptr ? T() : *reinterpret_cast<const T*>(defaultValuePtr);
 				const uint32_t previousComponentIndex = mEntityIDToComponentIndex[entityID.id];
 				if (previousComponentIndex != InvalidComponentIndex)
 				{
-					mComponents[previousComponentIndex] = std::move(defaultValue);
+					if (defaultValuePtr)
+					{
+						mComponents[previousComponentIndex] = *reinterpret_cast<const T*>(defaultValuePtr);
+					}
+					else
+					{
+						mComponents[previousComponentIndex] = T{};
+					}
 					return &mComponents[previousComponentIndex];
 				}
 
 				const uint32_t componentIndex = static_cast<uint32_t>(mComponents.size());
 				mEntityIDToComponentIndex[entityID.id] = componentIndex;
-				mComponents.emplace_back(std::move(defaultValue));
+
+				if (defaultValuePtr)
+				{
+					mComponents.emplace_back(*reinterpret_cast<const T*>(defaultValuePtr));
+				}
+				else
+				{
+					mComponents.emplace_back();
+				}
+
 				mComponentIndexToEntityID[componentIndex] = entityID;
 				return &mComponents.back();
 			}
@@ -393,7 +408,7 @@ namespace CLX
 			}
 
 			// Should not be const?
-			void Move(Concept* memory) const override
+			void Move(Concept* memory) override
 			{
 				::new(memory) Model(std::move(*this));
 			}

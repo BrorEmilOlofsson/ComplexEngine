@@ -16,6 +16,7 @@
 #include "Engine/ECSEngine/Utility/ECSEntityCompositionUtility.hpp"
 #include "Engine/ECSEngine/Utility/ECSTransformHierarchyUtility.hpp"
 #include "Engine/Utility/Visitor.hpp"
+#include "Engine/Reflection/PropertyPath.hpp"
 
 namespace CLX
 {
@@ -1249,6 +1250,12 @@ namespace CLX
             return std::nullopt;
         }
 
+        Blackboard newBlackboard = blackboard;
+        PropertyPath propertyPath;
+        propertyPath.entityID = entityID;
+        propertyPath.componentDataTypeID = componentDataTypeID;
+        newBlackboard.Insert<Key_CurrentPropertyPath>(propertyPath);
+
         const std::string& componentName = dataType->prettyName + "##Component";
 
         const bool isOpen = ImGui::TreeNodeEx(componentName.c_str(), ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_DefaultOpen);
@@ -1268,7 +1275,7 @@ namespace CLX
         if (isOpen)
         {
             PROFILER_BEGIN("View Component Data");
-            const ViewAndEditResult viewAndEditResult = dataTypeRegistry.ViewAndEditData(componentDataTypeID, componentPtr, blackboard);
+            const ViewAndEditResult viewAndEditResult = dataTypeRegistry.ViewAndEditData(componentDataTypeID, componentPtr, newBlackboard);
             anyActiveItem |= viewAndEditResult.isActive;
             PROFILER_END();
         }
@@ -1292,7 +1299,7 @@ namespace CLX
             ImGui::BeginDisabled(copiedComponent.json.is_null() || copiedComponent.dataTypeID != componentDataTypeID);
             if (ImGui::MenuItem("Paste"))
             {
-                dataTypeRegistry.LoadDataJSON(componentDataTypeID, componentPtr, copiedComponent.json, blackboard);
+                dataTypeRegistry.LoadDataJSON(componentDataTypeID, componentPtr, copiedComponent.json, newBlackboard);
             }
             ImGui::EndDisabled();
 

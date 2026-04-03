@@ -483,7 +483,7 @@ namespace CLX
     {
         ViewAndEditResult viewAndEditResult;
 
-        Degreesf horizontalFoV = ToDegrees(camera.GetHorizontalFOV());
+        /*Degreesf horizontalFoV = ToDegrees(camera.GetHorizontalFOV());
         float nearPlane = camera.GetNearPlane();
         float farPlane = camera.GetFarPlane();
 
@@ -504,6 +504,36 @@ namespace CLX
         if (ImGui::DragFloat("FarPlane", &farPlane, 0.1f, 0.5f, 30000.f))
         {
             camera.SetFarPlane(farPlane, resolution);
+            viewAndEditResult.isEdited = true;
+            viewAndEditResult.isActive = ImGui::IsItemActive();
+        }*/
+
+        const float aspectRatio = ToAspectRatio(resolution);
+
+        Degreesf horizontalFoV = ToDegrees(camera.GetHorizontalFOV());
+        float nearPlane = camera.GetNearPlane();
+        float farPlane = camera.GetFarPlane();
+
+        if (ImGui::DragFloat("HorizontalFoV", &horizontalFoV.Value(), 0.1f, 0.f, 179.f))
+        {
+            camera.SetHorizontalFOV(ToRadians(horizontalFoV));
+            camera.SetAspectRatio(aspectRatio);
+            viewAndEditResult.isEdited = true;
+            viewAndEditResult.isActive = ImGui::IsItemActive();
+        }
+
+        if (ImGui::DragFloat("NearPlane", &nearPlane, 0.1f, 0.f, 10.f))
+        {
+            camera.SetNearPlane(nearPlane);
+            camera.SetAspectRatio(aspectRatio);
+            viewAndEditResult.isEdited = true;
+            viewAndEditResult.isActive = ImGui::IsItemActive();
+        }
+
+        if (ImGui::DragFloat("FarPlane", &farPlane, 0.1f, 0.5f, 30000.f))
+        {
+            camera.SetFarPlane(farPlane);
+            camera.SetAspectRatio(aspectRatio);
             viewAndEditResult.isEdited = true;
             viewAndEditResult.isActive = ImGui::IsItemActive();
         }

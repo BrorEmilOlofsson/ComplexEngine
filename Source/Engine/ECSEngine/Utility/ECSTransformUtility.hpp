@@ -1,9 +1,12 @@
 #pragma once
+#include <vector>
+
+#include "Engine/Utility/Index.hpp"
+
 #include "Engine/Math/Transform3.hpp"
 #include "Engine/ECS/ECS.hpp"
 #include "Engine/ECSEngine/Components/TransformHierarchyComponent.hpp"
 #include "Engine/ECSEngine/Components/TransformComponent.hpp"
-#include <variant>
 
 namespace CLX
 {
@@ -95,11 +98,6 @@ namespace CLX
 		}
 		return true;
 	}
-
-	struct LastIndex {};
-	struct FirstIndex {};
-	struct Index { std::size_t mIndex = 0; };
-	using ChildIndexSetting = std::variant<Index, FirstIndex, LastIndex>;
 
 	inline bool SetParentEntity(ECS& ecs, const EntityID childID, const EntityID parentID, ChildIndexSetting indexSetting = LastIndex{})
 	{

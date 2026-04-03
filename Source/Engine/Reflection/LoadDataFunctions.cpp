@@ -118,16 +118,17 @@ namespace CLX
 	void FromJSON(Camera& camera, const nlohmann::json& json)
 	{
 		const Vector2ui resolution = Vector2ui(1600, 900);
-
+        const float aspectRatio = ToAspectRatio(resolution);
 		Point3f position;
 		position.x = json["Position"]["x"];
 		position.y = json["Position"]["y"];
 		position.z = json["Position"]["z"];
 
+        camera.SetAspectRatio(aspectRatio);
 		camera.SetPosition(position);
-		camera.SetHorizontalFOV(Radiansf(json["HorizontalFoV"]), resolution);
-		camera.SetNearPlane(json["NearPlane"], resolution);
-		camera.SetFarPlane(json["FarPlane"], resolution);
+		camera.SetHorizontalFOV(Radiansf(json["HorizontalFoV"]));
+		camera.SetNearPlane(json["NearPlane"]);
+		camera.SetFarPlane(json["FarPlane"]);
 	}
 
 	static void FromJSON(MeshAssetHandle& mesh, const nlohmann::json& json, AssetManager& assetManager)

@@ -27,4 +27,6 @@ namespace CLX
     using Key_ECSRegistry = BlackboardKey<class ECSRegistry&, "ECSRegistry">;
     using Key_OnEntitySelected = BlackboardKey<std::function<void(struct EntityID)>&, "OnEntitySelected">;
     using Key_CurrentECS = BlackboardKey<class ECS&, "CurrentECS">;
+    using Key_CurrentPropertyPath = BlackboardKey<struct PropertyPath&, "CurrentPropertyPath">;
+    using Key_ActivePropertyPath = BlackboardKey<struct PropertyPath&, "ActivePropertyPath">;
 }

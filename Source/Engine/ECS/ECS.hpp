@@ -658,6 +658,9 @@ namespace CLX
         template<typename T>
         [[nodiscard]] const T* GetComponent(const EntityID entityID) const;
 
+        [[nodiscard]] void* GetComponent(const EntityID entityID, const DataTypeID& dataTypeID);
+        [[nodiscard]] const void* GetComponent(const EntityID entityID, const DataTypeID& dataTypeID) const;
+
         template<typename T>
         [[nodiscard]] bool HasComponent(const EntityID entityID) const;
 
@@ -671,18 +674,6 @@ namespace CLX
 
         template<typename T>
         [[nodiscard]] std::size_t GetComponentCount() const;
-
-        //template<typename... Ts>
-        //[[nodiscard]] ComponentView<false, Ts...> View();
-
-        //template<typename... Ts>
-        //[[nodiscard]] ConstComponentView<false, Ts...> View() const;
-
-        //template<typename... Ts>
-        //[[nodiscard]] ComponentView<true, Ts...> ViewUsingEntityID();
-
-        //template<typename... Ts>
-        //[[nodiscard]] ConstComponentView<true, Ts...> ViewUsingEntityID() const;
 
         template<typename Func>
         void ForEach(Func&& func);
@@ -830,6 +821,26 @@ namespace CLX
         }
         const std::size_t componentTypeIndex = GetComponentTypeIndex<T>();
         return GetComponentPool(componentTypeIndex).GetComponent<T>(entityID);
+    }
+
+    inline void* ECS::GetComponent(const EntityID entityID, const DataTypeID& dataTypeID)
+    {
+        if (!IsEntityValid(entityID))
+        {
+            return nullptr;
+        }
+        const std::size_t componentTypeIndex = mRegistry.GetComponentTypeIndex(dataTypeID);
+        return GetComponentPool(componentTypeIndex).GetComponent(entityID);
+    }
+
+    inline const void* ECS::GetComponent(const EntityID entityID, const DataTypeID& dataTypeID) const
+    {
+        if (!IsEntityValid(entityID))
+        {
+            return nullptr;
+        }
+        const std::size_t componentTypeIndex = mRegistry.GetComponentTypeIndex(dataTypeID);
+        return GetComponentPool(componentTypeIndex).GetComponent(entityID);
     }
 
     template<typename T>

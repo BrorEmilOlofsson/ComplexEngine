@@ -2,6 +2,7 @@
 #include "Engine/Math/Transform3.hpp"
 #include "Engine/Math/Matrix4x4.hpp"
 #include "Engine/Math/Vector3.hpp"
+#include "Engine/Math/UnitVector3.hpp"
 #include "Engine/Math/Vector2.hpp"
 #include "Engine/Math/Angle.hpp"
 
@@ -30,22 +31,21 @@ namespace CLX
 
 		constexpr Camera();
 		
-		constexpr void UpdateProjection(const Vector2ui& resolution);
 		constexpr void UpdateProjection(const float aspectRatio);
 
 		constexpr void SetOrthographicProjection(const float halfSize, const float nearPlane, const float farPlane);
 
-		constexpr void SetCameraType(const eCameraType cameraType, const Vector2ui& resolution);
+		constexpr void SetCameraType(const eCameraType cameraType);
 
 		constexpr void SetPosition(const Point3f& position);
 		constexpr void SetRotation(const Rotatorf& rotationInDegree);
 		constexpr void SetRotation(const RotationMatrix3f& rotationMatrix);
         constexpr void SetTransform(const Transform& transform);
-		constexpr void SetNearPlane(const float nearPlane, const Vector2ui& resolution);
-		constexpr void SetFarPlane(const float farPlane, const Vector2ui& resolution);
-		constexpr void SetHorizontalFOV(const Radiansf horizontalFoVRad, const Vector2ui& resolution);
-		constexpr void SetVerticalFOV(const Radiansf verticalFOV, const Vector2ui& resolution);
-		constexpr void SetResolution(const Vector2ui& resolution);
+		constexpr void SetNearPlane(const float nearPlane);
+		constexpr void SetFarPlane(const float farPlane);
+		constexpr void SetHorizontalFOV(const Radiansf horizontalFoVRad);
+		constexpr void SetAspectRatio(const float aspectRatio);
+        constexpr void SetResolution(const Vector2ui resolution);
 
 	public:
 
@@ -69,7 +69,6 @@ namespace CLX
 		[[nodiscard]] constexpr float GetAspectRatio() const noexcept;
 
 		[[nodiscard]] constexpr static Matrix4x4f CreatePerspectiveProjectionMatrix(const Radiansf verticalFOV, const float nearPlane, const float farPlane, const float aspectRatio);
-		[[nodiscard]] constexpr static Matrix4x4f CreatePerspectiveProjectionMatrix(const Radiansf verticalFOV, const float nearPlane, const float farPlane, const Vector2ui resolution);
 		[[nodiscard]] constexpr static Matrix4x4f CreateOrthographicProjectionMatrix(const float halfSize, const float nearPlane, const float farPlane);
 
 	private:
@@ -189,11 +188,6 @@ namespace CLX
 		return matrix;
 	}
 
-	constexpr Matrix4x4f Camera::CreatePerspectiveProjectionMatrix(const Radiansf verticalFOV, const float nearPlane, const float farPlane, const Vector2ui resolution)
-	{
-		return CreatePerspectiveProjectionMatrix(verticalFOV, nearPlane, farPlane, ToAspectRatio(resolution));
-	}
-
 	constexpr Matrix4x4f Camera::CreateOrthographicProjectionMatrix(const float halfSize, const float nearPlane, const float farPlane)
 	{
 		const float left = -halfSize;
@@ -239,71 +233,70 @@ namespace CLX
 		mTransform = transform;
     }
 
-	constexpr void Camera::UpdateProjection(const Vector2ui& resolution)
+	constexpr void Camera::UpdateProjection(const float aspectRatio)
 	{
-		const float aspectRatio = ToAspectRatio(resolution);
 		mAspectRatio = aspectRatio;
 		switch (mCameraType)
 		{
 		case eCameraType::Perspective:
-			UpdateProjection(aspectRatio);
+			mProjectionMatrix = CreatePerspectiveProjectionMatrix(mVerticalFOV, mNearPlane, mFarPlane, aspectRatio);
 			break;
 		case eCameraType::Orthographic:
 			break;
 		}
 	}
 
-	constexpr void Camera::UpdateProjection(const float aspectRatio)
-	{
-		mProjectionMatrix = CreatePerspectiveProjectionMatrix(mVerticalFOV, mNearPlane, mFarPlane, aspectRatio);
-		mAspectRatio = aspectRatio;
-	}
-
-	constexpr void Camera::SetCameraType(const eCameraType cameraType, const Vector2ui& resolution)
+	constexpr void Camera::SetCameraType(const eCameraType cameraType)
 	{
 		mCameraType = cameraType;
-		UpdateProjection(resolution);
+		UpdateProjection(mAspectRatio);
 	}
 
-	constexpr void Camera::SetNearPlane(const float nearPlane, const Vector2ui& resolution)
+	constexpr void Camera::SetNearPlane(const float nearPlane)
 	{
 		mNearPlane = nearPlane;
 
 		if (mCameraType == eCameraType::Perspective)
 		{
-			UpdateProjection(resolution);
+			UpdateProjection(mAspectRatio);
 		}
 	}
 
-	constexpr void Camera::SetFarPlane(const float farPlane, const Vector2ui& resolution)
+	constexpr void Camera::SetFarPlane(const float farPlane)
 	{
 		mFarPlane = farPlane;
 
 		if (mCameraType == eCameraType::Perspective)
 		{
-			UpdateProjection(resolution);
+			UpdateProjection(mAspectRatio);
 		}
 	}
 
-	constexpr void Camera::SetHorizontalFOV(const Radiansf horizontalFoVRad, const Vector2ui& resolution)
+	constexpr void Camera::SetHorizontalFOV(const Radiansf horizontalFoVRad)
 	{
-		mVerticalFOV = CalculateVerticalFOV(horizontalFoVRad, ToAspectRatio(resolution));
+		mVerticalFOV = CalculateVerticalFOV(horizontalFoVRad, mAspectRatio);
 
 		if (mCameraType == eCameraType::Perspective)
 		{
-			UpdateProjection(resolution);
+			UpdateProjection(mAspectRatio);
 		}
 	}
 
-	constexpr void Camera::SetResolution(const Vector2ui& resolution)
+	constexpr void Camera::SetAspectRatio(const float aspectRatio)
 	{
-		if (resolution.x == 0 || resolution.y == 0)
+		if (aspectRatio == 0)
 		{
-            ASSERT(false && "Resolution components must be non-zero.");
+            ASSERT(false && "Aspect ratio cannot be zero");
 		}
+        mAspectRatio = aspectRatio;
 		if (mCameraType == eCameraType::Perspective)
 		{
-			UpdateProjection(resolution);
+			UpdateProjection(mAspectRatio);
 		}
 	}
+
+	constexpr void Camera::SetResolution(const Vector2ui resolution)
+	{
+		SetAspectRatio(ToAspectRatio(resolution));
+    }
 }
