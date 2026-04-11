@@ -177,8 +177,10 @@ namespace CLX
                         .shouldExpose = shouldExpose,
                         .canEdit = canEdit,
                         .editorSpeed = Extract<EditorSpeed>(args...).transform([](const auto& editorSpeed) { return editorSpeed.speed; }),
+                        .dataTypeID = customVariableData.dataTypeID,
+                        .ownerDataTypeID = customVariableData.ownerDataTypeID,
                         .getFunction = customVariableData.getFunction,
-                        .setFunction = customVariableData.setFunction
+                        .setFunction = customVariableData.setFunction,
                     };
 
                     dataTypeRegistry.RegisterMemberVariable2(
@@ -241,12 +243,12 @@ namespace CLX
 #define REGISTER_DATATYPE(DATATYPE) inline bool  Reflection_ECS_Registered_Datatype_##DATATYPE = CLX::TypeRegistration::RegisterType<DATATYPE>();
 
 #define REGISTER_MEMBER(VARIABLE, ...) \
-	inline bool COMBINE_FOR_UNIQUE_NAME(Reflection_ECS_Registered_Property_, __COUNTER__) = \
+	static bool COMBINE_FOR_UNIQUE_NAME(Reflection_ECS_Registered_Property_, __COUNTER__) = \
 		CLX::TypeRegistration::RegisterMember(&VARIABLE, CLX::ExtractVariableNameFromDataTypeName(CONVERT_TO_STRING(VARIABLE)), __VA_ARGS__);
 
 
 #define REGISTER_MEMBER_2(VARIABLE_DATA, ...) \
-	inline bool COMBINE_FOR_UNIQUE_NAME(Reflection_ECS_Registered_Property_, __COUNTER__) = \
+	static bool COMBINE_FOR_UNIQUE_NAME(Reflection_ECS_Registered_Property_, __COUNTER__) = \
 		CLX::TypeRegistration::RegisterMember2(VARIABLE_DATA, __VA_ARGS__);
 
 #define REGISTER_DATATYPE_CONST_POINTER(DATATYPE) inline bool Reflection_ECS_Registered_Datatype_Const_Pointer_##DATATYPE = CLX::TypeRegistration::RegisterType<const DATATYPE*>();

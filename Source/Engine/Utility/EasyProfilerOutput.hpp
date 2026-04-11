@@ -1,6 +1,6 @@
 #pragma once
 #include "Engine/Utility/Algorithm.hpp"
-#include "External/profiler.h"
+#include <External/profiler.h>
 #include <filesystem>
 
 namespace CLX
@@ -27,6 +27,8 @@ namespace CLX
 
 		const std::filesystem::path fileNameWithCounter = AppendCounterIfAlreadyExist(filePath);
 
-		PROFILER_DUMP_FILE(std::filesystem::absolute(fileNameWithCounter).string().c_str());
+        const std::filesystem::path absolutePath = std::filesystem::absolute(fileNameWithCounter);
+
+		PROFILER_DUMP_FILE(absolutePath.string().c_str());
 	}
 }

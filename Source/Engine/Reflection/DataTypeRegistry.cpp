@@ -96,17 +96,7 @@ namespace CLX
         return it->second;
     }
 
-    static void* PtrAdd(void* ptr, const std::size_t offset)
-    {
-        return reinterpret_cast<char*>(ptr) + offset;
-    }
-
-    static const void* PtrAdd(const void* ptr, const std::size_t offset)
-    {
-        return reinterpret_cast<const char*>(ptr) + offset;
-    }
-
-    ViewAndEditResult DataTypeRegistry::ViewAndEditData(DataTypeID dataTypeID, void* dataPtr, const Blackboard& blackboard) const
+    ViewAndEditResult DataTypeRegistry::ViewAndEditData(const DataTypeID dataTypeID, void* const dataPtr, const Blackboard& blackboard, const DataTypeMemberVariable* memberData) const
     {
         const DataType* dataType = Find(dataTypeID);
         if (dataType == nullptr)
@@ -115,7 +105,7 @@ namespace CLX
         }
         if (dataType->viewAndEdit != nullptr)
         {
-            return dataType->viewAndEdit(dataPtr, blackboard);
+            return dataType->viewAndEdit(dataPtr, blackboard, memberData);
         }
 
         ViewAndEditResult viewAndEditResult;
@@ -127,12 +117,27 @@ namespace CLX
             }
 
             ImGui::BeginDisabled(!member.canEdit);
-            void* memberDataPtr = PtrAdd(dataPtr, member.byteOffset);
-            Blackboard newBlackboard = blackboard;
-            newBlackboard.Insert<Key_VariableName>(member.customName);
-            PropertyPath& propertyPath = newBlackboard.Get<Key_CurrentPropertyPath>();
-            propertyPath.elements.push_back(member.name);
-            viewAndEditResult |= ViewAndEditData(member.dataTypeID, memberDataPtr, newBlackboard);
+            if (std::holds_alternative<ByteOffset>(member.memberType))
+            {
+                void* memberDataPtr = dataPtr + std::get<ByteOffset>(member.memberType);
+                Blackboard newBlackboard = blackboard;
+                newBlackboard.Insert<Key_VariableName>(member.customName);
+                PropertyPath& propertyPath = newBlackboard.Get<Key_CurrentPropertyPath>();
+                propertyPath.elements.push_back(member.name);
+                viewAndEditResult |= ViewAndEditData(member.dataTypeID, memberDataPtr, newBlackboard, &member);
+            }
+            else
+            {
+                const DataType* memberDataType = Find(member.dataTypeID);
+                ASSERT(memberDataType != nullptr);
+                void* ownerPtr = dataPtr;
+                std::unique_ptr<std::byte[]> outPtr = std::make_unique<std::byte[]>(memberDataType->size);
+                FunctionMember functionMember = std::get<FunctionMember>(member.memberType);
+                InplaceAllocateData(member.dataTypeID, outPtr.get());
+                functionMember.getFunction(ownerPtr, outPtr.get());
+                viewAndEditResult |= ViewAndEditData(member.dataTypeID, outPtr.get(), blackboard);
+
+            }
 
             if (viewAndEditResult.isActive)
             {
@@ -165,7 +170,7 @@ namespace CLX
                 continue;
             }
 
-            void* const memberPtr = PtrAdd(dataPtr, member.byteOffset);
+            void* const memberPtr = dataPtr + std::get<ByteOffset>(member.memberType);
             const nlohmann::json& memberJSON = json[member.name];
             LoadDataJSON(*memberDataType, memberPtr, memberJSON, blackboard);
         }
@@ -199,7 +204,7 @@ namespace CLX
                 continue;
             }
 
-            const void* const memberPtr = PtrAdd(dataPtr, member.byteOffset);
+            const void* const memberPtr = dataPtr + std::get<ByteOffset>(member.memberType);
             json[member.name] = SaveDataJSON(*memberDataType, memberPtr);
         }
 

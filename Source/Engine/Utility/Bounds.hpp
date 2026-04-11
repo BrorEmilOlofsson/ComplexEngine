@@ -1,5 +1,4 @@
 #pragma once
-#include <functional>
 #include <type_traits>
 #include "Engine/Utility/Assert.hpp"
 
@@ -52,7 +51,6 @@ namespace CLX
 		[[nodiscard]] constexpr T GetCenter() const noexcept;
 		[[nodiscard]] constexpr ExtentType GetExtent() const noexcept;
 
-		
 	private:
 
 		constexpr void Assert();

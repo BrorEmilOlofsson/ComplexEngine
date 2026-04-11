@@ -6,29 +6,26 @@
 #include <type_traits>
 #include <typeinfo>
 #include <any>
-#include <limits>
 #include <functional>
 #include <optional>
 
 #include <External/nlohmann/json.hpp>
 
 #include "Engine/Reflection/DataTypeID.hpp"
+#include "Engine/Reflection/DataType.hpp"
+#include "Engine/Reflection/MemberVariable.hpp"
 #include "Engine/Reflection/ViewAndEditResult.hpp"
 #include "Engine/Utility/Algorithm.hpp"
 
 namespace CLX
 {
-    using InPlaceAllocateFunction = void(*)(void* data, const void* defaultValuePtr);
-    using DestroyFunction = void(*)(void* data);
-    using CopyFunction = void (*)(void* destinationPtr, const void* sourcePtr);
-    using SwapFunction = void (*)(void* dataPtr1, void* dataPtr2);
 
     class DataTypeRegistry;
 
     template<typename T>
-    concept Editable = requires(T & data, const Blackboard & blackboard)
+    concept Editable = requires(T & data, const Blackboard & blackboard, const DataTypeMemberVariable* memberData)
     {
-        { ViewAndEditValue(data, blackboard) } -> std::same_as<ViewAndEditResult>;
+        { ViewAndEditValue(data, blackboard, memberData) } -> std::same_as<ViewAndEditResult>;
     };
 
     template<typename T>
@@ -41,45 +38,6 @@ namespace CLX
     concept Loadable = requires(T & data, const nlohmann::json & json, const Blackboard & blackboard)
     {
         { FromJSON(data, json, blackboard) };
-    };
-
-    struct DataTypeMemberVariable final
-    {
-        std::string name;
-        std::string customName;
-        DataTypeID dataTypeID = InvalidDataTypeID;
-        std::size_t byteOffset = std::numeric_limits<std::size_t>::max();
-        bool shouldExpose = true;
-        bool canEdit = true;
-        std::any defaultValue;
-        std::optional<std::any> minValue;
-        std::optional<std::any> maxValue;
-        std::optional<float> editorSpeed;
-        std::function<void(void* ownerPtr, void* outPtr)> getFunction;
-        std::function<void(void* ownerPtr, const void* newValuePtr)> setFunction;
-    };
-
-    class DataType final
-    {
-    public:
-        std::string name;
-        std::string prettyName;
-        std::vector<DataTypeMemberVariable> memberVariables;
-
-        ViewAndEditResult(*viewAndEdit)(void* dataPtr, const Blackboard& blackboard) = nullptr;
-        nlohmann::json(*toJSON)(const void* dataPtr, const class DataTypeRegistry& dataTypeRegistry) = nullptr;
-        void (*fromJSON)(void* dataPtr, const nlohmann::json& json, const Blackboard& blackboard) = nullptr;
-
-        InPlaceAllocateFunction inplaceAllocate = nullptr;
-        DestroyFunction destroy = nullptr;
-        CopyFunction copy = nullptr;
-        SwapFunction swap = nullptr;
-
-        std::size_t size = std::numeric_limits<std::size_t>::max();
-        std::size_t alignment = std::numeric_limits<std::size_t>::max();
-        std::reference_wrapper<const std::type_info> typeInfo;
-        DataTypeID containingValueDataTypeID = InvalidDataTypeID;
-        bool isComponent = false;
     };
 
     struct MemberMetaData
@@ -98,9 +56,21 @@ namespace CLX
     };
 
     template<typename MemberType, typename OwnerType>
-    [[nodiscard]] constexpr std::size_t GetByteOffset(MemberType OwnerType::* member)
+    [[nodiscard]] constexpr ByteOffset GetByteOffset(MemberType OwnerType::* member)
     {
-        return (std::size_t) & reinterpret_cast<const volatile char&>((((OwnerType*)0)->*member));
+        return ByteOffset{ (std::size_t) & reinterpret_cast<const volatile char&>((((OwnerType*)0)->*member)) };
+    }
+
+    template<typename T>
+    [[nodiscard]] constexpr T* operator+(T* ptr, const ByteOffset offset)
+    {
+        return static_cast<T*>(static_cast<char*>(ptr) + offset.value);
+    }
+
+    template<typename T>
+    [[nodiscard]] constexpr const T* operator+(const T* ptr, const ByteOffset offset)
+    {
+        return static_cast<const T*>(static_cast<const char*>(ptr) + offset.value);
     }
 
     class DataTypeRegistry final
@@ -109,7 +79,7 @@ namespace CLX
 
         DataTypeRegistry() = default;
 
-        ViewAndEditResult ViewAndEditData(DataTypeID dataTypeID, void* data, const Blackboard& blackboard) const;
+        ViewAndEditResult ViewAndEditData(DataTypeID dataTypeID, void* data, const Blackboard& blackboard, const DataTypeMemberVariable* memberData = nullptr) const;
         void LoadDataJSON(const DataType& dataType, void* dataPtr, const nlohmann::json& json, const Blackboard& blackboard) const;
         void LoadDataJSON(DataTypeID dataTypeID, void* dataPtr, const nlohmann::json& json, const Blackboard& blackboard) const;
         nlohmann::json SaveDataJSON(const DataType& dataType, const void* dataPtr) const;
@@ -222,10 +192,10 @@ namespace CLX
 
         if constexpr (Editable<T>)
         {
-            dataType.viewAndEdit = [](void* dataPtr, const Blackboard& blackboard) -> ViewAndEditResult
+            dataType.viewAndEdit = [](void* dataPtr, const Blackboard& blackboard, const DataTypeMemberVariable* member) -> ViewAndEditResult
                 {
                     T* pointer = reinterpret_cast<T*>(dataPtr);
-                    return ViewAndEditValue(*pointer, blackboard);
+                    return ViewAndEditValue(*pointer, blackboard, member);
                 };
         }
 
@@ -279,13 +249,12 @@ namespace CLX
         {
             .name = variableName,
             .dataTypeID = GetDataTypeID<MemberType>(),
-            .byteOffset = GetByteOffset(variable),
+            .memberType = GetByteOffset(variable),
             .shouldExpose = memberMetaData.shouldExpose,
             .canEdit = memberMetaData.canEdit,
             .minValue = memberMetaData.minValue,
             .maxValue = memberMetaData.maxValue,
-            .editorSpeed = memberMetaData.editorSpeed,
-            .setFunction = memberMetaData.setFunction
+            .editorSpeed = memberMetaData.editorSpeed
         };
         
         if (memberMetaData.customName.has_value())
@@ -314,19 +283,17 @@ namespace CLX
         {
             .name = variableName,
             .dataTypeID = memberMetaData.dataTypeID,
-            .byteOffset = 0,
+            .memberType = FunctionMember{ memberMetaData.getFunction, memberMetaData.setFunction },
             .shouldExpose = memberMetaData.shouldExpose,
             .canEdit = memberMetaData.canEdit,
             .minValue = memberMetaData.minValue,
             .maxValue = memberMetaData.maxValue,
             .editorSpeed = memberMetaData.editorSpeed,
-            .getFunction = memberMetaData.getFunction,
-            .setFunction = memberMetaData.setFunction
         };
 
         if (memberMetaData.customName.has_value())
         {
-            member.customName = std::move(memberMetaData.customName.value());
+            member.customName = memberMetaData.customName.value();
         }
         else
         {

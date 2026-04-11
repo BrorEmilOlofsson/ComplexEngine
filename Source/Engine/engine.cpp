@@ -120,16 +120,12 @@ namespace CLX
 
         const std::string defaultSceneRelativePathStr = gameSettings["Start_Scene_Path"];
         const std::filesystem::path sceneRelativePath = std::filesystem::path(defaultSceneRelativePathStr);
-        const std::filesystem::path sceneFilePath = std::filesystem::absolute(SIMPLE_DIR_ASSETS / sceneRelativePath);
+        const std::filesystem::path sceneFilePath = GetAbsoluteAssetPath(sceneRelativePath);
         std::ifstream sceneFile(sceneFilePath);
 
         if (!sceneFile.is_open())
         {
-            std::ofstream writeFile(sceneFilePath);
-            assert(writeFile.is_open() && "Failed to create the file");
-
-            const nlohmann::json emptyJson = {};
-            writeFile << emptyJson.dump(-1);
+            ASSERT("Failed to open default scene file at path");
         }
 
         return sceneRelativePath;

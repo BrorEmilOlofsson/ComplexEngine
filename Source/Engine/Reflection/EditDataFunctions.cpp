@@ -130,6 +130,11 @@ namespace CLX
         return viewAndEditResult;
     }
 
+    ViewAndEditResult ViewAndEditValue(bool& value, const DataTypeMemberVariable* memberData)
+    {
+        return ViewAndEditValue(value, memberData ? memberData->customName : "");
+    }
+
     ViewAndEditResult ViewAndEditValue(char& value, const std::string& variableName)
     {
         ViewAndEditResult viewAndEditResult;
@@ -148,6 +153,11 @@ namespace CLX
         return viewAndEditResult;
     }
 
+    ViewAndEditResult ViewAndEditValue(char& value, const DataTypeMemberVariable* memberData)
+    {
+        return ViewAndEditValue(value, memberData ? memberData->customName : "");
+    }
+
     ViewAndEditResult ViewAndEditValue(int& value, const std::string& variableName)
     {
         ViewAndEditResult viewAndEditResult;
@@ -156,7 +166,12 @@ namespace CLX
         return viewAndEditResult;
     }
 
-    ViewAndEditResult ViewAndEditValue(float& value, const std::string& variableName, float speed, float min = 0.f, float max = 0.f)
+    ViewAndEditResult ViewAndEditValue(int& value, const DataTypeMemberVariable* memberData)
+    {
+        return ViewAndEditValue(value, memberData ? memberData->customName : "");
+    }
+
+    ViewAndEditResult ViewAndEditValue(float& value, const std::string& variableName, float speed, float min, float max)
     {
         const float width = CalculateItemWidth(1);
         ImGui::SetNextItemWidth(width);
@@ -166,9 +181,21 @@ namespace CLX
         return viewAndEditResult;
     }
 
+
     ViewAndEditResult ViewAndEditValue(float& value, const std::string& variableName)
     {
-        return ViewAndEditValue(value, variableName, 0.1f);
+        float speed = 0.1f;
+        float min = 0.f;
+        float max = 0.f;
+        return ViewAndEditValue(value, variableName, speed, min, max);
+    }
+
+    ViewAndEditResult ViewAndEditValue(float& value, const DataTypeMemberVariable* memberData)
+    {
+        float speed = 0.1f;
+        float min = 0.f;
+        float max = 0.f;
+        return ViewAndEditValue(value, memberData ? memberData->customName : "", speed, min, max);
     }
 
     ViewAndEditResult ViewAndEditValue(std::string& value, const std::string& variableName)
@@ -190,12 +217,22 @@ namespace CLX
         return viewAndEditResult;
     }
 
+    ViewAndEditResult ViewAndEditValue(std::string& value, const DataTypeMemberVariable* memberData)
+    {
+        return ViewAndEditValue(value, memberData ? memberData->customName : "");
+    }
+
     ViewAndEditResult ViewAndEditValue(Vector2f& value, const std::string& variableName)
     {
         ViewAndEditResult viewAndEditResult;
         viewAndEditResult.isEdited = ImGui::DragFloat2(variableName.c_str(), &value.x);
         viewAndEditResult.isActive = ImGui::IsItemActive();
         return viewAndEditResult;
+    }
+
+    ViewAndEditResult ViewAndEditValue(Vector2f& value, const DataTypeMemberVariable* memberData)
+    {
+        return ViewAndEditValue(value, memberData ? memberData->customName : "");
     }
 
     ViewAndEditResult ViewAndEditValue(Vector2i& value, const std::string& variableName)
@@ -206,12 +243,22 @@ namespace CLX
         return viewAndEditResult;
     }
 
+    ViewAndEditResult ViewAndEditValue(Vector2i& value, const DataTypeMemberVariable* memberData)
+    {
+        return ViewAndEditValue(value, memberData ? memberData->customName : "");
+    }
+
     ViewAndEditResult ViewAndEditValue(Vector3f& value, const std::string& variableName)
     {
         ViewAndEditResult viewAndEditResult;
         viewAndEditResult.isEdited = ImGui::DragFloat3(variableName.c_str(), &value.x);
         viewAndEditResult.isActive = ImGui::IsItemActive();
         return viewAndEditResult;
+    }
+
+    ViewAndEditResult ViewAndEditValue(Vector3f& value, const DataTypeMemberVariable* memberData)
+    {
+        return ViewAndEditValue(value, memberData ? memberData->customName : "");
     }
 
     ViewAndEditResult ViewAndEditValue(Vector4f& value, const std::string& variableName)
@@ -222,12 +269,22 @@ namespace CLX
         return viewAndEditResult;
     }
 
+    ViewAndEditResult ViewAndEditValue(Vector4f& value, const DataTypeMemberVariable* memberData)
+    {
+        return ViewAndEditValue(value, memberData ? memberData->customName : "");
+    }
+
     ViewAndEditResult ViewAndEditValue(Point2f& value, const std::string& variableName)
     {
         ViewAndEditResult viewAndEditResult;
         viewAndEditResult.isEdited = ImGui::DragFloat2(variableName.c_str(), &value.x);
         viewAndEditResult.isActive = ImGui::IsItemActive();
         return viewAndEditResult;
+    }
+
+    ViewAndEditResult ViewAndEditValue(Point2f& value, const DataTypeMemberVariable* memberData)
+    {
+        return ViewAndEditValue(value, memberData ? memberData->customName : "");
     }
 
     ViewAndEditResult ViewAndEditValue(Point2i& value, const std::string& variableName)
@@ -238,12 +295,22 @@ namespace CLX
         return viewAndEditResult;
     }
 
+    ViewAndEditResult ViewAndEditValue(Point2i& value, const DataTypeMemberVariable* memberData)
+    {
+        return ViewAndEditValue(value, memberData ? memberData->customName : "");
+    }
+
     ViewAndEditResult ViewAndEditValue(Point3f& value, const std::string& variableName)
     {
         ViewAndEditResult viewAndEditResult;
         viewAndEditResult.isEdited = ImGui::DragFloat3(variableName.c_str(), &value.x, 0.01f);
         viewAndEditResult.isActive = ImGui::IsItemActive();
         return viewAndEditResult;
+    }
+
+    ViewAndEditResult ViewAndEditValue(Point3f& value, const DataTypeMemberVariable* memberData)
+    {
+        return ViewAndEditValue(value, memberData ? memberData->customName : "");
     }
 
     ViewAndEditResult ViewAndEditValue(UnitVector2f& value, const std::string& variableName)
@@ -261,6 +328,11 @@ namespace CLX
         }
         viewAndEditResult.isActive = ImGui::IsItemActive();
         return viewAndEditResult;
+    }
+
+    ViewAndEditResult ViewAndEditValue(UnitVector2f& value, const DataTypeMemberVariable* memberData)
+    {
+        return ViewAndEditValue(value, memberData ? memberData->customName : "");
     }
 
     ViewAndEditResult VisualizeInScene(UnitVector3f& value, const Point3f& origin, const Camera& camera, RenderList& renderList)
@@ -327,9 +399,9 @@ namespace CLX
         return ViewAndEditValue(value, variableName, showInScene, referenceTransform.GetPosition(), currentCamera, renderState.GetRenderList());
     }
 
-    ViewAndEditResult ViewAndEditValue(UnitVector3f& value, const Blackboard& blackboard)
+    ViewAndEditResult ViewAndEditValue(UnitVector3f& value, const Blackboard& blackboard, const DataTypeMemberVariable* memberData)
     {
-        return ViewAndEditValue(value, GetVariableName(blackboard), blackboard);
+        return ViewAndEditValue(value, memberData ? memberData->customName : "", blackboard);
     }
 
     ViewAndEditResult ViewAndEditValue(Color& value, const std::string& variableName)
@@ -345,6 +417,11 @@ namespace CLX
         return viewAndEditResult;
     }
 
+    ViewAndEditResult ViewAndEditValue(Color& value, const DataTypeMemberVariable* memberData)
+    {
+        return ViewAndEditValue(value, memberData ? memberData->customName : "");
+    }
+
     ViewAndEditResult ViewAndEditValue(RGBColor& value, const std::string& variableName)
     {
         ViewAndEditResult viewAndEditResult;
@@ -358,8 +435,14 @@ namespace CLX
         return viewAndEditResult;
     }
 
-    ViewAndEditResult ViewAndEditValue(Transform& value, const std::string&)
+    ViewAndEditResult ViewAndEditValue(RGBColor& value, const DataTypeMemberVariable* memberData)
     {
+        return ViewAndEditValue(value, memberData ? memberData->customName : "");
+    }
+
+    ViewAndEditResult ViewAndEditValue(Transform& value, const DataTypeMemberVariable* memberData)
+    {
+        memberData;
         ViewAndEditResult viewAndEditResult;
 
         {
@@ -454,15 +537,16 @@ namespace CLX
         return viewAndEditResult;
     }
 
-    ViewAndEditResult ViewAndEditValue(EntityID& entityID, const Blackboard& blackboard)
+    ViewAndEditResult ViewAndEditValue(EntityID& entityID, const Blackboard& blackboard, const DataTypeMemberVariable* memberData)
     {
         const ECS& ecs = blackboard.Get<Key_CurrentECS>();
-        return ViewAndEditValue(entityID, ecs, GetVariableName(blackboard));
+        return ViewAndEditValue(entityID, ecs, memberData ? memberData->customName : "");
     }
 
 
-    ViewAndEditResult ViewAndEditValue(PointLight& pointLight, const std::string&)
+    ViewAndEditResult ViewAndEditValue(PointLight& pointLight, const DataTypeMemberVariable* memberData)
     {
+        memberData;
         ViewAndEditResult viewAndEditResult;
         viewAndEditResult |= ViewAndEditValue(pointLight.color, "Color");
         viewAndEditResult |= ViewAndEditValue(pointLight.intensity, "Intensity", 0.01f, 0.0f, 10.f);
@@ -546,54 +630,55 @@ namespace CLX
         return ViewAndEditCamera(camera, blackboard.Get<Key_WindowView>().GetClientSize());
     }
 
-    ViewAndEditResult ViewAndEditValue(AABB3f& aAABB, const std::string&)
+    ViewAndEditResult ViewAndEditValue(AABB3f& aabb, const DataTypeMemberVariable* memberData)
     {
+        memberData;
         ViewAndEditResult viewAndEditResult;
 
         {
-            Point3f center = aAABB.GetCenter();
+            Point3f center = aabb.GetCenter();
             ViewAndEditResult centerViewAndEditResult = ViewAndEditValue(center, "Center");
             viewAndEditResult |= centerViewAndEditResult;
             if (centerViewAndEditResult.isEdited)
             {
-                aAABB.SetCenter(center);
+                aabb.SetCenter(center);
             }
         }
         {
-            Vector3f extent = aAABB.GetExtent();
+            Vector3f extent = aabb.GetExtent();
             ViewAndEditResult extentViewAndEditResult = ViewAndEditValue(extent, "Extent");
             viewAndEditResult |= extentViewAndEditResult;
             if (extentViewAndEditResult.isEdited)
             {
-                aAABB.SetExtent(extent);
+                aabb.SetExtent(extent);
             }
         }
 
         return viewAndEditResult;
     }
 
-    ViewAndEditResult ViewAndEditValue(Ray3f& aRay, const Blackboard& blackboard)
+    ViewAndEditResult ViewAndEditValue(Ray3f& ray, const Blackboard& blackboard)
     {
         ViewAndEditResult viewAndEditResult;
 
         {
-            Point3f origin = aRay.GetOrigin();
+            Point3f origin = ray.GetOrigin();
             ViewAndEditResult originViewAndEditResult = ViewAndEditValue(origin, "Origin");
             viewAndEditResult |= originViewAndEditResult;
             if (originViewAndEditResult.isEdited)
             {
-                aRay.SetOrigin(origin);
+                ray.SetOrigin(origin);
             }
         }
         {
-            UnitVector3f direction = aRay.GetDirection();
+            UnitVector3f direction = ray.GetDirection();
             Blackboard newBlackboard = blackboard;
             newBlackboard.Insert<Key_VariableName>("Direction");
-            ViewAndEditResult directionViewAndEditResult = ViewAndEditValue(direction, newBlackboard);
+            ViewAndEditResult directionViewAndEditResult = ViewAndEditValue(direction, newBlackboard, nullptr);
             viewAndEditResult |= directionViewAndEditResult;
             if (directionViewAndEditResult.isEdited)
             {
-                aRay.SetDirection(direction);
+                ray.SetDirection(direction);
             }
         }
 
@@ -983,13 +1068,17 @@ namespace CLX
         return ViewAndEditValue(animationAsset, blackboard.Get<Key_AssetManager>());
     }
 
-    static ViewAndEditResult ViewAndEditValue(SceneAssetHandle& sceneAsset, AssetManager& assetManager)
+    static ViewAndEditResult ViewAndEditValue(SceneAssetHandle& sceneAsset, const std::string* variableName, AssetManager& assetManager)
     {
         ViewAndEditResult viewAndEditResult;
         const std::filesystem::path filePath = sceneAsset ? sceneAsset.GetRelativePath() : std::filesystem::path();
 
         ImGui::AlignTextToFramePadding();
 
+        if (variableName)
+        {
+            ImGui::Text(variableName->c_str());
+        }
         ImGui::Text("Scene:");
         ImGui::SameLine();
         ImGui::BeginDisabled();
@@ -1019,9 +1108,9 @@ namespace CLX
         return viewAndEditResult;
     }
 
-    ViewAndEditResult ViewAndEditValue(SceneAssetHandle& sceneAsset, const Blackboard& blackboard)
+    ViewAndEditResult ViewAndEditValue(SceneAssetHandle& sceneAsset, const Blackboard& blackboard, const DataTypeMemberVariable* memberData)
     {
-        return ViewAndEditValue(sceneAsset, blackboard.Get<Key_AssetManager>());
+        return ViewAndEditValue(sceneAsset, memberData ? &memberData->customName : nullptr, blackboard.Get<Key_AssetManager>());
     }
 
     /*ViewAndEditResult ViewAndEditValue(Fly::ClassInstanceProxy& aClassInstance, [[maybe_unused]] const std::string&)

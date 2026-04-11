@@ -30,44 +30,44 @@ namespace CLX
         }
     }*/
 
-    inline std::pair<void*, const DataType*> GetPropertyPtr(void* currentDataPtr, const DataType& dataType, std::string_view name)
-    {
-        for (auto& member : dataType.memberVariables)
-        {
-            if (member.name == name)
-            {
-                return { static_cast<char*>(currentDataPtr) + member.byteOffset, &dataType };
-            }
-        }
-        return { nullptr, nullptr };
-    }
+    //inline std::pair<void*, const DataType*> GetPropertyPtr(void* currentDataPtr, const DataType& dataType, std::string_view name)
+    //{
+    //    for (auto& member : dataType.memberVariables)
+    //    {
+    //        if (member.name == name)
+    //        {
+    //            return { static_cast<char*>(currentDataPtr) + member.byteOffset, &dataType };
+    //        }
+    //    }
+    //    return { nullptr, nullptr };
+    //}
 
-    inline void* GetProperty(ECS& ecs, const DataTypeRegistry& dataTypeRegistry, const PropertyPath& path)
-    {
-        const DataType* dataType = dataTypeRegistry.Find(path.componentDataTypeID);
-        ASSERT(dataType != nullptr);
+    //inline void* GetProperty(ECS& ecs, const DataTypeRegistry& dataTypeRegistry, const PropertyPath& path)
+    //{
+    //    const DataType* dataType = dataTypeRegistry.Find(path.componentDataTypeID);
+    //    ASSERT(dataType != nullptr);
 
-        void* currentDataPtr = ecs.GetComponent(path.entityID, path.componentDataTypeID);
+    //    void* currentDataPtr = ecs.GetComponent(path.entityID, path.componentDataTypeID);
 
-        for (auto& element : path.elements)
-        {
-            std::visit(Visitor
-                {
-                    [&](const std::string_view memberName)
-                    {
-                        auto [ptr, newDataType] = GetPropertyPtr(currentDataPtr, *dataType, memberName);
-                        currentDataPtr = ptr;
-                        dataType = newDataType;
-                    },
-                    [&](const Index& index)
-                    {
-                        index;
-                        ASSERT(false);
-                    //currentDataPtr = GetPropertyPtr(currentDataPtr, element);
-                    }
-                }, element);
-        }
+    //    for (auto& element : path.elements)
+    //    {
+    //        std::visit(Visitor
+    //            {
+    //                [&](const std::string_view memberName)
+    //                {
+    //                    auto [ptr, newDataType] = GetPropertyPtr(currentDataPtr, *dataType, memberName);
+    //                    currentDataPtr = ptr;
+    //                    dataType = newDataType;
+    //                },
+    //                [&](const Index& index)
+    //                {
+    //                    index;
+    //                    ASSERT(false);
+    //                //currentDataPtr = GetPropertyPtr(currentDataPtr, element);
+    //                }
+    //            }, element);
+    //    }
 
-        return currentDataPtr;
-    }
+    //    return currentDataPtr;
+    //}
 }

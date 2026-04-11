@@ -1,14 +1,22 @@
 #include "Engine/Debugger/MemoryTracker/MemoryTracker.h"
+#include <External/profiler.h>
 #include "Engine/Utility/EasyProfilerOutput.hpp"
 #include "Editor/EditorApplication.hpp"
 #include "Game/GameMain.hpp"
 #include "Engine/OperatingSystem/OperatingSystem.hpp"
 #include <memory>
 
+#ifdef BUILD_WITH_EASY_PROFILER
+#pragma message("BUILD_WITH_EASY_PROFILER is defined")
+#else
+#pragma message("BUILD_WITH_EASY_PROFILER is NOT defined")
+#endif
+
 struct Profiler
 {
 	Profiler([[maybe_unused]] const std::string& name)
 	{
+		EASY_PROFILER_ENABLE;
 		PROFILER_INIT();
 		PROFILER_ENABLE();
 		PROFILER_START_LISTEN();

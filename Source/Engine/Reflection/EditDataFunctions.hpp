@@ -1,4 +1,5 @@
 #pragma once
+#include "Engine/Reflection/MemberVariable.hpp"
 #include "Engine/Math/Vector2.hpp"
 #include "Engine/Math/Vector3.hpp"
 #include "Engine/Math/Vector4.hpp"
@@ -25,40 +26,56 @@
 #include <array>
 #include <External/imgui/imgui.h>
 
-namespace Fly
-{
-	class ClassInstanceProxy;
-}
-
+	//CLX::ViewAndEditResult ViewAndEditValue(float& value, const std::string& variableName);
 namespace CLX
 {
 
-	constexpr const std::string& GetVariableName(const Blackboard& blackboard)
-	{
-		return blackboard.Get<Key_VariableName>();
-	}
-
 	ViewAndEditResult ViewAndEditDataPtr(const DataTypeID dataTypeID, void* dataPtr, const Blackboard& blackboard);
 
-	ViewAndEditResult ViewAndEditValue(char& value, const std::string& blackboard);
+	ViewAndEditResult ViewAndEditValue(char& value, const std::string& variableName);
+	//ViewAndEditResult ViewAndEditValue(char& value, const DataTypeMemberVariable* memberData = nullptr);
 	ViewAndEditResult ViewAndEditValue(bool& value, const std::string& variableName);
+	//ViewAndEditResult ViewAndEditValue(bool& value, const DataTypeMemberVariable* memberData = nullptr);
 	ViewAndEditResult ViewAndEditValue(int& value, const std::string& variableName);
+	//ViewAndEditResult ViewAndEditValue(int& value, const DataTypeMemberVariable* memberData = nullptr);
 	ViewAndEditResult ViewAndEditValue(float& value, const std::string& variableName, float speed, float min, float max);
 	ViewAndEditResult ViewAndEditValue(float& value, const std::string& variableName);
+	ViewAndEditResult ViewAndEditValue(float& value, const DataTypeMemberVariable* memberData = nullptr);
 	ViewAndEditResult ViewAndEditValue(std::string& value, const std::string& variableName);
+	//ViewAndEditResult ViewAndEditValue(std::string& value, const DataTypeMemberVariable* memberData = nullptr);
 
 	ViewAndEditResult ViewAndEditValue(Vector2f& value, const std::string& variableName);
+	//ViewAndEditResult ViewAndEditValue(Vector2f& value, const DataTypeMemberVariable* memberData = nullptr);
 	ViewAndEditResult ViewAndEditValue(Vector2i& value, const std::string& variableName);
+	//ViewAndEditResult ViewAndEditValue(Vector2i& value, const DataTypeMemberVariable* memberData = nullptr);
 	ViewAndEditResult ViewAndEditValue(Vector3f& value, const std::string& variableName);
+	//ViewAndEditResult ViewAndEditValue(Vector3f& value, const DataTypeMemberVariable* memberData = nullptr);
 	ViewAndEditResult ViewAndEditValue(Vector4f& value, const std::string& variableName);
+	//ViewAndEditResult ViewAndEditValue(Vector4f& value, const DataTypeMemberVariable* memberData = nullptr);
 	ViewAndEditResult ViewAndEditValue(Point2f& value, const std::string& variableName);
+	//ViewAndEditResult ViewAndEditValue(Point2f& value, const DataTypeMemberVariable* memberData = nullptr);
 	ViewAndEditResult ViewAndEditValue(Point2i& value, const std::string& variableName);
+	//ViewAndEditResult ViewAndEditValue(Point2i& value, const DataTypeMemberVariable* memberData = nullptr);
 	ViewAndEditResult ViewAndEditValue(Point3f& value, const std::string& variableName);
+	//ViewAndEditResult ViewAndEditValue(Point3f& value, const DataTypeMemberVariable* memberData = nullptr);
 	ViewAndEditResult ViewAndEditValue(UnitVector2f& value, const std::string& variableName);
+	//ViewAndEditResult ViewAndEditValue(UnitVector2f& value, const DataTypeMemberVariable* memberData = nullptr);
 	ViewAndEditResult VisualizeInScene(UnitVector3f& value, const Point3f& origin, const Camera& camera, class RenderList& renderList);
-	ViewAndEditResult ViewAndEditValue(UnitVector3f& value, const Blackboard& blackboard);
+	ViewAndEditResult ViewAndEditValue(UnitVector3f& value, const Blackboard& blackboard, const DataTypeMemberVariable* memberData);
 	ViewAndEditResult ViewAndEditValue(Color& value, const std::string& variableName);
+	//ViewAndEditResult ViewAndEditValue(Color& value, const DataTypeMemberVariable* memberData = nullptr);
 	ViewAndEditResult ViewAndEditValue(RGBColor& value, const std::string& variableName);
+	//ViewAndEditResult ViewAndEditValue(RGBColor& value, const DataTypeMemberVariable* memberData = nullptr);
+	
+	template<typename T>
+		requires requires(T& value)
+	{
+		{ ViewAndEditValue(value, std::string{}) } -> std::same_as<ViewAndEditResult>;
+	}
+    ViewAndEditResult ViewAndEditValue(T& value, const DataTypeMemberVariable* memberData)
+	{
+		return ViewAndEditValue(value, memberData ? memberData->customName : "");
+	}
 
 	template<typename T>
 	ViewAndEditResult ViewAndEditValue(Degrees<T>& degrees, const std::string& variableName)
@@ -138,7 +155,7 @@ namespace CLX
 			UnitVector3<T> axis = cylinder.GetAxis();
             Blackboard axisBlackboard = blackboard;
             axisBlackboard.Insert<Key_VariableName>("Axis");
-			ViewAndEditResult axisViewAndEditResult = ViewAndEditValue(axis, blackboard);
+			ViewAndEditResult axisViewAndEditResult = ViewAndEditValue(axis, axisBlackboard, nullptr);
 			viewAndEditResult |= axisViewAndEditResult;
 			if (axisViewAndEditResult.isEdited)
 			{
@@ -148,8 +165,8 @@ namespace CLX
 		return viewAndEditResult;
 	}
 
-	ViewAndEditResult ViewAndEditValue(Transform& value, const std::string& variableName);
-	ViewAndEditResult ViewAndEditValue(PointLight& pointLight, const std::string& variableName);
+	ViewAndEditResult ViewAndEditValue(Transform& value, const DataTypeMemberVariable* memberData);
+	ViewAndEditResult ViewAndEditValue(PointLight& pointLight, const DataTypeMemberVariable* memberData);
 	ViewAndEditResult ViewAndEditValue(DirectionalLight& directionalLight, const Blackboard& blackboard);
 	ViewAndEditResult ViewAndEditValue(Camera& camera, const Blackboard& blackboard);
 
@@ -162,7 +179,7 @@ namespace CLX
 			Point3<T> center = aabb.GetCenter();
 			ViewAndEditResult centerViewAndEditResult = ViewAndEditValue(center, "Center");
 			viewAndEditResult |= centerViewAndEditResult;
-			if (centerViewAndEditResult.myIsEdited)
+			if (centerViewAndEditResult.isEdited)
 			{
 				aabb.SetCenter(center);
 			}
@@ -171,7 +188,7 @@ namespace CLX
 			Vector3<T> extent = aabb.GetExtent();
 			ViewAndEditResult extentViewAndEditResult = ViewAndEditValue(extent, "Extent");
 			viewAndEditResult |= extentViewAndEditResult;
-			if (extentViewAndEditResult.myIsEdited)
+			if (extentViewAndEditResult.isEdited)
 			{
 				aabb.SetExtent(extent);
 			}
@@ -182,7 +199,7 @@ namespace CLX
 
 	ViewAndEditResult ViewAndEditValue(Ray3f& ray, const Blackboard& blackboard);
 
-	ViewAndEditResult ViewAndEditValue(EntityID& entityID, const Blackboard& blackboard);
+	ViewAndEditResult ViewAndEditValue(EntityID& entityID, const Blackboard& blackboard, const DataTypeMemberVariable* memberData);
 
 	ViewAndEditResult ViewAndEditValue(MeshAssetHandle& meshAsset, const Blackboard& blackboard);
 	ViewAndEditResult ViewAndEditValue(ModelAssetHandle& modelAsset, const Blackboard& blackboard);
@@ -191,7 +208,7 @@ namespace CLX
 	ViewAndEditResult ViewAndEditValue(PixelShaderAssetHandle& shaderAsset, const Blackboard& blackboard);
 	ViewAndEditResult ViewAndEditValue(VertexShaderAssetHandle& shaderAsset, const Blackboard& blackboard);
 	ViewAndEditResult ViewAndEditValue(AnimationAssetHandle& animationAsset, const Blackboard& blackboard);
-    ViewAndEditResult ViewAndEditValue(SceneAssetHandle& sceneAsset, const Blackboard& blackboard);
+    ViewAndEditResult ViewAndEditValue(SceneAssetHandle& sceneAsset, const Blackboard& blackboard, const DataTypeMemberVariable* memberData);
 
 	ViewAndEditResult ViewAndEditValue(std::array<TextureAssetHandle, 3>& textureAssets, const Blackboard& blackboard);
 
@@ -220,21 +237,34 @@ namespace CLX
 	}
 
 	template<typename T>
-		requires requires(T& value)
+		requires requires(T& value, const DataTypeMemberVariable* memberData)
 	{
-		{ ViewAndEditValue(value, std::string{}) } -> std::same_as<ViewAndEditResult>;
+		{ ViewAndEditValue(value, memberData) } -> std::same_as<ViewAndEditResult>;
 	}
-	ViewAndEditResult ViewAndEditValue(T& value, const Blackboard& blackboard)
+	ViewAndEditResult ViewAndEditValue(T& value, const Blackboard&, const DataTypeMemberVariable* memberData)
 	{
-		return ViewAndEditValue(value, GetVariableName(blackboard));
+		return ViewAndEditValue(value, memberData);
 	}
 
 	template<typename T>
-	ViewAndEditResult ViewAndEditValueVectorImpl(std::vector<T>& vector, const Blackboard& blackboard)
+		requires requires(T& value, const Blackboard& blackboard)
+	{
+		{ ViewAndEditValue(value, blackboard) } -> std::same_as<ViewAndEditResult>;
+	}
+	ViewAndEditResult ViewAndEditValue(T& value, const Blackboard& blackboard, const DataTypeMemberVariable*)
+	{
+		return ViewAndEditValue(value, blackboard);
+	}
+
+	template<typename T>
+	ViewAndEditResult ViewAndEditValueVectorImpl(std::vector<T>& vector, const Blackboard& blackboard, const DataTypeMemberVariable* memberData = nullptr)
 	{
 		static size_t currentPopupIndex = 0;
 		static constexpr const char* VectorElementPopupStrID = "Vector Element Popup";
 		ViewAndEditResult result;
+
+        const std::string variableName = memberData ? memberData->customName : "Vector";
+        ImGui::Text(variableName.c_str());
 
 		for (size_t i = 0; i < vector.size(); ++i)
 		{
@@ -306,8 +336,8 @@ namespace CLX
 namespace std
 {
 	template<typename T>
-	CLX::ViewAndEditResult ViewAndEditValue(std::vector<T>& vector, const CLX::Blackboard& blackboard)
+	CLX::ViewAndEditResult ViewAndEditValue(std::vector<T>& vector, const CLX::Blackboard& blackboard, const CLX::DataTypeMemberVariable* memberData = nullptr)
 	{
-        return CLX::ViewAndEditValueVectorImpl(vector, blackboard);
+        return CLX::ViewAndEditValueVectorImpl(vector, blackboard, memberData);
 	}
 }

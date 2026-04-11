@@ -95,7 +95,7 @@ namespace CLX
 
             auto memberPair = membersFiltered | std::views::transform([&dataTypeRegistry, &componentPtr](const DataTypeMemberVariable& member)
                 {
-                    return std::pair<const std::type_info&, void*>{ dataTypeRegistry.Find(member.dataTypeID)->typeInfo.get(), static_cast<char*>(componentPtr) + member.byteOffset };
+                    return std::pair<const std::type_info&, void*>{ dataTypeRegistry.Find(member.dataTypeID)->typeInfo.get(), componentPtr + std::get<ByteOffset>(member.memberType) };
                 })
                 | std::ranges::to<std::vector>();
 

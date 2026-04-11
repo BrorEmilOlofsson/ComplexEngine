@@ -124,7 +124,15 @@ namespace CLX
             }
 
             mRenderState.SetRenderRect(renderRect);
-            mCamera.SetResolution(Vector2ui(renderRect.GetExtent()));
+            if (renderRect.GetExtent().y == 0.f)
+            {
+
+            }
+            else
+            {
+
+                mCamera.SetResolution(Vector2ui(renderRect.GetExtent()));
+            }
 
 
             if (input.IsKeyPressed(eInputKey::LMB))

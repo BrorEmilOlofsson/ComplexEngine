@@ -117,6 +117,9 @@ workspace "FootballGame" -- Workspace, is not same as Project. Anything configur
 		runtime "Release"
 		libdirs { dirs.Lib }
 
+    filter "configurations:Debug_*"
+        defines { "BUILD_WITH_EASY_PROFILER" }
+
 	filter "system:windows"
 		systemversion "latest"
 		
