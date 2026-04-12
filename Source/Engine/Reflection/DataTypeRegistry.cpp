@@ -2,6 +2,7 @@
 #include "Engine/Reflection/DataTypeRegistry.hpp"
 #include <External/imgui/imgui.h>
 #include "PropertyPath.hpp"
+#include "Engine/Utility/Memory/GenericBufferArena.hpp"
 
 namespace CLX
 {
@@ -27,7 +28,7 @@ namespace CLX
 
     void DataTypeRegistry::InplaceAllocateData(DataTypeID dataTypeID, void* dataPtr, const void* defaultValuePtr) const
     {
-        mDataTypes.at(dataTypeID).inplaceAllocate(dataPtr, defaultValuePtr);
+        mDataTypes.at(dataTypeID).inplaceConstruct(dataPtr, defaultValuePtr);
     }
 
     void DataTypeRegistry::CopyData(DataTypeID dataTypeID, void* destination, const void* source) const
@@ -50,9 +51,9 @@ namespace CLX
         return mDataTypes.at(dataTypeID).size;
     }
 
-    InPlaceAllocateFunction DataTypeRegistry::GetInplaceAllocateFunction(DataTypeID dataTypeID) const
+    InplaceConstructFunction DataTypeRegistry::GetInplaceConstructFunction(DataTypeID dataTypeID) const
     {
-        return mDataTypes.at(dataTypeID).inplaceAllocate;
+        return mDataTypes.at(dataTypeID).inplaceConstruct;
     }
 
     DestroyFunction DataTypeRegistry::GetDestroyFunction(DataTypeID dataTypeID) const
@@ -131,6 +132,7 @@ namespace CLX
                 const DataType* memberDataType = Find(member.dataTypeID);
                 ASSERT(memberDataType != nullptr);
                 void* ownerPtr = dataPtr;
+                GenericBufferArena<1028> arena;
                 std::unique_ptr<std::byte[]> outPtr = std::make_unique<std::byte[]>(memberDataType->size);
                 FunctionMember functionMember = std::get<FunctionMember>(member.memberType);
                 InplaceAllocateData(member.dataTypeID, outPtr.get());

@@ -1,6 +1,10 @@
 #pragma once
 #include <vector>
-#include <type_traits>
+#include <typeindex>
+#include <cassert>
+#include <limits>
+
+#include "Engine/Utility/FundamentalFunctionDefinitions.hpp"
 
 namespace CLX
 {
@@ -14,97 +18,22 @@ namespace CLX
 		}
 	};
 
+	constexpr std::size_t AlignUp(std::size_t n, std::size_t a)
+	{
+		return (n + (a - 1)) & ~(a - 1);
+	}
+
 	class DynamicMemoryArena final
 	{
-	public:
-
-		template<typename, typename...>
-		class FunctionPtrWrapper;
-
-		template<typename Tag, typename Ret, typename... Args>
-		class FunctionPtrWrapper<Ret(Args...), Tag> final
-		{
-			using FunctionType = Ret(Args...);
-		public:
-
-			constexpr FunctionPtrWrapper(FunctionType* functionPtr)
-				: mFunctionPtr(functionPtr)
-			{
-			}
-
-			constexpr Ret operator()(Args... aArgs) const
-			{
-				return mFunctionPtr(std::forward<Args>(aArgs)...);
-			}
-
-			[[nodiscard]] explicit operator bool() const
-			{
-				return mFunctionPtr != nullptr;
-			}
-
-		private:
-
-			FunctionType* mFunctionPtr = nullptr;
-		};
-
-		using InplaceAllocateFunction = FunctionPtrWrapper<void(void*, const void*), struct InplaceFTag>;
-		using DestructFunction = FunctionPtrWrapper<void(void*), struct DestructFTag>;
-		using CopyFunction = FunctionPtrWrapper<void(void*, const void*), struct CopyFTag>;
-
 	private:
-
-		template<typename T>
-		[[nodiscard]] constexpr InplaceAllocateFunction CreateInplaceAllocateFunction()
-		{
-			return [](void* aPtr, const void* aDefaultValuePtr) -> void
-				{
-					if (aDefaultValuePtr)
-					{
-						const T& defaultValue = *reinterpret_cast<const T*>(aDefaultValuePtr);
-						new(aPtr)T(defaultValue);
-					}
-					else
-					{
-						new(aPtr)T();
-					}
-				};
-		}
-
-		template<typename T>
-		[[nodiscard]] constexpr DestructFunction CreateDestructFunction()
-		{
-			return [](void* aPtr) -> void
-				{
-					T& value = *reinterpret_cast<T*>(aPtr);
-					value.~T();
-				};
-		}
-
-		template<typename T>
-		[[nodiscard]] constexpr CopyFunction CreateCopyFunction()
-		{
-			return [](void* aDestination, const void* aSource) -> void
-				{
-					const T& source = *reinterpret_cast<const T*>(aSource);
-					if constexpr (std::is_trivially_copyable_v<T>)
-					{
-						T& dest = *reinterpret_cast<T*>(aDestination);
-						std::memcpy(&dest, &source, sizeof(T));
-					}
-					else
-					{
-						new(aDestination)T(source);
-					}
-				};
-		}
 
 		struct MemoryObject
 		{
 			DynamicMemoryArenaHandle handle;
-			DestructFunction destroy = nullptr;
+			DestroyFunction destroy = nullptr;
 			CopyFunction copy = nullptr;
 #ifdef _DEBUG
-			const std::type_info* typeInfo = nullptr;
+			std::type_index type;
 #endif
 		};
 	public:
@@ -120,7 +49,7 @@ namespace CLX
 		template<typename T, typename... Args>
 		[[nodiscard]] DynamicMemoryArenaHandle Allocate(Args&&... args);
 
-		[[nodiscard]] DynamicMemoryArenaHandle AllocateUnsafe(size_t size, InplaceAllocateFunction inplaceAllocateFunction, DestructFunction destructFunction, CopyFunction copyFunction);
+		[[nodiscard]] DynamicMemoryArenaHandle AllocateUnsafe(size_t size, InplaceConstructFunction inplaceAllocateFunction, DestroyFunction destructFunction, CopyFunction copyFunction, std::type_index type);
 
 		template<typename T>
 		[[nodiscard]] T& At(DynamicMemoryArenaHandle handle);
@@ -139,7 +68,7 @@ namespace CLX
 
 	private:
 
-		void AllocateSize(size_t aSize);
+		void AllocateSize(size_t size);
 		void Reallocate();
 
 	private:

@@ -1173,7 +1173,7 @@ namespace CLX
     template<typename T>
     void ECSRegistry::RegisterComponentType(const bool isDefault)
     {
-        bool hasBeenRegistered = mComponentTypeToIDMap.contains(GetDataTypeID<T>());
+        [[maybe_unused]] const bool hasBeenRegistered = mComponentTypeToIDMap.contains(GetDataTypeID<T>());
         ASSERT(!hasBeenRegistered);
 
         ECSComponentType componentType;

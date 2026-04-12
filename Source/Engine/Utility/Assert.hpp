@@ -16,5 +16,6 @@
 #else 
 
 #define ASSERT(expression) ((void)0)
+#define ASSERT_NEW(expression, message) ((void)0)
 
 #endif

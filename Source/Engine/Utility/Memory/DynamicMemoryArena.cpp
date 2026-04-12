@@ -95,7 +95,7 @@ namespace CLX
 		return *this;
 	}
 
-	DynamicMemoryArenaHandle DynamicMemoryArena::AllocateUnsafe(const size_t size, InplaceAllocateFunction inplaceAllocateFunction, DestructFunction destructorFunction, CopyFunction copyFunction)
+	DynamicMemoryArenaHandle DynamicMemoryArena::AllocateUnsafe(const size_t size, InplaceConstructFunction inplaceAllocateFunction, DestroyFunction destructorFunction, CopyFunction copyFunction, [[maybe_unused]] std::type_index type)
 	{
 		assert(inplaceAllocateFunction);
 		assert(destructorFunction);
@@ -114,7 +114,7 @@ namespace CLX
 				.destroy = destructorFunction,
 				.copy = copyFunction,
 #ifdef _DEBUG
-				.typeInfo = nullptr
+				.type = type
 #endif
 			}
 		);
@@ -137,13 +137,13 @@ namespace CLX
 		return mCapacity - mSize;
 	}
 
-	void DynamicMemoryArena::AllocateSize(const size_t aSize)
+	void DynamicMemoryArena::AllocateSize(const size_t size)
 	{
 		if (mStartPtr == nullptr)
 		{
-			*this = DynamicMemoryArena(aSize * 2);
+			*this = DynamicMemoryArena(size * 2);
 		}
-		while (aSize > GetSizeLeft())
+		while (size > GetSizeLeft())
 		{
 			Reallocate();
 		}

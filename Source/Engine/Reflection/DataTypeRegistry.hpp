@@ -104,10 +104,8 @@ namespace CLX
         template<typename Filter>
         [[nodiscard]] auto GetDataTypesFiltered(Filter&& filter) const;
 
-    public:
-
         [[nodiscard]] size_t GetDataTypeSize(DataTypeID dataTypeID) const;
-        [[nodiscard]] InPlaceAllocateFunction GetInplaceAllocateFunction(DataTypeID dataTypeID) const;
+        [[nodiscard]] InplaceConstructFunction GetInplaceConstructFunction(DataTypeID dataTypeID) const;
         [[nodiscard]] DestroyFunction GetDestroyFunction(DataTypeID dataTypeID) const;
         [[nodiscard]] CopyFunction GetCopyFunction(DataTypeID dataTypeID) const;
 
@@ -159,7 +157,7 @@ namespace CLX
     void DataTypeRegistry::RegisterType(const bool isComponent)
     {
         const DataTypeID dataTypeID = GetDataTypeID<T>();
-        const bool alreadyExistOrHashCollision = mDataTypes.contains(dataTypeID);
+        [[maybe_unused]] const bool alreadyExistOrHashCollision = mDataTypes.contains(dataTypeID);
 
         ASSERT(alreadyExistOrHashCollision == false);
 
@@ -183,6 +181,11 @@ namespace CLX
         {
             .name = std::move(name),
             .prettyName = std::move(prettyName),
+            .inplaceConstruct = CreateInplaceConstructFunction<T>(),
+            .destroy = CreateDestroyFunction<T>(),
+            .copy = CreateCopyFunction<T>(),
+            .move = CreateMoveFunction<T>(),
+            .swap = CreateSwapFunction<T>(),
             .size = sizeof(T),
             .alignment = alignof(T),
             .typeInfo = typeInfo,

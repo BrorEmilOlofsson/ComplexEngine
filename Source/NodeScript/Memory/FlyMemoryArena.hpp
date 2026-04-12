@@ -295,7 +295,7 @@ namespace FLY_NAMESPACE
             std::size_t alignedOffset = AlignUp(mSize, alignment);
             if (alignedOffset + size > Capacity)
             {
-                throw std::bad_alloc(); // or your own handling
+                throw std::bad_alloc();
             }
 
             void* p = mBuffer.data() + alignedOffset;
