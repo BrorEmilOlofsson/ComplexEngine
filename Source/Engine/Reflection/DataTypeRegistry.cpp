@@ -133,11 +133,10 @@ namespace CLX
                 ASSERT(memberDataType != nullptr);
                 void* ownerPtr = dataPtr;
                 GenericBufferArena<1028> arena;
-                std::unique_ptr<std::byte[]> outPtr = std::make_unique<std::byte[]>(memberDataType->size);
+                void* allocatedDataPtr = arena.AllocateTypeErased(memberDataType->size, memberDataType->alignment, memberDataType->destroy, memberDataType->copy, memberDataType->type);
                 FunctionMember functionMember = std::get<FunctionMember>(member.memberType);
-                InplaceAllocateData(member.dataTypeID, outPtr.get());
-                functionMember.getFunction(ownerPtr, outPtr.get());
-                viewAndEditResult |= ViewAndEditData(member.dataTypeID, outPtr.get(), blackboard);
+                functionMember.getFunction(ownerPtr, allocatedDataPtr);
+                viewAndEditResult |= ViewAndEditData(member.dataTypeID, allocatedDataPtr, blackboard);
 
             }
 

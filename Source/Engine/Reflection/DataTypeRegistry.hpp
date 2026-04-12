@@ -188,7 +188,7 @@ namespace CLX
             .swap = CreateSwapFunction<T>(),
             .size = sizeof(T),
             .alignment = alignof(T),
-            .typeInfo = typeInfo,
+            .type = std::type_index(typeInfo),
             .containingValueDataTypeID = containingValueDataTypeID,
             .isComponent = isComponent
         };

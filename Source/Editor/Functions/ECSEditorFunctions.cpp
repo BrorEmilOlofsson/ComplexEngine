@@ -73,9 +73,9 @@ namespace CLX
         ecs.DestroyEntity(entityID);
     }
 
-    [[nodiscard]] bool HasVariableEntity(const std::type_info& typeInfo)
+    [[nodiscard]] bool HasVariableEntity(const std::type_index& type)
     {
-        return typeInfo == typeid(EntityID) || typeInfo == typeid(std::vector<EntityID>);
+        return type == typeid(EntityID) || type == typeid(std::vector<EntityID>);
     }
 
     static void RemapEntityIDs(ECS& ecs, const EntityID newEntityID, const std::map<EntityID, EntityID>& oldToNewEntityIDMap, const DataTypeRegistry& dataTypeRegistry)
@@ -90,12 +90,12 @@ namespace CLX
                 {
                     const auto& dataType = dataTypeRegistry.Find(member.dataTypeID);
                     ASSERT(dataType != nullptr);
-                    return HasVariableEntity(dataType->typeInfo);
+                    return HasVariableEntity(dataType->type);
                 });
 
             auto memberPair = membersFiltered | std::views::transform([&dataTypeRegistry, &componentPtr](const DataTypeMemberVariable& member)
                 {
-                    return std::pair<const std::type_info&, void*>{ dataTypeRegistry.Find(member.dataTypeID)->typeInfo.get(), componentPtr + std::get<ByteOffset>(member.memberType) };
+                    return std::pair<std::type_index, void*>{ dataTypeRegistry.Find(member.dataTypeID)->type, componentPtr + std::get<ByteOffset>(member.memberType) };
                 })
                 | std::ranges::to<std::vector>();
 
@@ -1543,8 +1543,8 @@ namespace CLX
         auto isValidComponentDataType = [&ecs, entityID](const DataType& dataType)
             {
                 return dataType.isComponent
-                    && !ecs.GetRegistry().GetComponentType(GetDataTypeID(dataType.typeInfo)).isDefault
-                    && !ecs.HasComponent(entityID, GetDataTypeID(dataType.typeInfo));
+                    && !ecs.GetRegistry().GetComponentType(GetDataTypeID(dataType.type)).isDefault
+                    && !ecs.HasComponent(entityID, GetDataTypeID(dataType.type));
             };
 
         auto componentDataTypes = dataTypeRegistry.GetDataTypesFiltered(isValidComponentDataType)
@@ -1561,7 +1561,7 @@ namespace CLX
             const std::string componentNameLabel = dataType.prettyName + "##Component";
             if (ImGui::Selectable(componentNameLabel.c_str(), selectedIndex == indexCounter))
             {
-                addComponentAction = CreateAddComponentToEntityAction(ecs, entityID, GetDataTypeID(dataType.typeInfo), dataType.prettyName);
+                addComponentAction = CreateAddComponentToEntityAction(ecs, entityID, GetDataTypeID(dataType.type), dataType.prettyName);
                 selectedIndex = 0;
                 ImGui::CloseCurrentPopup();
             }
@@ -1582,7 +1582,7 @@ namespace CLX
             else if (ImGui::IsKeyPressed(ImGuiKey_Enter) && !componentDataTypes.empty())
             {
                 const auto& dataType = componentDataTypes[selectedIndex];
-                addComponentAction = CreateAddComponentToEntityAction(ecs, entityID, GetDataTypeID(dataType.typeInfo), dataType.prettyName);
+                addComponentAction = CreateAddComponentToEntityAction(ecs, entityID, GetDataTypeID(dataType.type), dataType.prettyName);
                 selectedIndex = 0;
                 ImGui::CloseCurrentPopup();
             }

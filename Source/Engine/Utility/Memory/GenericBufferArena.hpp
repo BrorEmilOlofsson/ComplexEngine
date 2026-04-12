@@ -201,8 +201,11 @@ namespace CLX
         template<MemSizeLessEqual<BufferCapacity> T, typename... Args>
         T& Allocate(Args&&... args);
 
+        void* AllocateTypeErased(std::size_t size, std::size_t alignment, const DestroyFunction destroyFuncton, const CopyFunction copyFunction, std::type_index type);
+
         // Returns a raw pointer to a memory block at the start of the allocated size.
         void* AllocateSizeAligned(std::size_t size, std::size_t alignment);
+
 
         void RegisterMemoryObject(void* dataPtr, const DestroyFunction destroyFuncton, const CopyFunction copyFunction, std::type_index type);
 
@@ -266,6 +269,13 @@ namespace CLX
         return value;
     }
 
+    template<size_t BufferCapacity>
+    inline void* GenericBufferArena<BufferCapacity>::AllocateTypeErased(std::size_t size, std::size_t alignment, const DestroyFunction destroyFuncton, const CopyFunction copyFunction, std::type_index type)
+    {
+        void* dataPtr = AllocateSizeAligned(size, alignment);
+        RegisterMemoryObject(dataPtr, destroyFuncton, copyFunction, type);
+        return dataPtr;
+    }
 
     template<size_t BufferCapacity>
     inline void* GenericBufferArena<BufferCapacity>::AllocateSizeAligned(const std::size_t size, const std::size_t alignment)

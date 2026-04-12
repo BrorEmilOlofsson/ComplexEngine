@@ -20,9 +20,14 @@ namespace CLX
 		return a.typeIndex < b.typeIndex;
 	}
 
+	[[nodiscard]] inline DataTypeID GetDataTypeID(const std::type_index type)
+	{
+		return DataTypeID{ type };
+	}
+
 	[[nodiscard]] inline DataTypeID GetDataTypeID(const std::type_info& typeInfo)
 	{
-		return DataTypeID{ std::type_index{ typeInfo } };
+		return GetDataTypeID(std::type_index(typeInfo));
 	}
 
 	template<typename T>

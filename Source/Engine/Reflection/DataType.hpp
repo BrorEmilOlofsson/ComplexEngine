@@ -34,7 +34,7 @@ namespace CLX
 
         std::size_t size = std::numeric_limits<std::size_t>::max();
         std::size_t alignment = std::numeric_limits<std::size_t>::max();
-        std::reference_wrapper<const std::type_info> typeInfo;
+        std::type_index type;
         DataTypeID containingValueDataTypeID = InvalidDataTypeID;
         bool isComponent = false;
     };
