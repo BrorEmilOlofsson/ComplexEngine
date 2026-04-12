@@ -6,29 +6,14 @@
 namespace CLX
 {
 
-    //template<typename T, typename... Args>
-    //concept HasArgsConstructor = requires(Args&&... args)
-    //{
-    //    T(std::forward<Args>(args)...);
-    //};
-
-    template<typename T, bool DefaultConstruct = true>
+    template<typename T>
     class HeapObject final
     {
     public:
 
         HeapObject()
+            : mUniquePtr(std::make_unique<T>())
         {
-            if constexpr (DefaultConstruct)
-            {
-                mUniquePtr = std::make_unique<T>();
-            }
-        }
-
-        explicit HeapObject(T* ptr)
-            : mUniquePtr(std::unique_ptr<T>(ptr))
-        {
-
         }
 
 
@@ -38,16 +23,15 @@ namespace CLX
         {}
 
         HeapObject(const HeapObject& other)
-            : mUniquePtr(other ? std::make_unique<T>(*other) : std::unique_ptr<T>())
+            : mUniquePtr(other.Get() != nullptr ? std::make_unique<T>(*other) : std::unique_ptr<T>())
         {
-
         }
 
         HeapObject(HeapObject&&) noexcept = default;
 
         HeapObject& operator=(const HeapObject& other)
         {
-            mUniquePtr = other ? std::make_unique<T>(*other) : std::unique_ptr<T>();
+            mUniquePtr = other.Get() != nullptr ? std::make_unique<T>(*other) : std::unique_ptr<T>();
 
             return *this;
         }
@@ -82,21 +66,6 @@ namespace CLX
         [[nodiscard]] const T& operator*() const
         {
             return *mUniquePtr;
-        }
-
-        void Reset(T* ptr = nullptr) noexcept
-        {
-            mUniquePtr.reset(ptr);
-        }
-
-        [[nodiscard]] T* Release()
-        {
-            return mUniquePtr.release();
-        }
-
-        explicit operator bool() const
-        {
-            return mUniquePtr.operator bool();
         }
 
     private:
