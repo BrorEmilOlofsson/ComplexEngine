@@ -1,12 +1,12 @@
 #pragma once
+#include <memory>
+#include <string>
 #include "Engine/Math/Shapes/AABB2.hpp"
 #include "Engine/Win/WinInputProcessor.hpp"
 #include "WinWindowClass.hpp"
 #include "Engine/OperatingSystem/WindowFrameBuffer.hpp"
-#include "Engine/Graphics/DX11/DX11Window.hpp"
 #include "Engine/Graphics/GraphicsWindowView.hpp"
-#include <memory>
-#include <string>
+#include "Engine/Math/Dimension2.hpp"
 
 #ifdef _WIN32
 
@@ -22,7 +22,7 @@ namespace CLX
 	public:
 
 		Win_Window(
-			const Vector2ui& windowSize, 
+			const Vector2ui& windowSize,
 			const std::wstring& name, 
 			const Win_WindowClass& windowClass, 
 			void* operatingSystem

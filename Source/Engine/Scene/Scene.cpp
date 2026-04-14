@@ -60,7 +60,7 @@ namespace CLX
 		{
 			mMouseRay = CalculateMouseRay(
 				*mRenderState.GetCamera(),
-				 mRenderState.GetRenderRect().value_or(AABB2i::FromDefaultAndExtent(Vector2i(clientSize))),
+				 mRenderState.GetRenderRect().value_or(AABB2i::FromDefaultAndExtent(Vector2ui(clientSize))),
 				clientSize,
 				mouseScreenPos
 			);

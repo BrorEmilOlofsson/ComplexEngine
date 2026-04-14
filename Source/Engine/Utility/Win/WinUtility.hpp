@@ -1,8 +1,11 @@
 #pragma once
-#include "Engine/Math/Vector2.hpp"
-#include "Engine/Math/Shapes/AABB2.hpp"
 
 #ifdef _WIN32
+
+#include "Engine/Math/Vector2.hpp"
+#include "Engine/Math/Dimension2.hpp"
+#include "Engine/Math/Point2.hpp"
+#include "Engine/Math/Shapes/AABB2.hpp"
 
 #include <Windows.h>
 #include "Engine/Utility/Win/WinAdapterFunctions.hpp"
@@ -12,9 +15,7 @@ namespace CLX
 
 	[[nodiscard]] inline AABB2i GetDefaultClientRect(const Vector2ui windowSize)
 	{
-		AABB2i rect;
-		rect.SetMinAndExtent(Point2i(100, 100), static_cast<Vector2i>(windowSize));
-		return rect;
+        return AABB2i::FromMinAndExtent(Point2i(100, 100), windowSize);
 	}
 
 	[[nodiscard]] inline AABB2i GetAdjustedWindowRect(const AABB2i& rect, DWORD style)
@@ -32,7 +33,7 @@ namespace CLX
 		return ToAABB<int>(rect);
 	}
 
-	[[nodiscard]] inline Vector2i GetWindowSize(HWND hWND)
+	[[nodiscard]] inline Vector2ui GetWindowSize(HWND hWND)
 	{
 		return GetWindowRect(hWND).GetExtent();
 	}

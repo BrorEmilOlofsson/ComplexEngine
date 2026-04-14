@@ -1,8 +1,10 @@
 #pragma once
 #include <cstdint>
 #include <array>
+#include <type_traits>
 #include "Engine/Math/Math.hpp"
 #include "Engine/Utility/ValueType.hpp"
+#include "Engine/Utility/Rebind.hpp"
 
 namespace CLX
 {
@@ -36,6 +38,13 @@ namespace CLX
     using Vector3ui64 = Vector3<uint64_t>;
     using Vector3i = Vector3i32;
     using Vector3ui = Vector3ui32;
+
+
+	template<typename T, typename U>
+	struct rebind<Vector3<T>, U>
+	{
+		using type = Vector3<U>;
+	};
 
 	template<typename T>
 	struct ValueType<Vector3<T>> : std::type_identity<T> {};

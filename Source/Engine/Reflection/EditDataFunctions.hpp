@@ -47,6 +47,13 @@ namespace CLX
 	ViewAndEditResult ViewAndEditValue(Vector2f& value, const std::string& variableName);
 	//ViewAndEditResult ViewAndEditValue(Vector2f& value, const DataTypeMemberVariable* memberData = nullptr);
 	ViewAndEditResult ViewAndEditValue(Vector2i& value, const std::string& variableName);
+	inline ViewAndEditResult ViewAndEditValue(Vector2ui& value, const std::string& variableName)
+	{
+        auto v = Vector2i(value);
+		auto viewAndEditResult = ViewAndEditValue(v, variableName);
+        value = Vector2ui(v);
+		return viewAndEditResult;
+	}
 	//ViewAndEditResult ViewAndEditValue(Vector2i& value, const DataTypeMemberVariable* memberData = nullptr);
 	ViewAndEditResult ViewAndEditValue(Vector3f& value, const std::string& variableName);
 	//ViewAndEditResult ViewAndEditValue(Vector3f& value, const DataTypeMemberVariable* memberData = nullptr);
@@ -107,7 +114,7 @@ namespace CLX
 			}
 		}
 		{
-			Vector2<T> extent = aabb.GetExtent();
+			auto extent = aabb.GetExtent();
 			ViewAndEditResult extentViewAndEditResult = ViewAndEditValue(extent, "Extent");
 			viewAndEditResult |= extentViewAndEditResult;
 			if (extentViewAndEditResult.isEdited)

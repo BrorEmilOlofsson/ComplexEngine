@@ -18,8 +18,8 @@ namespace CLX
 		ImVec2 size =ImGui::GetContentRegionAvail();
 
 		return AABB2i::FromMinAndExtent(
-			ToPoint2<int>(pos),
-			ToVector2<int>(size)
+			ToPoint2<int32_t>(pos),
+			ToVector2<uint32_t>(size)
 		);
 
 	}

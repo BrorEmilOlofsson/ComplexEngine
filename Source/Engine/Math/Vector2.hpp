@@ -3,6 +3,7 @@
 #include <format>
 
 #include "Engine/Utility/Assert.hpp"
+#include "Engine/Utility/Rebind.hpp"
 
 namespace CLX
 {
@@ -32,6 +33,12 @@ namespace CLX
 	using Vector2ui64 = Vector2<uint64_t>;
     using Vector2i = Vector2i32;
 	using Vector2ui = Vector2ui32;
+
+	template<typename T, typename U>
+    struct rebind<Vector2<T>, U>
+	{
+		using type = Vector2<U>;
+    };
 
 	template<typename T>
 	constexpr Vector2<T>::Vector2(const T& x, const T& y) noexcept

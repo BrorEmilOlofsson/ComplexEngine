@@ -1,6 +1,8 @@
 #pragma once
 #include "Engine/Math/Vector2.hpp"
 #include "Engine/Math/UnitVector2.hpp"
+#include "Engine/Utility/Rebind.hpp"
+#include <cstdint>
 #include <format>
 
 namespace CLX
@@ -35,6 +37,12 @@ namespace CLX
     using Point2ui64 = Point2<uint64_t>;
     using Point2i = Point2i32;
     using Point2ui = Point2ui32;
+
+    template<typename T, typename U>
+    struct rebind<Point2<T>, U>
+    {
+        using type = Point2<U>;
+    };
 
     template<typename T>
     constexpr Point2<T>::Point2(const T& x, const T& y) noexcept

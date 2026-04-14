@@ -19,7 +19,7 @@ namespace CLX
 
 		Transform mTransform;
 		Vector2f mScale = Vector2f::One();
-		AABB2i mUVAABB = AABB2i::FromDefaultAndExtent(Vector2i(512, 512));
+		AABB2i mUVAABB = AABB2i::FromDefaultAndExtent(Vector2ui(512, 512));
 		Color mColor = Colors::White;
 		Vector2f mPivot;
 		TextureAssetHandle mTexture;

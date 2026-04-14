@@ -1,8 +1,9 @@
 #pragma once
+#include <limits>
+#include <cstdint>
 #include "Engine/Utility/Bounds.hpp"
 #include "Engine/Math/Point2.hpp"
 #include "Engine/Math/VectorMath.hpp"
-#include <limits>
 
 namespace CLX
 {
@@ -53,11 +54,12 @@ namespace CLX
 	template<typename T>
 	[[nodiscard]] constexpr AABB2<T> ScaleAABB(const AABB2<T>& aabb, Vector2f scale, Vector2f pivot = Vector2f(0.5f, 0.5f))
 	{
-		const Vector2<T> extent = static_cast<Vector2<T>>(static_cast<Vector2f>(aabb.GetExtent()) * scale);
+		const Vector2f extent = static_cast<Vector2f>(aabb.GetExtent()) * scale;
 		const Point2<T> min = aabb.GetMin();
 		const Point2<T> max = aabb.GetMax();
 		const Point2<T> center = Point2<T>(Lerp(min, max, pivot));
-		return AABB2<T>::FromCenterAndExtent(center, extent);
+        using ExtentType = typename AABB2<T>::extent_t;
+		return AABB2<T>::FromCenterAndExtent(center, static_cast<ExtentType>(extent));
 	}
 
 	template<typename T>

@@ -165,15 +165,15 @@ namespace CLX
 			throw std::runtime_error("No render rect set in RenderState");
 		}
 
-		if (renderState.GetRenderRect().value().GetExtent() == Vector2i::Zero())
+		if (renderState.GetRenderRect().value().GetExtent() == Vector2ui::Zero())
 		{
 			throw std::runtime_error("Render rect is too small");
 		}
 
 		Camera camera = renderState.GetCamera().value();
 		Matrix4x4f proj = camera.GetProjectionMatrix();
-		Vector2i resolution = renderState.GetRenderRect()->GetExtent();
-		Matrix4x4f expected = Camera::CreatePerspectiveProjectionMatrix(camera.GetHorizontalFOV(), camera.GetNearPlane(), camera.GetFarPlane(), ToAspectRatio(Vector2ui(resolution)));
+		Vector2ui resolution = renderState.GetRenderRect()->GetExtent();
+		Matrix4x4f expected = Camera::CreatePerspectiveProjectionMatrix(camera.GetHorizontalFOV(), camera.GetNearPlane(), camera.GetFarPlane(), ToAspectRatio(resolution));
 		if (proj != expected)
 		{
 			//throw std::runtime_error("Resolution in camera does not correspond to RenderState resolution");

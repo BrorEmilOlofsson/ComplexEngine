@@ -1,6 +1,9 @@
 #pragma once
 #include <type_traits>
+#include <functional>
+#include <concepts>
 #include "Engine/Utility/Assert.hpp"
+#include "Engine/Utility/Rebind.hpp"
 
 namespace CLX
 {
@@ -11,45 +14,89 @@ namespace CLX
 		ASSERT(BoundsChecker{}(min, max));
 	}
 
+	template<typename T>
+	concept HasValueType = requires
+	{
+		typename T::value_type;
+	};
+
+	template<typename T>
+	struct make_extent_scalar
+	{
+		using type = T;
+	};
+
+	template<std::signed_integral T>
+	struct make_extent_scalar<T>
+	{
+		using type = std::make_unsigned_t<T>;
+	};
+
+	template<typename T>
+	using make_extent_scalar_t = typename make_extent_scalar<T>::type;
+
+	template<typename T>
+	struct make_extent
+	{
+		using type = make_extent_scalar_t<T>;
+	};
+
+	template<typename T>
+		requires HasValueType<T>
+	struct make_extent<T>
+	{
+		using type = rebind_t<T, make_extent_scalar_t<typename T::value_type>>;
+	};
+
+	template<typename T>
+	using make_extent_t = typename make_extent<T>::type;
+
 	template<typename T, typename BoundsChecker = std::less_equal<T>>
 	class Bounds final
 	{
 		template<typename T>
-		struct ScalarTypeResolve;
+		struct scalar_resolve;
 
 		template<typename T> requires std::is_arithmetic_v<T>
-		struct ScalarTypeResolve<T>
+		struct scalar_resolve<T>
 		{
 			using type = T;
 		};
 
 		template<typename T> requires (!std::is_arithmetic_v<T>)
-		struct ScalarTypeResolve<T>
+		struct scalar_resolve<T>
 		{
 			using type = typename T::value_type;
 		};
 
-		using ExtentType = decltype(T() - T());
-		using ScalarType = ScalarTypeResolve<T>::type;
-		
+		template<typename U>
+		struct extent_resolve
+		{
+			using difference_type = decltype(U{} - U{});
+			using type = make_extent_t<difference_type>;
+		};
+
 		constexpr Bounds(const T& min, const T& max);
 
 	public:
 
+		using extent_t = extent_resolve<T>::type;
+		using scalar_t = scalar_resolve<T>::type;
+
 		constexpr Bounds() = default;
 
-		constexpr void SetCenterAndExtent(const T& center, const ExtentType& extent);
+		constexpr void SetCenterAndExtent(const T& center, const extent_t& extent);
 		constexpr void SetCenter(const T& center);
-		constexpr void SetExtent(const ExtentType& extent);
+		constexpr void SetExtent(const extent_t& extent);
 		constexpr void SetMin(const T& min);
 		constexpr void SetMax(const T& max);
 		constexpr void SetMinAndMax(const T& min, const T& max);
-		constexpr void SetMinAndExtent(const T& min, const ExtentType& extent);
+		constexpr void SetMinAndExtent(const T& min, const extent_t& extent);
 
 		[[nodiscard]] constexpr const T& GetMin() const noexcept;
 		[[nodiscard]] constexpr const T& GetMax() const noexcept;
 		[[nodiscard]] constexpr T GetCenter() const noexcept;
-		[[nodiscard]] constexpr ExtentType GetExtent() const noexcept;
+		[[nodiscard]] constexpr extent_t GetExtent() const noexcept;
 
 	private:
 
@@ -57,9 +104,9 @@ namespace CLX
 
 	public:
 
-		[[nodiscard]] static constexpr Bounds FromMinAndExtent(const T& min, const ExtentType& extent);
-		[[nodiscard]] static constexpr Bounds FromDefaultAndExtent(const ExtentType& extent);
-		[[nodiscard]] static constexpr Bounds FromCenterAndExtent(const T& center, const ExtentType& extent);
+		[[nodiscard]] static constexpr Bounds FromMinAndExtent(const T& min, const extent_t& extent);
+		[[nodiscard]] static constexpr Bounds FromDefaultAndExtent(const extent_t& extent);
+		[[nodiscard]] static constexpr Bounds FromCenterAndExtent(const T& center, const extent_t& extent);
 		[[nodiscard]] static constexpr Bounds FromMinAndMax(const T& min, const T& max);
 
 	private:
@@ -77,10 +124,10 @@ namespace CLX
 	}
 
 	template<typename T, typename BoundsChecker>
-	constexpr void Bounds<T, BoundsChecker>::SetCenterAndExtent(const T& center, const ExtentType& extent)
+	constexpr void Bounds<T, BoundsChecker>::SetCenterAndExtent(const T& center, const extent_t& extent)
 	{
-		mMin = center - extent / static_cast<ScalarType>(2);
-		mMax = center + extent / static_cast<ScalarType>(2);
+		mMin = center - extent / static_cast<scalar_t>(2);
+		mMax = center + extent / static_cast<scalar_t>(2);
 
 		Assert();
 	}
@@ -92,7 +139,7 @@ namespace CLX
 	}
 
 	template<typename T, typename BoundsChecker>
-	constexpr void Bounds<T, BoundsChecker>::SetExtent(const ExtentType& extent)
+	constexpr void Bounds<T, BoundsChecker>::SetExtent(const extent_t& extent)
 	{
 		SetCenterAndExtent(GetCenter(), extent);
 	}
@@ -120,7 +167,7 @@ namespace CLX
 	}
 
 	template<typename T, typename BoundsChecker>
-	constexpr void Bounds<T, BoundsChecker>::SetMinAndExtent(const T& min, const ExtentType& extent)
+	constexpr void Bounds<T, BoundsChecker>::SetMinAndExtent(const T& min, const extent_t& extent)
 	{
 		mMin = min;
 		mMax = min + extent;
@@ -142,13 +189,13 @@ namespace CLX
 	template<typename T, typename BoundsChecker>
 	constexpr T Bounds<T, BoundsChecker>::GetCenter() const noexcept
 	{
-		return mMin + GetExtent() / static_cast<ScalarType>(2);
+		return mMin + GetExtent() / static_cast<scalar_t>(2);
 	}
 
 	template<typename T, typename BoundsChecker>
-	constexpr typename Bounds<T, BoundsChecker>::ExtentType Bounds<T, BoundsChecker>::GetExtent() const noexcept
+	constexpr typename Bounds<T, BoundsChecker>::extent_t Bounds<T, BoundsChecker>::GetExtent() const noexcept
 	{
-		return mMax - mMin;
+		return static_cast<extent_t>(mMax - mMin);
 	}
 
 	template<typename T, typename BoundsChecker>
@@ -158,22 +205,22 @@ namespace CLX
 	}
 
 	template<typename T, typename BoundsChecker>
-	[[nodiscard]] constexpr Bounds<T, BoundsChecker> Bounds<T, BoundsChecker>::FromMinAndExtent(const T& min, const ExtentType& extent)
+	[[nodiscard]] constexpr Bounds<T, BoundsChecker> Bounds<T, BoundsChecker>::FromMinAndExtent(const T& min, const extent_t& extent)
 	{
 		return Bounds<T, BoundsChecker>(min, min + extent);
 	}
 
 	template<typename T, typename BoundsChecker>
-	[[nodiscard]] constexpr Bounds<T, BoundsChecker> Bounds<T, BoundsChecker>::FromDefaultAndExtent(const ExtentType& extent)
+	[[nodiscard]] constexpr Bounds<T, BoundsChecker> Bounds<T, BoundsChecker>::FromDefaultAndExtent(const extent_t& extent)
 	{
 		constexpr T d = T{};
 		return Bounds<T, BoundsChecker>(d, d + extent);
 	}
 
 	template<typename T, typename BoundsChecker>
-	[[nodiscard]] constexpr Bounds<T, BoundsChecker> Bounds<T, BoundsChecker>::FromCenterAndExtent(const T& center, const ExtentType& extent)
+	[[nodiscard]] constexpr Bounds<T, BoundsChecker> Bounds<T, BoundsChecker>::FromCenterAndExtent(const T& center, const extent_t& extent)
 	{
-		const auto halfExtent = extent / static_cast<ScalarType>(2);
+		const auto halfExtent = extent / static_cast<scalar_t>(2);
 		return Bounds<T, BoundsChecker>(center - halfExtent, center + halfExtent);
 	}
 
