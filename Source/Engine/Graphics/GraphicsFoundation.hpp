@@ -35,7 +35,7 @@ namespace CLX
         void Shutdown();
         void Render(RenderState& renderState);
 
-        [[nodiscard]] RenderContext CreateRenderContext(const Vector2ui& size);
+        [[nodiscard]] RenderContext CreateRenderContext(const Dimension2u& size);
         GraphicsWindowView MakeWindow(WindowView windowView);
 
         void SetAssetManager(std::shared_ptr<AssetManager> assetManager);
@@ -55,7 +55,7 @@ namespace CLX
             virtual void Shutdown() = 0;
             virtual void Render(RenderState& renderState) = 0;
 
-            [[nodiscard]] virtual RenderContext CreateRenderContext(const Vector2ui& size) = 0;
+            [[nodiscard]] virtual RenderContext CreateRenderContext(const Dimension2u& size) = 0;
             virtual GraphicsWindowView MakeWindow(WindowView windowView) = 0;
 
             virtual void SetAssetManager(std::shared_ptr<AssetManager> assetManager) = 0;
@@ -98,7 +98,7 @@ namespace CLX
                 mObject.Render(renderState);
             }
 
-            [[nodiscard]] RenderContext CreateRenderContext(const Vector2ui& size) override
+            [[nodiscard]] RenderContext CreateRenderContext(const Dimension2u& size) override
             {
                 return mObject.CreateRenderContext(size);
             }

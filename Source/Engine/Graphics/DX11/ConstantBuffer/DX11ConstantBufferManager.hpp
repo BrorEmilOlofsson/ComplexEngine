@@ -1,13 +1,12 @@
 #pragma once
+#ifdef _WIN32
+
 #include "Engine/Win/WinDefines.hpp"
 
-#include "Engine/Math/Vector2.hpp"
+#include "Engine/Math/Dimension2.hpp"
 #include "Engine/Graphics/DX11/ConstantBuffer/DX11ConstantBuffer.hpp"
 #include "Engine/Graphics/ConstantBufferData.hpp"
 #include "Engine/Utility/Camera.hpp"
-#include <memory>
-
-#ifdef _WIN32
 
 namespace CLX
 {
@@ -17,7 +16,7 @@ namespace CLX
 
 		explicit DX11ConstantBufferManager(ID3D11Device& device);
 
-		void UpdateCameraBuffer(Camera camera, const Vector2ui& resolution, ID3D11DeviceContext& context);
+		void UpdateCameraBuffer(Camera camera, const Dimension2u& resolution, ID3D11DeviceContext& context);
 		void UpdateTimeBuffer(const float totalTime, const float deltaTime, ID3D11DeviceContext& context);
 		void UpdateLightBuffer(const LightBufferData& lightBufferData, ID3D11DeviceContext& context);
 		void UpdatePostProcessBuffer(const PostProcessBufferData& postProcessData, ID3D11DeviceContext& context);

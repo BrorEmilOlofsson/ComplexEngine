@@ -26,11 +26,11 @@ namespace CLX
 		std::array<std::string_view, static_cast<std::size_t>(eRasterizerState::Count)> mRasterizerStateNames = GetRasterizerStateNames();
 
 		std::vector<std::string> mCursorNames;
-		std::vector<Vector2ui> mWindowSizes;
+		std::vector<Dimension2u> mWindowSizes;
 
 		std::string mLongCursorStringName;
 
-		Vector2ui mMonitorResolution;
+		Dimension2u mMonitorResolution;
 
 		std::optional<int> mSelectedWindowSizeIndex;
 		unsigned int mMonitorUpdateFrequency = 60;

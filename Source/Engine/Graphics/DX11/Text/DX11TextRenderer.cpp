@@ -12,7 +12,7 @@ namespace CLX
 		mSpriteFont = std::make_unique<DirectX::SpriteFont>(device, font.c_str());
 	}
 
-	void DX11TextRenderer::Render(std::span<const Text3D> texts, const Camera& camera, const Vector2ui& windowSize)
+	void DX11TextRenderer::Render(std::span<const Text3D> texts, const Camera& camera, const Dimension2u& windowSize)
 	{
 		if (texts.empty())
 		{

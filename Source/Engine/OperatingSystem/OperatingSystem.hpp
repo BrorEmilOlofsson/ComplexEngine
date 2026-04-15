@@ -1,9 +1,11 @@
 #pragma once
+#include <utility>
+#include <memory>
 #include "Engine/OperatingSystem/WindowView.hpp"
 #include "Engine/OperatingSystem/WindowHandle.hpp"
 #include "Engine/Utility/GraphicsBufferData.hpp"
 #include "Engine/Graphics/GraphicsFoundation.hpp"
-#include "Engine/Graphics/RenderState.hpp"
+#include "Engine/Math/Dimension2.hpp"
 
 namespace CLX
 {
@@ -30,7 +32,7 @@ namespace CLX
         [[nodiscard]] const GraphicsFoundation& GetGraphicsFoundation() const;
 
 
-		WindowHandle MakeWindow(Vector2ui size, std::wstring title);
+		WindowHandle MakeWindow(Dimension2u size, std::wstring title);
 
 
 		void LoadCursors(const std::filesystem::path& path);
@@ -55,7 +57,7 @@ namespace CLX
 			virtual void Shutdown() = 0;
 			virtual WindowView GetWindow(WindowHandle windowHandle) = 0;
 			virtual CWindowView GetCWindow(WindowHandle windowHandle) const = 0;
-			virtual WindowHandle MakeWindow(Vector2ui size, std::wstring title) = 0;
+			virtual WindowHandle MakeWindow(Dimension2u size, std::wstring title) = 0;
             virtual GraphicsFoundation& GetGraphicsFoundation() = 0;
             virtual const GraphicsFoundation& GetGraphicsFoundation() const = 0;
 			virtual void LoadCursors(const std::filesystem::path& path) = 0;
@@ -109,7 +111,7 @@ namespace CLX
 				return CWindowView(window);
 			}
 
-			WindowHandle MakeWindow(Vector2ui size, std::wstring title) override
+			WindowHandle MakeWindow(Dimension2u size, std::wstring title) override
 			{
 				return OSCreateWindow(mObject, size, title);
 			}

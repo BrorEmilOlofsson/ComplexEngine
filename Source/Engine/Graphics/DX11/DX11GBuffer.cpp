@@ -6,7 +6,7 @@
 namespace CLX
 {
 
-	DX11GBuffer::DX11GBuffer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, Microsoft::WRL::ComPtr<ID3D11Device> device, const Vector2ui size)
+	DX11GBuffer::DX11GBuffer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, Microsoft::WRL::ComPtr<ID3D11Device> device, const Dimension2u size)
 		: mAlbedoRT(context, device, *DX11Factory::CreateRenderTargetTexture(*device.Get(), DX11Factory::CreateRenderTargetTextureDesc(size)).Get(), size)
 		, mNormalRT(context, device, *DX11Factory::CreateRenderTargetTexture(*device.Get(), DX11Factory::CreateRenderTargetTextureDesc(size)).Get(), size)
 		, mMaterialRT(context, device, *DX11Factory::CreateRenderTargetTexture(*device.Get(), DX11Factory::CreateRenderTargetTextureDesc(size)).Get(), size)
@@ -56,7 +56,7 @@ namespace CLX
 			0);     // Stencil = 0
 	}
 
-	void DX11GBuffer::Resize(Vector2ui size)
+	void DX11GBuffer::Resize(Dimension2u size)
 	{
 		mAlbedoRT.Resize(*DX11Factory::CreateRenderTargetTexture(
 			*mDevice.Get(),

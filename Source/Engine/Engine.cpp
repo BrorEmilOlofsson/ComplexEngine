@@ -90,7 +90,7 @@ namespace CLX
 
         mAssetManager->LoadAssets();
         mOperatingSystem.Init();
-        mMainWindow = mOperatingSystem.MakeWindow(Vector2ui(1600, 900), L"SimpleEngine");
+        mMainWindow = mOperatingSystem.MakeWindow(Dimension2u(1600, 900), L"SimpleEngine");
 
         //mAudioManager.Init();
         mFrameTimer.Start();

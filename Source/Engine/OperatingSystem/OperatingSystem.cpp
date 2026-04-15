@@ -45,7 +45,7 @@ namespace CLX
     }
 
 
-    WindowHandle OperatingSystem::MakeWindow(Vector2ui size, std::wstring title)
+    WindowHandle OperatingSystem::MakeWindow(Dimension2u size, std::wstring title)
 	{
 		return mConcept->MakeWindow(size, title);
 	}

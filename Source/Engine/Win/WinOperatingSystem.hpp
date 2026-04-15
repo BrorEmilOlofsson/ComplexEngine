@@ -35,7 +35,7 @@ namespace CLX
 
 		LRESULT HandleMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-		unsigned int MakeWindow(Vector2ui size, std::wstring title);
+		unsigned int MakeWindow(Dimension2u size, std::wstring title);
 		[[nodiscard]] Win_Window& GetWindow(const WindowID windowID);
 		[[nodiscard]] const Win_Window& GetWindow(const WindowID windowID) const;
 
@@ -91,7 +91,7 @@ namespace CLX
 		return os.GetWindow(windowHandle.id);
 	}
 
-	[[nodiscard]] inline WindowHandle OSCreateWindow(Win_OperatingSystem& os, Vector2ui size, std::wstring title)
+	[[nodiscard]] inline WindowHandle OSCreateWindow(Win_OperatingSystem& os, Dimension2u size, std::wstring title)
 	{
 		return WindowHandle(os.MakeWindow(size, title));
 	}

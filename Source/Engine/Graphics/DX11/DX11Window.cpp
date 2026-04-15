@@ -42,7 +42,7 @@ namespace CLX
 	void DX11Window::Init()
 	{
 		{
-			const Vector2ui windowSize = mWindowView.GetClientSize();
+			const Dimension2u windowSize = mWindowView.GetClientSize();
 
 			const D3D11_VIEWPORT viewport = DX11Factory::CreateViewport(windowSize);
 
@@ -92,9 +92,9 @@ namespace CLX
 
 	void DX11Window::OnResize()
 	{
-		const Vector2ui windowSize = mWindowView.GetClientSize();
+		const Dimension2u windowSize = mWindowView.GetClientSize();
 
-		if (windowSize.x == 0 || windowSize.y == 0)
+		if (windowSize.GetWidth() == 0 || windowSize.GetHeight() == 0)
 		{
 			return;
 		}
@@ -106,7 +106,7 @@ namespace CLX
 		mDepthStencilViewManager.lock()->Get(mDepthStencilViewHandle).Reset();
 
 		// Resize swap chain buffers
-		HRESULT hr = mSwapChain->ResizeBuffers(0, windowSize.x, windowSize.y, DXGI_FORMAT_UNKNOWN, 0);
+		HRESULT hr = mSwapChain->ResizeBuffers(0, windowSize.GetWidth(), windowSize.GetHeight(), DXGI_FORMAT_UNKNOWN, 0);
 		WIN_CHECK_HRESULT(hr);
 
 		// Create RTV

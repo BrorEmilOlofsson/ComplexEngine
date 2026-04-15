@@ -60,12 +60,12 @@ namespace CLX
 		}*/
 	}
 
-	static std::string WindowSizeToString(Vector2ui aWindowSize)
+	static std::string WindowSizeToString(Dimension2u windowSize)
 	{
-		return std::to_string(aWindowSize.x) + "x" + std::to_string(aWindowSize.y);
+		return std::to_string(windowSize.GetWidth()) + "x" + std::to_string(windowSize.GetHeight());
 	}
 
-	void UpdateWindowsSizeSettings(Vector2ui currentWindowSize, std::span<const Vector2ui> windowSizes, std::optional<int>& selectedWindowSizeIndex, WindowView window)
+	void UpdateWindowsSizeSettings(Dimension2u currentWindowSize, std::span<const Dimension2u> windowSizes, std::optional<int>& selectedWindowSizeIndex, WindowView window)
 	{
 		ImGui::SetNextItemWidth(200);
 
@@ -116,8 +116,8 @@ namespace CLX
 
 	static void RenderPopup(bool& isActive, /*const std::string& windowName, const std::string& windowTag,*/
 		const float deltaTime, [[maybe_unused]] bool& isConsoleOpen, const unsigned int monitorUpdateFrequency, const ManualTimerf& updateFpsTimer, float& fps,
-		const std::span<const Vector2ui> windowSizes, std::optional<int>& selectedWindowSizeIndex,
-		Vector2ui currentWindowSize, GraphicsSettings& graphicsSettings, ImGuiStyleManager& imguiStyleManager, WindowView osWindow)
+		const std::span<const Dimension2u> windowSizes, std::optional<int>& selectedWindowSizeIndex,
+		Dimension2u currentWindowSize, GraphicsSettings& graphicsSettings, ImGuiStyleManager& imguiStyleManager, WindowView osWindow)
 	{
 		if (!isActive)
 		{
@@ -191,7 +191,7 @@ namespace CLX
 		settings.mShowFpsTimer.Update(std::chrono::duration<float>(deltaTime));
 
 		const WindowView window = blackboard.Get<Key_WindowView>();
-		Vector2ui currentWindowSize = window.GetClientSize();
+		Dimension2u currentWindowSize = window.GetClientSize();
 		ImGuiStyleManager& imguiStyleManager = blackboard.Get<Key_ImGuiStyleManager>();
 		GraphicsSettings& graphicsSettings = blackboard.Get<Key_GraphicsSettings>();
 		RenderPopup(

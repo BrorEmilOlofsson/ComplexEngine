@@ -84,17 +84,17 @@ namespace CLX
             mGraphicsSettings = std::move(graphicsSettings);
         }
 
-        RenderTargetView CreateRenderTarget(const Vector2ui& size)
+        RenderTargetView CreateRenderTarget(const Dimension2u& size)
         {
             return mRenderTargetManager.Create(size);
         }
 
-        DepthStencilViewHandle CreateDepthStencilView(const Vector2ui& size)
+        DepthStencilViewHandle CreateDepthStencilView(const Dimension2u& size)
         {
             return mDepthStencilViewManager->Create(size);
         }
 
-        [[nodiscard]] RenderContext CreateRenderContext(const Vector2ui& size);
+        [[nodiscard]] RenderContext CreateRenderContext(const Dimension2u& size);
 
         [[nodiscard]] std::shared_ptr<DX11DepthStencilViewManager> GetDepthStencilViewManager()
         {

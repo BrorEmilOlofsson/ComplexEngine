@@ -1,4 +1,6 @@
 #pragma once
+#ifdef _WIN32
+
 #include <memory>
 #include <string>
 #include "Engine/Math/Shapes/AABB2.hpp"
@@ -7,8 +9,6 @@
 #include "Engine/OperatingSystem/WindowFrameBuffer.hpp"
 #include "Engine/Graphics/GraphicsWindowView.hpp"
 #include "Engine/Math/Dimension2.hpp"
-
-#ifdef _WIN32
 
 #include "Engine/Win/WinDefines.hpp"
 #include <Windows.h>
@@ -22,7 +22,7 @@ namespace CLX
 	public:
 
 		Win_Window(
-			const Vector2ui& windowSize,
+			const Dimension2u& windowSize,
 			const std::wstring& name, 
 			const Win_WindowClass& windowClass, 
 			void* operatingSystem
@@ -65,7 +65,7 @@ namespace CLX
 		void Show();
 		void Hide();
 
-		void SetSize(const Vector2ui& windowSize, const bool fullScreen);
+		void SetSize(const Dimension2u& windowSize, const bool fullScreen);
 		void SetRect(const AABB2i& rect, unsigned int flags);
 		void ToggleFullScreen();
 
@@ -76,7 +76,7 @@ namespace CLX
 		[[nodiscard]] AABB2i GetBounds() const noexcept;
 		[[nodiscard]] AABB2i GetClientBounds() const noexcept;
 
-		[[nodiscard]] Vector2ui GetClientSize() const noexcept;
+		[[nodiscard]] Dimension2u GetClientSize() const noexcept;
 
 		[[nodiscard]] GraphicsWindowView& GetGraphicsWindow() noexcept
 		{
@@ -127,7 +127,7 @@ namespace CLX
 		window.EndFrame(renderContext);
 	}
 
-	inline void Window_SetSize(Win_Window& window, Vector2ui size, const bool fullScreen)
+	inline void Window_SetSize(Win_Window& window, Dimension2u size, const bool fullScreen)
 	{
 		window.SetSize(size, fullScreen);
 	}

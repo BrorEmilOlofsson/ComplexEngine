@@ -1,14 +1,13 @@
 #pragma once
-#include "Engine/Math/Vector2.hpp"
-#include "Engine/Win/WinMouseInput.hpp"
-#include "Engine/Input/InputState.hpp"
-#include <bitset>
-#include <string>
-
 #ifdef _WIN32
 
 #include "Engine/Win/WinDefines.hpp"
 #include <Windows.h>
+
+#include "Engine/Math/Dimension2.hpp"
+#include "Engine/Win/WinMouseInput.hpp"
+#include "Engine/Input/InputState.hpp"
+
 
 namespace CLX
 {
@@ -19,7 +18,7 @@ namespace CLX
 		Win_InputProcessor() = default;
 
 		
-		bool HandleMessages(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam, Vector2ui windowSize);
+		bool HandleMessages(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam, Dimension2u windowSize);
 		void Update();
 
 		void ResetKeyStates();

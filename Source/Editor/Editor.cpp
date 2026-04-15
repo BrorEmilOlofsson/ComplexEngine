@@ -165,7 +165,7 @@ namespace CLX
         }
         if (input.IsKeyPressed(eInputKey::F6))
         {
-            windowView.SetSize(Vector2ui(720, 405), false);
+            windowView.SetSize(Dimension2u(720, 405), false);
         }
     }
 

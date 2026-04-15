@@ -1,5 +1,4 @@
 #pragma once
-
 #ifdef _WIN32
 
 #include "Engine/Graphics/DX11/DX11GBuffer.hpp"
@@ -11,16 +10,16 @@ namespace CLX
 	{
 	public:
 		
-		DX11RenderContext(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, Vector2ui size);
+		DX11RenderContext(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, Dimension2u size);
 
 		[[nodiscard]] std::vector<void*> GetGBufferSRVs();
-		[[nodiscard]] Vector2ui GetBufferSize() const;
+		[[nodiscard]] Dimension2u GetBufferSize() const;
 		[[nodiscard]] uint32_t GetObjectIDAt(const Point2i& point);
 		[[nodiscard]] DX11RenderTarget& GetOutputRenderTarget();
 		[[nodiscard]] ID3D11ShaderResourceView* GetOutputSRV();
 		[[nodiscard]] DX11GBuffer& GetGBuffer();
 
-		void ResizeBuffers(const Vector2ui& size);
+		void ResizeBuffers(const Dimension2u& size);
 		void ClearBuffers();
 
 

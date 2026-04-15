@@ -16,10 +16,10 @@ namespace CLX
 	{
 	public:
 
-		[[nodiscard]] static D3D11_VIEWPORT CreateViewport(Vector2ui windowSize);
+		[[nodiscard]] static D3D11_VIEWPORT CreateViewport(Dimension2u windowSize);
 		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11Resource> GetBackBuffer(IDXGISwapChain& swapChain);
 		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11DepthStencilState> CreateDepthBuffer(ID3D11Device& device);
-		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11DepthStencilView> CreateDepthStencilView(ID3D11Device& device, Vector2ui windowSize);
+		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11DepthStencilView> CreateDepthStencilView(ID3D11Device& device, Dimension2u windowSize);
 		
 		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11RasterizerState> CreateRasterizerState(ID3D11Device& device, D3D11_RASTERIZER_DESC desc);
 		[[nodiscard]] static D3D11_RASTERIZER_DESC CreateRasterizerDesc_BackfaceCulling();
@@ -29,23 +29,23 @@ namespace CLX
 
 		[[nodiscard]] static void CreateDeviceAndContext(Microsoft::WRL::ComPtr<ID3D11Device>& device, Microsoft::WRL::ComPtr<ID3D11DeviceContext>& context);
 
-		[[nodiscard]] static Microsoft::WRL::ComPtr<IDXGISwapChain> CreateSwapChain(HWND hwnd, const Vector2ui windowSize, Microsoft::WRL::ComPtr<ID3D11Device> device);
-		[[nodiscard]] static Microsoft::WRL::ComPtr<IDXGISwapChain> CreateSwapChainAndDeviceAndContext(HWND hwnd, const Vector2ui windowSize, 
+		[[nodiscard]] static Microsoft::WRL::ComPtr<IDXGISwapChain> CreateSwapChain(HWND hwnd, const Dimension2u windowSize, Microsoft::WRL::ComPtr<ID3D11Device> device);
+		[[nodiscard]] static Microsoft::WRL::ComPtr<IDXGISwapChain> CreateSwapChainAndDeviceAndContext(HWND hwnd, const Dimension2u windowSize,
 			Microsoft::WRL::ComPtr<ID3D11Device>& aDevice, Microsoft::WRL::ComPtr<ID3D11DeviceContext>& context);
 
 		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11Buffer> CreateConstantBuffer(ID3D11Device& device, const unsigned int size);
 	
-		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> CreateTexture(ID3D11Device& device, Vector2ui size, const void* memory);
-		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11Texture2D> CreateRenderTargetTexture(ID3D11Device& device, Vector2ui size);
+		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> CreateTexture(ID3D11Device& device, Dimension2u size, const void* memory);
+		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11Texture2D> CreateRenderTargetTexture(ID3D11Device& device, Dimension2u size);
 		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11Texture2D> CreateRenderTargetTexture(ID3D11Device& device, D3D11_TEXTURE2D_DESC desc);
 
 		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11RenderTargetView> CreateRenderTargetView(ID3D11Device& device, ID3D11Resource& resource, std::optional<D3D11_RENDER_TARGET_VIEW_DESC> desc = {});
 		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> CreateShaderResourceView(ID3D11Device& device, ID3D11Resource& resource, std::optional<D3D11_SHADER_RESOURCE_VIEW_DESC> desc = {});
 
-		[[nodiscard]] static D3D11_TEXTURE2D_DESC CreateRenderTargetTextureDesc(Vector2ui size);
+		[[nodiscard]] static D3D11_TEXTURE2D_DESC CreateRenderTargetTextureDesc(Dimension2u size);
 
-		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11Texture2D> CreateObjectIDStagingTexture(ID3D11Device& device, Vector2ui size);
-		[[nodiscard]] static D3D11_TEXTURE2D_DESC CreateObjectSelectionTextureDesc(Vector2ui size);
+		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11Texture2D> CreateObjectIDStagingTexture(ID3D11Device& device, Dimension2u size);
+		[[nodiscard]] static D3D11_TEXTURE2D_DESC CreateObjectSelectionTextureDesc(Dimension2u size);
 
 		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11VertexShader> CreateVertexShaderAndInputLayout(const std::filesystem::path& path, ID3D11Device& device, Microsoft::WRL::ComPtr<ID3D11InputLayout>& inputLayout);
 		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11PixelShader> CreatePixelShader(const std::filesystem::path& path, ID3D11Device& device);

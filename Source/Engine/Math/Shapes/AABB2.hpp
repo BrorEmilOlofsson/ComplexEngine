@@ -1,9 +1,12 @@
 #pragma once
 #include <limits>
 #include <cstdint>
+#include <array>
+#include <type_traits>
 #include "Engine/Utility/Bounds.hpp"
 #include "Engine/Math/Point2.hpp"
 #include "Engine/Math/VectorMath.hpp"
+#include "Engine/Math/Dimension2.hpp"
 
 namespace CLX
 {
@@ -105,6 +108,25 @@ namespace CLX
 			max,
 			Point2<T>(min.x, max.y)
 		};
+	}
+
+	template<typename T>
+	[[nodiscard]] constexpr T GetWidth(const AABB2<T>& aabb) noexcept
+	{
+		return aabb.GetMax().x - aabb.GetMin().x;
+	}
+
+	template<typename T>
+	[[nodiscard]] constexpr T GetHeight(const AABB2<T>& aabb) noexcept
+	{
+		return aabb.GetMax().y - aabb.GetMin().y;
+	}
+
+	template<typename T>
+	[[nodiscard]] constexpr auto GetDimension(const AABB2<T>& aabb) noexcept
+	{
+        using DimensionType = typename AABB2<T>::extent_t::value_type;
+		return Dimension2<DimensionType>(GetWidth(aabb), GetHeight(aabb));
 	}
 }
 

@@ -10,13 +10,13 @@
 namespace CLX
 {
 
-	D3D11_VIEWPORT DX11Factory::CreateViewport(Vector2ui windowSize)
+	D3D11_VIEWPORT DX11Factory::CreateViewport(Dimension2u windowSize)
 	{
 		D3D11_VIEWPORT viewport = {};
 		viewport.TopLeftX = 0;
 		viewport.TopLeftY = 0;
-		viewport.Width = static_cast<float>(windowSize.x);
-		viewport.Height = static_cast<float>(windowSize.y);
+		viewport.Width = static_cast<float>(windowSize.GetWidth());
+		viewport.Height = static_cast<float>(windowSize.GetHeight());
 		viewport.MinDepth = 0.0f;
 		viewport.MaxDepth = 1.0f;
 
@@ -47,11 +47,11 @@ namespace CLX
 		return depthStencilState;
 	}
 
-	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> DX11Factory::CreateDepthStencilView(ID3D11Device& device, Vector2ui windowSize)
+	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> DX11Factory::CreateDepthStencilView(ID3D11Device& device, Dimension2u windowSize)
 	{
 		D3D11_TEXTURE2D_DESC descDepth{};
-		descDepth.Width = windowSize.x;
-		descDepth.Height = windowSize.y;
+		descDepth.Width = windowSize.GetWidth();
+		descDepth.Height = windowSize.GetHeight();
 		descDepth.MipLevels = 1u;
 		descDepth.ArraySize = 1u;
 		descDepth.Format = DXGI_FORMAT_D32_FLOAT;
@@ -149,12 +149,12 @@ namespace CLX
 		WIN_CHECK_HRESULT(hr);
 	}
 
-	static DXGI_SWAP_CHAIN_DESC CreateSwapChainDesc(HWND hwnd, const Vector2ui windowSize)
+	static DXGI_SWAP_CHAIN_DESC CreateSwapChainDesc(HWND hwnd, const Dimension2u windowSize)
 	{
 		DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
 		swapChainDesc.BufferCount = 2;
-		swapChainDesc.BufferDesc.Width = windowSize.x;
-		swapChainDesc.BufferDesc.Height = windowSize.y;
+		swapChainDesc.BufferDesc.Width = windowSize.GetWidth();
+		swapChainDesc.BufferDesc.Height = windowSize.GetHeight();
 		swapChainDesc.BufferDesc.RefreshRate.Numerator = 0;
 		swapChainDesc.BufferDesc.RefreshRate.Denominator = 0;
 		swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -167,7 +167,7 @@ namespace CLX
 		return swapChainDesc;
 	}
 
-	Microsoft::WRL::ComPtr<IDXGISwapChain> DX11Factory::CreateSwapChain(HWND hwnd, const Vector2ui windowSize, Microsoft::WRL::ComPtr<ID3D11Device> device)
+	Microsoft::WRL::ComPtr<IDXGISwapChain> DX11Factory::CreateSwapChain(HWND hwnd, const Dimension2u windowSize, Microsoft::WRL::ComPtr<ID3D11Device> device)
 	{
 		DXGI_SWAP_CHAIN_DESC swapChainDesc = CreateSwapChainDesc(hwnd, windowSize);
 
@@ -192,7 +192,7 @@ namespace CLX
 		return swapChain;
 	}
 
-	Microsoft::WRL::ComPtr<IDXGISwapChain> DX11Factory::CreateSwapChainAndDeviceAndContext(HWND hwnd, const Vector2ui windowSize,
+	Microsoft::WRL::ComPtr<IDXGISwapChain> DX11Factory::CreateSwapChainAndDeviceAndContext(HWND hwnd, const Dimension2u windowSize,
 		Microsoft::WRL::ComPtr<ID3D11Device>& device, Microsoft::WRL::ComPtr<ID3D11DeviceContext>& context)
 	{
 		DXGI_SWAP_CHAIN_DESC swapChainDesc = CreateSwapChainDesc(hwnd, windowSize);
@@ -235,12 +235,12 @@ namespace CLX
 		return CreateBuffer(device, bufferDescription, nullptr);
 	}
 
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> DX11Factory::CreateTexture(ID3D11Device& device, Vector2ui size, const void* memory)
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> DX11Factory::CreateTexture(ID3D11Device& device, Dimension2u size, const void* memory)
 	{
-
+        static_assert(sizeof(UINT) == 4, "Expected UINT to be 4 bytes for correct memory layout.");
 		D3D11_TEXTURE2D_DESC desc = {};
-		desc.Width = size.x;
-		desc.Height = size.y;
+		desc.Width = size.GetWidth();
+		desc.Height = size.GetHeight();
 		desc.MipLevels = 1;
 		desc.ArraySize = 1;
 
@@ -255,8 +255,8 @@ namespace CLX
 		D3D11_SUBRESOURCE_DATA subresourceDesc = {};
 
 		subresourceDesc.pSysMem = memory;
-		subresourceDesc.SysMemPitch = size.x * 4;
-		subresourceDesc.SysMemSlicePitch = size.x * size.y * 4;
+		subresourceDesc.SysMemPitch = size.GetWidth() * 4;
+		subresourceDesc.SysMemSlicePitch = size.GetWidth() * size.GetHeight() * 4;
 
 		Microsoft::WRL::ComPtr<ID3D11Texture2D> texture = nullptr;
 		const HRESULT hr = device.CreateTexture2D(&desc, &subresourceDesc, &texture);
@@ -272,7 +272,7 @@ namespace CLX
 		return shaderResourceView;
 	}
 
-	Microsoft::WRL::ComPtr<ID3D11Texture2D> DX11Factory::CreateRenderTargetTexture(ID3D11Device& device, Vector2ui size)
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> DX11Factory::CreateRenderTargetTexture(ID3D11Device& device, Dimension2u size)
 	{
 		return CreateRenderTargetTexture(device, CreateRenderTargetTextureDesc(size));
 	}
@@ -303,11 +303,11 @@ namespace CLX
 		return shaderResourceView;
 	}
 
-	D3D11_TEXTURE2D_DESC DX11Factory::CreateRenderTargetTextureDesc(Vector2ui size)
+	D3D11_TEXTURE2D_DESC DX11Factory::CreateRenderTargetTextureDesc(Dimension2u size)
 	{
 		D3D11_TEXTURE2D_DESC textureDesc = {};
-		textureDesc.Width = size.x;
-		textureDesc.Height = size.y;
+		textureDesc.Width = size.GetWidth();
+		textureDesc.Height = size.GetHeight();
 		textureDesc.MipLevels = 1;
 		textureDesc.ArraySize = 1;
 		textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -317,11 +317,11 @@ namespace CLX
 		return textureDesc;
 	}
 
-	Microsoft::WRL::ComPtr<ID3D11Texture2D> DX11Factory::CreateObjectIDStagingTexture(ID3D11Device& device, Vector2ui size)
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> DX11Factory::CreateObjectIDStagingTexture(ID3D11Device& device, Dimension2u size)
 	{
 		D3D11_TEXTURE2D_DESC desc = {};
-		desc.Width = size.x;
-		desc.Height = size.y;
+		desc.Width = size.GetWidth();
+		desc.Height = size.GetHeight();
 		desc.MipLevels = 1;
 		desc.ArraySize = 1;
 		desc.Format = DXGI_FORMAT_R32_UINT;
@@ -335,11 +335,11 @@ namespace CLX
 		return stagingTexture;
 	}
 
-	D3D11_TEXTURE2D_DESC DX11Factory::CreateObjectSelectionTextureDesc(Vector2ui size)
+	D3D11_TEXTURE2D_DESC DX11Factory::CreateObjectSelectionTextureDesc(Dimension2u size)
 	{
 		D3D11_TEXTURE2D_DESC textureDesc = {};
-		textureDesc.Width = size.x;
-		textureDesc.Height = size.y;
+		textureDesc.Width = size.GetWidth();
+		textureDesc.Height = size.GetHeight();
 		textureDesc.MipLevels = 1;
 		textureDesc.ArraySize = 1;
 		textureDesc.Format = DXGI_FORMAT_R32_UINT;
@@ -513,11 +513,11 @@ namespace CLX
 				imageData[static_cast<size_t>(4 * i + 3)] = 255;
 			}
 
-			shaderResourceView = DX11Factory::CreateTexture(device, Vector2ui(width, height), imageData.data());
+			shaderResourceView = DX11Factory::CreateTexture(device, Dimension2u(width, height), imageData.data());
 		}
 		else if (channels == 4)
 		{
-			shaderResourceView = DX11Factory::CreateTexture(device, Vector2ui(width, height), img);
+			shaderResourceView = DX11Factory::CreateTexture(device, Dimension2u(width, height), img);
 		}
 		else
 		{

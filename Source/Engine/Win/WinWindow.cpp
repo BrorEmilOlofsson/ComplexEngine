@@ -78,7 +78,7 @@ namespace CLX
 		MessageBoxA(handle, exception.what(), "Standard Exception", MB_OK | MB_ICONEXCLAMATION | MB_SETFOREGROUND);
 	}
 
-	Win_Window::Win_Window(const Vector2ui& windowSize, const std::wstring& name, const Win_WindowClass& windowClass, void* operatingSystem)
+	Win_Window::Win_Window(const Dimension2u& windowSize, const std::wstring& name, const Win_WindowClass& windowClass, void* operatingSystem)
 		: mHandle(CreateWindowImpl(GetAdjustedWindowRect(GetDefaultClientRect(windowSize), DEFAULT_WINDOW_STYLE),
 			windowClass.GetInstance(), name, std::wstring(windowClass.GetName()), DEFAULT_WINDOW_STYLE, operatingSystem))
 	{
@@ -240,7 +240,7 @@ namespace CLX
 	}
 
 
-	void Win_Window::SetSize(const Vector2ui& windowSize, const bool setFullScreen)
+	void Win_Window::SetSize(const Dimension2u& windowSize, const bool setFullScreen)
 	{
 		if (setFullScreen)
 		{
@@ -250,7 +250,7 @@ namespace CLX
 		{
 			mResizeBuffer.fullScreen = false;
 			const AABB2i currentClientRect = GetClientBounds();
-			const Vector2f scale = static_cast<Vector2f>(windowSize) / static_cast<Vector2f>(currentClientRect.GetExtent());
+			const Vector2f scale = static_cast<Vector2f>(ToVector2(windowSize)) / static_cast<Vector2f>(currentClientRect.GetExtent());
 			const AABB2i scaledClientAABB = ScaleAABB(currentClientRect, scale);
 			mResizeBuffer.windowedRect = GetAdjustedWindowRect(scaledClientAABB, GetStyle());
 			mResizeBuffer.windowedStyle = GetStyle();
@@ -335,9 +335,9 @@ namespace CLX
 		return GetClientRectInScreenSpace(mHandle);
 	}
 
-	Vector2ui Win_Window::GetClientSize() const noexcept
+	Dimension2u Win_Window::GetClientSize() const noexcept
 	{
-		return Vector2ui(GetClientBounds().GetExtent());
+		return GetDimension(GetClientBounds());
 	}
 }
 

@@ -45,7 +45,7 @@ namespace CLX
 		constexpr void SetFarPlane(const float farPlane);
 		constexpr void SetHorizontalFOV(const Radiansf horizontalFoVRad);
 		constexpr void SetAspectRatio(const float aspectRatio);
-        constexpr void SetResolution(const Vector2ui resolution);
+        constexpr void SetResolution(const Dimension2u resolution);
 
 	public:
 
@@ -295,7 +295,7 @@ namespace CLX
 		}
 	}
 
-	constexpr void Camera::SetResolution(const Vector2ui resolution)
+	constexpr void Camera::SetResolution(const Dimension2u resolution)
 	{
 		SetAspectRatio(ToAspectRatio(resolution));
     }

@@ -165,7 +165,7 @@ namespace CLX
         AABB2i renderRect = GetImGuiRenderRect();
         if (renderRect.GetExtent().x == 0 || renderRect.GetExtent().y == 0)
         {
-            renderRect = AABB2i::FromDefaultAndExtent(Vector2i(100, 100));
+            renderRect = AABB2i::FromDefaultAndExtent(Vector2ui(100, 100));
         }
         ImGui::End();
 
@@ -208,7 +208,7 @@ namespace CLX
 
 
             sceneRenderState.SetRenderRect(renderRect);
-            mCamera.SetResolution(Vector2ui(renderRect.GetExtent()));
+            mCamera.SetResolution(GetDimension(renderRect));
 
             if (input.IsKeyPressed(eInputKey::LMB))
             {

@@ -24,7 +24,7 @@ namespace CLX
 
 		void Init(ID3D11DeviceContext* context, ID3D11Device* device, const std::wstring& font);
 
-		void Render(std::span<const Text3D> texts, const Camera& camera, const Vector2ui& windowSize);
+		void Render(std::span<const Text3D> texts, const Camera& camera, const Dimension2u& windowSize);
 
 	private:
 

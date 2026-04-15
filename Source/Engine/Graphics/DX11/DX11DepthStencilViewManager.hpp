@@ -16,12 +16,12 @@ namespace CLX
 
 		explicit DX11DepthStencilViewManager(Microsoft::WRL::ComPtr<ID3D11Device> device);
 
-		DepthStencilViewHandle Create(const Vector2ui windowSize);
-		void Initialize(const DepthStencilViewHandle handle, const Vector2ui windowSize);
+		DepthStencilViewHandle Create(const Dimension2u windowSize);
+		void Initialize(const DepthStencilViewHandle handle, const Dimension2u windowSize);
 
 		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> Get(DepthStencilViewHandle handle);
 
-		void InitializeAll(const Vector2ui windowSize);
+		void InitializeAll(const Dimension2u windowSize);
 
 		[[nodiscard]] auto begin() const { return mDepthStencilViews.begin(); }
 		[[nodiscard]] auto end() const { return mDepthStencilViews.end(); }

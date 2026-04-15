@@ -117,7 +117,7 @@ namespace CLX
 
 	void FromJSON(Camera& camera, const nlohmann::json& json)
 	{
-		const Vector2ui resolution = Vector2ui(1600, 900);
+		const Dimension2u resolution = Dimension2u(1600, 900);
         const float aspectRatio = ToAspectRatio(resolution);
 		Point3f position;
 		position.x = json["Position"]["x"];

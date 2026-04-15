@@ -131,7 +131,7 @@ namespace CLX
             else
             {
 
-                mCamera.SetResolution(Vector2ui(renderRect.GetExtent()));
+                mCamera.SetResolution(GetDimension(renderRect));
             }
 
 

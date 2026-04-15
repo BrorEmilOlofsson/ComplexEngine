@@ -18,7 +18,7 @@ namespace CLX
 		mMouse.mTentativeWheelDelta = 0;
 	}
 
-	bool Win_InputProcessor::HandleMessages(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam, Vector2ui windowSize)
+	bool Win_InputProcessor::HandleMessages(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam, Dimension2u windowSize)
 	{
 		if (mMouse.HandleMessages(hWnd, message, wParam, lParam, windowSize))
 		{

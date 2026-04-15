@@ -22,7 +22,7 @@ namespace CLX
 		mObjectIDBuffer.Init(device, ConstantBufferSlots::ObjectID);
 	}
 
-	void DX11ConstantBufferManager::UpdateCameraBuffer(Camera camera, const Vector2ui& resolution, ID3D11DeviceContext& context)
+	void DX11ConstantBufferManager::UpdateCameraBuffer(Camera camera, const Dimension2u& resolution, ID3D11DeviceContext& context)
 	{
 		camera.SetResolution(resolution);
 		CameraBufferData cameraBufferData

@@ -5,7 +5,7 @@
 namespace CLX
 {
 
-	DX11RenderContext::DX11RenderContext(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, Vector2ui size)
+	DX11RenderContext::DX11RenderContext(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, Dimension2u size)
 		: mGBuffer(context, device, size)
 		, mOutputRT(context, device, *DX11Factory::CreateRenderTargetTexture(*device.Get(), DX11Factory::CreateRenderTargetTextureDesc(size)).Get(), size)
 		, mDevice(device)
@@ -24,7 +24,7 @@ namespace CLX
 		return srvs;
 	}
 
-	Vector2ui DX11RenderContext::GetBufferSize() const
+	Dimension2u DX11RenderContext::GetBufferSize() const
 	{
 		return mGBuffer.GetSize();
 	}
@@ -67,7 +67,7 @@ namespace CLX
 		return mGBuffer;
 	}
 
-	void DX11RenderContext::ResizeBuffers(const Vector2ui& size)
+	void DX11RenderContext::ResizeBuffers(const Dimension2u& size)
 	{
 		mGBuffer.Resize(size);
 		auto texture = DX11Factory::CreateRenderTargetTexture(*mDevice.Get(), size);

@@ -12,7 +12,7 @@ namespace CLX
 	{
 	}
 
-	RenderTargetView DX11RenderTargetManager::Create(Vector2ui size)
+	RenderTargetView DX11RenderTargetManager::Create(Dimension2u size)
 	{
 		static unsigned int nextID = 1; // Start from 1 to avoid zero ID
 		auto texture = DX11Factory::CreateRenderTargetTexture(*mDevice.Get(), DX11Factory::CreateRenderTargetTextureDesc(size));

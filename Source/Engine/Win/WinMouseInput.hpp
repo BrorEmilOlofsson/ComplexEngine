@@ -1,12 +1,13 @@
 #pragma once
-#include "Engine/Math/Point2.hpp"
-#include "Engine/Math/Vector2.hpp"
-#include "Engine/Input/InputMouseState.hpp"
-
 #ifdef _WIN32
 
 #include "Engine/Win/WinDefines.hpp"
 #include <Windows.h>
+
+#include "Engine/Math/Point2.hpp"
+#include "Engine/Math/Vector2.hpp"
+#include "Engine/Math/Dimension2.hpp"
+
 
 namespace CLX
 {
@@ -17,7 +18,7 @@ namespace CLX
 
 		Win_MouseInput() = default;
 
-		[[nodiscard]] bool HandleMessages(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam, Vector2ui aWindowSize);
+		[[nodiscard]] bool HandleMessages(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam, Dimension2u windowSize);
 		
 		
 		Point2i mTentativePosition;

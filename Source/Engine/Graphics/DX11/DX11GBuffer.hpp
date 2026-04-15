@@ -15,7 +15,7 @@ namespace CLX
 	{
 	public:
 
-		explicit DX11GBuffer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, Microsoft::WRL::ComPtr<ID3D11Device> device, Vector2ui size);
+		explicit DX11GBuffer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, Microsoft::WRL::ComPtr<ID3D11Device> device, Dimension2u size);
 
 		[[nodiscard]] std::array<ID3D11RenderTargetView*, 5> GetRTVArray()
 		{
@@ -48,9 +48,9 @@ namespace CLX
 
 		void Clear();
 
-		void Resize(Vector2ui size);
+		void Resize(Dimension2u size);
 
-		[[nodiscard]] Vector2ui GetSize() const { return mSize; }
+		[[nodiscard]] Dimension2u GetSize() const { return mSize; }
 
 		void SetRenderTargets();
 		void SetShaderResources();
@@ -71,7 +71,7 @@ namespace CLX
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext> mContext;
 		Microsoft::WRL::ComPtr<ID3D11Device> mDevice;
 
-		Vector2ui mSize = Vector2ui::Zero();
+		Dimension2u mSize = Dimension2u::Zero();
 	};
 }
 

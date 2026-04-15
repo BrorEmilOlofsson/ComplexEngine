@@ -122,7 +122,7 @@ namespace CLX
 
 		DX11RenderContext* r = renderState.GetRenderContext()->GetUnderlying<DX11RenderContext>();
 
-		const Vector2ui size = Vector2ui(renderState.GetRenderRect()->GetExtent());
+		const Dimension2u size = GetDimension(*renderState.GetRenderRect());
 
 		auto viewport = DX11Factory::CreateViewport(size);
 		mDeviceContext->RSSetViewports(1, &viewport);

@@ -15,7 +15,7 @@ namespace CLX
 			, hideFunc([](void* window) { return HideWindow(*static_cast<T*>(window)); })
 			, captureCursorFunc([](void* window) -> void { return Window_CaptureCursor(*static_cast<T*>(window)); })
 			, releaseCursorFunc([](void* window) -> void { return Window_ReleaseCursor(*static_cast<T*>(window)); })
-			, setSizeFunc([](void* window, Vector2ui size, const bool fullScreen) -> void { return Window_SetSize(*static_cast<T*>(window), size, fullScreen); })
+			, setSizeFunc([](void* window, Dimension2u size, const bool fullScreen) -> void { return Window_SetSize(*static_cast<T*>(window), size, fullScreen); })
 			, toggleFullScreen([](void* window) -> void { return Window_ToggleFullScreen(*static_cast<T*>(window)); })
 		{
 		}
@@ -24,7 +24,7 @@ namespace CLX
 		void (*hideFunc)(void*) = nullptr;
 		void (*captureCursorFunc)(void*) = nullptr;
 		void (*releaseCursorFunc)(void*) = nullptr;
-		void (*setSizeFunc)(void*, const Vector2ui, const bool) = nullptr;
+		void (*setSizeFunc)(void*, const Dimension2u, const bool) = nullptr;
 		void (*toggleFullScreen)(void*) = nullptr;
 	};
 
@@ -69,7 +69,7 @@ namespace CLX
 			mOperations.hideFunc(mWindow);
 		}
 
-		void SetSize(Vector2ui size, const bool fullScreen) const
+		void SetSize(Dimension2u size, const bool fullScreen) const
 		{
 			mOperations.setSizeFunc(mWindow, size, fullScreen);
 		}
@@ -94,25 +94,14 @@ namespace CLX
 			return mConstOperations.getFrameBufferFunc(mWindow);
 		}
 
-		[[nodiscard]] Vector2ui GetClientSize() const noexcept
+		[[nodiscard]] Dimension2u GetClientSize() const noexcept
 		{
-			return static_cast<Vector2ui>(GetClientBounds().GetExtent());
-		}
-
-		[[nodiscard]] unsigned int GetClientWidth() const noexcept
-		{
-			return GetClientSize().x;
-		}
-
-		[[nodiscard]] unsigned int GetClientHeight() const noexcept
-		{
-			return GetClientSize().y;
+			return ToDimension2(GetClientBounds().GetExtent());
 		}
 
 		[[nodiscard]] float GetAspectRatio() const noexcept
 		{
-			const Vector2ui clientSize = GetClientSize();
-			return static_cast<float>(clientSize.x) / static_cast<float>(clientSize.y);
+			return ToAspectRatio(GetClientSize());
 		}
 
 		[[nodiscard]] AABB2i GetBounds() const noexcept
@@ -159,19 +148,9 @@ namespace CLX
 			return mOperations.getFrameBufferFunc(mWindow);
 		}
 
-		[[nodiscard]] Vector2ui GetClientSize() const noexcept
+		[[nodiscard]] Dimension2u GetClientSize() const noexcept
 		{
-			return static_cast<Vector2ui>(GetClientBounds().GetExtent());
-		}
-
-		[[nodiscard]] unsigned int GetClientWidth() const noexcept
-		{
-			return GetClientSize().x;
-		}
-
-		[[nodiscard]] unsigned int GetClientHeight() const noexcept
-		{
-			return GetClientSize().y;
+			return ToDimension2(GetClientBounds().GetExtent());
 		}
 
 		[[nodiscard]] AABB2i GetBounds() const noexcept

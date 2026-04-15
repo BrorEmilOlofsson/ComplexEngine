@@ -118,7 +118,7 @@ namespace CLX
         return 0;
     }
 
-    uint32_t Win_OperatingSystem::MakeWindow(Vector2ui size, std::wstring title)
+    uint32_t Win_OperatingSystem::MakeWindow(Dimension2u size, std::wstring title)
     {
         try
         {

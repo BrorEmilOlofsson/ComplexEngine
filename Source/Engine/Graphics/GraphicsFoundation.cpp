@@ -29,7 +29,7 @@ namespace CLX
         mConcept->Render(renderState);
     }
 
-    RenderContext GraphicsFoundation::CreateRenderContext(const Vector2ui& size)
+    RenderContext GraphicsFoundation::CreateRenderContext(const Dimension2u& size)
     {
         return mConcept->CreateRenderContext(size);
     }

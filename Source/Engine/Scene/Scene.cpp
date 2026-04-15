@@ -45,22 +45,22 @@ namespace CLX
 		return Point2<T>(point.x, y - point.y);
 	}
 
-	static Ray3f CalculateMouseRay(const Camera& camera, const AABB2i& renderAABB, const Vector2ui windowSize, const Point2i& mouseScreenPos)
+	static Ray3f CalculateMouseRay(const Camera& camera, const AABB2i& renderAABB, const Dimension2u windowSize, const Point2i& mouseScreenPos)
 	{
 		const AABB2f renderAABBf = ToAABB<float>(renderAABB);
 
-		const Point2f mousePos = Remap(Point2f(mouseScreenPos), renderAABBf, AABB2f::FromDefaultAndExtent(Vector2f(windowSize)));
-		const Point2f correctedMousePos = InvertY(mousePos, static_cast<float>(windowSize.y));
+		const Point2f mousePos = Remap(Point2f(mouseScreenPos), renderAABBf, AABB2f::FromDefaultAndExtent(static_cast<Vector2f>(ToVector2(windowSize))));
+		const Point2f correctedMousePos = InvertY(mousePos, static_cast<float>(windowSize.GetHeight()));
 		return CalculateMouseRay(camera, Point2i(correctedMousePos), windowSize);
 	}
 
-	void Scene::BeginFrame(Vector2ui clientSize, Point2i mouseScreenPos)
+	void Scene::BeginFrame(Dimension2u clientSize, Point2i mouseScreenPos)
 	{
 		if (mRenderState.GetCamera())
 		{
 			mMouseRay = CalculateMouseRay(
 				*mRenderState.GetCamera(),
-				 mRenderState.GetRenderRect().value_or(AABB2i::FromDefaultAndExtent(Vector2ui(clientSize))),
+				 mRenderState.GetRenderRect().value_or(AABB2i::FromDefaultAndExtent(ToVector2(clientSize))),
 				clientSize,
 				mouseScreenPos
 			);

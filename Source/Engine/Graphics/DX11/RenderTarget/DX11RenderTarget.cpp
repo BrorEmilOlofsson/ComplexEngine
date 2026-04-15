@@ -8,7 +8,7 @@ namespace CLX
 {
 
 	DX11RenderTarget::DX11RenderTarget(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, Microsoft::WRL::ComPtr<ID3D11Device> device,
-		ID3D11Resource& resource, const Vector2ui size, const bool createSRV, std::optional<D3D11_RENDER_TARGET_VIEW_DESC> rtvDesc, std::optional<D3D11_SHADER_RESOURCE_VIEW_DESC> srvDesc)
+		ID3D11Resource& resource, const Dimension2u size, const bool createSRV, std::optional<D3D11_RENDER_TARGET_VIEW_DESC> rtvDesc, std::optional<D3D11_SHADER_RESOURCE_VIEW_DESC> srvDesc)
 		: mContext(std::move(context))
 		, mDevice(std::move(device))
 		, mSize(size)
@@ -27,7 +27,7 @@ namespace CLX
 		mShaderResourceView = DX11Factory::CreateShaderResourceView(*mDevice.Get(), resource, descOpt);
 	}
 
-	void DX11RenderTarget::InitRenderTargetView(ID3D11Resource& resource, Vector2ui size, std::optional<D3D11_RENDER_TARGET_VIEW_DESC> descOpt)
+	void DX11RenderTarget::InitRenderTargetView(ID3D11Resource& resource, Dimension2u size, std::optional<D3D11_RENDER_TARGET_VIEW_DESC> descOpt)
 	{
 		mSize = size;
 		if (descOpt)
@@ -52,7 +52,7 @@ namespace CLX
 		mContext->ClearRenderTargetView(mRenderTargetView.Get(), &color.r);
 	}
 
-	void DX11RenderTarget::Resize(ID3D11Resource& resource, Vector2ui size)
+	void DX11RenderTarget::Resize(ID3D11Resource& resource, Dimension2u size)
 	{
 		if (mShaderResourceView)
 		{

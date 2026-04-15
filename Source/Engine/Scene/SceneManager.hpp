@@ -22,7 +22,7 @@ namespace CLX
 		void EndPlay();
 
         void Update(float deltaTime);
-		void BeginFrame(Vector2ui windowSize, Point2i mouseScreenPos);
+		void BeginFrame(Dimension2u windowSize, Point2i mouseScreenPos);
 
 		void ChangeScene(SceneAssetHandle scene);
 		void ChangeSceneDirectly(SceneAssetHandle scene);

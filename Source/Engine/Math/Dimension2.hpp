@@ -30,6 +30,8 @@ namespace CLX
             return mHeight;
         }
 
+        [[nodiscard]] static constexpr Dimension2<T> Zero() noexcept;
+
     private:
 
         T mWidth{};
@@ -44,8 +46,26 @@ namespace CLX
     using Dimension2u = Dimension2u32;
 
     template<typename T>
+    constexpr Dimension2<T> Dimension2<T>::Zero() noexcept
+    {
+        return Dimension2<T>(T{ 0 }, T{ 0 });
+    }
+
+    template<typename T>
     [[nodiscard]] constexpr Vector2<T> ToVector2(Dimension2<T> dimension) noexcept
     {
         return Vector2<T>(dimension.GetWidth(), dimension.GetHeight());
+    }
+
+    template<typename T>
+    [[nodiscard]] constexpr Dimension2<T> ToDimension2(Vector2<T> vector) noexcept
+    {
+        return Dimension2<T>(vector.x, vector.y);
+    }
+
+    template<typename T>
+    [[nodiscard]] constexpr bool operator==(const Dimension2<T>& lhs, const Dimension2<T>& rhs) noexcept
+    {
+        return lhs.GetWidth() == rhs.GetWidth() && lhs.GetHeight() == rhs.GetHeight();
     }
 }

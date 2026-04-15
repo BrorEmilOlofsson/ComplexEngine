@@ -33,7 +33,7 @@ TEST_CASE("GetScreenPosition", "[CameraMath]")
 	{
 		const Camera camera;
 		constexpr Point3f worldPosition(0.0f, 0.0f, 10.0f);
-		constexpr Vector2ui windowSize(1600, 900);
+		constexpr Dimension2u windowSize(1600, 900);
 		const std::optional<Point2f> screenPosition = GetScreenPosition(worldPosition, camera, windowSize);
 
 		REQUIRE(screenPosition == Point2f(800, 450));

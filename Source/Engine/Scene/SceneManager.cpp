@@ -61,7 +61,7 @@ namespace CLX
         }
     }
 
-    void SceneManager::BeginFrame(const Vector2ui windowSize, const Point2i mouseScreenPos)
+    void SceneManager::BeginFrame(const Dimension2u windowSize, const Point2i mouseScreenPos)
     {
         if (!mActiveScene)
         {

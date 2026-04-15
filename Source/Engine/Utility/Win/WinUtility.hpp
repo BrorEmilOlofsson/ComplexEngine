@@ -13,9 +13,9 @@
 namespace CLX
 {
 
-	[[nodiscard]] inline AABB2i GetDefaultClientRect(const Vector2ui windowSize)
+	[[nodiscard]] inline AABB2i GetDefaultClientRect(const Dimension2u windowSize)
 	{
-        return AABB2i::FromMinAndExtent(Point2i(100, 100), windowSize);
+        return AABB2i::FromMinAndExtent(Point2i(100, 100), ToVector2(windowSize));
 	}
 
 	[[nodiscard]] inline AABB2i GetAdjustedWindowRect(const AABB2i& rect, DWORD style)

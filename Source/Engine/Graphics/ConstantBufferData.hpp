@@ -64,7 +64,7 @@ namespace CLX
 		Point3f cameraPosition = Point3f::Zero();
 		std::byte paddingCameraPos[4]{};
 
-		Vector2ui resolution = Vector2ui(1280, 720);
+		Dimension2u resolution = Dimension2u(1280, 720);
 
 		std::byte padding[8];
 	};

@@ -7,6 +7,7 @@
 #include "Point2.hpp"
 #include "UnitVector2.hpp"
 #include "UnitVector3.hpp"
+#include "Dimension2.hpp"
 
 namespace CLX
 {
@@ -683,9 +684,9 @@ namespace CLX
 		return GetPerpendicularVector(vector, normal);
 	}
 
-	[[nodiscard]] constexpr Point2f ToClipCoords(const Point2i& point, const Vector2ui& size)
+	[[nodiscard]] constexpr Point2f ToClipCoords(const Point2i& point, const Dimension2u& size)
 	{
-		return Remap(Point2f(point), Point2f::Zero(), Point2f::Zero() + Vector2f(size), -Point2f::One(), Point2f::One());
+		return Remap(Point2f(point), Point2f::Zero(), Point2f::Zero() + static_cast<Vector2f>(ToVector2(size)), -Point2f::One(), Point2f::One());
 	}
 
 	template<typename T, typename... Points>
@@ -716,9 +717,9 @@ namespace CLX
 	}
 
 	template<typename Ret = float, typename T>
-	constexpr float ToAspectRatio(const Vector2<T>& resolution)
+	constexpr float ToAspectRatio(const Dimension2<T>& resolution)
 	{
-        ASSERT(resolution.y != 0 && "Resolution height cannot be zero when calculating aspect ratio.");
-		return static_cast<float>(resolution.x) / static_cast<float>(resolution.y);
+        ASSERT(resolution.GetWidth() != 0 && "Resolution height cannot be zero when calculating aspect ratio.");
+		return static_cast<float>(resolution.GetWidth()) / static_cast<float>(resolution.GetHeight());
 	}
 }

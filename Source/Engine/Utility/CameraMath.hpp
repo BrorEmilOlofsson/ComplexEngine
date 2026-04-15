@@ -2,12 +2,13 @@
 #include "Engine/Math/Shapes/Ray3.hpp"
 #include "Engine/Math/VectorMath.hpp"
 #include "Engine/Utility/Camera.hpp"
+#include "Engine/Math/Dimension2.hpp"
 #include "Engine/Math/Shapes/AABB2.hpp"
 
 namespace CLX
 {
 
-	[[nodiscard]] constexpr Ray3f CalculateMouseRay(const Point3f& rayOrigin, const Matrix4x4f& viewMatrix, const Matrix4x4f& projectionMatrix, const Point2i& point, const Vector2ui& windowSize)
+	[[nodiscard]] constexpr Ray3f CalculateMouseRay(const Point3f& rayOrigin, const Matrix4x4f& viewMatrix, const Matrix4x4f& projectionMatrix, const Point2i& point, const Dimension2u& windowSize)
 	{
 		const Point2f clipCoords2 = ToClipCoords(point, windowSize);
 
@@ -28,13 +29,13 @@ namespace CLX
 		return Ray3f(rayOrigin, mouseDir);
 	}
 
-	[[nodiscard]] constexpr Ray3f CalculateMouseRay(const Camera& camera, const Point2i& point, const Vector2ui& windowSize)
+	[[nodiscard]] constexpr Ray3f CalculateMouseRay(const Camera& camera, const Point2i& point, const Dimension2u& windowSize)
 	{
 		return CalculateMouseRay(camera.GetPosition(), camera.GetViewMatrix(), camera.GetProjectionMatrix(), point, windowSize);
 	}
 
 	template<bool Cull = true>
-	[[nodiscard]] constexpr auto GetScreenPosition(const Point3f& position, const Camera& camera, const Vector2ui& windowSize)
+	[[nodiscard]] constexpr auto GetScreenPosition(const Point3f& position, const Camera& camera, const Dimension2u& windowSize)
 	{
 		const Matrix4x4f viewMatrix = camera.GetViewMatrix();
 		const Matrix4x4f& projectionMatrix = camera.GetProjectionMatrix();
@@ -49,8 +50,8 @@ namespace CLX
 				const Point3f ndc = Point3f(clipSpacePos.x / w, clipSpacePos.y / w, clipSpacePos.z / w);
 
 				// Map to screen space
-				const float x = (ndc.x + 1.0f) * 0.5f * static_cast<float>(windowSize.x);
-				const float y = (1.0f - ndc.y) * 0.5f * static_cast<float>(windowSize.y); // Y flipped
+				const float x = (ndc.x + 1.0f) * 0.5f * static_cast<float>(windowSize.GetWidth());
+				const float y = (1.0f - ndc.y) * 0.5f * static_cast<float>(windowSize.GetHeight()); // Y flipped
 
 				return Point2f(x, y);
 			};

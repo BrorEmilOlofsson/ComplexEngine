@@ -2,6 +2,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include "Engine/Math/Dimension2.hpp"
 
 namespace CLX
 {
@@ -58,7 +59,7 @@ namespace CLX
 			return mConcept->GetGBufferSRVs();
 		}
 
-		[[nodiscard]] Vector2ui GetBufferSize() const
+		[[nodiscard]] Dimension2u GetBufferSize() const
 		{
 			return mConcept->GetBufferSize();
 		}
@@ -78,7 +79,7 @@ namespace CLX
 			return mConcept->GetOutputSRV();
 		}
 
-		void ResizeBuffers(const Vector2ui& size)
+		void ResizeBuffers(const Dimension2u& size)
 		{
 			mConcept->ResizeBuffers(size);
 		}
@@ -113,11 +114,11 @@ namespace CLX
 			virtual ~Concept() {}
 
 			virtual std::vector<void*> GetGBufferSRVs() = 0;
-			virtual Vector2ui GetBufferSize() = 0;
+			virtual Dimension2u GetBufferSize() = 0;
 			virtual uint32_t GetObjectIDAt(const Point2i& point) = 0;
 			virtual void* GetOutputRenderTarget() = 0;
 			virtual void* GetOutputSRV() = 0;
-			virtual void ResizeBuffers(const Vector2ui& size) = 0;
+			virtual void ResizeBuffers(const Dimension2u& size) = 0;
 			virtual void ClearBuffers() = 0;
 			virtual void SetOutputRenderTarget() = 0;
 			virtual void SetGBufferRenderTargets() = 0;
@@ -156,7 +157,7 @@ namespace CLX
 				return mObject.GetGBufferSRVs();
 			}
 
-			Vector2ui GetBufferSize() override
+			Dimension2u GetBufferSize() override
 			{
 				return mObject.GetBufferSize();
 			}
@@ -176,7 +177,7 @@ namespace CLX
 				return mObject.GetOutputSRV();
 			}
 
-			void ResizeBuffers(const Vector2ui& size) override
+			void ResizeBuffers(const Dimension2u& size) override
 			{
 				mObject.ResizeBuffers(size);
 			}

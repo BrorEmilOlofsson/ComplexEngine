@@ -1,4 +1,6 @@
 #pragma once
+#include <expected>
+#include <span>
 #include "Engine/Math/Shapes/AABB2.hpp"
 #include "Engine/Math/Shapes/AABB3.hpp"
 #include "Engine/Math/Shapes/Circle.hpp"
@@ -18,8 +20,8 @@
 #include "Engine/Math/Math.hpp"
 #include "Engine/Math/VectorMath.hpp"
 #include "Engine/Utility/Percent.hpp"
+#include "Engine/Math/Dimension2.hpp"
 #include "Engine/Utility/Approximation.hpp"
-#include <expected>
 
 namespace CLX
 {
@@ -112,18 +114,6 @@ namespace CLX
     [[nodiscard]] constexpr AABB3<T> ToAABB3(const LineSegment3<T>& lineSegment)
     {
         return CreateAABB3FromPoints(std::span<const Point3<T>>({ lineSegment.StartPoint(), lineSegment.EndPoint() }));
-    }
-
-    template<typename T>
-    [[nodiscard]] constexpr T GetWidth(const AABB2<T>& aabb) noexcept
-    {
-        return aabb.GetMax().x - aabb.GetMin().x;
-    }
-
-    template<typename T>
-    [[nodiscard]] constexpr T GetHeight(const AABB2<T>& aabb) noexcept
-    {
-        return aabb.GetMax().y - aabb.GetMin().y;
     }
 
     template<typename T>

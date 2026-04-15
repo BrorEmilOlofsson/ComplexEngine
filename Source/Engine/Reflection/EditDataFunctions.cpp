@@ -563,7 +563,7 @@ namespace CLX
         return viewAndEditResult;
     }
 
-    static ViewAndEditResult ViewAndEditCamera(Camera& camera, const Vector2ui resolution)
+    static ViewAndEditResult ViewAndEditCamera(Camera& camera, const Dimension2u resolution)
     {
         ViewAndEditResult viewAndEditResult;
 

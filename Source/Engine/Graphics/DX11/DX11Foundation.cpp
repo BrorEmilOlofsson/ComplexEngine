@@ -172,7 +172,7 @@ namespace CLX
 
 		Camera camera = renderState.GetCamera().value();
 		Matrix4x4f proj = camera.GetProjectionMatrix();
-		Vector2ui resolution = renderState.GetRenderRect()->GetExtent();
+		Dimension2u resolution = GetDimension(*renderState.GetRenderRect());
 		Matrix4x4f expected = Camera::CreatePerspectiveProjectionMatrix(camera.GetHorizontalFOV(), camera.GetNearPlane(), camera.GetFarPlane(), ToAspectRatio(resolution));
 		if (proj != expected)
 		{
@@ -226,9 +226,9 @@ namespace CLX
 
 		ValidateRenderState(renderState);
 
-		const Vector2ui bufferSize = renderState.GetRenderContext()->GetBufferSize();
-		const Vector2ui renderSize = Vector2ui(renderState.GetRenderRect()->GetExtent());
-		if (renderSize.x == 0 || renderSize.y == 0)
+		const Dimension2u bufferSize = renderState.GetRenderContext()->GetBufferSize();
+		const Dimension2u renderSize = GetDimension(*renderState.GetRenderRect());
+		if (renderSize.GetWidth() == 0 || renderSize.GetHeight() == 0)
 		{
 			return;
 		}
@@ -305,7 +305,7 @@ namespace CLX
 			};
 	}
 
-	RenderContext DX11Foundation::CreateRenderContext(const Vector2ui& size)
+	RenderContext DX11Foundation::CreateRenderContext(const Dimension2u& size)
 	{
 		DX11RenderContext dx11RenderContext(GetDevice(), GetContext(), size);
 

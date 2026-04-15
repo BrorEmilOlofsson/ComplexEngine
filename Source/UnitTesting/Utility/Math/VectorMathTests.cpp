@@ -962,7 +962,7 @@ TEST_CASE("VectorMath::Average Point (Point3)", "[VectorMath]")
 TEST_CASE("VectorMath::ToClipCoords", "[VectorMath]")
 {
     constexpr Point2i point(0, 50);
-    constexpr Vector2ui size(100u, 100u);
+    constexpr Dimension2u size(100u, 100u);
 
     constexpr Point2f clipCoords = ToClipCoords(point, size);
 

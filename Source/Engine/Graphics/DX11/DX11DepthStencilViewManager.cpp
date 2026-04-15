@@ -10,7 +10,7 @@ namespace CLX
 	{
 	}
 
-	DepthStencilViewHandle DX11DepthStencilViewManager::Create(const Vector2ui windowSize)
+	DepthStencilViewHandle DX11DepthStencilViewManager::Create(const Dimension2u windowSize)
 	{
 		mDepthStencilViews[mIDCounter] = DX11Factory::CreateDepthStencilView(*mDevice.Get(), windowSize);
 
@@ -20,7 +20,7 @@ namespace CLX
 		return DepthStencilViewHandle(id);
 	}
 
-	void DX11DepthStencilViewManager::Initialize(const DepthStencilViewHandle handle, const Vector2ui windowSize)
+	void DX11DepthStencilViewManager::Initialize(const DepthStencilViewHandle handle, const Dimension2u windowSize)
 	{
 		auto dsv = Get(handle);
 		if (dsv == nullptr)
@@ -41,7 +41,7 @@ namespace CLX
 		return nullptr;
 	}
 
-	void DX11DepthStencilViewManager::InitializeAll(const Vector2ui windowSize)
+	void DX11DepthStencilViewManager::InitializeAll(const Dimension2u windowSize)
 	{
 		for (auto& depthStencilView : mDepthStencilViews)
 		{

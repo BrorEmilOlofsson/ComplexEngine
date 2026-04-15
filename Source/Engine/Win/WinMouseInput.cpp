@@ -7,14 +7,14 @@
 namespace CLX
 {
 
-	bool Win_MouseInput::HandleMessages([[maybe_unused]] HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam, Vector2ui windowSize)
+	bool Win_MouseInput::HandleMessages([[maybe_unused]] HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam, Dimension2u windowSize)
 	{
 		switch (message)
 		{
 		case WM_MOUSEMOVE:
 		{
 			const int xPos = GET_X_LPARAM(lParam);
-			const int yPos = windowSize.y - GET_Y_LPARAM(lParam);
+			const int yPos = windowSize.GetHeight() - GET_Y_LPARAM(lParam);
 
 			mTentativePosition.x = xPos;
 			mTentativePosition.y = yPos;
