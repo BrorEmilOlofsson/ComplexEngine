@@ -44,6 +44,10 @@ namespace CLX
 		return mConcept->GetGraphicsFoundation();
     }
 
+	const InputState& OperatingSystem::GetInputState() const
+	{
+        return mConcept->GetInputState();
+	}
 
     WindowHandle OperatingSystem::MakeWindow(Dimension2u size, std::wstring title)
 	{

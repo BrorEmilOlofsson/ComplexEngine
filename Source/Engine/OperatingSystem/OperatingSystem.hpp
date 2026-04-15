@@ -30,7 +30,7 @@ namespace CLX
 		[[nodiscard]] CWindowView GetWindow(WindowHandle windowHandle) const;
         [[nodiscard]] GraphicsFoundation& GetGraphicsFoundation();
         [[nodiscard]] const GraphicsFoundation& GetGraphicsFoundation() const;
-
+        [[nodiscard]] const InputState& GetInputState() const;
 
 		WindowHandle MakeWindow(Dimension2u size, std::wstring title);
 
@@ -60,6 +60,7 @@ namespace CLX
 			virtual WindowHandle MakeWindow(Dimension2u size, std::wstring title) = 0;
             virtual GraphicsFoundation& GetGraphicsFoundation() = 0;
             virtual const GraphicsFoundation& GetGraphicsFoundation() const = 0;
+            virtual const InputState& GetInputState() const = 0;
 			virtual void LoadCursors(const std::filesystem::path& path) = 0;
             virtual void* GetForegroundWindow() const = 0;
 			virtual bool IsCursorVisible() const = 0;
@@ -124,6 +125,11 @@ namespace CLX
 			const GraphicsFoundation& GetGraphicsFoundation() const override
 			{
 				return OSGetGraphicsFoundation(mObject);
+            }
+
+			const InputState& GetInputState() const override
+			{
+				return OSGetInputState(mObject);
             }
 
 			void LoadCursors(const std::filesystem::path& path) override

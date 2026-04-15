@@ -1275,9 +1275,21 @@ namespace CLX
         if (isOpen)
         {
             PROFILER_BEGIN("View Component Data");
+            try
+            {
+
             const ViewAndEditResult viewAndEditResult = dataTypeRegistry.ViewAndEditData(componentDataTypeID, componentPtr, newBlackboard);
             anyActiveItem |= viewAndEditResult.isActive;
             PROFILER_END();
+            }
+            catch (std::exception)
+            {
+                while (true)
+                {
+                    int a = 4;
+                    a;
+                }
+            }
         }
 
         std::optional<EditorAction> removeComponentAction;

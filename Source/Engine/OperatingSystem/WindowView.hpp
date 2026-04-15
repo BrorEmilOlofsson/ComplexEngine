@@ -35,7 +35,7 @@ namespace CLX
 			: getFrameBufferFunc([](const void* window) -> const WindowFrameBuffer& { return GetWindowFrameBuffer(*static_cast<const T*>(window)); })
 			, getBoundsFunc([](const void* window) { return GetWindowBounds(*static_cast<const T*>(window)); })
 			, getClientBoundsFunc([](const void* window) { return GetClientWindowBounds(*static_cast<const T*>(window)); })
-			, getInputStateFunc([](const void* window) -> const InputState& { return GetWindowInputState(*static_cast<const T*>(window)); })
+			//, getInputStateFunc([](const void* window) -> const InputState& { return GetWindowInputState(*static_cast<const T*>(window)); })
 			, getHandleFunc([](const void* window) { return GetWindowHandle(*static_cast<const T*>(window)); })
 		{
 		}
@@ -43,7 +43,7 @@ namespace CLX
 		AABB2i(*getBoundsFunc)(const void*) = nullptr;
 		AABB2i(*getClientBoundsFunc)(const void*) = nullptr;
 		const WindowFrameBuffer& (*getFrameBufferFunc)(const void*) = nullptr;
-		const InputState& (*getInputStateFunc)(const void*) = nullptr;
+		//const InputState& (*getInputStateFunc)(const void*) = nullptr;
 		void* (*getHandleFunc)(const void*) = nullptr;
 	};
 
@@ -114,10 +114,10 @@ namespace CLX
 			return mConstOperations.getClientBoundsFunc(mWindow);
 		}
 
-		[[nodiscard]] const InputState& GetInputState() const noexcept
+		/*[[nodiscard]] const InputState& GetInputState() const noexcept
 		{
 			return mConstOperations.getInputStateFunc(mWindow);
-		}
+		}*/
 
 		[[nodiscard]] void* GetHandle() const
 		{
@@ -163,10 +163,10 @@ namespace CLX
 			return mOperations.getClientBoundsFunc(mWindow);
 		}
 
-		[[nodiscard]] const InputState& GetInputState() const noexcept
+		/*[[nodiscard]] const InputState& GetInputState() const noexcept
 		{
 			return mOperations.getInputStateFunc(mWindow);
-		}
+		}*/
 
 		[[nodiscard]] void* GetHandle() const
 		{

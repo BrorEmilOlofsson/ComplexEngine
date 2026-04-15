@@ -10,6 +10,7 @@
 
 #include <dwmapi.h>
 #include <shellapi.h>
+#include <windowsx.h>
 
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -106,6 +107,13 @@ namespace CLX
 		}
 	}
 
+	static Point2i HandleMouseMove(LPARAM lParam, Dimension2u windowSize)
+	{
+		const int xPos = GET_X_LPARAM(lParam);
+		const int yPos = windowSize.GetHeight() - GET_Y_LPARAM(lParam);
+		return Point2i(xPos, yPos);
+	}
+
 	bool Win_Window::HandleMessage(UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		if (ImGui_ImplWin32_WndProcHandler(mHandle, msg, wParam, lParam))
@@ -113,20 +121,27 @@ namespace CLX
 			return true;
 		}
 
-		if (mInputProcessor.HandleMessages(mHandle, msg, wParam, lParam, GetClientSize()))
+		/*if (mInputProcessor.HandleMessages(mHandle, msg, wParam, lParam, GetClientSize()))
 		{
 			return true;
-		}
+		}*/
 		switch (msg)
 		{
+		case WM_CLOSE:
+			mFrameBuffer.hasQuit = true;
+			return true;
+			break;
 		case WM_KILLFOCUS:
-			mInputProcessor.ResetKeyStates();
+			//mInputProcessor.ResetKeyStates();
 			break;
 		case WM_ACTIVATE:
 			if (LOWORD(wParam) == WA_INACTIVE)
 			{
-				mInputProcessor.ResetKeyStates();
+				//mInputProcessor.ResetKeyStates();
 			}
+			break;
+        case WM_MOUSEMOVE:
+            mWindowMousePosition = HandleMouseMove(lParam, GetClientSize());
 			break;
 		case WM_SIZE:
 			mFrameBuffer.hasResized = true;
@@ -176,7 +191,7 @@ namespace CLX
 
 		ProcessMessages();
 
-		mInputProcessor.Update();
+		//mInputProcessor.Update();
 
 		if (mIsCursorCaptured)
 		{
@@ -186,11 +201,9 @@ namespace CLX
 		if (mFrameBuffer.hasResized)
 		{
 			mGraphicsWindowView->OnResize();
-			//mGraphicsWindow.OnWindowResize();
 		}
 
 		mGraphicsWindowView->BeginFrame();
-		//mGraphicsWindow.BeginFrame();
 	}
 
 	void Win_Window::EndFrame(RenderContext* renderContext)
@@ -198,7 +211,6 @@ namespace CLX
 		try
 		{
 			mGraphicsWindowView->EndFrame(renderContext);
-			//mGraphicsWindow.EndFrame(renderContext);
 		}
 		catch (const WinException& exception)
 		{
@@ -211,7 +223,7 @@ namespace CLX
 		PROFILER_FUNCTION(profiler::colors::Cyan700);
 		MSG msg = { 0 };
 
-		while (PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE))
+		while (PeekMessage(&msg, mHandle, 0, 0, PM_REMOVE))
 		{
 			if (msg.message == WM_QUIT)
 			{
@@ -219,7 +231,7 @@ namespace CLX
 			}
 
 			TranslateMessage(&msg);
-			DispatchMessageW(&msg);
+			DispatchMessage(&msg);
 		}
 	}
 
@@ -293,13 +305,12 @@ namespace CLX
 		return Point2<T>(point.x, yMax - point.y);
 	}
 
-	static void UpdateCapturedCursorPosition(Point2i mousePos, Dimension2u windowSize, HWND hWND, Point2i& capturedPos, bool& isCaptured)
+	static void UpdateCapturedCursorPosition(Point2i mousePos, Dimension2u windowSize, HWND hWND, Point2i& capturedPos)
 	{
 		POINT mousePositionScreenSpace = ToPOINT(InvertY(mousePos, windowSize.GetHeight()));
 		ClientToScreen(hWND, &mousePositionScreenSpace);
 
 		capturedPos = ToPoint(mousePositionScreenSpace);
-		isCaptured = true;
 	}
 
 	void Win_Window::CaptureCursor()
@@ -307,7 +318,7 @@ namespace CLX
 		const RECT clipCursorRect = GetClipCursorRect(mHandle);
 
 		ClipCursor(&clipCursorRect);
-		UpdateCapturedCursorPosition(mInputProcessor.GetInputState().GetMousePosition(), GetClientWindowSize(mHandle), mHandle, mCapturedCursorPosition, mIsCursorCaptured);
+		UpdateCapturedCursorPosition(mWindowMousePosition, GetClientWindowSize(mHandle), mHandle, mCapturedCursorPosition);
 
 
 		mIsCursorCaptured = true;

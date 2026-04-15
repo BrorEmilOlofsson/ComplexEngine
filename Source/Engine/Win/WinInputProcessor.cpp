@@ -1,7 +1,8 @@
 #include "Engine/Precompiled/EnginePch.hpp"
+
+#ifdef _WIN32
+
 #include "WinInputProcessor.hpp"
-#include <windowsx.h>
-#include <string>
 
 namespace CLX
 {
@@ -13,14 +14,14 @@ namespace CLX
 
 	void Win_InputProcessor::Update()
 	{
-		mInputState.Update(mMouse.mTentativePosition, mMouse.mTentativePositionDelta, mMouse.mTentativeWheelDelta);
+		mInputState.Update(/*mMouse.mTentativePosition*/{}, mMouse.mTentativePositionDelta, mMouse.mTentativeWheelDelta);
 		mMouse.mTentativePositionDelta = Vector2i::Zero();
 		mMouse.mTentativeWheelDelta = 0;
 	}
 
-	bool Win_InputProcessor::HandleMessages(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam, Dimension2u windowSize)
+	bool Win_InputProcessor::HandleMessages(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
-		if (mMouse.HandleMessages(hWnd, message, wParam, lParam, windowSize))
+		if (mMouse.HandleMessages(hWnd, message, wParam, lParam))
 		{
 			return true;
 		}
@@ -65,3 +66,5 @@ namespace CLX
 		mInputState.Reset();
 	}
 }
+
+#endif

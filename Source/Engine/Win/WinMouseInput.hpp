@@ -18,10 +18,10 @@ namespace CLX
 
 		Win_MouseInput() = default;
 
-		[[nodiscard]] bool HandleMessages(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam, Dimension2u windowSize);
+		[[nodiscard]] bool HandleMessages(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 		
 		
-		Point2i mTentativePosition;
+		//Point2i mTentativePosition;
 		Vector2i mTentativePositionDelta;
 		int mTentativeWheelDelta = 0;
 	};

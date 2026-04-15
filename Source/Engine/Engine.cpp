@@ -173,7 +173,7 @@ namespace CLX
             return false;
         }
 
-        mInputState = mOperatingSystem.GetWindow(mMainWindow).GetInputState();
+        mInputState = mOperatingSystem.GetInputState()/*.GetWindow(mMainWindow).GetInputState()*/;
         mInputManager.Update(mInputState);
 
         if (!windowFrameBuffer.droppedFiles.empty())

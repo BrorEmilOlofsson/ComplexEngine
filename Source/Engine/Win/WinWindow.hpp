@@ -42,16 +42,6 @@ namespace CLX
 
 		[[nodiscard]] DWORD GetStyle() const noexcept;
 
-		[[nodiscard]] Win_InputProcessor& GetInputManager() noexcept
-		{
-			return mInputProcessor;
-		}
-
-		[[nodiscard]] const Win_InputProcessor& GetInputManager() const noexcept
-		{
-			return mInputProcessor;
-		}
-
 		[[nodiscard]] const WindowFrameBuffer& GetFrameBuffer() const noexcept
 		{
 			return mFrameBuffer;
@@ -96,13 +86,14 @@ namespace CLX
 	private:
 		
 		HWND mHandle{};
-		Win_InputProcessor mInputProcessor;
+		//Win_InputProcessor mInputProcessor;
         std::unique_ptr<GraphicsWindowView> mGraphicsWindowView;
 
 		WindowFrameBuffer mFrameBuffer;
 
 		bool mIsCursorCaptured = false;
 		Point2i mCapturedCursorPosition;
+        Point2i mWindowMousePosition;
 
 		bool mIsFullscreen = false;
 
@@ -157,10 +148,10 @@ namespace CLX
 		return window.GetFrameBuffer();
 	}
 
-	[[nodiscard]] inline const InputState& GetWindowInputState(const Win_Window& window) noexcept
+	/*[[nodiscard]] inline const InputState& GetWindowInputState(const Win_Window& window) noexcept
 	{
 		return window.GetInputManager().GetInputState();
-	}
+	}*/
 
 	inline void ShowWindow(Win_Window& window)
 	{

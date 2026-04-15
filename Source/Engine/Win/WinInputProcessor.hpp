@@ -18,7 +18,7 @@ namespace CLX
 		Win_InputProcessor() = default;
 
 		
-		bool HandleMessages(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam, Dimension2u windowSize);
+		bool HandleMessages(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 		void Update();
 
 		void ResetKeyStates();

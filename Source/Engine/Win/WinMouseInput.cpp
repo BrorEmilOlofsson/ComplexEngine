@@ -1,25 +1,23 @@
 #include "Engine/Precompiled/EnginePch.hpp"
+
+#ifdef _WIN32
+
 #include "WinMouseInput.hpp"
 #include <Windows.h>
 #include <windowsx.h>
-#include "Engine/Utility/Win/WinUtility.hpp"
 
 namespace CLX
 {
 
-	bool Win_MouseInput::HandleMessages([[maybe_unused]] HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam, Dimension2u windowSize)
+	bool Win_MouseInput::HandleMessages([[maybe_unused]] HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		switch (message)
 		{
-		case WM_MOUSEMOVE:
+		/*case WM_MOUSEMOVE:
 		{
-			const int xPos = GET_X_LPARAM(lParam);
-			const int yPos = windowSize.GetHeight() - GET_Y_LPARAM(lParam);
-
-			mTentativePosition.x = xPos;
-			mTentativePosition.y = yPos;
+            mTentativePosition = HandleMouseMove(lParam, windowSize);
 		}
-		break;
+		break;*/
 		case WM_MOUSEWHEEL:
 			mTentativeWheelDelta = GET_WHEEL_DELTA_WPARAM(wParam);
 			break;
@@ -47,3 +45,5 @@ namespace CLX
 		return true;
 	}
 }
+
+#endif

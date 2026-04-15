@@ -1,9 +1,10 @@
 #include "Engine/Precompiled/EnginePch.hpp"
+#ifdef _WIN32
+
 #include "WinOperatingSystem.hpp"
 #include "Engine/Utility/Win/WinException.hpp"
 #include "Engine/Graphics/DX11/DX11Foundation.hpp"
 
-#ifdef _WIN32
 
 namespace CLX
 {
@@ -68,6 +69,7 @@ namespace CLX
         {
             window->BeginFrame();
         }
+        mInputProcessor.Update();
     }
 
     void Win_OperatingSystem::EndFrame(RenderContext* renderContext)
@@ -100,6 +102,7 @@ namespace CLX
             break;
         case WM_DESTROY:
             PostQuitMessage(0);
+            
             break;
         default:
             auto it = std::ranges::find_if(mWindows, [hwnd](auto& window) { return hwnd == window->GetHandle(); });
@@ -109,6 +112,11 @@ namespace CLX
                 {
                     return 0;
                 }
+            }
+
+            if (mInputProcessor.HandleMessages(hwnd, msg, wParam, lParam))
+            {
+                return 0;
             }
 
             return DefWindowProc(hwnd, msg, wParam, lParam);
@@ -173,7 +181,10 @@ namespace CLX
         return mGraphicsFoundation;
     }
 
-
+    const InputState& Win_OperatingSystem::GetInputState() const noexcept
+    {
+        return mInputProcessor.GetInputState();
+    }
 
     void Win_OperatingSystem::LoadCursors(const std::filesystem::path& path)
     {

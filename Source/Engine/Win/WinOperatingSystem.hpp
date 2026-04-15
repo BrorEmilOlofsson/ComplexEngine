@@ -1,4 +1,6 @@
 #pragma once
+#ifdef _WIN32
+
 #include <string>
 #include <memory>
 
@@ -6,8 +8,7 @@
 #include "Engine/OperatingSystem/WindowHandle.hpp"
 #include "Engine/Graphics/GraphicsFoundation.hpp"
 #include "Engine/Utility/Win/WinUtility.hpp"
-
-#ifdef _WIN32
+#include "Engine/Win/WinInputProcessor.hpp"
 
 #include "Engine/Win/WinDefines.hpp"
 #include <Windows.h>
@@ -39,9 +40,9 @@ namespace CLX
 		[[nodiscard]] Win_Window& GetWindow(const WindowID windowID);
 		[[nodiscard]] const Win_Window& GetWindow(const WindowID windowID) const;
 
-
 		[[nodiscard]] GraphicsFoundation& GetGraphicsFoundation() noexcept;
 		[[nodiscard]] const GraphicsFoundation& GetGraphicsFoundation() const noexcept;
+        [[nodiscard]] const InputState& GetInputState() const noexcept;
 
 		void LoadCursors(const std::filesystem::path& path);
 		void SetCursor(const std::filesystem::path& path);
@@ -54,6 +55,7 @@ namespace CLX
 
 		HINSTANCE mInstanceHandle = HINSTANCE{};
 		std::unique_ptr<Win_WindowClass> mWindowClass;
+        Win_InputProcessor mInputProcessor;
 		GraphicsFoundation mGraphicsFoundation;
 		std::vector<std::unique_ptr<Win_Window>> mWindows;
 
@@ -104,6 +106,11 @@ namespace CLX
 	[[nodiscard]] inline const GraphicsFoundation& OSGetGraphicsFoundation(const Win_OperatingSystem& os)
 	{
 		return os.GetGraphicsFoundation();
+    }
+
+	[[nodiscard]] inline const InputState& OSGetInputState(const Win_OperatingSystem& os)
+	{
+		return os.GetInputState();
     }
 
 	inline void OSLoadCursors(Win_OperatingSystem& os, const std::filesystem::path& path)
