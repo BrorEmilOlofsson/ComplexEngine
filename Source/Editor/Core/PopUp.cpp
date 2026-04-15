@@ -4,7 +4,7 @@
 namespace CLX
 {
 	PopUp::PopUp(const std::string& windowName)
-		: Window(windowName, "DefaultPopUp")
+		: EditorWindow(windowName, "DefaultPopUp")
 	{
 		mIsActive = false;
 	}

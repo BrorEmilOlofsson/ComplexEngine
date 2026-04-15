@@ -7,13 +7,13 @@ namespace CLX
 
 	class Scene;
 
-	class Window
+	class EditorWindow
 	{
 	public:
 
-		Window(const std::string& name, const std::string& tag);
+		EditorWindow(const std::string& name, const std::string& tag);
 
-		virtual ~Window() = default;
+		virtual ~EditorWindow() = default;
 		virtual void Render(const Blackboard& blackboard) = 0;
 		virtual void OnSceneLoaded(Scene&) {}
 		virtual void OnSceneBeginPlay(Scene&) {}

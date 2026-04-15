@@ -1,10 +1,10 @@
 #include "Editor/Precompiled/EditorPch.hpp"
-#include "Editor/Core/Base/Window.hpp"
+#include "EditorWindow.hpp"
 #include "Engine/Utility/Algorithm.hpp"
 
 namespace CLX
 {
-	Window::Window(const std::string& name, const std::string& tag)
+	EditorWindow::EditorWindow(const std::string& name, const std::string& tag)
 		: mName(name)
 		//, mIsActive(true)
 		, mIsFocus(false)
@@ -13,44 +13,44 @@ namespace CLX
 		mImGuiName = mName + mImGuiTag;
 	}
 
-	void Window::SetWindowName(const std::string& newName)
+	void EditorWindow::SetWindowName(const std::string& newName)
 	{
 		mName = newName;
 		mImGuiName = mName + mImGuiTag;
 	}
 
-	void Window::SetImGuiTag(const std::string& newTag)
+	void EditorWindow::SetImGuiTag(const std::string& newTag)
 	{
 		mImGuiTag = newTag;
 		mImGuiName = mName + mImGuiTag;
 	}
 
-	bool Window::IsActive() const
+	bool EditorWindow::IsActive() const
 	{
 		return mIsActive;
 	}
 
-	bool Window::IsFocused() const
+	bool EditorWindow::IsFocused() const
 	{
 		return mIsFocus;
 	}
 
-	bool& Window::IsActive()
+	bool& EditorWindow::IsActive()
 	{
 		return mIsActive;
 	}
 
-	bool& Window::IsFocused()
+	bool& EditorWindow::IsFocused()
 	{
 		return mIsFocus;
 	}
 
-	const std::string& Window::GetWindowName() const
+	const std::string& EditorWindow::GetWindowName() const
 	{
 		return mName;
 	}
 
-	const std::string& Window::GetImGuiName() const
+	const std::string& EditorWindow::GetImGuiName() const
 	{
 		return mImGuiName;
 	}

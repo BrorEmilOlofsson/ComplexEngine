@@ -1,11 +1,11 @@
 #pragma once
-#include "Editor/Core/Base/Window.hpp"
+#include "Editor/Core/Base/EditorWindow.hpp"
 #include <type_traits>
 
 namespace CLX
 {
 
-	class PopUp : public Window
+	class PopUp : public EditorWindow
 	{
 	public:
 
