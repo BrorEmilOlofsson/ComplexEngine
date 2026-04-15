@@ -113,7 +113,7 @@ namespace CLX
 		renderList.AddLines(lines);
 	}
 
-	void RenderGrid2(const Point2f& min, const Vector2ui& gridSize, const Vector2f& cellSize, const Vector2f& offset, const float yPos, const Color& color, RenderList& renderList)
+	void RenderGrid2(const Point2f& min, const Vector2u& gridSize, const Vector2f& cellSize, const Vector2f& offset, const float yPos, const Color& color, RenderList& renderList)
 	{
 		std::vector<DrawLine> lines;
 		lines.reserve(static_cast<std::size_t>(gridSize.x) + gridSize.y + 2);
@@ -149,7 +149,7 @@ namespace CLX
 		renderList.AddLines(lines);
 	}
 
-	void RenderGrid3(const Point3f& min, const Vector3ui& gridSize, const Vector3f& cellSize, const Vector3f& offset, const Color& color, RenderList& renderList)
+	void RenderGrid3(const Point3f& min, const Vector3u& gridSize, const Vector3f& cellSize, const Vector3f& offset, const Color& color, RenderList& renderList)
 	{
 		std::vector<DrawLine> lines;
 		const std::size_t xCount = gridSize.x;

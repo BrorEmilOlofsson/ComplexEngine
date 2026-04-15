@@ -33,7 +33,7 @@ namespace CLX
 		return ToAABB<int>(rect);
 	}
 
-	[[nodiscard]] inline Vector2ui GetWindowSize(HWND hWND)
+	[[nodiscard]] inline Vector2u GetWindowSize(HWND hWND)
 	{
 		return GetWindowRect(hWND).GetExtent();
 	}
@@ -46,9 +46,9 @@ namespace CLX
 		return ToAABB<int>(rect);
 	}
 
-	[[nodiscard]] inline Vector2ui GetClientWindowSize(HWND hWND)
+	[[nodiscard]] inline Dimension2u GetClientWindowSize(HWND hWND)
 	{
-		return Vector2ui(GetClientRect(hWND).GetExtent());
+		return GetDimension(GetClientRect(hWND));
 	}
 
 	[[nodiscard]] inline Point2i GetClientToScreenPos(HWND hWND, Point2i aClientPos)

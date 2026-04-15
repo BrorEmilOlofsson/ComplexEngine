@@ -165,7 +165,7 @@ namespace CLX
 			throw std::runtime_error("No render rect set in RenderState");
 		}
 
-		if (renderState.GetRenderRect().value().GetExtent() == Vector2ui::Zero())
+		if (renderState.GetRenderRect().value().GetExtent() == Vector2u::Zero())
 		{
 			throw std::runtime_error("Render rect is too small");
 		}

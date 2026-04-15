@@ -30,7 +30,7 @@ TEST_CASE("Grid2 Coordinates")
 
 TEST_CASE("Grid2 IsValidCoordinates")
 {
-	constexpr Vector2ui gridSize(10, 10);
+	constexpr Vector2u gridSize(10, 10);
 	REQUIRE(IsValidGridCoordinates(Point2i(0, 0), gridSize));
 	REQUIRE(IsValidGridCoordinates(Point2i(9, 9), gridSize));
 	REQUIRE(!IsValidGridCoordinates(Point2i(-1, 0), gridSize));
@@ -41,7 +41,7 @@ TEST_CASE("Grid2 IsValidCoordinates")
 
 TEST_CASE("Grid2 Add")
 {
-	Grid2<std::string> grid(Vector2ui(10, 10), Vector2f(1.0f, 1.0f), Point2f(0.0f, 0.0f));
+	Grid2<std::string> grid(Vector2u(10, 10), Vector2f(1.0f, 1.0f), Point2f(0.0f, 0.0f));
 	
 	constexpr std::string_view str = "TestObject1";
 	grid.Add(Point2f(1.5f, 6.5f), std::string(str));
@@ -55,7 +55,7 @@ TEST_CASE("Grid2 Add")
 
 TEST_CASE("Grid3 GetCellsByAABB")
 {
-	Grid3<std::string> grid(Vector3ui(10, 10, 10), Vector3f(1.0f, 1.0f, 1.0f), Point3f(0.0f, 0.0f, 0.f));
+	Grid3<std::string> grid(Vector3u(10, 10, 10), Vector3f(1.0f, 1.0f, 1.0f), Point3f(0.0f, 0.0f, 0.f));
 
 	constexpr std::string_view str = "TestObject1";
 	grid.Add(Point3f(1.5f, 6.5f, 2.58f), std::string(str));

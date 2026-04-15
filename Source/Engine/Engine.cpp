@@ -285,16 +285,16 @@ namespace CLX
         const nlohmann::json json = nlohmann::json::parse(file);
         file.close();
 
-        const nlohmann::json& windowSizeJson = json["Game_Settings"]["Window_Size"];
+        /*const nlohmann::json& windowSizeJson = json["Game_Settings"]["Window_Size"];
         const nlohmann::json& resolutionJson = json["Game_Settings"]["Resolution"];
 
-        Vector2ui windowSize;
-        windowSize.x = windowSizeJson["x"];
+        Dimension2u windowSize;
+        windowSize. = windowSizeJson["x"];
         windowSize.y = windowSizeJson["y"];
 
-        Vector2ui resolution;
+        Dimension2u resolution;
         resolution.x = resolutionJson["x"];
-        resolution.y = resolutionJson["y"];
+        resolution.y = resolutionJson["y"];*/
     }
 
     void Engine::CheckAndCopySettingsFiles()

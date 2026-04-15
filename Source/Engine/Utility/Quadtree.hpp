@@ -132,8 +132,8 @@ namespace CLX
                     for (std::size_t i = data.size(); i > 0; i--)
                     {
                         auto& existingEntry = data[i - 1];
-                        const uint32_t index1 = GetGridIndexByPosition(existingEntry.bounds.GetMin(), currentBounds.GetMin(), currentBounds.GetExtent() / 2.0, Vector2f::Zero(), Vector2ui(2, 2));
-                        const uint32_t index2 = GetGridIndexByPosition(existingEntry.bounds.GetMax(), currentBounds.GetMin(), currentBounds.GetExtent() / 2.0, Vector2f::Zero(), Vector2ui(2, 2));
+                        const uint32_t index1 = GetGridIndexByPosition(existingEntry.bounds.GetMin(), currentBounds.GetMin(), currentBounds.GetExtent() / 2.0, Vector2f::Zero(), Vector2u(2, 2));
+                        const uint32_t index2 = GetGridIndexByPosition(existingEntry.bounds.GetMax(), currentBounds.GetMin(), currentBounds.GetExtent() / 2.0, Vector2f::Zero(), Vector2u(2, 2));
 
                         if (index1 == index2)
                         {
@@ -143,8 +143,8 @@ namespace CLX
                     }
                 }
 
-                const uint32_t index1 = GetGridIndexByPosition(aabb.GetMin(), currentBounds.GetMin(), currentBounds.GetExtent() / 2.0, Vector2f::Zero(), Vector2ui(2, 2));
-                const uint32_t index2 = GetGridIndexByPosition(aabb.GetMax(), currentBounds.GetMin(), currentBounds.GetExtent() / 2.0, Vector2f::Zero(), Vector2ui(2, 2));
+                const uint32_t index1 = GetGridIndexByPosition(aabb.GetMin(), currentBounds.GetMin(), currentBounds.GetExtent() / 2.0, Vector2f::Zero(), Vector2u(2, 2));
+                const uint32_t index2 = GetGridIndexByPosition(aabb.GetMax(), currentBounds.GetMin(), currentBounds.GetExtent() / 2.0, Vector2f::Zero(), Vector2u(2, 2));
 
                 if (index1 != index2)
                 {
@@ -176,7 +176,7 @@ namespace CLX
 
             QuadtreeNodeRecursive<T, U>* currentNode = &mRootNode;
             AABB2<U> currentBounds = mBounds;
-            constexpr Vector2ui gridSize(2, 2);
+            constexpr Vector2u gridSize(2, 2);
 
             while (true)
             {

@@ -116,7 +116,7 @@ namespace CLX
                 const PrimitiveGrid3 grid
                 {
                     .minPos = Point3f::Zero(),
-                    .gridSize = Vector3ui(50, 0, 50),
+                    .gridSize = Vector3u(50, 0, 50),
                     .cellSize = Vector3f(10, 0, 10),
                     .offset = Vector3f(250.f, 0.f, 250.f),
                 };

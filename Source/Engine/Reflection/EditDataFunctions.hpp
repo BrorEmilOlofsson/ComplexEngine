@@ -47,11 +47,11 @@ namespace CLX
 	ViewAndEditResult ViewAndEditValue(Vector2f& value, const std::string& variableName);
 	//ViewAndEditResult ViewAndEditValue(Vector2f& value, const DataTypeMemberVariable* memberData = nullptr);
 	ViewAndEditResult ViewAndEditValue(Vector2i& value, const std::string& variableName);
-	inline ViewAndEditResult ViewAndEditValue(Vector2ui& value, const std::string& variableName)
+	inline ViewAndEditResult ViewAndEditValue(Vector2u& value, const std::string& variableName)
 	{
         auto v = Vector2i(value);
 		auto viewAndEditResult = ViewAndEditValue(v, variableName);
-        value = Vector2ui(v);
+        value = Vector2u(v);
 		return viewAndEditResult;
 	}
 	//ViewAndEditResult ViewAndEditValue(Vector2i& value, const DataTypeMemberVariable* memberData = nullptr);

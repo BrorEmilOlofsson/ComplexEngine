@@ -6,7 +6,7 @@
 
 using namespace CLX;
 
-Point2f GetScreenPositionDX(const Point3f& position, const Camera& camera, const Vector2ui& windowSize)
+Point2f GetScreenPositionDX(const Point3f& position, const Camera& camera, const Vector2u& windowSize)
 {
 	// Assume you have a world position
 	DirectX::XMFLOAT3 worldPos = ToXMFloat3(position);

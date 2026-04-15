@@ -165,7 +165,7 @@ namespace CLX
         AABB2i renderRect = GetImGuiRenderRect();
         if (renderRect.GetExtent().x == 0 || renderRect.GetExtent().y == 0)
         {
-            renderRect = AABB2i::FromDefaultAndExtent(Vector2ui(100, 100));
+            renderRect = AABB2i::FromDefaultAndExtent(Vector2u(100, 100));
         }
         ImGui::End();
 
@@ -199,7 +199,7 @@ namespace CLX
                 const PrimitiveGrid3 grid
                 {
                     .minPos = Point3f::Zero(),
-                    .gridSize = Vector3ui(500, 0, 500),
+                    .gridSize = Vector3u(500, 0, 500),
                     .cellSize = Vector3f(10, 0, 10),
                     .offset = Vector3f(250.f, 0.f, 250.f),
                 };

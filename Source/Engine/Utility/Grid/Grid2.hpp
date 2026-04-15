@@ -12,17 +12,17 @@ namespace CLX
 		return vector.x * vector.y;
 	}
 
-	[[nodiscard]] constexpr bool IsValidGridCoordinates(const Point2i& coords, const Vector2ui& gridSize) noexcept
+	[[nodiscard]] constexpr bool IsValidGridCoordinates(const Point2i& coords, const Vector2u& gridSize) noexcept
 	{
 		return IsInside(coords, Point2i::Zero(), Point2i::Zero() + Vector2i(gridSize) - Vector2i::One());
 	}
 
-	[[nodiscard]] constexpr int GetIndexByCoordinates(const Point2i& coords, const Vector2ui& gridSize) noexcept
+	[[nodiscard]] constexpr int GetIndexByCoordinates(const Point2i& coords, const Vector2u& gridSize) noexcept
 	{
 		return coords.y * gridSize.x + coords.x;
 	}
 
-	[[nodiscard]] constexpr unsigned int GetIndexByCoordinates(const Point2ui& coords, const Vector2ui& gridSize) noexcept
+	[[nodiscard]] constexpr unsigned int GetIndexByCoordinates(const Point2ui& coords, const Vector2u& gridSize) noexcept
 	{
 		return coords.y * gridSize.x + coords.x;
 	}
@@ -35,20 +35,20 @@ namespace CLX
 		return Point2i(xIndex, yIndex);
 	}
 
-	[[nodiscard]] constexpr int GetGridIndexByPosition(const Point2f& position, const Point2f& min, const Vector2f& cellSize, const Vector2f& offset, const Vector2ui& gridSize)
+	[[nodiscard]] constexpr int GetGridIndexByPosition(const Point2f& position, const Point2f& min, const Vector2f& cellSize, const Vector2f& offset, const Vector2u& gridSize)
 	{
 		const Point2i coords = GetGridCoordinatesByPosition(position, min, cellSize, offset);
 		return GetIndexByCoordinates(coords, gridSize);
     }
 
 	template<std::ranges::range Range>
-	[[nodiscard]] constexpr decltype(auto) GetElementByCoordinates(Range& range, const Point2ui& coords, const Vector2ui& gridSize)
+	[[nodiscard]] constexpr decltype(auto) GetElementByCoordinates(Range& range, const Point2ui& coords, const Vector2u& gridSize)
 	{
 		return range[GetIndexByCoordinates(coords, gridSize)];
 	}
 
 	template<std::ranges::range Range>
-	[[nodiscard]] constexpr decltype(auto) GetElementByCoordinates(const Range& range, const Point2ui& coords, const Vector2ui& gridSize)
+	[[nodiscard]] constexpr decltype(auto) GetElementByCoordinates(const Range& range, const Point2ui& coords, const Vector2u& gridSize)
 	{
 		return range[GetIndexByCoordinates(coords, gridSize)];
 	}

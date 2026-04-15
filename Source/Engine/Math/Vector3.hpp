@@ -33,11 +33,11 @@ namespace CLX
 	using Vector3f = Vector3<float>;
 	using Vector3d = Vector3<double>;
 	using Vector3i32 = Vector3<int32_t>;
-	using Vector3ui32 = Vector3<uint32_t>;
+	using Vector3u32 = Vector3<uint32_t>;
     using Vector3i64 = Vector3<int64_t>;
-    using Vector3ui64 = Vector3<uint64_t>;
+    using Vector3u64 = Vector3<uint64_t>;
     using Vector3i = Vector3i32;
-    using Vector3ui = Vector3ui32;
+    using Vector3u = Vector3u32;
 
 
 	template<typename T, typename U>

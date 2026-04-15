@@ -28,11 +28,11 @@ namespace CLX
 	using Vector2f = Vector2<float>;
 	using Vector2d = Vector2<double>;
 	using Vector2i32 = Vector2<int32_t>;
-	using Vector2ui32 = Vector2<uint32_t>;
+	using Vector2u32 = Vector2<uint32_t>;
 	using Vector2i64 = Vector2<int64_t>;
-	using Vector2ui64 = Vector2<uint64_t>;
+	using Vector2u64 = Vector2<uint64_t>;
     using Vector2i = Vector2i32;
-	using Vector2ui = Vector2ui32;
+	using Vector2u = Vector2u32;
 
 	template<typename T, typename U>
     struct rebind<Vector2<T>, U>

@@ -12,7 +12,7 @@ namespace CLX
 		return vector.x * vector.y * vector.z;
 	}
 
-	[[nodiscard]] constexpr bool IsValidGridCoordinates(const Point3i& coords, const Vector3ui& gridSize) noexcept
+	[[nodiscard]] constexpr bool IsValidGridCoordinates(const Point3i& coords, const Vector3u& gridSize) noexcept
 	{
 		return IsInside(coords, Point3i::Zero(), Point3i::Zero() + Vector3i(gridSize) - Vector3i::One());
 	}
@@ -26,19 +26,19 @@ namespace CLX
 		return Point3i(xIndex, yIndex, zIndex);
 	}
 
-	[[nodiscard]] constexpr unsigned int GetIndexByCoordinates(const Point3ui& coords, const Vector3ui& gridSize) noexcept
+	[[nodiscard]] constexpr unsigned int GetIndexByCoordinates(const Point3ui& coords, const Vector3u& gridSize) noexcept
 	{
 		return coords.z * gridSize.x * gridSize.y + coords.y * gridSize.x + coords.x;
 	}
 
 	template<std::ranges::range Range>
-	[[nodiscard]] constexpr decltype(auto) GetElementByCoordinates(Range& range, const Point3ui& coords, const Vector3ui& gridSize)
+	[[nodiscard]] constexpr decltype(auto) GetElementByCoordinates(Range& range, const Point3ui& coords, const Vector3u& gridSize)
 	{
 		return range[GetIndexByCoordinates(coords, gridSize)];
 	}
 
 	template<std::ranges::range Range>
-	[[nodiscard]] constexpr decltype(auto) GetElementByCoordinates(const Range& range, const Point3ui& coords, const Vector3ui& gridSize)
+	[[nodiscard]] constexpr decltype(auto) GetElementByCoordinates(const Range& range, const Point3ui& coords, const Vector3u& gridSize)
 	{
 		return range[GetIndexByCoordinates(coords, gridSize)];
 	}

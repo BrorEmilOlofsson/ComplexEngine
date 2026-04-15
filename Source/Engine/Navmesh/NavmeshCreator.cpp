@@ -220,7 +220,7 @@ namespace CLX
 		const size_t nodeSize = navmesh.mNodes.size();
 		const Vector2f extent = navmesh.mDimensions.GetExtent();
 		const unsigned int numTilesPerDimension = static_cast<unsigned int>(Sqrt(static_cast<float>(nodeSize))) + 1;
-		const Vector2ui gridSize(numTilesPerDimension, numTilesPerDimension);
+		const Vector2u gridSize(numTilesPerDimension, numTilesPerDimension);
 		const Vector2f cellSize(extent.x / gridSize.x, extent.y / gridSize.y);
 		const Point2f startPos = navmesh.mDimensions.GetMin();
 		navmesh.mNodeGrid = Grid2<NavmeshNodeIndex>(gridSize, cellSize, startPos);
@@ -246,7 +246,7 @@ namespace CLX
 		const size_t vertexSize = navmesh.mNavmeshData.mVertices.size();
 		const Vector2f diffMaxMin = navmesh.mDimensions.GetMax() - navmesh.mDimensions.GetMin();
 		const unsigned int numTilesPerDimension = static_cast<unsigned int>(sqrt(vertexSize)) + 1;
-		const Vector2ui gridSize(numTilesPerDimension, numTilesPerDimension);
+		const Vector2u gridSize(numTilesPerDimension, numTilesPerDimension);
 		const Vector2f cellSize(diffMaxMin.x / gridSize.x, diffMaxMin.y / gridSize.y);
 		const Point2f startPos = navmesh.mDimensions.GetMin();
 		navmesh.mVertexGrid = Grid2<NavmeshVertexIndex>(gridSize, cellSize, startPos);
@@ -265,7 +265,7 @@ namespace CLX
 		const size_t wallSize = navmesh.mWalls.size();
 		const Vector2f diffMaxMin = dimensions.GetExtent();
 		const unsigned int numTilesPerDimension = static_cast<unsigned int>(sqrt(wallSize)) + 10u;
-		const Vector2ui gridSize(numTilesPerDimension, numTilesPerDimension);
+		const Vector2u gridSize(numTilesPerDimension, numTilesPerDimension);
 		const Vector2f cellSize(diffMaxMin.x / gridSize.x, diffMaxMin.y / gridSize.y);
 		const Point2f startPos = dimensions.GetMin();
 		navmesh.mWallGrid = Grid2<NavmeshWallIndex>(gridSize, cellSize, startPos);

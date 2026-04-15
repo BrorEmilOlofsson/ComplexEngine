@@ -293,9 +293,9 @@ namespace CLX
 		return Point2<T>(point.x, yMax - point.y);
 	}
 
-	static void UpdateCapturedCursorPosition(Point2i mousePos, Vector2ui windowSize, HWND hWND, Point2i& capturedPos, bool& isCaptured)
+	static void UpdateCapturedCursorPosition(Point2i mousePos, Dimension2u windowSize, HWND hWND, Point2i& capturedPos, bool& isCaptured)
 	{
-		POINT mousePositionScreenSpace = ToPOINT(InvertY(mousePos, windowSize.y));
+		POINT mousePositionScreenSpace = ToPOINT(InvertY(mousePos, windowSize.GetHeight()));
 		ClientToScreen(hWND, &mousePositionScreenSpace);
 
 		capturedPos = ToPoint(mousePositionScreenSpace);
