@@ -202,7 +202,7 @@ namespace CLX
 		PROFILER_FUNCTION(profiler::colors::Cyan700);
 		MSG msg = { 0 };
 
-		while (PeekMessage(&msg, mHandle, 0, 0, PM_REMOVE))
+		while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
 		{
 			if (msg.message == WM_QUIT)
 			{
