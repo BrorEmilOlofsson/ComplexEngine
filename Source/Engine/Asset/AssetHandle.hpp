@@ -24,12 +24,7 @@ namespace CLX
 		{
 		}
 
-		[[nodiscard]] T& Get() noexcept
-		{
-			return mAssetData.lock()->object;
-		}
-
-		[[nodiscard]] const T& Get() const noexcept
+		[[nodiscard]] T& Get() const noexcept
 		{
 			return mAssetData.lock()->object;
 		}
