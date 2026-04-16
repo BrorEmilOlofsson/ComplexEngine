@@ -34,6 +34,11 @@ namespace CLX
 		return mConcept->GetCWindow(windowHandle);
 	}
 
+	WindowHandle OperatingSystem::MakeWindow(Dimension2u size, std::wstring title)
+	{
+		return mConcept->MakeWindow(size, title);
+	}
+
 	GraphicsFoundation& OperatingSystem::GetGraphicsFoundation()
 	{
 		return mConcept->GetGraphicsFoundation();
@@ -49,15 +54,15 @@ namespace CLX
         return mConcept->GetInputState();
 	}
 
-    WindowHandle OperatingSystem::MakeWindow(Dimension2u size, std::wstring title)
-	{
-		return mConcept->MakeWindow(size, title);
-	}
-
 	void OperatingSystem::LoadCursors(const std::filesystem::path& path)
 	{
 		mConcept->LoadCursors(path);
 	}
+
+	const WindowFrameBuffer& OperatingSystem::GetFrameBuffer() const
+	{
+		return mConcept->GetFrameBuffer();
+    }
 
 	void* OperatingSystem::GetForegroundWindow() const
 	{

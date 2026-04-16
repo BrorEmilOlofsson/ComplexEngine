@@ -28,17 +28,17 @@ namespace CLX
 
 		[[nodiscard]] WindowView GetWindow(WindowHandle windowHandle);
 		[[nodiscard]] CWindowView GetWindow(WindowHandle windowHandle) const;
+		WindowHandle MakeWindow(Dimension2u size, std::wstring title);
+
         [[nodiscard]] GraphicsFoundation& GetGraphicsFoundation();
         [[nodiscard]] const GraphicsFoundation& GetGraphicsFoundation() const;
         [[nodiscard]] const InputState& GetInputState() const;
 
-		WindowHandle MakeWindow(Dimension2u size, std::wstring title);
-
-
 		void LoadCursors(const std::filesystem::path& path);
-        [[nodiscard]] void* GetForegroundWindow() const;
+        [[nodiscard]] const WindowFrameBuffer& GetFrameBuffer() const;
+		[[nodiscard]] void* GetForegroundWindow() const;
 		[[nodiscard]] bool IsCursorVisible() const;
-		Point2i GetCursorScreenPosition() const;
+		[[nodiscard]] Point2i GetCursorScreenPosition() const;
         void ShowCursor();
 		void HideCursor();
 
@@ -62,6 +62,7 @@ namespace CLX
             virtual const GraphicsFoundation& GetGraphicsFoundation() const = 0;
             virtual const InputState& GetInputState() const = 0;
 			virtual void LoadCursors(const std::filesystem::path& path) = 0;
+            virtual const WindowFrameBuffer& GetFrameBuffer() const = 0;
             virtual void* GetForegroundWindow() const = 0;
 			virtual bool IsCursorVisible() const = 0;
 			virtual Point2i GetCursorScreenPosition() const = 0;
@@ -136,6 +137,11 @@ namespace CLX
 			{
                 OSLoadCursors(mObject, path);
 			}
+
+			const WindowFrameBuffer& GetFrameBuffer() const override
+			{
+				return OSGetFrameBuffer(mObject);
+            }
 
 			void* GetForegroundWindow() const override
 			{

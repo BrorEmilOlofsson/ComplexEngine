@@ -110,26 +110,26 @@ namespace CLX
 		return Point2i(xPos, yPos);
 	}
 
-	bool Win_Window::HandleMessage(UINT msg, WPARAM wParam, LPARAM lParam)
+	bool Win_Window::HandleMessage(UINT msg, WPARAM wParam, LPARAM lParam, WindowFrameBuffer& frameBuffer)
 	{
 
 		switch (msg)
 		{
 		case WM_CLOSE:
-			mFrameBuffer.hasQuit = true;
+			frameBuffer.hasQuit = true;
 			return true;
 			break;
         case WM_MOUSEMOVE:
             mWindowMousePosition = HandleMouseMove(lParam, GetClientSize());
 			break;
 		case WM_SIZE:
-			mFrameBuffer.hasResized = true;
+			frameBuffer.hasResized = true;
 			DefWindowProc(mHandle, msg, wParam, lParam);
 			break;
 		case WM_DROPFILES:
 		{
 			HDROP hDrop = reinterpret_cast<HDROP>(wParam);
-			mFrameBuffer.droppedFiles = GetDroppedFiles(hDrop);
+			frameBuffer.droppedFiles = GetDroppedFiles(hDrop);
 			break;
 		}
 		default:
@@ -145,10 +145,8 @@ namespace CLX
 		return GetWindowStyleCustom(mHandle);
 	}
 
-	void Win_Window::BeginFrame()
+	void Win_Window::BeginFrame(const WindowFrameBuffer& frameBuffer)
 	{
-		mFrameBuffer = {};
-
 		if (mHasCustomResized)
 		{
 			if (mResizeBuffer.fullScreen)
@@ -168,16 +166,12 @@ namespace CLX
 			mHasCustomResized = false;
 		}
 
-		ProcessMessages();
-
-		//mInputProcessor.Update();
-
 		if (mIsCursorCaptured)
 		{
 			SetCursorPosition(mCapturedCursorPosition);
 		}
 
-		if (mFrameBuffer.hasResized)
+		if (frameBuffer.hasResized)
 		{
 			mGraphicsWindowView->OnResize();
 		}
@@ -194,23 +188,6 @@ namespace CLX
 		catch (const WinException& exception)
 		{
 			HandleWinException(mHandle, exception);
-		}
-	}
-
-	void Win_Window::ProcessMessages()
-	{
-		PROFILER_FUNCTION(profiler::colors::Cyan700);
-		MSG msg = { 0 };
-
-		while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
-		{
-			if (msg.message == WM_QUIT)
-			{
-				mFrameBuffer.hasQuit = true;
-			}
-
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
 		}
 	}
 

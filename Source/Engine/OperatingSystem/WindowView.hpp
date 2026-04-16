@@ -32,18 +32,14 @@ namespace CLX
 	{
 		template<typename T>
 		explicit WindowConstOperations(std::type_identity<T>)
-			: getFrameBufferFunc([](const void* window) -> const WindowFrameBuffer& { return GetWindowFrameBuffer(*static_cast<const T*>(window)); })
-			, getBoundsFunc([](const void* window) { return GetWindowBounds(*static_cast<const T*>(window)); })
+			: getBoundsFunc([](const void* window) { return GetWindowBounds(*static_cast<const T*>(window)); })
 			, getClientBoundsFunc([](const void* window) { return GetClientWindowBounds(*static_cast<const T*>(window)); })
-			//, getInputStateFunc([](const void* window) -> const InputState& { return GetWindowInputState(*static_cast<const T*>(window)); })
 			, getHandleFunc([](const void* window) { return GetWindowHandle(*static_cast<const T*>(window)); })
 		{
 		}
 
 		AABB2i(*getBoundsFunc)(const void*) = nullptr;
 		AABB2i(*getClientBoundsFunc)(const void*) = nullptr;
-		const WindowFrameBuffer& (*getFrameBufferFunc)(const void*) = nullptr;
-		//const InputState& (*getInputStateFunc)(const void*) = nullptr;
 		void* (*getHandleFunc)(const void*) = nullptr;
 	};
 
@@ -89,11 +85,6 @@ namespace CLX
 			return mOperations.releaseCursorFunc(mWindow);
 		}
 
-		[[nodiscard]] const WindowFrameBuffer& GetFrameBuffer() const
-		{
-			return mConstOperations.getFrameBufferFunc(mWindow);
-		}
-
 		[[nodiscard]] Dimension2u GetClientSize() const noexcept
 		{
 			return ToDimension2(GetClientBounds().GetExtent());
@@ -104,20 +95,10 @@ namespace CLX
 			return ToAspectRatio(GetClientSize());
 		}
 
-		[[nodiscard]] AABB2i GetBounds() const noexcept
-		{
-			return mConstOperations.getBoundsFunc(mWindow);
-		}
-
 		[[nodiscard]] AABB2i GetClientBounds() const noexcept
 		{
 			return mConstOperations.getClientBoundsFunc(mWindow);
 		}
-
-		/*[[nodiscard]] const InputState& GetInputState() const noexcept
-		{
-			return mConstOperations.getInputStateFunc(mWindow);
-		}*/
 
 		[[nodiscard]] void* GetHandle() const
 		{
@@ -141,11 +122,6 @@ namespace CLX
 			: mWindow(&window)
 			, mOperations(std::type_identity<T>{})
 		{
-		}
-
-		const WindowFrameBuffer& GetFrameBuffer() const
-		{
-			return mOperations.getFrameBufferFunc(mWindow);
 		}
 
 		[[nodiscard]] Dimension2u GetClientSize() const noexcept

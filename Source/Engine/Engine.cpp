@@ -167,7 +167,7 @@ namespace CLX
         bufferData.totalTimer = mTotalTimer;
         mOperatingSystem.BeginFrame(bufferData);
 
-        const WindowFrameBuffer& windowFrameBuffer = mOperatingSystem.GetWindow(mMainWindow).GetFrameBuffer();
+        const WindowFrameBuffer& windowFrameBuffer = mOperatingSystem.GetFrameBuffer();
         if (windowFrameBuffer.hasQuit)
         {
             return false;

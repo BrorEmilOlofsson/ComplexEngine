@@ -58,7 +58,9 @@ namespace CLX
         Win_InputProcessor mInputProcessor;
 		GraphicsFoundation mGraphicsFoundation;
 		std::vector<std::unique_ptr<Win_Window>> mWindows;
-
+	public:
+		WindowFrameBuffer mFrameBuffer;
+	private:
 		std::unordered_map<std::filesystem::path, HCURSOR> mCursors;
 		bool mIsCursorVisible = true;
 	};
@@ -117,6 +119,11 @@ namespace CLX
 	{
 		os.LoadCursors(path);
 	}
+
+	inline const WindowFrameBuffer& OSGetFrameBuffer(const Win_OperatingSystem& os)
+	{
+		return os.mFrameBuffer;
+    }
 
 	inline void OSSetCursor(Win_OperatingSystem& os, const std::filesystem::path& path)
 	{

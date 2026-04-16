@@ -64,12 +64,34 @@ namespace CLX
         mGraphicsFoundation.Shutdown();
     }
 
+    [[nodiscard]] bool ProcessMessages()
+    {
+        PROFILER_FUNCTION(profiler::colors::Cyan700);
+        MSG msg = { 0 };
+        bool hasQuit = false;
+        while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+        {
+            if (msg.message == WM_QUIT)
+            {
+                hasQuit = true;
+            }
+
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+        }
+        return hasQuit;
+    }
+
     void Win_OperatingSystem::BeginFrame(const GraphicsBufferData& data)
     {
+        mFrameBuffer = {};
         mGraphicsFoundation.BeginFrame(data);
+        bool hasQuit = ProcessMessages();
+        mFrameBuffer.hasQuit |= hasQuit;
+
         for (auto& window : mWindows)
         {
-            window->BeginFrame();
+            window->BeginFrame(mFrameBuffer);
         }
         mInputProcessor.Update();
     }
@@ -140,7 +162,7 @@ namespace CLX
 
             if (it != end(mWindows))
             {
-                if (it->get()->HandleMessage(msg, wParam, lParam))
+                if (it->get()->HandleMessage(msg, wParam, lParam, mFrameBuffer))
                 {
                     return 0;
                 }

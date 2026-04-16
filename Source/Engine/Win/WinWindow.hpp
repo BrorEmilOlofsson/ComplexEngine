@@ -33,7 +33,7 @@ namespace CLX
 		Win_Window& operator=(const Win_Window&) = delete;
 		Win_Window& operator=(Win_Window&&) = delete;
 
-		bool HandleMessage(UINT msg, WPARAM wParam, LPARAM lParam);
+		bool HandleMessage(UINT msg, WPARAM wParam, LPARAM lParam, WindowFrameBuffer& frameBuffer);
 
 		[[nodiscard]] HWND GetHandle() const noexcept
 		{
@@ -42,15 +42,13 @@ namespace CLX
 
 		[[nodiscard]] DWORD GetStyle() const noexcept;
 
-		[[nodiscard]] const WindowFrameBuffer& GetFrameBuffer() const noexcept
+		/*[[nodiscard]] const WindowFrameBuffer& GetFrameBuffer() const noexcept
 		{
 			return mFrameBuffer;
-		}
+		}*/
 
-		void BeginFrame();
+		void BeginFrame(const WindowFrameBuffer& frameBuffer);
 		void EndFrame(RenderContext* renderContext);
-
-		void ProcessMessages();
 
 		void Show();
 		void Hide();
@@ -86,10 +84,9 @@ namespace CLX
 	private:
 		
 		HWND mHandle{};
-		//Win_InputProcessor mInputProcessor;
         std::unique_ptr<GraphicsWindowView> mGraphicsWindowView;
 
-		WindowFrameBuffer mFrameBuffer;
+		//WindowFrameBuffer mFrameBuffer;
 
 		bool mIsCursorCaptured = false;
 		Point2i mCapturedCursorPosition;
@@ -108,15 +105,15 @@ namespace CLX
 		bool mHasCustomResized = false;
 	};
 
-	inline void Window_BeginFrame(Win_Window& window)
+	/*inline void Window_BeginFrame(Win_Window& window)
 	{
 		window.BeginFrame();
-	}
+	}*/
 
-	inline void Window_EndFrame(Win_Window& window, RenderContext* renderContext)
+	/*inline void Window_EndFrame(Win_Window& window, RenderContext* renderContext)
 	{
 		window.EndFrame(renderContext);
-	}
+	}*/
 
 	inline void Window_SetSize(Win_Window& window, Dimension2u size, const bool fullScreen)
 	{
@@ -143,10 +140,10 @@ namespace CLX
 		return window.GetClientBounds();
 	}
 
-	[[nodiscard]] inline const WindowFrameBuffer& GetWindowFrameBuffer(const Win_Window& window) noexcept
-	{
-		return window.GetFrameBuffer();
-	}
+	//[[nodiscard]] inline const WindowFrameBuffer& GetWindowFrameBuffer(const Win_Window& window) noexcept
+	//{
+	//	return window.GetFrameBuffer();
+	//}
 
 	/*[[nodiscard]] inline const InputState& GetWindowInputState(const Win_Window& window) noexcept
 	{
