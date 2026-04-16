@@ -16,7 +16,7 @@
 namespace CLX
 {
 
-	using WindowID = unsigned int;
+	using WindowID = uint32_t;
 
 	class Win_OperatingSystem final
 	{
@@ -36,7 +36,7 @@ namespace CLX
 
 		LRESULT HandleMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-		unsigned int MakeWindow(Dimension2u size, std::wstring title);
+		WindowID MakeWindow(Dimension2u size, std::wstring title);
 		[[nodiscard]] Win_Window& GetWindow(const WindowID windowID);
 		[[nodiscard]] const Win_Window& GetWindow(const WindowID windowID) const;
 
@@ -95,7 +95,7 @@ namespace CLX
 
 	[[nodiscard]] inline WindowHandle OSCreateWindow(Win_OperatingSystem& os, Dimension2u size, std::wstring title)
 	{
-		return WindowHandle(os.MakeWindow(size, title));
+		return WindowHandle{ os.MakeWindow(size, title) };
 	}
 
 	[[nodiscard]] inline GraphicsFoundation& OSGetGraphicsFoundation(Win_OperatingSystem& os)

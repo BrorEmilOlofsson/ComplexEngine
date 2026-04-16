@@ -3,28 +3,21 @@
 #include "Engine/Input/InputMouseState.hpp"
 #include <cstddef>
 #include <bitset>
+#include <array>
 
 namespace CLX
 {
 
+
     class InputKeyState final
     {
         static constexpr std::size_t InputKeyCount = 255;
+
     public:
-
-        InputKeyState() = default;
-
-        void Update()
-        {
-            mPreviousKeyState = mKeyState;
-            mKeyState = mLiveKeyState;
-        }
 
         void Reset()
         {
-            mPreviousKeyState.reset();
             mKeyState.reset();
-            mLiveKeyState.reset();
         }
 
         [[nodiscard]] constexpr bool IsAnyPressed() const
@@ -34,55 +27,183 @@ namespace CLX
 
         [[nodiscard]] constexpr decltype(auto) operator[](const eInputKey key) noexcept
         {
-            return mLiveKeyState[static_cast<std::size_t>(key)];
+            return mKeyState[static_cast<std::size_t>(key)];
         }
-
-        [[nodiscard]] constexpr bool IsKeyPressed(const eInputKey key) const noexcept
-        {
-            return mKeyState[static_cast<std::size_t>(key)] && !mPreviousKeyState[static_cast<std::size_t>(key)];
-        }
-
-        [[nodiscard]] constexpr bool IsKeyHeld(const eInputKey key) const noexcept
-        {
-            return mKeyState[static_cast<std::size_t>(key)] && mPreviousKeyState[static_cast<std::size_t>(key)];
-        }
-
-        [[nodiscard]] constexpr bool IsKeyDown(const eInputKey key) const noexcept
+        [[nodiscard]] constexpr decltype(auto) operator[](const eInputKey key) const noexcept
         {
             return mKeyState[static_cast<std::size_t>(key)];
         }
 
+    private:
+
+        std::bitset<InputKeyCount> mKeyState = {};
+    };
+
+    class InputKeyFrameState final
+    {
+        static constexpr std::size_t InputKeyCount = 255;
+    public:
+
+        InputKeyFrameState() = default;
+
+        void Update(const InputKeyState& newKeyState)
+        {
+            mPreviousKeyState = mKeyState;
+            mKeyState = newKeyState;
+        }
+
+        void Reset()
+        {
+            mPreviousKeyState.Reset();
+            mKeyState.Reset();
+        }
+
+        [[nodiscard]] constexpr bool IsAnyPressed() const
+        {
+            return mKeyState.IsAnyPressed();
+        }
+
+        [[nodiscard]] constexpr bool IsKeyPressed(const eInputKey key) const noexcept
+        {
+            return mKeyState[key] && !mPreviousKeyState[key];
+        }
+
+        [[nodiscard]] constexpr bool IsKeyHeld(const eInputKey key) const noexcept
+        {
+            return mKeyState[key] && mPreviousKeyState[key];
+        }
+
+        [[nodiscard]] constexpr bool IsKeyDown(const eInputKey key) const noexcept
+        {
+            return mKeyState[key];
+        }
+
         [[nodiscard]] constexpr bool IsKeyReleased(const eInputKey key) const noexcept
         {
-            return !mKeyState[static_cast<std::size_t>(key)] && mPreviousKeyState[static_cast<std::size_t>(key)];
+            return !mKeyState[key] && mPreviousKeyState[key];
         }
 
     private:
 
 
-        std::bitset<InputKeyCount> mLiveKeyState = {};
-        std::bitset<InputKeyCount> mKeyState = {};
-        std::bitset<InputKeyCount> mPreviousKeyState = {};
+        //std::bitset<InputKeyCount> mLiveKeyState = {};
+        InputKeyState mKeyState = {};
+        InputKeyState mPreviousKeyState = {};
     };
 
-    struct GamepadInputState
+    enum class eGamepadButton : unsigned char
+    {
+        DPadUp,
+        DPadDown,
+        DPadLeft,
+        DPadRight,
+        Start,
+        Back,
+        LeftThumb,
+        RightThumb,
+        LeftShoulder,
+        RightShoulder,
+        A,
+        B,
+        X,
+        Y
+    };
+
+    struct InputGamepadState final
     {
         static constexpr std::size_t ButtonCount = 16;
 
+        [[nodiscard]] constexpr decltype(auto) operator[](const eGamepadButton button) noexcept
+        {
+            return mButtonState[static_cast<std::size_t>(button)];
+        }
+        [[nodiscard]] constexpr decltype(auto) operator[](const eGamepadButton button) const noexcept
+        {
+            return mButtonState[static_cast<std::size_t>(button)];
+        }
+
+        std::bitset<ButtonCount> mButtonState = {};
+        Vector2<int16_t> mLeftThumb{};
+        Vector2<int16_t> mRightThumb{};
+        uint8_t mLeftTriggerValue{};
+        uint8_t mRightTriggerValue{};
     };
 
-    using GamepadID = std::size_t;
+    struct InputGamepadFrameState final
+    {
+        static constexpr std::size_t ButtonCount = 16;
+
+
+        void Update(const InputGamepadState& newState)
+        {
+            mPreviousState = mState;
+            mState = newState;
+        }
+
+        [[nodiscard]] constexpr decltype(auto) operator[](const eGamepadButton button) noexcept
+        {
+            return mState[button];
+        }
+        [[nodiscard]] constexpr decltype(auto) operator[](const eGamepadButton button) const noexcept
+        {
+            return mState[button];
+        }
+
+        [[nodiscard]] constexpr bool IsKeyHeld(const eGamepadButton button) const noexcept
+        {
+            return mState[button] && mPreviousState[button];
+        }
+
+        [[nodiscard]] constexpr bool IsPressed(const eGamepadButton button) const noexcept
+        {
+            return mState[button] && !mPreviousState[button];
+        }
+
+        [[nodiscard]] constexpr bool IsReleased(const eGamepadButton button) const noexcept
+        {
+            return !mState[button] && mPreviousState[button];
+        }
+
+        [[nodiscard]] constexpr bool IsKeyDown(const eGamepadButton button) const noexcept
+        {
+            return mState[button];
+        }
+
+        [[nodiscard]] constexpr Vector2<int16_t> GetLeftThumbDirection() const
+        {
+            return mState.mLeftThumb;
+        }
+
+        [[nodiscard]] constexpr Vector2<int16_t> GetRightThumbDirection() const
+        {
+            return mState.mLeftThumb;
+        }
+
+        [[nodiscard]] constexpr uint8_t GetLeftTriggerValue() const
+        {
+            return mState.mLeftTriggerValue;
+        }
+
+        [[nodiscard]] constexpr uint8_t GetRightTriggerValue() const
+        {
+            return mState.mRightTriggerValue;
+        }
+
+        InputGamepadState mState = {};
+        InputGamepadState mPreviousState = {};
+    };
+
+    using GamepadID = uint32_t;
 
     class InputState final
     {
     public:
 
-        void Update(Point2i mousePos, Vector2i mousePosDelta, int mouseWheelDelta);
+        void Update(Point2i mousePos, Vector2i mousePosDelta, int mouseWheelDelta, const InputKeyState& newInputKeyState, const std::array<InputGamepadState, 4>& newGamepadStates);
         void Reset();
 
         [[nodiscard]] constexpr bool IsAnyPressed() const;
 
-        [[nodiscard]] constexpr decltype(auto) operator[](const eInputKey key) noexcept;
         [[nodiscard]] constexpr bool IsKeyPressed(const eInputKey key) const noexcept;
         [[nodiscard]] constexpr bool IsKeyHeld(const eInputKey key) const noexcept;
         [[nodiscard]] constexpr bool IsKeyDown(const eInputKey key) const noexcept;
@@ -93,22 +214,26 @@ namespace CLX
         [[nodiscard]] constexpr Vector2i GetMousePositionDelta() const noexcept;
         [[nodiscard]] constexpr int GetMouseWheelDelta() const noexcept;
 
-        [[nodiscard]] const GamepadInputState& GetGamepadState(GamepadID id) const
+        [[nodiscard]] const InputGamepadFrameState& GetGamepadState(GamepadID id) const
         {
-            return mGamepadStates[id];
+            return mGamepadStates.at(id);
         }
 
     private:
 
-        InputKeyState mKeyState;
+        InputKeyFrameState mKeyState;
         InputMouseState mMouseState;
-        std::array<GamepadInputState, 4> mGamepadStates;
+        std::array<InputGamepadFrameState, 4> mGamepadStates;
     };
 
-    inline void InputState::Update(Point2i mousePos, Vector2i mousePosDelta, int mouseWheelDelta)
+    inline void InputState::Update(Point2i mousePos, Vector2i mousePosDelta, int mouseWheelDelta, const InputKeyState& newInputKeyState, const std::array<InputGamepadState, 4>& newGamepadStates)
     {
-        mKeyState.Update();
+        mKeyState.Update(newInputKeyState);
         mMouseState.Update(mousePos, mousePosDelta, mouseWheelDelta);
+        for (std::size_t i = 0; i < mGamepadStates.size(); ++i)
+        {
+            mGamepadStates[i].Update(newGamepadStates[i]);
+        }
     }
 
     inline void InputState::Reset()
@@ -119,11 +244,6 @@ namespace CLX
     constexpr bool InputState::IsAnyPressed() const
     {
         return mKeyState.IsAnyPressed();
-    }
-
-    constexpr decltype(auto) InputState::operator[](const eInputKey key) noexcept
-    {
-        return mKeyState[key];
     }
 
     constexpr bool InputState::IsKeyPressed(const eInputKey key) const noexcept

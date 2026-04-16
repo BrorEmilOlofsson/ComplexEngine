@@ -6,7 +6,6 @@
 
 #include "Engine/Math/Point2.hpp"
 #include "Engine/Math/Vector2.hpp"
-#include "Engine/Math/Dimension2.hpp"
 
 
 namespace CLX
@@ -18,7 +17,7 @@ namespace CLX
 
 		Win_MouseInput() = default;
 
-		[[nodiscard]] bool HandleMessages(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+		[[nodiscard]] bool HandleMessage(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 		
 		
 		//Point2i mTentativePosition;

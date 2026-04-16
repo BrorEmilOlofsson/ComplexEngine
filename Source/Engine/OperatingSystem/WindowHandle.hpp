@@ -1,10 +1,11 @@
 #pragma once
+#include <cstdint>
 
 namespace CLX
 {
 
 	struct WindowHandle final
 	{
-		unsigned int id = 0;
+		uint32_t id = 0;
 	};
 }

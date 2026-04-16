@@ -5,7 +5,6 @@
 #include "Engine/Utility/Win/WinException.hpp"
 #include "Engine/Graphics/DX11/DX11Foundation.hpp"
 
-
 namespace CLX
 {
     static LRESULT HandleMsgMain(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -35,8 +34,7 @@ namespace CLX
         : mInstanceHandle(instanceHandle)
         , mWindowClass(std::make_unique<Win_WindowClass>(instanceHandle, std::move(className), HandleMsgSetup))
         , mGraphicsFoundation(DX11Foundation())
-    {
-    }
+    {}
 
     Win_OperatingSystem::Win_OperatingSystem(Win_OperatingSystem&& other)
         : mInstanceHandle(std::move(other.mInstanceHandle))
@@ -102,7 +100,7 @@ namespace CLX
             break;
         case WM_DESTROY:
             PostQuitMessage(0);
-            
+
             break;
         default:
             auto it = std::ranges::find_if(mWindows, [hwnd](auto& window) { return hwnd == window->GetHandle(); });
@@ -114,7 +112,7 @@ namespace CLX
                 }
             }
 
-            if (mInputProcessor.HandleMessages(hwnd, msg, wParam, lParam))
+            if (mInputProcessor.HandleMessage(hwnd, msg, wParam, lParam))
             {
                 return 0;
             }
@@ -158,6 +156,7 @@ namespace CLX
             }
         }
 
+        ASSERT(false);
         return std::numeric_limits<uint32_t>::max();
     }
 

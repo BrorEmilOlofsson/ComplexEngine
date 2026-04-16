@@ -68,9 +68,9 @@ namespace CLX
 			settings.freeFly = !settings.freeFly;
 		}
 
-		const bool tapped = input.IsKeyHeld(eInputKey::RMB);
+		const bool heldRMB = input.IsKeyHeld(eInputKey::RMB);
 
-		if (tapped)
+		if (heldRMB)
 		{
 			settings.mouseTapTimer += deltaTime;
 

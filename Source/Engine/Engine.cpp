@@ -173,7 +173,9 @@ namespace CLX
             return false;
         }
 
-        mInputState = mOperatingSystem.GetInputState()/*.GetWindow(mMainWindow).GetInputState()*/;
+        mInputState = mOperatingSystem.GetInputState();
+
+        std::println("{}", mInputState.GetGamepadState(0).GetLeftTriggerValue());
         mInputManager.Update(mInputState);
 
         if (!windowFrameBuffer.droppedFiles.empty())

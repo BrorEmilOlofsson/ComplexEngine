@@ -9,7 +9,7 @@
 namespace CLX
 {
 
-	bool Win_MouseInput::HandleMessages([[maybe_unused]] HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+	bool Win_MouseInput::HandleMessage([[maybe_unused]] HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		switch (message)
 		{
