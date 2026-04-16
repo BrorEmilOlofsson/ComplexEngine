@@ -10,7 +10,7 @@ namespace CLX
 	{
 		component.mesh = assetManager.GetMesh(GetPathByPrimitiveMeshType(ePrimitiveShape::SkyBox));
 		component.texture = assetManager.GetTexture(GetPath(eSkyBox::AutumnForest));
-		component.pixelShader = assetManager.GetPixelShader(GetPath(ePixelShaderType::LitDefault));
+		component.pixelShader = assetManager.GetPixelShader(GetPath(ePixelShaderType::SkyBox));
 		component.vertexShader = assetManager.GetVertexShader(GetPath(eVertexShaderType::Default));
 	}
 

@@ -1,7 +1,6 @@
 #include "Engine/Precompiled/EnginePch.hpp"
 #include "WinWindow.hpp"
 #include "Engine/Utility/Win/WinAdapterFunctions.hpp"
-#include <External/imgui/imgui.h>
 #include "Engine/Utility/Win/WinUtility.hpp"
 #include "Engine/Utility/Win/WinConsole.hpp"
 #include "Engine/Utility/Win/WinException.hpp"
@@ -11,9 +10,6 @@
 #include <dwmapi.h>
 #include <shellapi.h>
 #include <windowsx.h>
-
-
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 namespace CLX
 {
@@ -116,29 +112,12 @@ namespace CLX
 
 	bool Win_Window::HandleMessage(UINT msg, WPARAM wParam, LPARAM lParam)
 	{
-		if (ImGui_ImplWin32_WndProcHandler(mHandle, msg, wParam, lParam))
-		{
-			return true;
-		}
 
-		/*if (mInputProcessor.HandleMessages(mHandle, msg, wParam, lParam, GetClientSize()))
-		{
-			return true;
-		}*/
 		switch (msg)
 		{
 		case WM_CLOSE:
 			mFrameBuffer.hasQuit = true;
 			return true;
-			break;
-		case WM_KILLFOCUS:
-			//mInputProcessor.ResetKeyStates();
-			break;
-		case WM_ACTIVATE:
-			if (LOWORD(wParam) == WA_INACTIVE)
-			{
-				//mInputProcessor.ResetKeyStates();
-			}
 			break;
         case WM_MOUSEMOVE:
             mWindowMousePosition = HandleMouseMove(lParam, GetClientSize());

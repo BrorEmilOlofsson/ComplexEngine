@@ -359,7 +359,7 @@ namespace CLX
         {
             .ecs = ecs,
             .entityID = entityID,
-            
+
             .index = static_cast<std::size_t>(std::ranges::distance(begin(rootEntities), std::ranges::find(rootEntities, entityID))),
             .rootEntities = rootEntities
         };
@@ -1053,7 +1053,7 @@ namespace CLX
     }
 
     [[nodiscard]] static std::vector<EditorAction> ShowEntityChildren(ECS& ecs, const EntityID entityID, std::set<EntityID>& selectedEntityIDs, ECS& ecsBuffer,
-        std::vector<EntityID>& rootEntities, const std::span<const EntityID> parentEntities, const std::string& imGuiTag, const std::set<EntityID>& uneditableEntities, 
+        std::vector<EntityID>& rootEntities, const std::span<const EntityID> parentEntities, const std::string& imGuiTag, const std::set<EntityID>& uneditableEntities,
         const DataTypeRegistry& dataTypeRegistry, const std::function<bool(EntityID)>& filter)
     {
         std::vector<EditorAction> editorActions;
@@ -1216,7 +1216,7 @@ namespace CLX
     }
 
     void ShowEntityHierarchyWithAddButtons(ECS& ecs, ECS& ecsBuffer, std::vector<EntityID>& rootEntities,
-        EditorCommandTracker& commandTracker, const std::string& imGuiTag, std::set<EntityID>& selectedEntityIDs, const EntityID defaultParent, 
+        EditorCommandTracker& commandTracker, const std::string& imGuiTag, std::set<EntityID>& selectedEntityIDs, const EntityID defaultParent,
         const std::set<EntityID>& uneditableEntities, std::string& entitySearchBuffer, const DataTypeRegistry& dataTypeRegistry)
     {
         ShowEntityAddButtons(ecs, selectedEntityIDs, rootEntities, commandTracker, imGuiTag, defaultParent);
@@ -1234,13 +1234,15 @@ namespace CLX
             };
     }
 
-    [[nodiscard]] static std::optional<EditorAction> ShowComponentData(ECS& ecs, const EntityID entityID, const std::type_info& typeInfo, void* componentPtr, bool& anyActiveItem, ECS& ecsBuffer, 
+    [[nodiscard]] static std::optional<EditorAction> ShowComponentData(ECS& ecs, const EntityID entityID, const std::type_info& typeInfo, void* componentPtr, bool& anyActiveItem, ECS& ecsBuffer,
         JsonAny& copiedComponent, const DataTypeRegistry& dataTypeRegistry, const Blackboard& blackboard)
     {
         PROFILER_FUNCTION(profiler::colors::Lime400);
 
         ASSERT(componentPtr != nullptr);
         ImGui::AlignTextToFramePadding();
+
+        //std::println("{}", ImGui::IsKeyPressed(ImGuiKey_MouseLeft));
 
         const DataTypeID componentDataTypeID = GetDataTypeID(typeInfo);
 
@@ -1275,21 +1277,10 @@ namespace CLX
         if (isOpen)
         {
             PROFILER_BEGIN("View Component Data");
-            try
-            {
 
             const ViewAndEditResult viewAndEditResult = dataTypeRegistry.ViewAndEditData(componentDataTypeID, componentPtr, newBlackboard);
             anyActiveItem |= viewAndEditResult.isActive;
             PROFILER_END();
-            }
-            catch (std::exception)
-            {
-                while (true)
-                {
-                    int a = 4;
-                    a;
-                }
-            }
         }
 
         std::optional<EditorAction> removeComponentAction;
@@ -1477,14 +1468,14 @@ namespace CLX
                 }
             }
             auto editorAction = ShowComponentData(
-                ecs, 
-                selectedEntityID, 
-                typeInfo, 
+                ecs,
+                selectedEntityID,
+                typeInfo,
                 componentPtr,
-                anyActiveItem, 
-                ecsBuffer, 
-                copiedComponent, 
-                blackboard.Get<Key_DataTypeRegistry>(), 
+                anyActiveItem,
+                ecsBuffer,
+                copiedComponent,
+                blackboard.Get<Key_DataTypeRegistry>(),
                 blackboard
             );
             if (editorAction)
@@ -1558,6 +1549,7 @@ namespace CLX
                     && !ecs.GetRegistry().GetComponentType(GetDataTypeID(dataType.type)).isDefault
                     && !ecs.HasComponent(entityID, GetDataTypeID(dataType.type));
             };
+
 
         auto componentDataTypes = dataTypeRegistry.GetDataTypesFiltered(isValidComponentDataType)
             | std::views::values

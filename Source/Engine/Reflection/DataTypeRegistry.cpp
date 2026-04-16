@@ -142,7 +142,7 @@ namespace CLX
 
             if (viewAndEditResult.isActive)
             {
-                blackboard.Get<Key_ActivePropertyPath>() = blackboard.Get<Key_CurrentPropertyPath>();
+                //blackboard.Get<Key_ActivePropertyPath>() = blackboard.Get<Key_CurrentPropertyPath>();
             }
 
             ImGui::EndDisabled();

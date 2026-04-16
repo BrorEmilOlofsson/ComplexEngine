@@ -52,7 +52,7 @@ namespace CLX
 		case ePrimitiveShape::Sphere:
 			return "Primitive Sphere";
 		case ePrimitiveShape::SkyBox:
-			return "Primitive Skybox";
+			return "Primitive SkyBox";
 		default:
 			throw std::invalid_argument("Invalid primitive shape type");
 			break;

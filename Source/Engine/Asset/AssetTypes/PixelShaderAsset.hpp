@@ -17,7 +17,8 @@ namespace CLX
 		LitDefault,
 		ObjectID,
 		FullScreen,
-		Line
+		Line,
+		SkyBox
 	};
 
 	constexpr std::string_view EnumToString(ePixelShaderType pixelShaderType)
@@ -38,6 +39,9 @@ namespace CLX
 			break;
 		case ePixelShaderType::Line:
 			return "Line";
+			break;
+		case ePixelShaderType::SkyBox:
+			return "SkyBox";
 			break;
 		default:
 			throw std::invalid_argument("Invalid argument pixel shader type");

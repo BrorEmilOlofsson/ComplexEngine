@@ -2,8 +2,12 @@
 #ifdef _WIN32
 
 #include "WinOperatingSystem.hpp"
+#include <External/imgui/imgui.h>
 #include "Engine/Utility/Win/WinException.hpp"
 #include "Engine/Graphics/DX11/DX11Foundation.hpp"
+#include <set>
+
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 namespace CLX
 {
@@ -12,7 +16,7 @@ namespace CLX
         Win_OperatingSystem* const operatingSystem = reinterpret_cast<Win_OperatingSystem*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
         if (operatingSystem == nullptr)
         {
-            return 0;
+            return DefWindowProc(hwnd, msg, wParam, lParam);
         }
         return operatingSystem->HandleMessage(hwnd, msg, wParam, lParam);
     }
@@ -85,6 +89,26 @@ namespace CLX
 
     LRESULT Win_OperatingSystem::HandleMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     {
+        static uint32_t counter = 0;
+        static std::set<HWND> hwnds;
+        hwnds.insert(hwnd);
+
+        if (hwnds.size() > 1)
+        {
+            // Not getting in here.
+            std::println("Multiple HWNDs detected: {}", hwnds.size());
+        }
+        if (msg == WM_LBUTTONDOWN)
+        {
+            // I am not getting LBUTTONDOWN events here if I click the popup
+            std::println("Count: {}", counter);
+            counter++;
+        }
+        if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wParam, lParam))
+        {
+            return 1;
+        }
+
         switch (msg)
         {
         case WM_SETCURSOR:
@@ -102,8 +126,18 @@ namespace CLX
             PostQuitMessage(0);
 
             break;
+        case WM_KILLFOCUS:
+            mInputProcessor.ResetKeyStates();
+            break;
+        case WM_ACTIVATE:
+            if (LOWORD(wParam) == WA_INACTIVE)
+            {
+                mInputProcessor.ResetKeyStates();
+            }
+            break;
         default:
             auto it = std::ranges::find_if(mWindows, [hwnd](auto& window) { return hwnd == window->GetHandle(); });
+
             if (it != end(mWindows))
             {
                 if (it->get()->HandleMessage(msg, wParam, lParam))
