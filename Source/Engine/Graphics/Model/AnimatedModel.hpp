@@ -7,105 +7,134 @@
 namespace CLX
 {
 
-	class AnimatedModel final
-	{
-	public:
+    class AnimatedModel final
+    {
+    public:
 
-		template<typename T>
-		explicit AnimatedModel(T&& model)
-			: mConcept(std::make_unique<AnimatedModelModel<T>>(std::move(model)))
-		{
-		}
+        template<typename T>
+        explicit AnimatedModel(T&& model)
+            : mConcept(std::make_unique<AnimatedModelModel<T>>(std::move(model)))
+        {}
 
-		~AnimatedModel() = default;
-		AnimatedModel(const AnimatedModel&) = delete;
-		AnimatedModel(AnimatedModel&&) noexcept = default;
-		AnimatedModel& operator=(const AnimatedModel&) = delete;
-		AnimatedModel& operator=(AnimatedModel&&) noexcept = default;
+        ~AnimatedModel() = default;
+        AnimatedModel(const AnimatedModel&) = delete;
+        AnimatedModel(AnimatedModel&&) noexcept = default;
+        AnimatedModel& operator=(const AnimatedModel&) = delete;
+        AnimatedModel& operator=(AnimatedModel&&) noexcept = default;
 
-		[[nodiscard]] const std::string& GetName() const
-		{
-			return mConcept->GetName();
-		}
+        [[nodiscard]] const std::string& GetName() const
+        {
+            return mConcept->GetName();
+        }
 
-		[[nodiscard]] const std::filesystem::path& GetPath() const
-		{
-			return mConcept->GetPath();
-		}
+        [[nodiscard]] const std::filesystem::path& GetPath() const
+        {
+            return mConcept->GetPath();
+        }
 
-		[[nodiscard]] AABB3f GetBoundingBox() const
-		{
-			return mConcept->GetBoundingBox();
-		}
+        [[nodiscard]] AABB3f GetBoundingBox() const
+        {
+            return mConcept->GetBoundingBox();
+        }
 
-		const Skeleton& GetSkeleton() const
-		{
-			return mConcept->GetSkeleton();
-		}
+        const Skeleton& GetSkeleton() const
+        {
+            return mConcept->GetSkeleton();
+        }
 
-		void Render()
-		{
-			mConcept->Render();
-		}
+        template<typename T>
+        [[nodiscard]] T* Get()
+        {
+            if (auto* model = dynamic_cast<AnimatedModelModel<T>*>(mConcept.get()))
+            {
+                return &model->Get();
+            }
+            return nullptr;
+        }
 
-	private:
+        template<typename T>
+        [[nodiscard]] const T* Get() const
+        {
+            if (auto* model = dynamic_cast<AnimatedModelModel<T>*>(mConcept.get()))
+            {
+                return &model->Get();
+            }
+            return nullptr;
+        }
 
-		class AnimatedModelConcept
-		{
-		public:
+        template<typename T>
+        [[nodiscard]] T& GetUnsafe()
+        {
+            return reinterpret_cast<AnimatedModelModel<T>*>(mConcept.get())->Get();
+        }
 
-			AnimatedModelConcept() = default;
-			virtual ~AnimatedModelConcept() = default;
+        template<typename T>
+        [[nodiscard]] const T& GetUnsafe() const
+        {
+            return reinterpret_cast<const AnimatedModelModel<T>*>(mConcept.get())->Get();
+        }
 
-			virtual const std::string& GetName() const = 0;
-			virtual const std::filesystem::path& GetPath() const = 0;
-			virtual AABB3f GetBoundingBox() const = 0;
-			virtual const Skeleton& GetSkeleton() const = 0;
-			virtual void Render() = 0;
-		};
 
-		template<typename T>
-		class AnimatedModelModel final : public AnimatedModelConcept
-		{
-		public:
+    private:
 
-			explicit AnimatedModelModel(T&& model)
-				: mModel(std::move(model))
-			{
-			}
+        class AnimatedModelConcept
+        {
+        public:
 
-			const std::string& GetName() const override
-			{
-				return mModel.GetName();
-			}
+            AnimatedModelConcept() = default;
+            virtual ~AnimatedModelConcept() = default;
 
-			const std::filesystem::path& GetPath() const override
-			{
-				return mModel.GetPath();
-			}
+            virtual const std::string& GetName() const = 0;
+            virtual const std::filesystem::path& GetPath() const = 0;
+            virtual AABB3f GetBoundingBox() const = 0;
+            virtual const Skeleton& GetSkeleton() const = 0;
+        };
 
-			AABB3f GetBoundingBox() const override
-			{
-				return mModel.GetBoundingBox();
-			}
+        template<typename T>
+        class AnimatedModelModel final : public AnimatedModelConcept
+        {
+        public:
 
-			const Skeleton& GetSkeleton() const override
-			{
-				return mModel.GetSkeleton();
-			}
+            explicit AnimatedModelModel(T&& model)
+                : mModel(std::move(model))
+            {}
 
-			void Render() override
-			{
-				mModel.Render();
-			}
+            const std::string& GetName() const override
+            {
+                return mModel.GetName();
+            }
 
-		private:
+            const std::filesystem::path& GetPath() const override
+            {
+                return mModel.GetPath();
+            }
 
-			T mModel;
-		};
+            AABB3f GetBoundingBox() const override
+            {
+                return mModel.GetBoundingBox();
+            }
 
-	private:
+            const Skeleton& GetSkeleton() const override
+            {
+                return mModel.GetSkeleton();
+            }
 
-		std::unique_ptr<AnimatedModelConcept> mConcept;
-	};
+            [[nodiscard]] T& Get()
+            {
+                return mModel;
+            }
+            [[nodiscard]] const T& Get() const
+            {
+                return mModel;
+            }
+
+        private:
+
+            T mModel;
+        };
+
+    private:
+
+        std::unique_ptr<AnimatedModelConcept> mConcept;
+    };
 }

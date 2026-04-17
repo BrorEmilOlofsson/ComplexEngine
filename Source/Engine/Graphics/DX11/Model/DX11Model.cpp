@@ -32,24 +32,4 @@ namespace CLX
 	{
 		return mPath;
 	}
-
-	static void RenderMesh(ID3D11DeviceContext& context, Microsoft::WRL::ComPtr<ID3D11Buffer> vertexBuffer,
-		Microsoft::WRL::ComPtr<ID3D11Buffer> indexBuffer, const MeshData<Vertex>& meshData)
-	{
-		UINT stride = sizeof(Vertex);
-		UINT offset = 0;
-
-		context.IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), &stride, &offset);
-		context.IASetIndexBuffer(indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-		context.IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		context.DrawIndexed(static_cast<UINT>(meshData.indices.size()), 0, 0);
-	}
-
-	void DX11Model::Render()
-	{
-		for (auto& mesh : mMeshes)
-		{
-			mesh.Render();
-		}
-	}
 }

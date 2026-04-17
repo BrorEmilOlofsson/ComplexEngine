@@ -19,6 +19,11 @@ namespace CLX
 
 		void Bind();
 
+		ID3D11PixelShader& GetPixelShader()
+		{
+			return *mPixelShader.Get();
+		}
+
 	private:
 
 		Microsoft::WRL::ComPtr<ID3D11PixelShader> mPixelShader;

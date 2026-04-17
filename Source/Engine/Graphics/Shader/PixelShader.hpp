@@ -1,5 +1,6 @@
 #pragma once
-#include <filesystem>
+#include <memory>
+#include <utility>
 
 namespace CLX
 {
@@ -19,6 +20,17 @@ namespace CLX
 			mConcept->Bind();
 		}
 
+		template<typename T>
+		[[nodiscard]] T& GetUnsafe()
+		{
+			return reinterpret_cast<Model<T>*>(mConcept.get())->Get();
+		}
+
+		template<typename T>
+		[[nodiscard]] const T& GetUnsafe() const
+		{
+			return reinterpret_cast<const Model<T>*>(mConcept.get())->Get();
+		}
 
 	private:
 
@@ -45,6 +57,16 @@ namespace CLX
 			void Bind() override
 			{
 				mObject.Bind();
+			}
+
+			T& Get()
+			{
+				return mObject;
+			}
+
+			[[nodiscard]] T& Get() const
+			{
+				return mObject;
 			}
 
 		private:

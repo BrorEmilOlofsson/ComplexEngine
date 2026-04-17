@@ -1242,8 +1242,6 @@ namespace CLX
         ASSERT(componentPtr != nullptr);
         ImGui::AlignTextToFramePadding();
 
-        //std::println("{}", ImGui::IsKeyPressed(ImGuiKey_MouseLeft));
-
         const DataTypeID componentDataTypeID = GetDataTypeID(typeInfo);
 
         const DataType* dataType = dataTypeRegistry.Find(componentDataTypeID);

@@ -17,7 +17,7 @@ namespace CLX
 	{
 	}
 
-	void DX11Texture::Bind(const unsigned int slot)
+	void DX11Texture::Bind(const uint32_t slot)
 	{
 		mDeviceContext->PSSetShaderResources(slot, 1, mShaderResourceView.GetAddressOf());
 	}
@@ -33,12 +33,12 @@ namespace CLX
 		mDeviceContext->PSSetShaderResources(mSlot, 1, &nullSRV);
 	}
 
-	void DX11Texture::SetSlot(const unsigned int slot)
+	void DX11Texture::SetSlot(const uint32_t slot)
 	{
 		mSlot = slot;
 	}
 
-	unsigned int DX11Texture::GetSlot() const
+	uint32_t DX11Texture::GetSlot() const
 	{
 		return mSlot;
 	}

@@ -37,14 +37,6 @@ namespace CLX
 	{
 		return mSkeleton;
 	}
-
-	void DX11AnimatedModel::Render()
-	{
-		for (auto& mesh : mMeshes)
-		{
-			mesh.Render();
-		}
-	}
 }
 
 #endif

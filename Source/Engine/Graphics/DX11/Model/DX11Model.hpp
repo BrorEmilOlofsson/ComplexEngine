@@ -1,10 +1,11 @@
 #pragma once
+
+#ifdef _WIN32
+
 #include "Engine/Math/Shapes/AABB3.hpp"
 #include "Engine/Utility/MeshData.hpp"
 #include <string>
 #include <filesystem>
-
-#ifdef _WIN32
 
 #include <d3d11.h>
 #include <wrl/client.h>
@@ -28,9 +29,15 @@ namespace CLX
 		[[nodiscard]] const AABB3f& GetBoundingBox() const;
 		[[nodiscard]] const std::string& GetName() const;
 		[[nodiscard]] const std::filesystem::path& GetPath() const;
+		[[nodiscard]] std::span<const DX11Mesh> GetMeshes() const
+		{
+			return mMeshes;
+        }
 
-		void Render();
-
+		[[nodiscard]] std::span<DX11Mesh> GetMeshes()
+		{
+			return mMeshes;
+		}
 	private:
 
 		std::vector<DX11Mesh> mMeshes;

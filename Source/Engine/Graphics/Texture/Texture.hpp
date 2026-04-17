@@ -25,22 +25,34 @@ namespace CLX
 
 		void Bind(uint32_t slot)
 		{
-			mConcept->SetSlot(slot);
+			mConcept->Bind(slot);
 		}
 
 		void Bind()
 		{
-			mConcept->Bind(mConcept->GetSlot());
+			mConcept->Bind();
 		}
 
-		void* GetShaderResourceView()
+		[[nodiscard]] void* GetShaderResourceView()
 		{
 			return mConcept->GetShaderResourceView();
 		}
 
-		uint32_t GetSlot() const
+		[[nodiscard]] uint32_t GetSlot() const
 		{
 			return mConcept->GetSlot();
+		}
+
+		template<typename T>
+		[[nodiscard]] T& GetUnsafe()
+		{
+			return static_cast<TextureModel<T>*>(mConcept.get())->Get();
+		}
+
+		template<typename T>
+		[[nodiscard]] const T& GetUnsafe() const
+		{
+			return static_cast<const TextureModel<T>*>(mConcept.get())->Get();
 		}
 
 	private:
@@ -91,6 +103,16 @@ namespace CLX
 			{
 				return mTexture.GetShaderResourceView();
 			}
+
+			T& Get()
+			{
+				return mTexture;
+            }
+
+			const T& Get() const
+			{
+				return mTexture;
+            }
 
 		private:
 

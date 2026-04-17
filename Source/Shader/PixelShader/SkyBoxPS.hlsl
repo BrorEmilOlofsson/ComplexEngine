@@ -14,6 +14,7 @@ PixelOutput main(PixelInputType input)
     float blendStart = -0.1; // Start blending slightly below the horizon
     float blendEnd = 0.1; // End blending slightly above the horizon
 
+    // Hardcode skybox flooring for now (can be made dynamic later)
     bool skyBoxUseFlooring = false;
     // Early exit if skybox flooring is disabled or above the blend region
     if (!skyBoxUseFlooring || normalizedPositionDiff.y > blendEnd)

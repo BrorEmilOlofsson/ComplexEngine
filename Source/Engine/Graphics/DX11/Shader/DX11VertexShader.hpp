@@ -4,7 +4,6 @@
 
 #include <wrl/client.h>
 #include <d3d11.h>
-#include <filesystem>
 
 
 namespace CLX
@@ -19,6 +18,15 @@ namespace CLX
 
 
 		void Bind();
+
+		[[nodiscard]] ID3D11InputLayout& GetInputLayout()
+		{
+			return *mInputLayout.Get();
+		}
+		[[nodiscard]] ID3D11VertexShader& GetVertexShader()
+		{
+			return *mVertexShader.Get();
+        }
 
 	private:
 

@@ -3,56 +3,76 @@
 namespace CLX
 {
 
-	class VertexShader final
-	{
-	public:
+    class VertexShader final
+    {
+    public:
 
-		template<typename T>
-		VertexShader(T&& object)
-			: mConcept(std::make_unique<VertexShaderModel<T>>(object))
-		{
-		}
+        template<typename T>
+        VertexShader(T&& object)
+            : mConcept(std::make_unique<VertexShaderModel<T>>(object))
+        {}
 
-		void Bind()
-		{
-			mConcept->Bind();
-		}
+        void Bind()
+        {
+            mConcept->Bind();
+        }
 
-	private:
+        template<typename T>
+        [[nodiscard]] T& GetUnsafe()
+        {
+            return static_cast<VertexShaderModel<T>*>(mConcept.get())->Get();
+        }
 
-		class VertexShaderConcept
-		{
-		public:
+        template<typename T>
+        [[nodiscard]] const T& GetUnsafe() const
+        {
+            return static_cast<const VertexShaderModel<T>*>(mConcept.get())->Get();
+        }
 
-			virtual ~VertexShaderConcept() = default;
+    private:
 
-			virtual void Bind() = 0;
-		};
+        class VertexShaderConcept
+        {
+        public:
 
-		template<typename T>
-		class VertexShaderModel final : public VertexShaderConcept
-		{
-		public:
+            virtual ~VertexShaderConcept() = default;
 
-			template<typename T>
-			VertexShaderModel(T&& object)
-				: mObject(std::move(object))
-			{
-			}
+            virtual void Bind() = 0;
+        };
 
-			void Bind()
-			{
-				mObject.Bind();
-			}
+        template<typename T>
+        class VertexShaderModel final : public VertexShaderConcept
+        {
+        public:
 
-		private:
+            template<typename T>
+            VertexShaderModel(T&& object)
+                : mObject(std::move(object))
+            {}
 
-			T mObject;
-		};
+            void Bind()
+            {
+                mObject.Bind();
+            }
 
-	private:
+            T& Get()
+            {
+                return mObject;
+            }
+
+            const T& Get() const
+            {
+                return mObject;
+            }
+
+        private:
+
+            T mObject;
+        };
+
+    private:
 
 
-		std::unique_ptr<VertexShaderConcept> mConcept;
-	};
+        std::unique_ptr<VertexShaderConcept> mConcept;
+    };
 }

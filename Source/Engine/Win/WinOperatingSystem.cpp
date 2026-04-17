@@ -111,21 +111,6 @@ namespace CLX
 
     LRESULT Win_OperatingSystem::HandleMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     {
-        static uint32_t counter = 0;
-        static std::set<HWND> hwnds;
-        hwnds.insert(hwnd);
-
-        if (hwnds.size() > 1)
-        {
-            // Not getting in here.
-            std::println("Multiple HWNDs detected: {}", hwnds.size());
-        }
-        if (msg == WM_LBUTTONDOWN)
-        {
-            // I am not getting LBUTTONDOWN events here if I click the popup
-            std::println("Count: {}", counter);
-            counter++;
-        }
         if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wParam, lParam))
         {
             return 1;

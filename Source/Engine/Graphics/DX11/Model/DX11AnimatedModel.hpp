@@ -18,38 +18,45 @@
 
 namespace CLX
 {
-	class DX11AnimatedModel final
-	{
-	public:
+    class DX11AnimatedModel final
+    {
+    public:
 
-		DX11AnimatedModel(std::vector<DX11Mesh>&& meshData, const Skeleton& skeleton, const std::string& modelName, const std::filesystem::path& path,
-			ID3D11Device& device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext);
+        DX11AnimatedModel(std::vector<DX11Mesh>&& meshData, const Skeleton& skeleton, const std::string& modelName, const std::filesystem::path& path,
+            ID3D11Device& device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext);
 
-		DX11AnimatedModel(DX11AnimatedModel&&) noexcept = default;
-		DX11AnimatedModel(const DX11AnimatedModel&) = delete;
-		DX11AnimatedModel& operator=(DX11AnimatedModel&&) noexcept = default;
-		DX11AnimatedModel& operator=(const DX11AnimatedModel&) = delete;
+        DX11AnimatedModel(DX11AnimatedModel&&) noexcept = default;
+        DX11AnimatedModel(const DX11AnimatedModel&) = delete;
+        DX11AnimatedModel& operator=(DX11AnimatedModel&&) noexcept = default;
+        DX11AnimatedModel& operator=(const DX11AnimatedModel&) = delete;
 
-		[[nodiscard]] const AABB3f& GetBoundingBox() const;
-		[[nodiscard]] const std::string& GetName() const;
-		[[nodiscard]] const std::filesystem::path& GetPath() const;
-		[[nodiscard]] const Skeleton& GetSkeleton() const;
+        [[nodiscard]] const AABB3f& GetBoundingBox() const;
+        [[nodiscard]] const std::string& GetName() const;
+        [[nodiscard]] const std::filesystem::path& GetPath() const;
+        [[nodiscard]] const Skeleton& GetSkeleton() const;
 
-		void Render();
+        [[nodiscard]] std::span<const DX11Mesh> GetMeshes() const
+        {
+            return mMeshes;
+        }
+        [[nodiscard]] std::span<DX11Mesh> GetMeshes()
+        {
+            return mMeshes;
+        }
 
-	private:
+    private:
 
-		std::vector<DX11Mesh> mMeshes;
+        std::vector<DX11Mesh> mMeshes;
 
-		std::string mName;
-		std::filesystem::path mPath;
+        std::string mName;
+        std::filesystem::path mPath;
 
-		AABB3f mBoundingBox;
+        AABB3f mBoundingBox;
 
-		Skeleton mSkeleton;
+        Skeleton mSkeleton;
 
-		Microsoft::WRL::ComPtr<ID3D11DeviceContext> mContext;
-	};
+        Microsoft::WRL::ComPtr<ID3D11DeviceContext> mContext;
+    };
 }
 
 #endif

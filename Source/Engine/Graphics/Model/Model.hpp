@@ -38,10 +38,27 @@ namespace CLX
 			return mConcept->GetBoundingBox();
 		}
 
-		void Render()
+		template<typename T>
+		[[nodiscard]] T* Get()
 		{
-			mConcept->Render();
+			if (auto* model = dynamic_cast<ModelModel<T>*>(mConcept.get()))
+			{
+				return &model->Get();
+			}
+
+			return nullptr;
 		}
+
+		template<typename T>
+		[[nodiscard]] const T* Get() const
+		{
+			if (auto* model = dynamic_cast<ModelModel<T>*>(mConcept.get()))
+			{
+				return &model->Get();
+			}
+			
+			return nullptr;
+        }
 
 	private:
 
@@ -55,7 +72,6 @@ namespace CLX
 			virtual const std::string& GetName() const = 0;
 			virtual const std::filesystem::path& GetPath() const = 0;
 			virtual AABB3f GetBoundingBox() const = 0;
-			virtual void Render() = 0;
 		};
 
 		template<typename T>
@@ -83,10 +99,16 @@ namespace CLX
 				return mModel.GetBoundingBox();
 			}
 
-			void Render() override
+			T& Get()
 			{
-				mModel.Render();
-			}
+				return mModel;
+            }
+
+			const T& Get() const
+			{
+				return &mModel;
+            }
+
 
 		private:
 

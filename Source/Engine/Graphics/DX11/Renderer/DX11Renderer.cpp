@@ -12,9 +12,54 @@
 #include "Engine/Graphics/DX11/RenderTarget/DX11RenderTarget.hpp"
 #include "Engine/Graphics/DX11/DX11GBuffer.hpp"
 #include "Engine/Graphics/DX11/DX11RenderContext.hpp"
+#include "Engine/Graphics/DX11/Model/DX11Model.hpp"
+#include "Engine/Graphics/DX11/Model/DX11AnimatedModel.hpp"
+#include "Engine/Graphics/DX11/Shader/DX11PixelShader.hpp"
+#include "Engine/Graphics/DX11/Shader/DX11VertexShader.hpp"
+#include "Engine/Graphics/DX11/Texture/DX11Texture.hpp"
 
 namespace CLX
 {
+
+    static void BindPixelShader(ID3D11DeviceContext& context, DX11PixelShader& pixelShader)
+    {
+        context.PSSetShader(&pixelShader.GetPixelShader(), nullptr, 0);
+    }
+
+    static void BindVertexShader(ID3D11DeviceContext& context, DX11VertexShader& vertexShader)
+    {
+        context.VSSetShader(&vertexShader.GetVertexShader(), nullptr, 0);
+        context.IASetInputLayout(&vertexShader.GetInputLayout());
+    }
+
+    static void BindTexture(ID3D11DeviceContext& context, DX11Texture& texture, uint32_t slot)
+    {
+        ID3D11ShaderResourceView* srv = texture.GetShaderResourceView();
+        context.PSSetShaderResources(slot, 1, &srv);
+    }
+
+    static void BindTexture(ID3D11DeviceContext& context, DX11Texture& texture)
+    {
+        BindTexture(context, texture, texture.GetSlot());
+    }
+
+    static void RenderMesh(ID3D11DeviceContext& context, DX11VertexBuffer& vertexBuffer,
+        Microsoft::WRL::ComPtr<ID3D11Buffer> indexBuffer, const MeshData<Vertex>& meshData)
+    {
+        UINT stride = sizeof(Vertex);
+        UINT offset = 0;
+
+        context.IASetVertexBuffers(0, 1, vertexBuffer.Get().GetAddressOf(), &stride, &offset);
+        context.IASetIndexBuffer(indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+        context.IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        context.DrawIndexed(static_cast<UINT>(meshData.indices.size()), 0, 0);
+    }
+
+
+    static void RenderMesh(ID3D11DeviceContext& context, DX11Mesh& mesh)
+    {
+        RenderMesh(context, mesh.GetVertexBuffer(), mesh.GetIndexBuffer(), mesh.GetMeshData());
+    }
 
     static void RenderModel(const ModelInstance& modelInstance, DX11ConstantBuffer<TransformBufferData>& transformCB, DX11ConstantBuffer<ObjectIDBufferData>& objectIDCB, ID3D11DeviceContext& context)
     {
@@ -34,7 +79,12 @@ namespace CLX
             transformCB.UpdateAndBind(TransformBufferData{ modelInstance.transform.GetMatrix() }, context);
             objectIDCB.UpdateAndBind(ObjectIDBufferData{ modelInstance.objectID }, context);
 
-            modelInstance.model->Render();
+            DX11Model* dx11Model = modelInstance.model->Get<DX11Model>();
+            ASSERT_NEW(dx11Model != nullptr, "ModelInstance has a model that is not a DX11Model");
+            for (DX11Mesh& mesh : dx11Model->GetMeshes())
+            {
+                RenderMesh(context, mesh);
+            }
 
             return;
         }
@@ -45,7 +95,9 @@ namespace CLX
 
         transformCB.UpdateAndBind(TransformBufferData{ modelInstance.transform.GetMatrix() }, context);
         objectIDCB.UpdateAndBind(ObjectIDBufferData{ modelInstance.objectID }, context);
-        modelInstance.mesh->Render();
+        DX11Mesh* mesh = modelInstance.mesh->Get<DX11Mesh>();
+        ASSERT_NEW(mesh != nullptr, "ModelInstance has a mesh that is not a DX11Mesh");
+        RenderMesh(context, mesh->GetVertexBuffer(), mesh->GetIndexBuffer(), mesh->GetMeshData());
     }
 
     static void RenderModels(std::span<const ModelInstance> modelInstances, DX11ConstantBuffer<TransformBufferData>& transformCB, DX11ConstantBuffer<ObjectIDBufferData>& objectIDCB, ID3D11DeviceContext& context)
@@ -81,8 +133,11 @@ namespace CLX
 
             boneCB.UpdateAndBind(BoneBufferData{ modelInstance.boneMatrices }, context);
 
-            modelInstance.animatedModel->Render();
-
+            DX11AnimatedModel* dx11AnimatedModel = modelInstance.animatedModel->Get<DX11AnimatedModel>();
+            for (DX11Mesh& mesh : dx11AnimatedModel->GetMeshes())
+            {
+                RenderMesh(context, mesh);
+            }
         }
     }
 
@@ -109,11 +164,12 @@ namespace CLX
         {
             return;
         }
-        skyBox.vertexShader->Bind();
-        skyBox.pixelShader->Bind();
-        skyBox.texture->Bind();
+        BindVertexShader(context, skyBox.vertexShader->GetUnsafe<DX11VertexShader>());
+        BindPixelShader(context, skyBox.pixelShader->GetUnsafe<DX11PixelShader>());
+        BindTexture(context, skyBox.texture->GetUnsafe<DX11Texture>(), TextureSlots::CubeMap);
         transformCB.UpdateAndBind(TransformBufferData{ skyBox.transform.GetMatrix() }, context);
-        skyBox.mesh->Render();
+        DX11Mesh& mesh = skyBox.mesh->GetUnsafe<DX11Mesh>();
+        RenderMesh(context, mesh);
     }
 
     DX11Renderer::DX11Renderer(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
@@ -204,10 +260,9 @@ namespace CLX
             assetManager.GetPixelShader(GetShaderPath("DeferredLightingPS"))
         );
 
-        RenderSkyBox(renderState.GetSkyBox(), transformCB, *mDeviceContext.Get());
-
         // Render debug lines
 
+        // TODO: Remove the creation of this depth stencil state every frame. It can be created once and stored in the renderer.
         D3D11_DEPTH_STENCIL_DESC dsDesc = {};
         dsDesc.DepthEnable = TRUE;
         dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;   // READ-ONLY
@@ -221,10 +276,11 @@ namespace CLX
         mDeviceContext->OMSetRenderTargets(1, &rtv, r->GetGBuffer().GetDepthStencilView());
         mDeviceContext->OMSetDepthStencilState(depthReadOnlyState.Get(), 0);
 
+        RenderSkyBox(renderState.GetSkyBox(), transformCB, *mDeviceContext.Get());
+
         RenderDebugLines(renderState.GetRenderList(), assetManager, vertexShader, colorCB);
 
         mTextRenderer.Render(renderState.GetRenderList().GetText3Ds(), *renderState.GetCamera(), size);
-
     }
 
     void DX11Renderer::RenderDebugLines(const RenderList& renderList, AssetManager& assetManager,

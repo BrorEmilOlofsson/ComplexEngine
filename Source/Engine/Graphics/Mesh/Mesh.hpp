@@ -6,105 +6,134 @@
 namespace CLX
 {
 
-	class Mesh final
-	{
-	public:
+    class Mesh final
+    {
+    public:
 
-		template<typename T>
-		explicit Mesh(T&& mesh)
-			: mMesh(std::make_unique<MeshModel<T>>(std::forward<T>(mesh)))
-		{
-		}
+        template<typename T>
+        explicit Mesh(T&& mesh)
+            : mMesh(std::make_unique<MeshModel<T>>(std::forward<T>(mesh)))
+        {}
 
-		~Mesh() = default;
-		Mesh(Mesh&&) noexcept = default;
-		Mesh(const Mesh&) = delete;
-		Mesh& operator=(Mesh&&) noexcept = default;
-		Mesh& operator=(const Mesh&) = delete;
+        ~Mesh() = default;
+        Mesh(Mesh&&) noexcept = default;
+        Mesh(const Mesh&) = delete;
+        Mesh& operator=(Mesh&&) noexcept = default;
+        Mesh& operator=(const Mesh&) = delete;
 
-		[[nodiscard]] const MeshData<Vertex>& GetMeshData() const
-		{
-			return mMesh->GetMeshData();
-		}
+        [[nodiscard]] const MeshData<Vertex>& GetMeshData() const
+        {
+            return mMesh->GetMeshData();
+        }
 
-		[[nodiscard]] const std::filesystem::path& GetName() const
-		{
-			return mMesh->GetName();
-		}
+        [[nodiscard]] const std::filesystem::path& GetName() const
+        {
+            return mMesh->GetName();
+        }
 
-		[[nodiscard]] const std::filesystem::path& GetPath() const
-		{
-			return mMesh->GetPath();
-		}
+        [[nodiscard]] const std::filesystem::path& GetPath() const
+        {
+            return mMesh->GetPath();
+        }
 
-		[[nodiscard]] AABB3f GetBoundingBox() const
-		{
-			return mMesh->GetBoundingBox();
-		}
+        [[nodiscard]] AABB3f GetBoundingBox() const
+        {
+            return mMesh->GetBoundingBox();
+        }
 
-		void Render()
-		{
-			mMesh->Render();
-		}
+        template<typename T>
+        [[nodiscard]] T* Get()
+        {
+            if (auto* mesh = dynamic_cast<MeshModel<T>*>(mMesh.get()))
+            {
+                return &mesh->Get();
+            }
+            return nullptr;
+        }
 
-	private:
+        template<typename T>
+        [[nodiscard]] const T* Get() const
+        {
+            if (auto* mesh = dynamic_cast<MeshModel<T>*>(mMesh.get()))
+            {
+                return &mesh->Get();
+            }
+            return nullptr;
+        }
 
-		class MeshConcept
-		{
-		public:
+        template<typename T>
+        [[nodiscard]] T& GetUnsafe()
+        {
+            return reinterpret_cast<MeshModel<T>*>(mMesh.get())->Get();
+        }
 
-			MeshConcept() = default;
-			virtual ~MeshConcept() = default;
+        template<typename T>
+        [[nodiscard]] const T& GetUnsafe() const
+        {
+            return reinterpret_cast<const MeshModel<T>*>(mMesh.get())->Get();
+        }
 
-			virtual const MeshData<Vertex>& GetMeshData() const = 0;
-			virtual const std::filesystem::path& GetName() const = 0;
-			virtual const std::filesystem::path& GetPath() const = 0;
-			virtual AABB3f GetBoundingBox() const = 0;
-			virtual void Render() = 0;
- 		};
+    private:
 
-		template<typename T>
-		class MeshModel final : public MeshConcept
-		{
-		public:
+        class MeshConcept
+        {
+        public:
 
-			explicit MeshModel(T&& mesh)
-				: mMesh(std::move(mesh))
-			{
-			}
+            MeshConcept() = default;
+            virtual ~MeshConcept() = default;
 
-			const MeshData<Vertex>& GetMeshData() const override
-			{
-				return mMesh.GetMeshData();
-			}
+            virtual const MeshData<Vertex>& GetMeshData() const = 0;
+            virtual const std::filesystem::path& GetName() const = 0;
+            virtual const std::filesystem::path& GetPath() const = 0;
+            virtual AABB3f GetBoundingBox() const = 0;
+        };
 
-			const std::filesystem::path& GetName() const override
-			{
-				return mMesh.GetName();
-			}
+        template<typename T>
+        class MeshModel final : public MeshConcept
+        {
+        public:
 
-			const std::filesystem::path& GetPath() const override
-			{
-				return mMesh.GetPath();
-			}
+            explicit MeshModel(T&& mesh)
+                : mMesh(std::move(mesh))
+            {}
 
-			AABB3f GetBoundingBox() const override
-			{
-				return mMesh.GetBoundingBox();
-			}
+            const MeshData<Vertex>& GetMeshData() const override
+            {
+                return mMesh.GetMeshData();
+            }
 
-			void Render() override
-			{
-				mMesh.Render();
-			}
+            const std::filesystem::path& GetName() const override
+            {
+                return mMesh.GetName();
+            }
 
-		private:
+            const std::filesystem::path& GetPath() const override
+            {
+                return mMesh.GetPath();
+            }
 
-			T mMesh;
-		};
+            AABB3f GetBoundingBox() const override
+            {
+                return mMesh.GetBoundingBox();
+            }
 
-	private:
+            [[nodiscard]] T& Get()
+            {
+                return mMesh;
+            }
 
-		std::unique_ptr<MeshConcept> mMesh;
-	};
+            [[nodiscard]] const T& Get() const
+            {
+                return mMesh;
+            }
+
+        private:
+
+            T mMesh;
+        };
+
+    private:
+
+        std::unique_ptr<MeshConcept> mMesh;
+    };
 }

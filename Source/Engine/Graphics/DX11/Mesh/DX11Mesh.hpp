@@ -42,6 +42,11 @@ namespace CLX
 		[[nodiscard]] const std::filesystem::path& GetName() const;
 		[[nodiscard]] const std::filesystem::path& GetPath() const;
 
+		[[nodiscard]] DX11VertexBuffer& GetVertexBuffer()
+		{
+			return mVertexBuffer;
+		}
+
 		[[nodiscard]] const DX11VertexBuffer& GetVertexBuffer() const
 		{
 			return mVertexBuffer;
@@ -56,8 +61,6 @@ namespace CLX
 		{
 			return mMeshData;
 		}
-
-		void Render();
 
 	private:
 

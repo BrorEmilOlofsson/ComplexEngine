@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 
 namespace CLX
 {
@@ -7,16 +8,16 @@ namespace CLX
 
 	namespace ConstantBufferSlots
 	{
-		constexpr unsigned int Camera = 0;
-		constexpr unsigned int Transform = 1;
-		constexpr unsigned int Time = 2;
-		constexpr unsigned int Light = 3;
-		constexpr unsigned int Bone = 4;
-		constexpr unsigned int PostProcess = 5;
-		constexpr unsigned int Pointlight = 6;
-		constexpr unsigned int SkyBox = 7;
-		constexpr unsigned int ObjectID = 8;
-		constexpr unsigned int Color = 9;
+		constexpr uint32_t Camera = 0;
+		constexpr uint32_t Transform = 1;
+		constexpr uint32_t Time = 2;
+		constexpr uint32_t Light = 3;
+		constexpr uint32_t Bone = 4;
+		constexpr uint32_t PostProcess = 5;
+		constexpr uint32_t Pointlight = 6;
+		constexpr uint32_t SkyBox = 7;
+		constexpr uint32_t ObjectID = 8;
+		constexpr uint32_t Color = 9;
 	}
 
 	constexpr std::size_t Global_StartSlot_GBuffer = 5;
@@ -24,10 +25,10 @@ namespace CLX
 
 	namespace TextureSlots
 	{
-		constexpr unsigned int Albedo = 0;
-		constexpr unsigned int Normal = 1;
-		constexpr unsigned int Material = 2;
-		constexpr unsigned int CubeMap = 4;
-		constexpr unsigned int GBufferStart = 5;
+		constexpr uint32_t Albedo = 0;
+		constexpr uint32_t Normal = 1;
+		constexpr uint32_t Material = 2;
+		constexpr uint32_t CubeMap = 4;
+		constexpr uint32_t GBufferStart = 5;
 	}
 }
