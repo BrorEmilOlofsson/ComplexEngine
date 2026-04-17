@@ -1,6 +1,5 @@
 #include "Editor/Precompiled/EditorPch.hpp"
 #include "AudioSettingsWindow.hpp"
-#include "Engine/Audio/AudioManager.hpp"
 #include "Engine/Utility/BlackboardKeys.hpp"
 
 namespace CLX

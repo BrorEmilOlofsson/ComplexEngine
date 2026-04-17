@@ -3,7 +3,6 @@
 #include "Engine/Utility/Win/WinConsole.hpp"
 #include "Engine/Utility/SystemTimer.hpp"
 #include "Engine/Scene/SceneManager.hpp"
-#include "Engine/Audio/AudioManager.hpp"
 #include "Engine/OperatingSystem/OperatingSystem.hpp"
 #include "Engine/SimpleScript/SimpleNodeScript.hpp"
 #include "Engine/Asset/AssetManager.hpp"
@@ -38,8 +37,6 @@ namespace CLX
 		[[nodiscard]] const InputState& GetInputState() const { return mInputState; }
 		[[nodiscard]] SceneManager& GetSceneManager() { return mSceneManager; }
 		[[nodiscard]] const SceneManager& GetSceneManager() const { return mSceneManager; }
-		[[nodiscard]] AudioManager& GetAudioManager() { return mAudioManager; }
-		[[nodiscard]] const AudioManager& GetAudioManager() const { return mAudioManager; }
 		[[nodiscard]] OperatingSystem& GetOperatingSystem() { return mOperatingSystem; }
 		[[nodiscard]] const OperatingSystem& GetOperatingSystem() const { return mOperatingSystem; }
 		[[nodiscard]] WindowView GetMainWindow();
@@ -66,7 +63,6 @@ namespace CLX
 		OperatingSystem mOperatingSystem;
 		[[no_unique_address]] Console mConsole;
 		std::shared_ptr<AssetManager> mAssetManager;
-		AudioManager mAudioManager;
 		SceneManager mSceneManager;
 
 		SystemTimerf mFrameTimer;
