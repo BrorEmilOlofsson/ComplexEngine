@@ -4,7 +4,7 @@
 #include "Editor/Functions/ECSEditorFunctions.hpp"
 #include "Engine/Scene/SceneManager.hpp"
 #include "Engine/Utility/BlackboardKeys.hpp"
-#include "Engine/ECSEngine/Utility/ECSTransformHierarchyUtility.hpp"
+#include "Engine/ECSEngine/Utility/ECSUtilityFunctions.hpp"
 #include "Editor/PopUps/Editor/EntityCompositionPopUp.hpp"
 
 namespace CLX

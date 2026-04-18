@@ -5,7 +5,7 @@
 #include "Engine/Utility/Win/WinConsole.hpp"
 #include "Engine/ECS/ECS.hpp"
 #include "Engine/Camera/CameraMovement.hpp"
-#include "Engine/ECSEngine/Utility/ECSTransformUtility.hpp"
+#include "Engine/ECSEngine/Utility/ECSUtilityFunctions.hpp"
 #include "Engine/Input/InputState.hpp"
 #include "Engine/Graphics/RenderState.hpp"
 #include "Engine/Utility/DebugShapes.hpp"
@@ -38,7 +38,7 @@ namespace CLX
 	{
 		ecs.ForEach([&ecs](const EntityID entityID, CameraComponent& cameraComponent)
 			{
-				cameraComponent.camera.SetTransform(GetWorldTransform(ecs, entityID));
+				cameraComponent.camera.SetTransform(GetEntityWorldTransform(ecs, entityID));
 			});
 	}
 

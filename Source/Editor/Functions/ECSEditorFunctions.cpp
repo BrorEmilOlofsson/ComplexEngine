@@ -6,7 +6,7 @@
 #include "Editor/Command/Commands/SetDataPtrCommand.hpp"
 #include "Engine/ECSEngine/Components/MeshComponent.hpp"
 #include "Engine/ECSEngine/Components/EditorComponent.hpp"
-#include "Engine/ECSEngine/Utility/ECSTransformUtility.hpp"
+#include "Engine/ECSEngine/Utility/ECSUtilityFunctions.hpp"
 #include "Engine/Utility/Camera.hpp"
 #include "Engine/Utility/BlackboardKeys.hpp"
 #include "Engine/Reflection/DataTypeRegistry.hpp"
@@ -14,7 +14,6 @@
 #include "Engine/ECS/EntityComposition.hpp"
 #include "Engine/ECSEngine/Components/EntityCompositionComponent.hpp"
 #include "Engine/ECSEngine/Utility/ECSEntityCompositionUtility.hpp"
-#include "Engine/ECSEngine/Utility/ECSTransformHierarchyUtility.hpp"
 #include "Engine/Utility/Visitor.hpp"
 #include "Engine/Reflection/PropertyPath.hpp"
 
@@ -1021,13 +1020,6 @@ namespace CLX
         return editorActions;
     }
 
-    [[nodiscard]] static const std::string& GetEntityName(const ECS& ecs, const EntityID entityID)
-    {
-        const NameComponent* nameComponent = ecs.GetComponent<NameComponent>(entityID);
-        ASSERT(nameComponent != nullptr);
-        return nameComponent->name;
-    }
-
     [[nodiscard]] EditorAction CreateSetEntitySelectionAction(const EntityID entityID, std::set<EntityID>& selectedEntityIDs)
     {
         return [entityID, &selectedEntityIDs](EditorCommandTracker& commandTracker)
@@ -1161,7 +1153,7 @@ namespace CLX
                 {
                     if (selectedEntityID != InvalidEntityID)
                     {
-                        InsertRange(parentEntites, GetParents(ecs, selectedEntityID));
+                        InsertRange(parentEntites, GetEntityParents(ecs, selectedEntityID));
                     }
                 }
             }
@@ -1644,7 +1636,7 @@ namespace CLX
         {
             return;
         }
-        const Point3f entityPos = GetWorldTransform(ecs, entityID).GetPosition();
+        const Point3f entityPos = GetEntityWorldTransform(ecs, entityID).GetPosition();
         const Point3f oldCamPos = camera.GetTransform().GetPosition();
         if (entityPos == oldCamPos)
         {

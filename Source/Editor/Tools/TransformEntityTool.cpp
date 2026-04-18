@@ -2,7 +2,7 @@
 #include "TransformEntityTool.hpp"
 #include "Editor/Command/Core/EditorCommandTracker.hpp"
 #include "Editor/Utility/EditorUtilities.hpp"
-#include "Engine/ECSEngine/Utility/ECSTransformUtility.hpp"
+#include "Engine/ECSEngine/Utility/ECSUtilityFunctions.hpp"
 #include <External/imgui/imguizmo/imguizmo.h>
 
 namespace CLX
@@ -32,7 +32,7 @@ namespace CLX
 		TransformComponent* transformComponent = ecs.GetComponent<TransformComponent>(selectedEntityID);
 		ASSERT_NEW(transformComponent != nullptr, "Selected entity does not have a TransformComponent.");
 
-		Matrix4x4f objectMatrix = GetWorldTransform(ecs, selectedEntityID).GetMatrix();
+		Matrix4x4f objectMatrix = GetEntityWorldTransform(ecs, selectedEntityID).GetMatrix();
 		const Matrix4x4f view = camera.GetViewMatrix();
 		const Matrix4x4f proj = camera.GetProjectionMatrix();
 
@@ -76,7 +76,7 @@ namespace CLX
 
 		if (isManipulatingEntityTransform)
 		{
-			const Transform localTransform = GetLocalTransform(ecs, selectedEntityID, Transform::FromMatrix(objectMatrix));
+			const Transform localTransform = GetEntityLocalTransform(ecs, selectedEntityID, Transform::FromMatrix(objectMatrix));
 
 			switch (operation)
 			{

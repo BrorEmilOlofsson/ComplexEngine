@@ -4,7 +4,7 @@
 #include "Engine/ECSEngine/Components/EntityCompositionComponent.hpp"
 #include "Engine/ECS/EntityComposition.hpp"
 #include "Engine/ECSEngine/Components/TransformHierarchyComponent.hpp"
-#include "Engine/ECSEngine/Utility/ECSTransformHierarchyUtility.hpp"
+#include "Engine/ECSEngine/Utility/ECSUtilityFunctions.hpp"
 
 namespace CLX
 {

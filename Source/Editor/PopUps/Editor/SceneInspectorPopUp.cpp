@@ -4,7 +4,7 @@
 #include "Engine/ECS/ECS.hpp"
 #include "Editor/PopUps/Editor/SceneHierarchyPopUp.hpp"
 #include "Editor/Functions/ECSEditorFunctions.hpp"
-#include "Engine/ECSEngine/Utility/ECSTransformUtility.hpp"
+#include "Engine/ECSEngine/Utility/ECSUtilityFunctions.hpp"
 #include "Engine/Utility/BlackboardKeys.hpp"
 #include "Engine/Scene/SceneManager.hpp"
 
@@ -29,7 +29,7 @@ namespace CLX
 			
 			auto entityNameAction = ShowEntityName(ecs, selectedEntityID, input);
 
-			const Transform worldTransform = GetWorldTransform(ecs, selectedEntityID);
+			const Transform worldTransform = GetEntityWorldTransform(ecs, selectedEntityID);
 
 			Blackboard newBlackboard = blackboard;
 			newBlackboard.Insert<Key_CurrentCamera>(camera);

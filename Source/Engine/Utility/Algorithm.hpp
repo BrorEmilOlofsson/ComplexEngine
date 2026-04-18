@@ -39,6 +39,11 @@ namespace CLX
 		return std::wstring(string.begin(), string.end());
 	}
 
+	constexpr std::wstring ToWString(const char* string)
+	{
+        return ToWString(std::string(string));
+	}
+
 	constexpr std::string ConvertTypeIndexNameToPrettyName(const std::string& nameFromTypeIndex)
 	{
 		size_t pos = nameFromTypeIndex.find_last_of("::"); //NOTE(v9.30.10): For struct/classes with namespaces

@@ -1,5 +1,6 @@
 #include "Engine/Precompiled/EnginePch.hpp"
 #include "EntityComposition.hpp"
+#include "ECSRegistry.hpp"
 
 namespace CLX
 {

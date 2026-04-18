@@ -37,5 +37,4 @@
 #include "Engine/ECSEngine/Components/TransformComponent.hpp"
 #include "Engine/ECSEngine/Components/TransformHierarchyComponent.hpp"
 #include "Engine/ECSEngine/Components/NameComponent.hpp"
-#include "Engine/ECSEngine/Components/MeshComponent.hpp"
-#include "Engine/ECSEngine/Utility/ECSTransformUtility.hpp"
+#include "Engine/ECSEngine/Utility/ECSUtilityFunctions.hpp"

@@ -7,8 +7,7 @@
 #include "Editor/EditorSceneSettings.hpp"
 #include "Engine/Utility/DebugShapes.hpp"
 #include "Engine/OperatingSystem/OperatingSystem.hpp"
-#include "Engine/ECSEngine/Utility/ECSTransformUtility.hpp"
-#include "Engine/ECSEngine/Utility/ECSTransformHierarchyUtility.hpp"
+#include "Engine/ECSEngine/Utility/ECSUtilityFunctions.hpp"
 #include "Engine/ECS/ECSSerializer.hpp"
 #include "Engine/Asset/AssetManager.hpp"
 
@@ -30,7 +29,7 @@ namespace CLX
             const EntityID selectedEntityID = selectedEntityIDs.size() == 1 ? *selectedEntityIDs.begin() : InvalidEntityID;
             if (selectedEntityID != InvalidEntityID)
             {
-                const Transform transform = GetWorldTransform(entityCompositionAsset->GetECS(), selectedEntityID);
+                const Transform transform = GetEntityWorldTransform(entityCompositionAsset->GetECS(), selectedEntityID);
                 newBlackboard.Insert<Key_ReferenceTransform>(transform);
             }
 

@@ -109,6 +109,15 @@ namespace CLX
         assetManager.Rename(path, newName);
     }
 
+    EntityComposition CreateEntityComposition(const ECSRegistry& ecsRegistry)
+    {
+        EntityComposition entityComposition(ecsRegistry);
+        NameComponent* nameComponent = entityComposition.GetECS().GetComponent<NameComponent>(entityComposition.GetRootEntity());
+        ASSERT(nameComponent);
+        nameComponent->name = "Root";
+        return entityComposition;
+    }
+
     static void ShowAssetCreationPopUp(const std::filesystem::path& directoryPath, bool& canOpenPopUp, AssetManager& assetManager, const DataTypeRegistry& dataTypeRegistry, const ECSRegistry& ecsRegistry)
     {
         static constexpr const char* CreateAssetMenuPopupName = "CreateAssetMenu";
@@ -172,8 +181,8 @@ namespace CLX
             ImGui::BeginDisabled(std::strlen(name) == 0);
             if (ImGui::Button("Create"))
             {
-                const std::filesystem::path path = directoryPath / (std::string(name) + ".ecomp");
-                EntityCompositionAsset asset(EntityComposition(ecsRegistry), path);
+                const std::filesystem::path path = directoryPath / (ToWString(name) + std::wstring(AssetExtensions::EntityComposition));
+                EntityCompositionAsset asset(CreateEntityComposition(ecsRegistry), path);
                 auto assetHandle = assetManager.AddEntityComposition(asset);
                 SaveEntityCompositionAsset(assetHandle, dataTypeRegistry);
 

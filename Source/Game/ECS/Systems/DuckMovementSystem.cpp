@@ -71,8 +71,8 @@ struct LessDistanceSorter
 
     bool operator()(CLX::EntityID lhs, CLX::EntityID rhs) const
     {
-        const float distance1 = CLX::DistanceSquared(GetWorldTransform(ecs, lhs).GetPosition(), targetPoint);
-        const float distance2 = CLX::DistanceSquared(GetWorldTransform(ecs, rhs).GetPosition(), targetPoint);
+        const float distance1 = CLX::DistanceSquared(GetEntityWorldTransform(ecs, lhs).GetPosition(), targetPoint);
+        const float distance2 = CLX::DistanceSquared(GetEntityWorldTransform(ecs, rhs).GetPosition(), targetPoint);
         return distance1 < distance2;
     }
 };
@@ -94,12 +94,12 @@ static void UpdateFollowMovement(CLX::ECS& ecs, const float deltaTime)
                 })
                 | std::ranges::to<std::vector>();
 
-            const CLX::Transform parentTransform = GetWorldTransform(ecs, entityID);
+            const CLX::Transform parentTransform = GetEntityWorldTransform(ecs, entityID);
             std::ranges::sort(ducklingChildren, LessDistanceSorter{ parentTransform.GetPosition(), ecs});
 
             auto moveTowardsTarget = [&ecs](const CLX::EntityID ducklingID, const CLX::Point3f& target, const float speed, const float deltaTime)
                 {
-                    const CLX::Transform ducklingTransform = GetWorldTransform(ecs, ducklingID);
+                    const CLX::Transform ducklingTransform = GetEntityWorldTransform(ecs, ducklingID);
                     const CLX::Point3f currentPosition = ducklingTransform.GetPosition();
                     constexpr float minDistance = 0.5f;
                     if (CLX::IsInRange(currentPosition, target, minDistance))
@@ -112,7 +112,7 @@ static void UpdateFollowMovement(CLX::ECS& ecs, const float deltaTime)
                     CLX::Transform newTransform = ducklingTransform;
                     newTransform.SetPosition(newPosition);
 
-                    ecs.GetComponent<CLX::TransformComponent>(ducklingID)->transform = GetLocalTransform(ecs, ducklingID, newTransform);
+                    ecs.GetComponent<CLX::TransformComponent>(ducklingID)->transform = GetEntityLocalTransform(ecs, ducklingID, newTransform);
                 };
             {
                 const CLX::Point3f target = parentTransform.GetPosition();
@@ -125,7 +125,7 @@ static void UpdateFollowMovement(CLX::ECS& ecs, const float deltaTime)
                 const CLX::EntityID ducklingID = ducklingChildren[i];
                 const CLX::EntityID previousEntityID = ducklingChildren[i - 1];
 
-                const CLX::Transform previousTransform = GetWorldTransform(ecs, previousEntityID);
+                const CLX::Transform previousTransform = GetEntityWorldTransform(ecs, previousEntityID);
 
                 const CLX::Point3f target = CLX::Lerp(previousTransform.GetPosition(), parentTransform.GetPosition(), 0.2f);
 

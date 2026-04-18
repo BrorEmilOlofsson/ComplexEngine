@@ -6,7 +6,7 @@
 #include "Engine/ECS/EntityID.hpp"
 #include "Engine/Utility/Blackboard.hpp"
 #include "Engine/Asset/AssetTypes/EntityCompositionAsset.hpp"
-#include "Engine/ECSEngine/Utility/ECSTransformUtility.hpp"
+#include "Engine/ECSEngine/Utility/ECSUtilityFunctions.hpp"
 #include "Engine/Reflection/JsonAny.hpp"
 
 namespace CLX

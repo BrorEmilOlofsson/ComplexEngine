@@ -9,7 +9,7 @@
 #include "Engine/ECSEngine/Components/AnimatedModelComponent.hpp"
 #include "Engine/ECSEngine/Components/SkyBoxComponent.hpp"
 #include "Engine/ECSEngine/Components/ArrowComponent.hpp"
-#include "Engine/ECSEngine/Utility/ECSTransformUtility.hpp"
+#include "Engine/ECSEngine/Utility/ECSUtilityFunctions.hpp"
 #include "Engine/Graphics/RenderList.hpp"
 #include "Engine/Graphics/GraphicsSettings.hpp"
 #include "Engine/Graphics/SkyBox/SkyBox.hpp"
@@ -118,7 +118,7 @@ namespace CLX
     {
         ecs.ForEach([&ecs](const EntityID entityID, Sprite3DComponent& sprite3DComponent)
             {
-                sprite3DComponent.sprite.mTransform = GetWorldTransform(ecs, entityID);
+                sprite3DComponent.sprite.mTransform = GetEntityWorldTransform(ecs, entityID);
             });
     }
 
@@ -147,7 +147,7 @@ namespace CLX
                 {
                     return;
                 }
-                const Transform worldTransform = GetWorldTransform(ecs, entityID);
+                const Transform worldTransform = GetEntityWorldTransform(ecs, entityID);
                 if (shouldRenderBoundingBox)
                 {
                     renderList.AddBoundingBox(DrawBoundingBox(worldTransform, meshComponent.mesh->GetBoundingBox(), Colors::LightGreen));
@@ -175,7 +175,7 @@ namespace CLX
                 {
                     return;
                 }
-                const Transform worldTransform = GetWorldTransform(ecs, entityID);
+                const Transform worldTransform = GetEntityWorldTransform(ecs, entityID);
                 if (shouldRenderBoundingBox)
                 {
                     renderList.AddBoundingBox(DrawBoundingBox(worldTransform, modelComponent.model->GetBoundingBox(), Colors::LightGreen));
@@ -208,7 +208,7 @@ namespace CLX
                     return;
                 }
 
-                const Transform worldTransform = GetWorldTransform(ecs, entityID);
+                const Transform worldTransform = GetEntityWorldTransform(ecs, entityID);
 
                 auto globalBoneMatrices = ComputeGlobalTransforms(
                     animatedModelComponent.animationPlayer.localBoneMatrices,
@@ -288,7 +288,7 @@ namespace CLX
     {
         ecs.ForEach([&](const EntityID entityID, const ArrowComponent& arrowComponent)
             {
-                const Transform& worldTransform = GetWorldTransform(ecs, entityID);
+                const Transform& worldTransform = GetEntityWorldTransform(ecs, entityID);
                 DrawArrow arrow
                 {
                     .startPoint = worldTransform.GetPosition(),

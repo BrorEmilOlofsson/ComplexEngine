@@ -4,7 +4,7 @@
 #include "Engine/ECSEngine/Components/PointLightComponent.hpp"
 #include "Engine/ECSEngine/Components/TransformComponent.hpp"
 #include "Engine/Graphics/RenderState.hpp"
-#include "Engine/ECSEngine/Utility/ECSTransformUtility.hpp"
+#include "Engine/ECSEngine/Utility/ECSUtilityFunctions.hpp"
 
 namespace CLX
 {
@@ -14,7 +14,7 @@ namespace CLX
 		ecs.ForEach([&ecs, &renderList](const EntityID entityID, const PointLightComponent& pointLightComponent)
 			{
 				PointLight p = pointLightComponent.pointLight;
-				p.position = GetWorldTransform(ecs, entityID).GetPosition();
+				p.position = GetEntityWorldTransform(ecs, entityID).GetPosition();
 				renderList.AddPointLight(p);
 			});
 	}
