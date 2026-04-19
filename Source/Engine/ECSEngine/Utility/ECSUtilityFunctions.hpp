@@ -198,6 +198,21 @@ namespace CLX
         return ancestors;
     }
 
+    template<typename T>
+    [[nodiscard]] inline bool HasAncestorComponent(const ECS& ecs, const EntityID entityID, const bool includeSelf)
+    {
+        EntityID entityToCheck = includeSelf ? entityID : GetParentEntity(ecs, entityID);
+        while (entityToCheck != InvalidEntityID)
+        {
+            if (ecs.HasComponent<T>(entityToCheck))
+            {
+                return true;
+            }
+            entityToCheck = GetParentEntity(ecs, entityToCheck);
+        }
+        return false;
+    }
+
     inline const Transform& GetEntityTransform(const ECS& ecs, const EntityID entityID)
     {
         const TransformComponent* transformComponent = ecs.GetComponent<TransformComponent>(entityID);

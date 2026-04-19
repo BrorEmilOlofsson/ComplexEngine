@@ -31,6 +31,7 @@ namespace CLX
         CopyFunction copy;
         MoveFunction move;
         SwapFunction swap;
+        EqualsFunction equals;
 
         std::size_t size = std::numeric_limits<std::size_t>::max();
         std::size_t alignment = std::numeric_limits<std::size_t>::max();

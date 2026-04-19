@@ -35,6 +35,27 @@ namespace CLX
         range.insert(range.end(), range2.begin(), range2.end());
     }
 
+    bool AreEntitiesEqual(const ECS& ecs1, const EntityID entityID1, const ECS& ecs2, const EntityID entityID2, const DataTypeRegistry& dataTypeRegistry)
+    {
+        for (auto [type1, type2] : std::views::zip(ecs1.ViewEntity(entityID1), ecs2.ViewEntity(entityID2)))
+        {
+            if (type1.first != type2.first)
+            {
+                return false;
+            }
+            else
+            {
+                if (!dataTypeRegistry.EqualsData(GetDataTypeID(type1.first), type1.second, type2.second))
+                {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+
     static std::size_t GetEntityIndexInParent(const ECS& ecs, const EntityID entityID, std::vector<EntityID>& rootEntities)
     {
         const EntityID parentID = GetParentEntity(ecs, entityID);
@@ -1226,7 +1247,8 @@ namespace CLX
             };
     }
 
-    [[nodiscard]] static std::optional<EditorAction> ShowComponentData(ECS& ecs, const EntityID entityID, const std::type_info& typeInfo, void* componentPtr, bool& anyActiveItem, ECS& ecsBuffer,
+    [[nodiscard]] static std::optional<EditorAction> ShowComponentData(ECS& ecs, const EntityID entityID, const std::type_index type,
+        void* componentPtr, bool& anyActiveItem, ECS& ecsBuffer,
         JsonAny& copiedComponent, const DataTypeRegistry& dataTypeRegistry, const Blackboard& blackboard)
     {
         PROFILER_FUNCTION(profiler::colors::Lime400);
@@ -1234,7 +1256,7 @@ namespace CLX
         ASSERT(componentPtr != nullptr);
         ImGui::AlignTextToFramePadding();
 
-        const DataTypeID componentDataTypeID = GetDataTypeID(typeInfo);
+        const DataTypeID componentDataTypeID = GetDataTypeID(type);
 
         const DataType* dataType = dataTypeRegistry.Find(componentDataTypeID);
         if (dataType == nullptr)
@@ -1271,15 +1293,20 @@ namespace CLX
             const ViewAndEditResult viewAndEditResult = dataTypeRegistry.ViewAndEditData(componentDataTypeID, componentPtr, newBlackboard);
             anyActiveItem |= viewAndEditResult.isActive;
             PROFILER_END();
+
+            if (viewAndEditResult.isEdited)
+            {
+                std::println("{}", HasAncestorComponent<EntityCompositionComponent>(ecs, entityID, true));
+            }
         }
 
         std::optional<EditorAction> removeComponentAction;
         if (ImGui::BeginPopup("Component Options"))
         {
-            ImGui::BeginDisabled(ecs.GetRegistry().GetComponentType(GetDataTypeID(typeInfo)).isDefault);
+            ImGui::BeginDisabled(ecs.GetRegistry().GetComponentType(GetDataTypeID(type)).isDefault);
             if (ImGui::MenuItem("Remove"))
             {
-                removeComponentAction = CreateRemoveComponentAction(ecs, entityID, GetDataTypeID(typeInfo), ecsBuffer);
+                removeComponentAction = CreateRemoveComponentAction(ecs, entityID, GetDataTypeID(type), ecsBuffer);
             }
             ImGui::EndDisabled();
 
@@ -1331,16 +1358,12 @@ namespace CLX
 
         auto doCommand = [](const SetNameData& data)
             {
-                NameComponent* nameComponent = data.ecs.get().GetComponent<NameComponent>(data.entityID);
-                ASSERT(nameComponent != nullptr);
-                nameComponent->name = data.newName;
+                SetEntityName(data.ecs, data.entityID, data.newName);
             };
 
         auto undoCommand = [](const SetNameData& data)
             {
-                NameComponent* nameComponent = data.ecs.get().GetComponent<NameComponent>(data.entityID);
-                ASSERT(nameComponent != nullptr);
-                nameComponent->name = data.oldName;
+                SetEntityName(data.ecs, data.entityID, data.oldName);
             };
 
         commandTracker.ExecuteCommand(EditorCommand(data, doCommand, undoCommand, "Set Entity Name"));
@@ -1423,9 +1446,9 @@ namespace CLX
             };
     }
 
-    [[nodiscard]] bool ShouldHideComponent(const std::type_info& typeInfo)
+    [[nodiscard]] bool ShouldHideComponent(const std::type_index type)
     {
-        return (typeInfo == typeid(NameComponent) || typeInfo == typeid(TransformHierarchyComponent)) || typeInfo == typeid(EditorComponent);
+        return (type == typeid(NameComponent) || type == typeid(TransformHierarchyComponent)) || type == typeid(EditorComponent);
     }
 
     [[nodiscard]] std::vector<EditorAction> ShowEntityComponents(ECS& ecs, const EntityID selectedEntityID, bool& anyItemActiveLastFrame,
@@ -1443,9 +1466,9 @@ namespace CLX
         std::vector<EditorAction> editorActions;
 
         static bool showAllComponents = false;
-        for (auto [typeInfo, componentPtr] : ecs.ViewEntity(selectedEntityID))
+        for (auto [type, componentPtr] : ecs.ViewEntity(selectedEntityID))
         {
-            bool isHiddenComponent = ShouldHideComponent(typeInfo);
+            bool isHiddenComponent = ShouldHideComponent(type);
             if (isHiddenComponent)
             {
                 if (showAllComponents)
@@ -1460,7 +1483,7 @@ namespace CLX
             auto editorAction = ShowComponentData(
                 ecs,
                 selectedEntityID,
-                typeInfo,
+                type,
                 componentPtr,
                 anyActiveItem,
                 ecsBuffer,

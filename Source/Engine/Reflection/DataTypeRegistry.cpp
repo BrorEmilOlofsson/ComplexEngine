@@ -46,6 +46,34 @@ namespace CLX
         mDataTypes.at(dataTypeID).destroy(dataPtr);
     }
 
+    void DataTypeRegistry::MoveData(DataTypeID dataTypeID, void* destination, void* source) const
+    {
+        mDataTypes.at(dataTypeID).move(destination, source);
+    }
+
+    bool DataTypeRegistry::EqualsData(DataTypeID dataTypeID, const void* dataPtr1, const void* dataPtr2) const
+    {
+        if (EqualsFunction equalsFunction = mDataTypes.at(dataTypeID).equals)
+        {
+            return equalsFunction(dataPtr1, dataPtr2);
+        }
+
+        for (auto member : mDataTypes.at(dataTypeID).memberVariables)
+        {
+            const DataType* memberDataType = Find(member.dataTypeID);
+            ASSERT(memberDataType != nullptr);
+            const void* memberDataPtr1 = dataPtr1 + std::get<ByteOffset>(member.memberType);
+            const void* memberDataPtr2 = dataPtr2 + std::get<ByteOffset>(member.memberType);
+            if (!EqualsData(member.dataTypeID, memberDataPtr1, memberDataPtr2))
+            {
+                return false;
+            }
+        }
+
+        return true;
+
+    }
+
     size_t DataTypeRegistry::GetDataTypeSize(DataTypeID dataTypeID) const
     {
         return mDataTypes.at(dataTypeID).size;

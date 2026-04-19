@@ -146,6 +146,11 @@ namespace CLX
         return EntityView(this, entityID);
     }
 
+    ECS::ConstEntityView ECS::ViewEntity(const EntityID entityID) const
+    {
+        return ConstEntityView(this, entityID);
+    }
+
     const ECSRegistry& ECS::GetRegistry() const
     {
         return mRegistry;

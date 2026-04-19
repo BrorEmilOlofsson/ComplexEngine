@@ -337,6 +337,9 @@ namespace CLX
             {
             public:
 
+                using difference_type = std::ptrdiff_t;
+                using value_type = std::pair<std::type_index, void*>;
+
                 TypeErasedComponentIterator(ECS* ecs, EntityID entityID)
                     : mECS(ecs)
                     , mEntityID(entityID)
@@ -356,10 +359,10 @@ namespace CLX
                     return *this;
                 }
 
-                [[nodiscard]] std::pair<const std::type_info&, void*> operator*()
+                [[nodiscard]] value_type operator*() const
                 {
                     auto& componentPool = mECS->GetComponentPool(mComponentTypeIndices[mCurrentIndex]);
-                    return std::pair<const std::type_info&, void*>{ componentPool.GetTypeInfo(), componentPool.GetComponent(mEntityID) };
+                    return value_type{ componentPool.GetType(), componentPool.GetComponent(mEntityID) };
                 }
 
                 [[nodiscard]] friend bool operator==(const TypeErasedComponentIterator& a, const TypeErasedComponentIterator& b)
@@ -381,12 +384,12 @@ namespace CLX
                 , mEntityID(entityID)
             {}
 
-            [[nodiscard]] TypeErasedComponentIterator begin() const
+            [[nodiscard]] TypeErasedComponentIterator begin()
             {
                 return TypeErasedComponentIterator(mECS, mEntityID);
             }
 
-            [[nodiscard]] TypeErasedComponentIterator end() const
+            [[nodiscard]] TypeErasedComponentIterator end()
             {
                 return TypeErasedComponentIterator(mECS, mEntityID, BitMaskToIndices(mECS->mEntityData[mEntityID.id].mask).size());
             }
@@ -413,11 +416,18 @@ namespace CLX
             EntityID mEntityID;
         };
 
-        class ConstEntityView final
+        class ConstEntityView final : public std::ranges::view_interface<ConstEntityView>
         {
+        public:
             class ConstTypeErasedComponentIterator final
             {
             public:
+                
+                using difference_type = std::ptrdiff_t; 
+                using value_type = std::pair<const std::type_info&, const void*>;
+
+
+                ConstTypeErasedComponentIterator() = default;
 
                 ConstTypeErasedComponentIterator(const ECS* ecs, EntityID entityID)
                     : mECS(ecs)
@@ -438,10 +448,15 @@ namespace CLX
                     return *this;
                 }
 
-                [[nodiscard]] std::pair<const std::type_info&, const void*> operator*()
+                void operator++(int)
+                {
+                    mCurrentIndex++;
+                }
+
+                [[nodiscard]] std::pair<std::type_index, const void*> operator*() const
                 {
                     const auto& componentPool = mECS->GetComponentPool(mComponentTypeIndices[mCurrentIndex]);
-                    return std::pair<const std::type_info&, const void*>{ componentPool.GetTypeInfo(), componentPool.GetComponent(mEntityID) };
+                    return std::pair<std::type_index, const void*>{ componentPool.GetType(), componentPool.GetComponent(mEntityID) };
                 }
 
                 [[nodiscard]] friend bool operator==(const ConstTypeErasedComponentIterator& a, const ConstTypeErasedComponentIterator& b)
@@ -458,10 +473,22 @@ namespace CLX
             };
         public:
 
+            ConstEntityView() = default;
+
             ConstEntityView(const ECS* ecs, const EntityID entityID)
                 : mECS(ecs)
                 , mEntityID(entityID)
             {}
+
+            [[nodiscard]] ConstTypeErasedComponentIterator begin()
+            {
+                return ConstTypeErasedComponentIterator(mECS, mEntityID);
+            }
+
+            [[nodiscard]] ConstTypeErasedComponentIterator end()
+            {
+                return ConstTypeErasedComponentIterator(mECS, mEntityID, BitMaskToIndices(mECS->mEntityData[mEntityID.id].mask).size());
+            }
 
             [[nodiscard]] ConstTypeErasedComponentIterator begin() const
             {
@@ -684,6 +711,7 @@ namespace CLX
         [[nodiscard]] EntityCollectionView ViewEntities();
         [[nodiscard]] ConstEntityCollectionView ViewEntities() const;
         [[nodiscard]] EntityView ViewEntity(const EntityID entityID);
+        [[nodiscard]] ConstEntityView ViewEntity(const EntityID entityID) const;
 
         [[nodiscard]] std::size_t GetEntityCount() const;
 

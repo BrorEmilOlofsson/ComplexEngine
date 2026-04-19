@@ -200,7 +200,7 @@ namespace CLX
 
 		template<typename T>
 		constexpr explicit ComponentPoolSBO(std::type_identity<T>)
-			: mTypeInfo(&typeid(T))
+			: mType(std::type_index(typeid(T)))
 		{
 			using M = Model<T>;
 			static_assert(sizeof(M) == BufferSize);
@@ -214,7 +214,7 @@ namespace CLX
 		}
 
 		ComponentPoolSBO(const ComponentPoolSBO& other)
-			: mTypeInfo(other.mTypeInfo)
+			: mType(other.mType)
 		{
 			other.GetConcept()->Clone(GetConcept());
 		}
@@ -223,12 +223,12 @@ namespace CLX
 		{
 			ComponentPoolSBO temp(other);
 			mBuffer.swap(temp.mBuffer);
-			mTypeInfo = other.mTypeInfo;
+			mType = other.mType;
 			return *this;
 		}
 
 		ComponentPoolSBO(ComponentPoolSBO&& other) noexcept
-			: mTypeInfo(std::exchange(other.mTypeInfo, nullptr))
+			: mType(other.mType)
 		{
 			other.GetConcept()->Move(GetConcept());
 		}
@@ -237,7 +237,7 @@ namespace CLX
 		{
 			ComponentPoolSBO temp(std::move(other));
 			mBuffer.swap(temp.mBuffer);
-			mTypeInfo = std::exchange(other.mTypeInfo, nullptr);
+			mType = other.mType;
 
 			return *this;
 		}
@@ -294,9 +294,9 @@ namespace CLX
 			GetConcept()->ResizeComponentIndices(size);
 		}
 
-		[[nodiscard]] const std::type_info& GetTypeInfo() const
+		[[nodiscard]] std::type_index GetType() const
 		{
-			return *mTypeInfo;
+			return mType;
 		}
 
 	private:
@@ -439,6 +439,6 @@ namespace CLX
 		static constexpr std::size_t BufferAlignment = 16;
 
 		alignas(BufferAlignment) std::array<std::byte, BufferSize> mBuffer = {};
-		const std::type_info* mTypeInfo = nullptr;
+		std::type_index mType;
 	};
 }

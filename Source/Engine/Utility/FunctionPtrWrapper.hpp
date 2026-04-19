@@ -13,6 +13,8 @@ namespace CLX
         using FunctionType = Ret(Args...);
     public:
 
+        constexpr FunctionPtrWrapper() = default;
+
         constexpr FunctionPtrWrapper(FunctionType* functionPtr)
             : mFunctionPtr(functionPtr)
         {}

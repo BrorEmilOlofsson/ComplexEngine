@@ -312,16 +312,19 @@ namespace CLX
 			if (ImGui::MenuItem("Delete"))
 			{
 				vector.erase(begin(vector) + currentPopupIndex);
+				result.isEdited = true;
 			}
 
 			if (ImGui::MenuItem("Insert Before"))
 			{
 				vector.insert(begin(vector) + currentPopupIndex, T());
+				result.isEdited = true;
 			}
 
 			if (ImGui::MenuItem("Reset Value"))
 			{
 				vector[currentPopupIndex] = T();
+				result.isEdited = true;
 			}
 
 			result.isActive = true;
@@ -333,6 +336,7 @@ namespace CLX
 		{
 			vector.emplace_back();
 
+			result.isEdited = true;
 			result.isActive |= ImGui::IsItemActive();
 		}
 

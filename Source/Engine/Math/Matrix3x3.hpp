@@ -127,7 +127,8 @@ namespace CLX
 		return transposed;
 	}
 
-	[[nodiscard]] constexpr bool operator==(const Matrix3x3f& a, const Matrix3x3f& b) noexcept
+	template<typename T>
+	[[nodiscard]] constexpr bool operator==(const Matrix3x3<T>& a, const Matrix3x3<T>& b) noexcept
 	{
 		for (unsigned int i = 0; i < 9; ++i)
 		{

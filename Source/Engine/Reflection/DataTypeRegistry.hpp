@@ -89,6 +89,8 @@ namespace CLX
         void CopyData(DataTypeID dataTypeID, void* destinationPtr, const void* sourcePtr) const;
         void SwapData(DataTypeID dataTypeID, void* dataPtr1, void* dataPtr2) const;
         void DestroyData(DataTypeID dataTypeID, void* dataPtr) const;
+        void MoveData(DataTypeID dataTypeID, void* destinationPtr, void* sourcePtr) const;
+        bool EqualsData(DataTypeID dataTypeID, const void* dataPtr1, const void* dataPtr2) const;
 
         [[nodiscard]] DataType* Find(DataTypeID dataTypeID);
         [[nodiscard]] const DataType* Find(DataTypeID dataTypeID) const;
@@ -177,6 +179,20 @@ namespace CLX
             containingValueDataTypeID = GetDataTypeID<typename T::value_type>();
         }
 
+        EqualsFunction equalsFunction;
+        if constexpr (IsVector<T>)
+        {
+            using ValueType = typename T::value_type;
+            if constexpr (std::equality_comparable<ValueType>)
+            {
+                equalsFunction = CreateEqualsFunction<T>();
+            }
+        }
+        else if constexpr (std::equality_comparable<T>)
+        {
+            equalsFunction = CreateEqualsFunction<T>();
+        }
+
         DataType dataType
         {
             .name = std::move(name),
@@ -186,6 +202,7 @@ namespace CLX
             .copy = CreateCopyFunction<T>(),
             .move = CreateMoveFunction<T>(),
             .swap = CreateSwapFunction<T>(),
+            .equals = equalsFunction,
             .size = sizeof(T),
             .alignment = alignof(T),
             .type = std::type_index(typeInfo),

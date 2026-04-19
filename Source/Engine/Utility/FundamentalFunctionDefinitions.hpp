@@ -9,6 +9,7 @@
 
 namespace CLX
 {
+
     using InplaceConstructFunction = FunctionPtrWrapper<void(void*, const void*), struct InplaceFTag>;
     using DestroyFunction = FunctionPtrWrapper<void(void*), struct DestructFTag>;
     using CopyConstructFunction = FunctionPtrWrapper<void(void*, const void*), struct CopyConstructFTag>;
@@ -16,7 +17,7 @@ namespace CLX
     using MoveConstructFunction = FunctionPtrWrapper<void(void*, void*), struct MoveConstructFTag>;
     using MoveFunction = FunctionPtrWrapper<void(void*, void*), struct MoveFTag>;
     using SwapFunction = FunctionPtrWrapper<void(void*, void*), struct SwapFTag>;
-
+    using EqualsFunction = FunctionPtrWrapper<bool(const void*, const void*), struct EqualsFTag>;
 
     template<typename T>
     [[nodiscard]] constexpr InplaceConstructFunction CreateInplaceConstructFunction()
@@ -112,6 +113,18 @@ namespace CLX
                 using std::swap;
 
                 swap(value1, value2);
+            });
+    }
+
+    template<std::equality_comparable T>
+    [[nodiscard]] constexpr EqualsFunction CreateEqualsFunction()
+    {
+        return EqualsFunction(
+            [](const void* dataPtr1, const void* dataPtr2) -> bool
+            {
+                const T& value1 = *reinterpret_cast<const T*>(dataPtr1);
+                const T& value2 = *reinterpret_cast<const T*>(dataPtr2);
+                return value1 == value2;
             });
     }
 }
