@@ -4,6 +4,7 @@
 #include <type_traits>
 #include <cstring>
 #include <utility>
+#include <concepts>
 
 #include "Engine/Utility/FunctionPtrWrapper.hpp"
 

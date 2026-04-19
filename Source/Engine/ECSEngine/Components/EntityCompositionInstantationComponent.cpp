@@ -1,0 +1,12 @@
+#include "Engine/Precompiled/EnginePch.hpp"
+#include "EntityCompositionInstantiationComponent.hpp"
+#include "Engine/Reflection/Reflection.hpp"
+
+namespace CLX
+{
+
+	void RegisterEntityCompositionInstantiationComponent() {}
+
+	REGISTER_COMPONENT(EntityCompositionInstantiationComponent);
+	REGISTER_MEMBER(EntityCompositionInstantiationComponent::mappedEntityID, NoEdit{});
+}

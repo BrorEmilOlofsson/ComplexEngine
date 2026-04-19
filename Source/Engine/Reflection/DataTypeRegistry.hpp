@@ -7,6 +7,7 @@
 #include <typeinfo>
 #include <any>
 #include <functional>
+#include <string_view>
 #include <optional>
 
 #include <External/nlohmann/json.hpp>
@@ -55,31 +56,13 @@ namespace CLX
         std::function<void(void* ownerPtr, const void* newValuePtr)> setFunction;
     };
 
-    template<typename MemberType, typename OwnerType>
-    [[nodiscard]] constexpr ByteOffset GetByteOffset(MemberType OwnerType::* member)
-    {
-        return ByteOffset{ (std::size_t) & reinterpret_cast<const volatile char&>((((OwnerType*)0)->*member)) };
-    }
-
-    template<typename T>
-    [[nodiscard]] constexpr T* operator+(T* ptr, const ByteOffset offset)
-    {
-        return static_cast<T*>(static_cast<char*>(ptr) + offset.value);
-    }
-
-    template<typename T>
-    [[nodiscard]] constexpr const T* operator+(const T* ptr, const ByteOffset offset)
-    {
-        return static_cast<const T*>(static_cast<const char*>(ptr) + offset.value);
-    }
-
     class DataTypeRegistry final
     {
     public:
 
         DataTypeRegistry() = default;
 
-        ViewAndEditResult ViewAndEditData(DataTypeID dataTypeID, void* data, const Blackboard& blackboard, const DataTypeMemberVariable* memberData = nullptr) const;
+        ViewAndEditResult ViewAndEditData(DataTypeID dataTypeID, void* dataPtr, const Blackboard& blackboard, const DataTypeMemberVariable* memberData = nullptr) const;
         void LoadDataJSON(const DataType& dataType, void* dataPtr, const nlohmann::json& json, const Blackboard& blackboard) const;
         void LoadDataJSON(DataTypeID dataTypeID, void* dataPtr, const nlohmann::json& json, const Blackboard& blackboard) const;
         nlohmann::json SaveDataJSON(const DataType& dataType, const void* dataPtr) const;
@@ -91,6 +74,11 @@ namespace CLX
         void DestroyData(DataTypeID dataTypeID, void* dataPtr) const;
         void MoveData(DataTypeID dataTypeID, void* destinationPtr, void* sourcePtr) const;
         bool EqualsData(DataTypeID dataTypeID, const void* dataPtr1, const void* dataPtr2) const;
+
+        [[nodiscard]] size_t GetDataTypeSize(DataTypeID dataTypeID) const;
+        [[nodiscard]] InplaceConstructFunction GetInplaceConstructFunction(DataTypeID dataTypeID) const;
+        [[nodiscard]] DestroyFunction GetDestroyFunction(DataTypeID dataTypeID) const;
+        [[nodiscard]] CopyFunction GetCopyFunction(DataTypeID dataTypeID) const;
 
         [[nodiscard]] DataType* Find(DataTypeID dataTypeID);
         [[nodiscard]] const DataType* Find(DataTypeID dataTypeID) const;
@@ -106,10 +94,8 @@ namespace CLX
         template<typename Filter>
         [[nodiscard]] auto GetDataTypesFiltered(Filter&& filter) const;
 
-        [[nodiscard]] size_t GetDataTypeSize(DataTypeID dataTypeID) const;
-        [[nodiscard]] InplaceConstructFunction GetInplaceConstructFunction(DataTypeID dataTypeID) const;
-        [[nodiscard]] DestroyFunction GetDestroyFunction(DataTypeID dataTypeID) const;
-        [[nodiscard]] CopyFunction GetCopyFunction(DataTypeID dataTypeID) const;
+        [[nodiscard]] void* GetPropertyPathDataPtr(void* dataPtr, const PropertyPath& propertyPath) const;
+        [[nodiscard]] const void* GetPropertyPathDataPtr(const void* dataPtr, const PropertyPath& propertyPath) const;
 
     public:
 

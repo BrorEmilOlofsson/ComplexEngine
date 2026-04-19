@@ -5,6 +5,8 @@
 #include "Engine/Utility/MacroUtility.hpp"
 #include "DataTypeRegistry.hpp"
 #include "Engine/ECS/ECS.hpp"
+#include <optional>
+#include <type_traits>
 
 namespace CLX
 {
@@ -115,7 +117,7 @@ namespace CLX
         }
 
         template<typename T, typename... Args>
-        static constexpr std::optional<T> Extract(Args&&... args)
+        static constexpr std::optional<T> Extract([[maybe_unused]] Args&&... args)
         {
             std::optional<T> value;
             ([&]
@@ -135,12 +137,11 @@ namespace CLX
                 {
                     const bool shouldExpose = !(std::is_same_v<NoExpose, std::decay_t<Args>> || ...);
                     const bool canEdit = !(std::is_same_v<NoEdit, std::decay_t<Args>> || ...);
-                    std::optional<std::string> customName;
-                    ((std::is_same_v<CustomName, std::decay_t<Args>> ? customName = args.customName : void()), ...);
+                    std::optional<std::string> customName = Extract<CustomName>(args...).transform([](const auto& customName) { return std::string(customName.customName); });
                     std::optional<MemberType> minValue = Extract<MinValue<MemberType>>(args...).transform([](const auto& min) { return min.value; });
                     std::optional<MemberType> maxValue = Extract<MaxValue<MemberType>>(args...).transform([](const auto& max) { return max.value; });
 
-                    std::optional<CustomGetSetFunctions> customGetSetFunctions = Extract<CustomGetSetFunctions>(std::forward<Args>(args)...);
+                    std::optional<CustomGetSetFunctions> customGetSetFunctions = Extract<CustomGetSetFunctions>(args...);
 
                     MemberMetaData memberMetaData
                     {

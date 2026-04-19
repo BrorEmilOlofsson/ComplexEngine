@@ -2,12 +2,14 @@
 #include <vector>
 #include <string_view>
 #include <variant>
+#include <format>
 
-#include "Engine/ECS/EntityID.hpp"
+//#include "Engine/ECS/EntityID.hpp"
 #include "Engine/Utility/Index.hpp"
 
-#include "Engine/ECS/ECS.hpp"
-#include "DataTypeRegistry.hpp"
+//#include "Engine/ECS/ECS.hpp"
+//#include "DataTypeRegistry.hpp"
+#include "Engine/Reflection/DataTypeID.hpp"
 #include "Engine/Utility/Visitor.hpp"
 
 namespace CLX
@@ -17,8 +19,7 @@ namespace CLX
 
     struct PropertyPath final
     {
-        EntityID entityID;
-        DataTypeID componentDataTypeID;
+        DataTypeID dataTypeID;
         std::vector<PropertyElement> elements;
     };
 
@@ -71,3 +72,29 @@ namespace CLX
     //    return currentDataPtr;
     //}
 }
+
+template<>
+struct std::formatter<CLX::PropertyPath> : std::formatter<std::string, char>
+{
+    template<typename FormatContext>
+    [[nodiscard]] auto format(const CLX::PropertyPath& propertyPath, FormatContext& ctx) const
+    {
+        std::string result;/*"EntityID: " + std::to_string(static_cast<uint32_t>(propertyPath.entityID.id)) + ", ComponentDataTypeID: " + std::to_string(propertyPath.componentDataTypeID.typeIndex.hash_code());*/
+        for (const auto& element : propertyPath.elements)
+        {
+            result += " -> ";
+            std::visit(CLX::Visitor
+                {
+                    [&](const std::string_view memberName)
+                    {
+                        result += memberName;
+                    },
+                    [&](const CLX::Index& index)
+                    {
+                        result += "[" + std::to_string(index.mIndex) + "]";
+                    }
+                }, element);
+        }
+        return std::format_to(ctx.out(), "{}", result);
+    }
+};

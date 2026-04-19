@@ -1,8 +1,6 @@
 #include "Editor/Precompiled/EditorPch.hpp"
 #include "Editor.hpp"
 
-#include "Editor/EditorSystem.hpp"
-
 #include "Editor/Core/Tabs/MenuTabWindow.hpp"
 #include "Editor/Core/Tabs/MenuTabDefault.hpp"
 
@@ -114,7 +112,6 @@ namespace CLX
         : mECSBuffer(engine->GetECSRegistry())
         , mEngine(engine)
     {
-        engine->GetECSRegistry().RegisterSystem<EditorSystem>();
     }
 
     void Editor::Init()

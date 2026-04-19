@@ -7,6 +7,7 @@
 #include "Engine/Utility/Blackboard.hpp"
 #include "Engine/Asset/AssetTypes/EntityCompositionAsset.hpp"
 #include "Engine/ECSEngine/Utility/ECSUtilityFunctions.hpp"
+#include "Engine/ECS/ECSHandle.hpp"
 #include "Engine/Reflection/JsonAny.hpp"
 
 namespace CLX
@@ -44,13 +45,14 @@ namespace CLX
 	
 	[[nodiscard]] std::optional<EditorAction> ShowEntityName(ECS& ecs, const EntityID selectedEntityID, const InputState& input);
 	[[nodiscard]] std::vector<EditorAction> ShowEntityComponents(ECS& ecs, EntityID entityID, bool& anyItemActiveLastFrame,
-		ECS& ecsBuffer, EntityID& copyEntityID, JsonAny& copiedComponent, const Blackboard& blackboard);
+		ECS& ecsBuffer, EntityID& copyEntityID, JsonAny& copiedComponent, EntityCompositionAssetHandle entityCompositionAsset, const Blackboard& blackboard);
 	[[nodiscard]] std::optional<EditorAction> ShowEntityAddComponentButtons(ECS& ecs, EntityID entityID, uint32_t& selectedIndex, std::string& searchBuffer, const class DataTypeRegistry& dataTypeRegistry);
 	[[nodiscard]] std::vector<EditorAction> ShowEntityInspector(ECS& ecs, EntityID selectedEntityID, bool& anyItemActiveLastFrame,
-		ECS& ecsBuffer, EntityID& copyEntityID, uint32_t& selectedComponentPopupIndex, std::string& componentSearchString, JsonAny& copiedComponent, const Blackboard& blackboard);
+		ECS& ecsBuffer, EntityID& copyEntityID, uint32_t& selectedComponentPopupIndex, std::string& componentSearchString, JsonAny& copiedComponent,
+		EntityCompositionAssetHandle entityCompositionAsset, const Blackboard& blackboard);
 
 	// Returns root entity of instantiated entity composition
-	EntityID InstantiateEntityComposition(ECS& targetECS, const EntityCompositionAssetHandle& compositionAsset, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker);
+	EntityID InstantiateEntityComposition(ECSHandle targetECSHandle, const EntityCompositionAssetHandle& compositionAsset, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker);
 
 	void TeleportCameraToEntity(const ECS& ecs, EntityID entityID, Camera& camera, bool changeRotation = true, const float offsetDistance = 5.f);
 }

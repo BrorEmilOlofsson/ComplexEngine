@@ -122,7 +122,7 @@ namespace CLX
     }
 
 
-    static void CheckForEntityCompositionDrops(ECS& ecs, AssetManager& assetManager, std::vector<EntityID>& rootEntities, std::set<EntityID>& selectedEntityIDs, EditorCommandTracker& commandTracker)
+    static void CheckForEntityCompositionDrops(ECSHandle ecsHandle, AssetManager& assetManager, std::vector<EntityID>& rootEntities, std::set<EntityID>& selectedEntityIDs, EditorCommandTracker& commandTracker)
     {
         if (ImGui::BeginDragDropTarget())
         {
@@ -134,7 +134,7 @@ namespace CLX
                     commandTracker.BeginComposite("Instantiate Entity Composition + Select Root");
 
                     const EntityID rootEntity = InstantiateEntityComposition(
-                        ecs,
+                        ecsHandle,
                         assetManager.GetEntityComposition(path),
                         rootEntities,
                         commandTracker
@@ -274,7 +274,7 @@ namespace CLX
             //assert(renderRect == sceneRenderState.GetRenderRect().value());
 
             CheckForEntityCompositionDrops(
-                activeScene.GetECS(),
+                activeScene.GetECSHandle(),
                 assetManager,
                 mHierarchyPopUp.GetRootEntities(),
                 mHierarchyPopUp.GetSelectedEntityIDs(),

@@ -133,7 +133,7 @@ namespace CLX
 
                 const ECSRegistry& registry = ecs.GetRegistry();
 				const std::vector<DataTypeMemberVariable>& componentProperties = dataTypeRegistry.Find(dataTypeID)->memberVariables;
-				void* componentPointer = registry.GetComponentType(dataTypeID).addComponentFunction(ecs, newEntityID, nullptr);
+				void* componentPointer = registry.GetComponentType(dataTypeID.typeIndex).addComponentFunction(ecs, newEntityID, nullptr);
 
 				if (!componentDataJSON.contains("Properties"))
 				{

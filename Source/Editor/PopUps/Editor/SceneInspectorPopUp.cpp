@@ -46,6 +46,7 @@ namespace CLX
 				selectedComponentPopupIndex,
 				componentSearchString,
 				copiedComponent,
+				EntityCompositionAssetHandle::Empty(),
 				newBlackboard
 			);
 

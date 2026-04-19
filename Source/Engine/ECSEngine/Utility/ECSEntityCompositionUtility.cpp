@@ -3,7 +3,7 @@
 #include "Engine/ECS/ECS.hpp"
 #include "Engine/ECS/EntityComposition.hpp"
 #include "Engine/ECSEngine/Components/TransformHierarchyComponent.hpp"
-#include "Engine/ECSEngine/Components/EntityCompositionComponent.hpp"
+#include "Engine/ECSEngine/Components/EntityCompositionInstantiationComponent.hpp"
 
 namespace CLX
 {
@@ -12,18 +12,18 @@ namespace CLX
 	{
 		for (auto e : previousECS.ViewEntities())
 		{
-			const EntityID newEntityID = entityIDConverter[e.GetEntityID()];
+			const EntityID newEntityID = entityIDConverter.ConvertToTarget(e.GetEntityID());
 			auto entityView = ecs.ViewEntity(newEntityID);
 			TransformHierarchyComponent& hierarchyComponent = *entityView.GetComponent<TransformHierarchyComponent>();
 
 			if (hierarchyComponent.parent != InvalidEntityID)
 			{
-				hierarchyComponent.parent = entityIDConverter[hierarchyComponent.parent];
+				hierarchyComponent.parent = entityIDConverter.ConvertToTarget(hierarchyComponent.parent);
 			}
 
 			for (std::size_t i = 0; i < hierarchyComponent.children.size(); i++)
 			{
-				hierarchyComponent.children[i] = entityIDConverter[hierarchyComponent.children[i]];
+				hierarchyComponent.children[i] = entityIDConverter.ConvertToTarget(hierarchyComponent.children[i]);
 			}
 		}
 	}

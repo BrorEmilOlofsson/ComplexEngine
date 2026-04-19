@@ -17,16 +17,30 @@ namespace CLX
 
         ECSManager() = default;
 
-        [[nodiscard]] ECS& GetECS(const ECSID ecsID)
+        [[nodiscard]] ECS* GetECS(const ECSID ecsID)
         {
-            ASSERT(mECSMap.contains(ecsID));
-            return mECSMap.at(ecsID);
+            auto it = mECSMap.find(ecsID);
+            if (it != mECSMap.end())
+            {
+                return &it->second;
+            }
+            else
+            {
+                return nullptr;
+            }
         }
 
-        [[nodiscard]] const ECS& GetECS(const ECSID ecsID) const
+        [[nodiscard]] const ECS* GetECS(const ECSID ecsID) const
         {
-            ASSERT(mECSMap.contains(ecsID));
-            return mECSMap.at(ecsID);
+            auto it = mECSMap.find(ecsID);
+            if (it != mECSMap.end())
+            {
+                return &it->second;
+            }
+            else
+            {
+                return nullptr;
+            }
         }
 
         [[nodiscard]] ECSID CreateECS(const ECSRegistry& registry)
@@ -40,9 +54,10 @@ namespace CLX
         [[nodiscard]] ECSID CopyECS(const ECSID& other)
         {
             const ECSID ecsID = mECSIDCounter++;
-            ECS& otherECS = GetECS(other);
+            ECS* otherECS = GetECS(other);
+            ASSERT(otherECS != nullptr);
             ASSERT(!mECSMap.contains(ecsID));
-            mECSMap.emplace(ecsID, ECS(otherECS));
+            mECSMap.emplace(ecsID, ECS(*otherECS));
             return ecsID;
         }
 
@@ -59,7 +74,7 @@ namespace CLX
 
     /*
     * Handle with value semantics that manages the lifetime of an ECS.
-    When the handle is destroyed, the associated ECS is also destroyed. 
+    When the handle is destroyed, the associated ECS is also destroyed.
     Copying the handle creates a new ECS with the same data.
     */
     class ECSOwningHandle final
@@ -80,8 +95,7 @@ namespace CLX
         ECSOwningHandle(ECSOwningHandle&& other) noexcept
             : mECSManager(std::exchange(other.mECSManager, nullptr))
             , mECSID(std::exchange(other.mECSID, std::numeric_limits<ECSID>::max()))
-        {
-        }
+        {}
 
         ECSOwningHandle& operator=(const ECSOwningHandle& other)
         {
@@ -116,12 +130,16 @@ namespace CLX
 
         [[nodiscard]] ECS& Get()
         {
-            return mECSManager->GetECS(mECSID);
+            ECS* ecs = mECSManager->GetECS(mECSID);
+            ASSERT(ecs != nullptr);
+            return *ecs;
         }
 
         [[nodiscard]] const ECS& Get() const
         {
-            return mECSManager->GetECS(mECSID);
+            const ECS* ecs = mECSManager->GetECS(mECSID);
+            ASSERT(ecs != nullptr);
+            return *ecs;
         }
 
         [[nodiscard]] ECSID GetID() const
@@ -129,9 +147,24 @@ namespace CLX
             return mECSID;
         }
 
+        [[nodiscard]] ECSManager& GetManager()
+        {
+            return *mECSManager;
+        }
+
+        [[nodiscard]] const ECSManager& GetManager() const
+        {
+            return *mECSManager;
+        }
+
+        [[nodiscard]] constexpr bool operator==(const ECSOwningHandle& other) const
+        {
+            return mECSManager == other.mECSManager && mECSID == other.mECSID;
+        }
+
     private:
 
-        ECSManager* mECSManager;
+        ECSManager* mECSManager = nullptr;
         ECSID mECSID = std::numeric_limits<ECSID>::max();
     };
 

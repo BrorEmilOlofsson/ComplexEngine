@@ -26,105 +26,6 @@ namespace CLX
         }
     }
 
-    void DataTypeRegistry::InplaceAllocateData(DataTypeID dataTypeID, void* dataPtr, const void* defaultValuePtr) const
-    {
-        mDataTypes.at(dataTypeID).inplaceConstruct(dataPtr, defaultValuePtr);
-    }
-
-    void DataTypeRegistry::CopyData(DataTypeID dataTypeID, void* destination, const void* source) const
-    {
-        mDataTypes.at(dataTypeID).copy(destination, source);
-    }
-
-    void DataTypeRegistry::SwapData(DataTypeID dataTypeID, void* dataPtr1, void* dataPtr2) const
-    {
-        mDataTypes.at(dataTypeID).swap(dataPtr1, dataPtr2);
-    }
-
-    void DataTypeRegistry::DestroyData(DataTypeID dataTypeID, void* dataPtr) const
-    {
-        mDataTypes.at(dataTypeID).destroy(dataPtr);
-    }
-
-    void DataTypeRegistry::MoveData(DataTypeID dataTypeID, void* destination, void* source) const
-    {
-        mDataTypes.at(dataTypeID).move(destination, source);
-    }
-
-    bool DataTypeRegistry::EqualsData(DataTypeID dataTypeID, const void* dataPtr1, const void* dataPtr2) const
-    {
-        if (EqualsFunction equalsFunction = mDataTypes.at(dataTypeID).equals)
-        {
-            return equalsFunction(dataPtr1, dataPtr2);
-        }
-
-        for (auto member : mDataTypes.at(dataTypeID).memberVariables)
-        {
-            const DataType* memberDataType = Find(member.dataTypeID);
-            ASSERT(memberDataType != nullptr);
-            const void* memberDataPtr1 = dataPtr1 + std::get<ByteOffset>(member.memberType);
-            const void* memberDataPtr2 = dataPtr2 + std::get<ByteOffset>(member.memberType);
-            if (!EqualsData(member.dataTypeID, memberDataPtr1, memberDataPtr2))
-            {
-                return false;
-            }
-        }
-
-        return true;
-
-    }
-
-    size_t DataTypeRegistry::GetDataTypeSize(DataTypeID dataTypeID) const
-    {
-        return mDataTypes.at(dataTypeID).size;
-    }
-
-    InplaceConstructFunction DataTypeRegistry::GetInplaceConstructFunction(DataTypeID dataTypeID) const
-    {
-        return mDataTypes.at(dataTypeID).inplaceConstruct;
-    }
-
-    DestroyFunction DataTypeRegistry::GetDestroyFunction(DataTypeID dataTypeID) const
-    {
-        return mDataTypes.at(dataTypeID).destroy;
-    }
-
-    CopyFunction DataTypeRegistry::GetCopyFunction(DataTypeID dataTypeID) const
-    {
-        return mDataTypes.at(dataTypeID).copy;
-    }
-
-    DataType* DataTypeRegistry::Find(DataTypeID dataTypeID)
-    {
-        auto it = mDataTypes.find(dataTypeID);
-        if (it == mDataTypes.end())
-        {
-            return nullptr;
-        }
-        return &it->second;
-    }
-
-    const DataType* DataTypeRegistry::Find(DataTypeID dataTypeID) const
-    {
-        auto it = mDataTypes.find(dataTypeID);
-        if (it == mDataTypes.end())
-        {
-            return nullptr;
-        }
-        return &it->second;
-    }
-
-    DataTypeID DataTypeRegistry::Find(std::string_view name) const
-    {
-        auto it = mNameToID.find(std::string(name));
-        if (it == mNameToID.end())
-        {
-            return InvalidDataTypeID;
-        }
-
-        return it->second;
-    }
-
     ViewAndEditResult DataTypeRegistry::ViewAndEditData(const DataTypeID dataTypeID, void* const dataPtr, const Blackboard& blackboard, const DataTypeMemberVariable* memberData) const
     {
         const DataType* dataType = Find(dataTypeID);
@@ -151,12 +52,22 @@ namespace CLX
                 void* memberDataPtr = dataPtr + std::get<ByteOffset>(member.memberType);
                 Blackboard newBlackboard = blackboard;
                 newBlackboard.Insert<Key_VariableName>(member.customName);
-                PropertyPath& propertyPath = newBlackboard.Get<Key_CurrentPropertyPath>();
+                PropertyPath propertyPath = newBlackboard.Get<Key_CurrentPropertyPath>();
                 propertyPath.elements.push_back(member.name);
+                newBlackboard.Insert<Key_CurrentPropertyPath>(propertyPath);
+                std::println("Viewing member: {}", member.name);
+                std::println("Property Path: {}", propertyPath);
                 viewAndEditResult |= ViewAndEditData(member.dataTypeID, memberDataPtr, newBlackboard, &member);
+                if (viewAndEditResult.isEdited)
+                {
+                    viewAndEditResult.dataTypeID = member.dataTypeID;
+                    viewAndEditResult.dataPtr = dataPtr + std::get<ByteOffset>(member.memberType);
+                    viewAndEditResult.propertyPath = propertyPath;
+                }
             }
             else
             {
+                ASSERT_NEW(false, "Path has not been tested");
                 const DataType* memberDataType = Find(member.dataTypeID);
                 ASSERT(memberDataType != nullptr);
                 void* ownerPtr = dataPtr;
@@ -165,7 +76,6 @@ namespace CLX
                 FunctionMember functionMember = std::get<FunctionMember>(member.memberType);
                 functionMember.getFunction(ownerPtr, allocatedDataPtr);
                 viewAndEditResult |= ViewAndEditData(member.dataTypeID, allocatedDataPtr, blackboard);
-
             }
 
             if (viewAndEditResult.isActive)
@@ -249,5 +159,144 @@ namespace CLX
         }
 
         return SaveDataJSON(*dataType, dataPtr);
+    }
+
+    void DataTypeRegistry::InplaceAllocateData(DataTypeID dataTypeID, void* dataPtr, const void* defaultValuePtr) const
+    {
+        mDataTypes.at(dataTypeID).inplaceConstruct(dataPtr, defaultValuePtr);
+    }
+
+    void DataTypeRegistry::CopyData(DataTypeID dataTypeID, void* destination, const void* source) const
+    {
+        mDataTypes.at(dataTypeID).copy(destination, source);
+    }
+
+    void DataTypeRegistry::SwapData(DataTypeID dataTypeID, void* dataPtr1, void* dataPtr2) const
+    {
+        mDataTypes.at(dataTypeID).swap(dataPtr1, dataPtr2);
+    }
+
+    void DataTypeRegistry::DestroyData(DataTypeID dataTypeID, void* dataPtr) const
+    {
+        mDataTypes.at(dataTypeID).destroy(dataPtr);
+    }
+
+    void DataTypeRegistry::MoveData(DataTypeID dataTypeID, void* destination, void* source) const
+    {
+        mDataTypes.at(dataTypeID).move(destination, source);
+    }
+
+    bool DataTypeRegistry::EqualsData(DataTypeID dataTypeID, const void* dataPtr1, const void* dataPtr2) const
+    {
+        if (EqualsFunction equalsFunction = mDataTypes.at(dataTypeID).equals)
+        {
+            return equalsFunction(dataPtr1, dataPtr2);
+        }
+
+        for (auto member : mDataTypes.at(dataTypeID).memberVariables)
+        {
+            const DataType* memberDataType = Find(member.dataTypeID);
+            ASSERT(memberDataType != nullptr);
+            const void* memberDataPtr1 = dataPtr1 + std::get<ByteOffset>(member.memberType);
+            const void* memberDataPtr2 = dataPtr2 + std::get<ByteOffset>(member.memberType);
+            if (!EqualsData(member.dataTypeID, memberDataPtr1, memberDataPtr2))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    size_t DataTypeRegistry::GetDataTypeSize(DataTypeID dataTypeID) const
+    {
+        return mDataTypes.at(dataTypeID).size;
+    }
+
+    InplaceConstructFunction DataTypeRegistry::GetInplaceConstructFunction(DataTypeID dataTypeID) const
+    {
+        return mDataTypes.at(dataTypeID).inplaceConstruct;
+    }
+
+    DestroyFunction DataTypeRegistry::GetDestroyFunction(DataTypeID dataTypeID) const
+    {
+        return mDataTypes.at(dataTypeID).destroy;
+    }
+
+    CopyFunction DataTypeRegistry::GetCopyFunction(DataTypeID dataTypeID) const
+    {
+        return mDataTypes.at(dataTypeID).copy;
+    }
+
+    DataType* DataTypeRegistry::Find(DataTypeID dataTypeID)
+    {
+        auto it = mDataTypes.find(dataTypeID);
+        if (it == mDataTypes.end())
+        {
+            return nullptr;
+        }
+        return &it->second;
+    }
+
+    const DataType* DataTypeRegistry::Find(DataTypeID dataTypeID) const
+    {
+        auto it = mDataTypes.find(dataTypeID);
+        if (it == mDataTypes.end())
+        {
+            return nullptr;
+        }
+        return &it->second;
+    }
+
+    DataTypeID DataTypeRegistry::Find(std::string_view name) const
+    {
+        auto it = mNameToID.find(std::string(name));
+        if (it == mNameToID.end())
+        {
+            return InvalidDataTypeID;
+        }
+
+        return it->second;
+    }
+
+    void* DataTypeRegistry::GetPropertyPathDataPtr(void* dataPtr, const PropertyPath& propertyPath) const
+    {
+        auto findMember = [&](DataTypeID dataTypeID, std::string_view name) -> std::optional<DataTypeMemberVariable>
+            {
+                return FindIf(mDataTypes.at(dataTypeID).memberVariables,
+                    [&name](const DataTypeMemberVariable& member)
+                    { 
+                        return member.name == name; 
+                    }
+                );
+            };
+
+        ByteOffset byteOffset{ 0 };
+        for (const auto& element : propertyPath.elements)
+        {
+            if (std::holds_alternative<std::string_view>(element))
+            {
+                const std::string_view memberName = std::get<std::string_view>(element);
+                const auto member = findMember(propertyPath.dataTypeID, memberName);
+                if (!member.has_value())
+                {
+                    ASSERT(false && "Member not found in data type.");
+                }
+
+                byteOffset += std::get<ByteOffset>(member->memberType);
+                
+            }
+            else
+            {
+                ASSERT(false && "Indexing into vectors or arrays is not yet supported.");
+            }
+        }
+
+        return dataPtr + byteOffset;
+    }
+
+    const void* DataTypeRegistry::GetPropertyPathDataPtr(const void* dataPtr, const PropertyPath& propertyPath) const
+    {
+        return const_cast<const void*>(GetPropertyPathDataPtr(const_cast<void*>(dataPtr), propertyPath));
     }
 }

@@ -279,7 +279,7 @@ namespace CLX
 			if constexpr (std::same_as<T, bool>)
 			{
 				bool b = vector[i];
-				result.isActive |= ViewAndEditDataPtr(GetDataTypeID<T>(), &b, blackboard).isActive;
+				result |= ViewAndEditDataPtr(GetDataTypeID<T>(), &b, blackboard);
 				vector[i] = b;
 
 				ImGui::SameLine();
@@ -292,7 +292,7 @@ namespace CLX
 			else
 			{
 				T& data = vector[i];
-				result.isActive |= ViewAndEditDataPtr(GetDataTypeID<T>(), &data, blackboard).isActive;
+				result |= ViewAndEditDataPtr(GetDataTypeID<T>(), &data, blackboard);
 				ImGui::SameLine();
 
 				ImGui::PushID(&data);

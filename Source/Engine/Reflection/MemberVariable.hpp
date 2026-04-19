@@ -6,14 +6,10 @@
 #include <functional>
 
 #include "Engine/Reflection/DataTypeID.hpp"
+#include "Engine/Utility/ByteOffset.hpp"
 
 namespace CLX
 {
-
-    struct ByteOffset final
-    {
-        std::size_t value = std::numeric_limits<std::size_t>::max();
-    };
 
     struct FunctionMember final
     {

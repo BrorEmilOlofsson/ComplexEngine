@@ -124,7 +124,7 @@ namespace CLX
             ImGui::BeginDisabled(!openedEntityComposition.IsValid());
             if (ImGui::Button("Instantiate"))
             {
-                InstantiateEntityComposition(sceneManager.GetActiveScene()->GetECS(), openedEntityComposition, mRootEntities, commandTracker);
+                InstantiateEntityComposition(sceneManager.GetActiveScene()->GetECSHandle(), openedEntityComposition, mRootEntities, commandTracker);
             }
             ImGui::EndDisabled();
         }

@@ -12,10 +12,11 @@
 #include "Engine/Reflection/DataTypeRegistry.hpp"
 #include "Engine/Asset/AssetTypes/EntityCompositionAsset.hpp"
 #include "Engine/ECS/EntityComposition.hpp"
-#include "Engine/ECSEngine/Components/EntityCompositionComponent.hpp"
+#include "Engine/ECSEngine/Components/EntityCompositionInstantiationComponent.hpp"
 #include "Engine/ECSEngine/Utility/ECSEntityCompositionUtility.hpp"
 #include "Engine/Utility/Visitor.hpp"
 #include "Engine/Reflection/PropertyPath.hpp"
+#include "Engine/ECS/ECSManager.hpp"
 
 namespace CLX
 {
@@ -574,13 +575,13 @@ namespace CLX
 
         auto doCommand = [](const AddComponentData& data)
             {
-                data.ecs.get().GetRegistry().GetComponentType(data.dataTypeID).addComponentFunction(data.ecs.get(), data.entityID, nullptr);
+                data.ecs.get().GetRegistry().GetComponentType(data.dataTypeID.typeIndex).addComponentFunction(data.ecs.get(), data.entityID, nullptr);
 
             };
 
         auto undoCommand = [](const AddComponentData& data)
             {
-                data.ecs.get().RemoveComponent(data.entityID, data.dataTypeID);
+                data.ecs.get().RemoveComponent(data.entityID, data.dataTypeID.typeIndex);
             };
 
         commandTracker.ExecuteCommand(EditorCommand(data, doCommand, undoCommand, "Add Component (" + componentName + ")"));
@@ -597,7 +598,7 @@ namespace CLX
     void RemoveComponent(ECS& ecs, const EntityID entityID, const DataTypeID& dataTypeID, ECS& ecsBuffer, EditorCommandTracker& commandTracker)
     {
         const EntityID copyEntityID = ecs.CopyEntity(entityID, ecsBuffer);
-        ecs.RemoveComponent(entityID, dataTypeID);
+        ecs.RemoveComponent(entityID, dataTypeID.typeIndex);
 
 
         struct RemoveComponentData final
@@ -1078,7 +1079,7 @@ namespace CLX
         InsertRange(editorActions, ShowEntityDropSpaceTarget(ecs, entityID, false, rootEntities, selectedEntityIDs));
         ImGui::PushID(entityID.id);
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 3 });
-        const bool isOpen = ImGui::TreeNodeEx(GetEntityName(ecs, entityID).c_str(), GetHierarchyTreeNodeFlags(isSelected, isLeaf, shouldBeDefaultOpen));
+        const bool isOpen = ImGui::TreeNodeEx((GetEntityName(ecs, entityID) + " (" + std::to_string(entityID.id) + ")").c_str(), GetHierarchyTreeNodeFlags(isSelected, isLeaf, shouldBeDefaultOpen));
         ImGui::PopStyleVar();
         ImGui::PopID();
 
@@ -1247,16 +1248,128 @@ namespace CLX
             };
     }
 
-    [[nodiscard]] static std::optional<EditorAction> ShowComponentData(ECS& ecs, const EntityID entityID, const std::type_index type,
-        void* componentPtr, bool& anyActiveItem, ECS& ecsBuffer,
-        JsonAny& copiedComponent, const DataTypeRegistry& dataTypeRegistry, const Blackboard& blackboard)
+    [[nodiscard]] static std::optional<EntityID> FindEntity(const ECS& ecs, auto&& predicate, const EntityID startEntityID)
+    {
+        if (predicate(startEntityID))
+        {
+            return startEntityID;
+        }
+        for (const EntityID entityID : GetEntityChildren(ecs, startEntityID))
+        {
+            if (predicate(entityID))
+            {
+                return entityID;
+            }
+            if (const std::optional<EntityID> foundInChildren = FindEntity(ecs, predicate, entityID))
+            {
+                return foundInChildren;
+            }
+        }
+        return std::nullopt;
+    }
+
+    struct EntityCompositionInstantiation final
+    {
+        EntityID entityID;
+        ECSHandle ecsHandle;
+    };
+    std::map<EntityCompositionAssetHandle, std::vector<EntityCompositionInstantiation>> instantiationsByEntityComposition;
+
+    void HandleEntityCompositionModification(EntityCompositionAssetHandle entityCompopsitionAssetHandle, const EntityID modifiedEntityID,
+        const void* sourcePtr, const DataTypeID modifiedDataTypeID, const DataTypeID componentTypeID, const PropertyPath& propertyPath, const DataTypeRegistry& dataTypeRegistry)
+    {
+        dataTypeRegistry;
+        if (!entityCompopsitionAssetHandle)
+        {
+            return;
+        }
+
+        const ECS& ecs = entityCompopsitionAssetHandle.Get().GetECS();
+        ecs;
+        auto& instantiations = instantiationsByEntityComposition[entityCompopsitionAssetHandle];
+        for (const auto& [entityID, ecsHandle] : instantiations)
+        {
+            // Find the instantiation that corresponds to the modified entity
+            ECS* instantiationECS = ecsHandle.Get();
+            if (instantiationECS == nullptr)
+            {
+                // TODO: Handle this case (probably by removing the instantiation from the list)
+                continue;
+            }
+            auto* compositionComponent = instantiationECS->GetComponent<EntityCompositionInstantiationComponent>(entityID);
+            ASSERT(compositionComponent != nullptr);
+
+            std::optional<EntityID> foundEntityID = FindEntity(*instantiationECS, [&](const EntityID entityID)
+                {
+                    auto* compositionComponent = instantiationECS->GetComponent<EntityCompositionInstantiationComponent>(entityID);
+                    ASSERT(compositionComponent != nullptr);
+                    return compositionComponent->mappedEntityID == modifiedEntityID;
+                }, entityID);
+
+            ASSERT(foundEntityID.has_value());
+            const EntityID correspondingEntityID = foundEntityID.value();
+
+            if (modifiedDataTypeID == GetDataTypeID<EntityID>())
+            {
+                const EntityID newEntityID = *static_cast<const EntityID*>(sourcePtr);
+                
+                std::optional<EntityID> f = FindEntity(*instantiationECS, [&](const EntityID entityID)
+                    {
+                        auto* compositionComponent = instantiationECS->GetComponent<EntityCompositionInstantiationComponent>(entityID);
+                        ASSERT(compositionComponent != nullptr);
+                        return compositionComponent->mappedEntityID == newEntityID;
+                    }, entityID);
+
+                ASSERT(f.has_value());
+            }
+            else if (modifiedDataTypeID == GetDataTypeID<std::vector<EntityID>>())
+            {
+                const std::vector<EntityID> newEntityIDs = *static_cast<const std::vector<EntityID>*>(sourcePtr);
+
+                void* componentPtr = instantiationECS->GetComponent(correspondingEntityID, componentTypeID.typeIndex);
+                ASSERT(componentPtr != nullptr);
+                void* s = dataTypeRegistry.GetPropertyPathDataPtr(componentPtr, propertyPath);
+                std::vector<EntityID>& entityIDVector = *static_cast<std::vector<EntityID>*>(s);
+                entityIDVector;
+
+                ASSERT(newEntityIDs.size() == entityIDVector.size());
+                
+                int i = 0;
+                for (EntityID newEntityID : newEntityIDs)
+                {
+                    if (newEntityID == InvalidEntityID)
+                    {
+                        continue;
+                    }
+                    std::optional<EntityID> f = FindEntity(*instantiationECS, [&](const EntityID entityID)
+                        {
+                            auto* compositionComponent = instantiationECS->GetComponent<EntityCompositionInstantiationComponent>(entityID);
+                            ASSERT(compositionComponent != nullptr);
+                            return compositionComponent->mappedEntityID == newEntityID;
+                        }, entityID);
+
+                    ASSERT(f.has_value());
+
+                    const EntityID correspondingEntityID2 = f.value();
+                   
+                    entityIDVector[i] = correspondingEntityID2;
+                    i++;
+                }
+            }
+
+        }
+    }
+
+    [[nodiscard]] static std::optional<EditorAction> ShowComponentData(ECS& ecs, const EntityID entityID, const std::type_index componentType,
+        void* const componentPtr, bool& anyActiveItem, ECS& ecsBuffer, JsonAny& copiedComponent,
+        EntityCompositionAssetHandle entityCompositionAsset, const DataTypeRegistry& dataTypeRegistry, const Blackboard& blackboard)
     {
         PROFILER_FUNCTION(profiler::colors::Lime400);
 
         ASSERT(componentPtr != nullptr);
         ImGui::AlignTextToFramePadding();
 
-        const DataTypeID componentDataTypeID = GetDataTypeID(type);
+        const DataTypeID componentDataTypeID = GetDataTypeID(componentType);
 
         const DataType* dataType = dataTypeRegistry.Find(componentDataTypeID);
         if (dataType == nullptr)
@@ -1266,8 +1379,7 @@ namespace CLX
 
         Blackboard newBlackboard = blackboard;
         PropertyPath propertyPath;
-        propertyPath.entityID = entityID;
-        propertyPath.componentDataTypeID = componentDataTypeID;
+        propertyPath.dataTypeID = componentDataTypeID;
         newBlackboard.Insert<Key_CurrentPropertyPath>(propertyPath);
 
         const std::string& componentName = dataType->prettyName + "##Component";
@@ -1296,17 +1408,31 @@ namespace CLX
 
             if (viewAndEditResult.isEdited)
             {
-                std::println("{}", HasAncestorComponent<EntityCompositionComponent>(ecs, entityID, true));
+                HandleEntityCompositionModification(
+                    entityCompositionAsset, 
+                    entityID, 
+                    viewAndEditResult.dataPtr, 
+                    viewAndEditResult.dataTypeID, 
+                    componentDataTypeID, 
+                    viewAndEditResult.propertyPath,
+                    dataTypeRegistry
+                );
+
+                if (HasAncestorComponent<EntityCompositionInstantiationComponent>(ecs, entityID, true))
+                {
+                    // Handle override logic for components that are part of the entity's composition
+
+                }
             }
         }
 
         std::optional<EditorAction> removeComponentAction;
         if (ImGui::BeginPopup("Component Options"))
         {
-            ImGui::BeginDisabled(ecs.GetRegistry().GetComponentType(GetDataTypeID(type)).isDefault);
+            ImGui::BeginDisabled(ecs.GetRegistry().GetComponentType(componentDataTypeID.typeIndex).isDefault);
             if (ImGui::MenuItem("Remove"))
             {
-                removeComponentAction = CreateRemoveComponentAction(ecs, entityID, GetDataTypeID(type), ecsBuffer);
+                removeComponentAction = CreateRemoveComponentAction(ecs, entityID, componentDataTypeID, ecsBuffer);
             }
             ImGui::EndDisabled();
 
@@ -1452,7 +1578,7 @@ namespace CLX
     }
 
     [[nodiscard]] std::vector<EditorAction> ShowEntityComponents(ECS& ecs, const EntityID selectedEntityID, bool& anyItemActiveLastFrame,
-        ECS& ecsBuffer, EntityID& copyEntityID, JsonAny& copiedComponent, const Blackboard& blackboard)
+        ECS& ecsBuffer, EntityID& copyEntityID, JsonAny& copiedComponent, EntityCompositionAssetHandle entityCompositionAsset, const Blackboard& blackboard)
     {
         PROFILER_FUNCTION(profiler::colors::Brown400);
 
@@ -1488,6 +1614,7 @@ namespace CLX
                 anyActiveItem,
                 ecsBuffer,
                 copiedComponent,
+                entityCompositionAsset,
                 blackboard.Get<Key_DataTypeRegistry>(),
                 blackboard
             );
@@ -1559,8 +1686,8 @@ namespace CLX
         auto isValidComponentDataType = [&ecs, entityID](const DataType& dataType)
             {
                 return dataType.isComponent
-                    && !ecs.GetRegistry().GetComponentType(GetDataTypeID(dataType.type)).isDefault
-                    && !ecs.HasComponent(entityID, GetDataTypeID(dataType.type));
+                    && !ecs.GetRegistry().GetComponentType(dataType.type).isDefault
+                    && !ecs.HasComponent(entityID, dataType.type);
             };
 
 
@@ -1611,7 +1738,8 @@ namespace CLX
     }
 
     [[nodiscard]] std::vector<EditorAction> ShowEntityInspector(ECS& ecs, const EntityID entityID, bool& anyItemActiveLastFrame,
-        ECS& ecsBuffer, EntityID& copyEntityID, uint32_t& selectedIndex, std::string& componentSearchString, JsonAny& copiedComponent, const Blackboard& blackboard)
+        ECS& ecsBuffer, EntityID& copyEntityID, uint32_t& selectedIndex, std::string& componentSearchString, JsonAny& copiedComponent,
+        EntityCompositionAssetHandle entityCompositionAsset, const Blackboard& blackboard)
     {
         PROFILER_FUNCTION(profiler::colors::Pink200);
         if (entityID == InvalidEntityID)
@@ -1619,7 +1747,7 @@ namespace CLX
             return {};
         }
         std::vector<EditorAction> editorActions;
-        auto showEntityComponents = ShowEntityComponents(ecs, entityID, anyItemActiveLastFrame, ecsBuffer, copyEntityID, copiedComponent, blackboard);
+        auto showEntityComponents = ShowEntityComponents(ecs, entityID, anyItemActiveLastFrame, ecsBuffer, copyEntityID, copiedComponent, entityCompositionAsset, blackboard);
         InsertRange(editorActions, showEntityComponents);
         if (auto action = ShowEntityAddComponentButtons(ecs, entityID, selectedIndex, componentSearchString, blackboard.Get<Key_DataTypeRegistry>()))
         {
@@ -1631,24 +1759,39 @@ namespace CLX
     EntityIDConverter MergeECS(ECS& targetECS, const ECS& sourceECS)
     {
         auto entityCollectionView = sourceECS.ViewEntities();
-        std::vector<EntityID> entityConverter(entityCollectionView.GetCount());
+        std::unordered_map<EntityID, EntityID> entityConverter1(entityCollectionView.GetCount());
+        std::unordered_map<EntityID, EntityID> entityConverter2(entityCollectionView.GetCount());
         for (auto entity : entityCollectionView)
         {
             const EntityID createdEntityID = sourceECS.CopyEntity(entity.GetEntityID(), targetECS);
-            entityConverter[entity.GetEntityID().id] = createdEntityID;
+            entityConverter1[entity.GetEntityID()] = createdEntityID;
+            entityConverter2[createdEntityID] = entity.GetEntityID();
         }
-        return EntityIDConverter(std::move(entityConverter));
+        return EntityIDConverter(std::move(entityConverter1), std::move(entityConverter2));
     }
 
-    EntityID InstantiateEntityComposition(ECS& targetECS, const EntityCompositionAssetHandle& compositionAsset, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker)
+    EntityID InstantiateEntityComposition(const ECSHandle targetECSHandle, const EntityCompositionAssetHandle& compositionAsset, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker)
     {
         ASSERT(compositionAsset.IsValid());
+        ASSERT(targetECSHandle.Get() != nullptr);
+            ECS& targetECS = *targetECSHandle.Get();
         commandTracker;
         const EntityComposition& entityComposition = compositionAsset.Get();
         const EntityIDConverter entityConverter = MergeECS(targetECS, entityComposition.GetECS());
         UpdateEntityIDs(entityComposition.GetECS(), targetECS, entityConverter);
-        const EntityID instantiatedRootEntity = entityConverter[entityComposition.GetRootEntity()];
-        targetECS.AddComponent<EntityCompositionComponent>(instantiatedRootEntity).asset = compositionAsset;
+        const EntityID instantiatedRootEntity = entityConverter.ConvertToTarget(entityComposition.GetRootEntity());
+        targetECS.AddComponent<EntityCompositionInstantiationComponent>(instantiatedRootEntity).asset = compositionAsset;
+        targetECS.AddComponent<EntityCompositionInstantiationComponent>(instantiatedRootEntity).mappedEntityID = entityComposition.GetRootEntity();
+
+        for (const EntityID entityID : GetAllEntityChildren(targetECS, instantiatedRootEntity))
+        {
+            auto& compositionComponent = targetECS.AddComponent<EntityCompositionInstantiationComponent>(entityID);
+            compositionComponent.asset = compositionAsset;
+            compositionComponent.mappedEntityID = entityConverter.ConvertToSource(entityID);
+        }
+
+        instantiationsByEntityComposition[compositionAsset].push_back(EntityCompositionInstantiation{ instantiatedRootEntity, targetECSHandle });
+
         rootEntities = GetRootEntities(targetECS);
         return instantiatedRootEntity;
     }

@@ -44,6 +44,7 @@ namespace CLX
                 selectedComponentPopupIndex,
                 componentSearchBuffer,
                 copiedComponent,
+                entityCompositionAsset,
                 newBlackboard
             );
 

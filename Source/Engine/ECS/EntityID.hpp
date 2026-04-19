@@ -29,3 +29,15 @@ namespace CLX
 
 	constexpr EntityID InvalidEntityID = EntityID{};
 }
+
+namespace std
+{
+	template<>
+	struct hash<CLX::EntityID>
+	{
+		[[nodiscard]] std::size_t operator()(const CLX::EntityID& entityID) const noexcept
+		{
+			return std::hash<uint64_t>{}(static_cast<uint64_t>(entityID.id) | (static_cast<uint64_t>(entityID.generation) << 32));
+		}
+    };
+}

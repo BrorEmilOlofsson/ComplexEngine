@@ -1,6 +1,7 @@
 #pragma once
 #include "Engine/ECS/ECS.hpp"
 #include "Engine/ECS/ECSManager.hpp"
+#include "Engine/ECS/ECSHandle.hpp"
 #include "Engine/Graphics/RenderState.hpp"
 #include "Engine/Navmesh/Navmesh.hpp"
 #include "Engine/Math/Shapes/Ray3.hpp"
@@ -24,6 +25,7 @@ namespace CLX
 
 		[[nodiscard]] inline ECS& GetECS();
 		[[nodiscard]] inline const ECS& GetECS() const;
+		[[nodiscard]] constexpr ECSHandle GetECSHandle();
 
 		[[nodiscard]] constexpr RenderState& GetRenderState();
 
@@ -59,6 +61,11 @@ namespace CLX
 	inline const ECS& Scene::GetECS() const
 	{
 		return mECSHandle.Get();
+	}
+
+	constexpr ECSHandle Scene::GetECSHandle()
+	{
+		return ToHandle(mECSHandle);
 	}
 
 	[[nodiscard]] constexpr RenderState& Scene::GetRenderState()

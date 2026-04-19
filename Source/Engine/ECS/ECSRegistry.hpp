@@ -52,12 +52,12 @@ namespace CLX
 			return mSystemRegistrationFunctions;
 		}
 
-		[[nodiscard]] std::size_t GetComponentTypeIndex(DataTypeID typeIndex) const
+		[[nodiscard]] std::size_t GetComponentTypeIndex(std::type_index typeIndex) const
 		{
 			return mComponentTypeToIDMap.at(typeIndex);
 		}
 
-		[[nodiscard]] const ECSComponentType& GetComponentType(DataTypeID typeIndex) const
+		[[nodiscard]] const ECSComponentType& GetComponentType(std::type_index typeIndex) const
 		{
 			const std::size_t index = mComponentTypeToIDMap.at(typeIndex);
 			return mComponentTypes[index - 1];
@@ -75,7 +75,7 @@ namespace CLX
 
 		void InitializeEntity(ECS& ecs, EntityID entityID) const
 		{
-			for (const DataTypeID& typeIndex : mDefaultComponentTypeIndices)
+			for (const std::type_index& typeIndex : mDefaultComponentTypeIndices)
 			{
 				const ECSComponentType& componentType = GetComponentType(typeIndex);
 				componentType.addComponentFunction(ecs, entityID, nullptr);
@@ -94,11 +94,11 @@ namespace CLX
 
 	private:
 
-		std::unordered_map<DataTypeID, std::size_t> mComponentTypeToIDMap;
+		std::unordered_map<std::type_index, std::size_t> mComponentTypeToIDMap;
 		std::vector<ECSComponentType> mComponentTypes;
 		std::vector<System(*)()> mSystemRegistrationFunctions;
 		std::size_t mCurrentID = 1;
 		std::shared_ptr<Blackboard> mBlackboard;
-		std::vector<DataTypeID> mDefaultComponentTypeIndices;
+		std::vector<std::type_index> mDefaultComponentTypeIndices;
 	};
 }

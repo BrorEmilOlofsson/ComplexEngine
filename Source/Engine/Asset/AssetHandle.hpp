@@ -70,4 +70,10 @@ namespace CLX
 		return &a.Get() == &b.Get();
 	}
 
+	template<typename T>
+    [[nodiscard]] constexpr bool operator<(const AssetHandle<T>& a, const AssetHandle<T>& b) noexcept
+	{
+        return &a.Get() < &b.Get();
+	}
+
 }

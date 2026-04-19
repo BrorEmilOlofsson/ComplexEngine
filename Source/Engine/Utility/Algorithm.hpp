@@ -4,11 +4,30 @@
 #include <cctype>
 #include <filesystem>
 #include <vector>
-#include <unordered_set>
 #include <ranges>
+#include <optional>
 
 namespace CLX
 {
+
+	constexpr auto Find(std::ranges::range auto&& range, auto&& value)
+	{
+		return std::ranges::find(range, value);
+	}
+
+	constexpr auto FindIf(std::ranges::range auto&& range, auto&& predicate)
+	{
+		auto it = std::ranges::find_if(range, predicate);
+		using Ret = decltype(std::make_optional(*it));
+		if (it != std::ranges::end(range))
+		{
+			return std::make_optional(*it);
+		}
+		else
+		{
+			return Ret(std::nullopt);
+        }
+	}
 
 	template<typename T>
 	constexpr std::vector<std::vector<T>> SplitVector(const std::vector<T>& vector, const size_t subSize)

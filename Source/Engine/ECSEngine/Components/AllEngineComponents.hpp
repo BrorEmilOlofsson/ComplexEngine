@@ -2,7 +2,7 @@
 #include "Engine/ECSEngine/Components/NameComponent.hpp"
 #include "Engine/ECSEngine/Components/TransformComponent.hpp"
 #include "Engine/ECSEngine/Components/TransformHierarchyComponent.hpp"
-#include "Engine/ECSEngine/Components/EntityCompositionComponent.hpp"
+#include "Engine/ECSEngine/Components/EntityCompositionInstantiationComponent.hpp"
 #include "Engine/ECSEngine/Components/EditorComponent.hpp"
 #include "Engine/ECSEngine/Components/MeshComponent.hpp"
 #include "Engine/ECSEngine/Components/ModelComponent.hpp"
@@ -28,7 +28,7 @@ namespace CLX
 		RegisterNameComponent();
 		RegisterTransformComponent();
 		RegisterTransformHierarchyComponent();
-		RegisterEntityCompositionComponent();
+		RegisterEntityCompositionInstantiationComponent();
 		RegisterEditorComponent();
 		RegisterMeshComponent();
 		RegisterModelComponent();
