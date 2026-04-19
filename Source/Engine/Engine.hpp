@@ -2,8 +2,11 @@
 #include <memory>
 #include "Engine/Utility/Win/WinConsole.hpp"
 #include "Engine/Utility/SystemTimer.hpp"
-#include "Engine/Scene/SceneManager.hpp"
 #include "Engine/OperatingSystem/OperatingSystem.hpp"
+#include "Engine/Utility/Blackboard.hpp"
+#include "Engine/Input/InputState.hpp"
+#include "Engine/ECS/ECSManager.hpp"
+#include "Engine/Scene/SceneManager.hpp"
 #include "Engine/SimpleScript/SimpleNodeScript.hpp"
 #include "Engine/Asset/AssetManager.hpp"
 #include "Engine/Graphics/GraphicsSettings.hpp"
@@ -59,8 +62,9 @@ namespace CLX
 	private:
 
 		DataTypeRegistry mDataTypeRegistry;
-		ECSRegistry mECSRegistry;
 		OperatingSystem mOperatingSystem;
+		ECSRegistry mECSRegistry;
+		ECSManager mECSManager;
 		[[no_unique_address]] Console mConsole;
 		std::shared_ptr<AssetManager> mAssetManager;
 		SceneManager mSceneManager;

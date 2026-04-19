@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/ECS/ECS.hpp"
+#include "Engine/ECS/ECSManager.hpp"
 #include "Engine/Graphics/RenderState.hpp"
 #include "Engine/Navmesh/Navmesh.hpp"
 #include "Engine/Math/Shapes/Ray3.hpp"
@@ -21,8 +22,8 @@ namespace CLX
 		void EditorUpdate();
 		void Render();
 
-		[[nodiscard]] constexpr ECS& GetECS();
-		[[nodiscard]] constexpr const ECS& GetECS() const;
+		[[nodiscard]] inline ECS& GetECS();
+		[[nodiscard]] inline const ECS& GetECS() const;
 
 		[[nodiscard]] constexpr RenderState& GetRenderState();
 
@@ -41,23 +42,23 @@ namespace CLX
 
 	private:
 
-		ECS mECS;
+		ECSOwningHandle mECSHandle;
 		Navmesh mNavmesh;
 		std::filesystem::path mNavmeshPath;
-		ECS mBackupECS;
+		ECSOwningHandle mBackupECSHandle;
 		RenderState mRenderState;
 		std::weak_ptr<Blackboard> mBlackboard;
 		Ray3f mMouseRay;
 	};
 
-	constexpr ECS& Scene::GetECS()
+	inline ECS& Scene::GetECS()
 	{
-		return mECS;
+		return mECSHandle.Get();
 	}
 
-	constexpr const ECS& Scene::GetECS() const
+	inline const ECS& Scene::GetECS() const
 	{
-		return mECS;
+		return mECSHandle.Get();
 	}
 
 	[[nodiscard]] constexpr RenderState& Scene::GetRenderState()

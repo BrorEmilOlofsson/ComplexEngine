@@ -38,8 +38,8 @@ namespace CLX
         [[nodiscard]] RenderContext CreateRenderContext(const Dimension2u& size);
         GraphicsWindowView MakeWindow(WindowView windowView);
 
-        void SetAssetManager(std::shared_ptr<AssetManager> assetManager);
-        void SetGraphicsSettings(std::shared_ptr<GraphicsSettings> graphicsSettings);
+        void SetAssetManager(std::weak_ptr<AssetManager> assetManager);
+        void SetGraphicsSettings(std::weak_ptr<GraphicsSettings> graphicsSettings);
 
     private:
 
@@ -58,8 +58,8 @@ namespace CLX
             [[nodiscard]] virtual RenderContext CreateRenderContext(const Dimension2u& size) = 0;
             virtual GraphicsWindowView MakeWindow(WindowView windowView) = 0;
 
-            virtual void SetAssetManager(std::shared_ptr<AssetManager> assetManager) = 0;
-            virtual void SetGraphicsSettings(std::shared_ptr<GraphicsSettings> graphicsSettings) = 0;
+            virtual void SetAssetManager(std::weak_ptr<AssetManager> assetManager) = 0;
+            virtual void SetGraphicsSettings(std::weak_ptr<GraphicsSettings> graphicsSettings) = 0;
         };
 
         template<typename T>
@@ -108,12 +108,12 @@ namespace CLX
                 return mObject.MakeWindow(windowView);
             }
 
-            void SetAssetManager(std::shared_ptr<AssetManager> assetManager)
+            void SetAssetManager(std::weak_ptr<AssetManager> assetManager)
             {
                 mObject.SetAssetManager(std::move(assetManager));
             }
 
-            void SetGraphicsSettings(std::shared_ptr<GraphicsSettings> graphicsSettings)
+            void SetGraphicsSettings(std::weak_ptr<GraphicsSettings> graphicsSettings)
             {
                 mObject.SetGraphicsSettings(std::move(graphicsSettings));
             }

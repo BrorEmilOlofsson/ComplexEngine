@@ -72,14 +72,14 @@ namespace CLX
 
         [[nodiscard]] std::function<void(AssetManager&)> GetDefaultAssetLoader();
 
-        void SetAssetManager(std::shared_ptr<AssetManager> assetManager)
+        void SetAssetManager(std::weak_ptr<AssetManager> assetManager)
         {
             mAssetManager = std::move(assetManager);
-            SetAssetLoaders(mAssetManager->GetAssetLoader());
-            mAssetManager->SetDefaultLoader(GetDefaultAssetLoader());
+            SetAssetLoaders(mAssetManager.lock()->GetAssetLoader());
+            mAssetManager.lock()->SetDefaultLoader(GetDefaultAssetLoader());
         }
 
-        void SetGraphicsSettings(std::shared_ptr<GraphicsSettings> graphicsSettings)
+        void SetGraphicsSettings(std::weak_ptr<GraphicsSettings> graphicsSettings)
         {
             mGraphicsSettings = std::move(graphicsSettings);
         }
@@ -116,8 +116,8 @@ namespace CLX
         DX11RenderTargetManager mRenderTargetManager;
         std::shared_ptr<DX11DepthStencilViewManager> mDepthStencilViewManager;
         std::shared_ptr<DX11SamplerState> mSamplerState;
-        std::shared_ptr<AssetManager> mAssetManager;
-        std::shared_ptr<GraphicsSettings> mGraphicsSettings;
+        std::weak_ptr<AssetManager> mAssetManager;
+        std::weak_ptr<GraphicsSettings> mGraphicsSettings;
         std::unordered_map<uint32_t, DX11Window> mWindows;
         uint32_t mCurrentWindowID = 0;
 

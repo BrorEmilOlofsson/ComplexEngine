@@ -136,7 +136,7 @@ namespace CLX
     };
 
 
-    ECSOwningHandle CreateECS(ECSManager& ecsManager, const ECSRegistry& registry)
+    inline ECSOwningHandle CreateECS(ECSManager& ecsManager, const ECSRegistry& registry)
     {
         return ECSOwningHandle(ecsManager, ecsManager.CreateECS(registry));
     }

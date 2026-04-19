@@ -3,6 +3,7 @@
 #include "Engine/ECS/ECS.hpp"
 #include "Engine/Graphics/RenderState.hpp"
 #include "Engine/ECSEngine/Components/CylinderComponent.hpp"
+#include "Engine/ECSEngine/Components/TransformComponent.hpp"
 #include "Engine/Math/ShapeMath.hpp"
 
 namespace CLX

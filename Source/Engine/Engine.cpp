@@ -79,6 +79,7 @@ namespace CLX
         mBlackboard->Insert<Key_SceneManager>(mSceneManager);
         mBlackboard->Insert<Key_DataTypeRegistry>(mDataTypeRegistry);
         mBlackboard->Insert<Key_InputState>(mInputState);
+        mBlackboard->Insert<Key_ECSManager>(mECSManager);
 
         mAssetManager->GetAssetLoader().SetSceneLoader([this](const std::filesystem::path& path)
             {

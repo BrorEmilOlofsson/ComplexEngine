@@ -39,12 +39,12 @@ namespace CLX
         return mConcept->MakeWindow(windowView);
     }
 
-    void GraphicsFoundation::SetAssetManager(std::shared_ptr<AssetManager> assetManager)
+    void GraphicsFoundation::SetAssetManager(std::weak_ptr<AssetManager> assetManager)
     {
         mConcept->SetAssetManager(std::move(assetManager));
     }
 
-    void GraphicsFoundation::SetGraphicsSettings(std::shared_ptr<GraphicsSettings> graphicsSettings)
+    void GraphicsFoundation::SetGraphicsSettings(std::weak_ptr<GraphicsSettings> graphicsSettings)
     {
         mConcept->SetGraphicsSettings(std::move(graphicsSettings));
     }

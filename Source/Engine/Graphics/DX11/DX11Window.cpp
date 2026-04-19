@@ -24,7 +24,7 @@ namespace CLX
 	}
 
 	DX11Window::DX11Window(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context,
-		WindowView windowView, std::shared_ptr<AssetManager> assetManager, std::shared_ptr<GraphicsSettings> graphicsSettings,
+		WindowView windowView, std::weak_ptr<AssetManager> assetManager, std::weak_ptr<GraphicsSettings> graphicsSettings,
 		std::weak_ptr<DX11DepthStencilViewManager> dsvManager, std::weak_ptr<DX11SamplerState> samplerState, bool instantiateImGui)
 		: mDevice(device)
 		, mContext(context)

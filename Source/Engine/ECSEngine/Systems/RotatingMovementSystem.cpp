@@ -2,6 +2,7 @@
 #include "RotatingMovementSystem.hpp"
 #include "Engine/ECSEngine/Components/RotatingMovementComponent.hpp"
 #include "Engine/ECS/ECS.hpp"
+#include "Engine/ECSEngine/Components/TransformComponent.hpp"
 
 namespace CLX
 {

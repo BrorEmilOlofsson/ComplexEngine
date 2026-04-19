@@ -121,7 +121,7 @@ namespace CLX
 		mConstantBufferManager.UpdateTimeBuffer(totalTime, deltaTime, *GetContext().Get());
 		mConstantBufferManager.UpdatePostProcessBuffer(PostProcessBufferData{}, *GetContext().Get());
 
-		mRenderTargetManager.ClearAll(mGraphicsSettings->clearColor);
+		mRenderTargetManager.ClearAll(mGraphicsSettings.lock()->clearColor);
 
 		for (auto& depthStencilView : *mDepthStencilViewManager)
 		{
@@ -140,7 +140,7 @@ namespace CLX
 	void DX11Foundation::Init()
 	{
 		mImGui.Load();
-		mRenderer.Init(*mAssetManager);
+		mRenderer.Init(*mAssetManager.lock());
 	}
 
 	void DX11Foundation::Shutdown()
@@ -254,9 +254,9 @@ namespace CLX
 
 		mRenderer.Render(
 			renderState,
-			*mAssetManager,
-			mAssetManager->GetPixelShader(GetPath(ePixelShaderType::LitDefault)),
-			mAssetManager->GetVertexShader(GetPath(eVertexShaderType::Default)),
+			*mAssetManager.lock(),
+			mAssetManager.lock()->GetPixelShader(GetPath(ePixelShaderType::LitDefault)),
+			mAssetManager.lock()->GetVertexShader(GetPath(eVertexShaderType::Default)),
 			mConstantBufferManager.mColorBuffer,
 			mConstantBufferManager.mTransformBuffer,
 			mConstantBufferManager.mObjectIDBuffer,

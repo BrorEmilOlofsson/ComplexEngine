@@ -22,5 +22,3 @@
 #include "Engine/Math/Matrix4x4.hpp"
 #include "Engine/Math/Transform3.hpp"
 #include "Engine/Utility/BlackboardKeys.hpp"
-
-#include "Engine/ECSEngine/Components/TransformComponent.hpp"
