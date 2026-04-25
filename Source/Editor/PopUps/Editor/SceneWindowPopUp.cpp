@@ -122,7 +122,7 @@ namespace CLX
     }
 
 
-    static void CheckForEntityCompositionDrops(ECSHandle ecsHandle, AssetManager& assetManager, std::vector<EntityID>& rootEntities, std::set<EntityID>& selectedEntityIDs, EditorCommandTracker& commandTracker)
+    static void CheckForEntityCompositionDrops(ECSHandle ecsHandle, AssetManager& assetManager, std::vector<EntityID>& rootEntities, std::set<EntityID>& selectedEntityIDs, const DataTypeRegistry& dataTypeRegistry, EditorCommandTracker& commandTracker)
     {
         if (ImGui::BeginDragDropTarget())
         {
@@ -137,6 +137,7 @@ namespace CLX
                         ecsHandle,
                         assetManager.GetEntityComposition(path),
                         rootEntities,
+                        dataTypeRegistry,
                         commandTracker
                     );
 
@@ -254,6 +255,7 @@ namespace CLX
         OperatingSystem& os = blackboard.Get<Key_OperatingSystem>();
         AssetManager& assetManager = blackboard.Get<Key_AssetManager>();
         EditorSceneSettings& editorSceneSettings = blackboard.Get<Key_EditorSceneSettings>();
+        const DataTypeRegistry& dataTypeRegistry = blackboard.Get<Key_DataTypeRegistry>();
 
         const WindowView windowView = blackboard.Get<Key_WindowView>();
         void* sceneTextureID = activeScene.GetRenderState().GetRenderContext()->GetOutputSRV();
@@ -278,9 +280,9 @@ namespace CLX
                 assetManager,
                 mHierarchyPopUp.GetRootEntities(),
                 mHierarchyPopUp.GetSelectedEntityIDs(),
+                dataTypeRegistry,
                 commandTracker
             );
-
 
             if (mHierarchyPopUp.GetSelectedEntityIDs().size() == 1)
             {

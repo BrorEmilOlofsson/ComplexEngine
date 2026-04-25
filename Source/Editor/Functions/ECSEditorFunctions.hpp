@@ -52,7 +52,8 @@ namespace CLX
 		EntityCompositionAssetHandle entityCompositionAsset, const Blackboard& blackboard);
 
 	// Returns root entity of instantiated entity composition
-	EntityID InstantiateEntityComposition(ECSHandle targetECSHandle, const EntityCompositionAssetHandle& compositionAsset, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker);
+	EntityID InstantiateEntityComposition(ECSHandle targetECSHandle, const EntityCompositionAssetHandle& compositionAsset, std::vector<EntityID>& rootEntities, 
+		const DataTypeRegistry& dataTypeRegistry, EditorCommandTracker& commandTracker);
 
 	void TeleportCameraToEntity(const ECS& ecs, EntityID entityID, Camera& camera, bool changeRotation = true, const float offsetDistance = 5.f);
 }

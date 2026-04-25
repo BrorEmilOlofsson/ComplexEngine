@@ -3,18 +3,18 @@
 #include "Engine/ECS/ECS.hpp"
 #include "Engine/ECS/EntityComposition.hpp"
 #include "Engine/ECSEngine/Components/TransformHierarchyComponent.hpp"
-#include "Engine/ECSEngine/Components/EntityCompositionInstantiationComponent.hpp"
+#include "Engine/ECSEngine/Utility/ECSUtilityFunctions.hpp"
 
 namespace CLX
 {
 
-	void UpdateEntityIDs(const ECS& previousECS, ECS& ecs, const EntityIDConverter& entityIDConverter)
+	void UpdateEntityIDs(const ECS& previousECS, ECS& ecs, const EntityIDConverter& entityIDConverter, const DataTypeRegistry& dataTypeRegistry)
 	{
-		for (auto e : previousECS.ViewEntities())
+		for (auto entityView : previousECS.ViewEntities())
 		{
-			const EntityID newEntityID = entityIDConverter.ConvertToTarget(e.GetEntityID());
-			auto entityView = ecs.ViewEntity(newEntityID);
-			TransformHierarchyComponent& hierarchyComponent = *entityView.GetComponent<TransformHierarchyComponent>();
+			const EntityID newEntityID = entityIDConverter.ConvertToTarget(entityView.GetEntityID());
+			auto newEntityView = ecs.ViewEntity(newEntityID);
+			TransformHierarchyComponent& hierarchyComponent = *newEntityView.GetComponent<TransformHierarchyComponent>();
 
 			if (hierarchyComponent.parent != InvalidEntityID)
 			{
@@ -25,6 +25,8 @@ namespace CLX
 			{
 				hierarchyComponent.children[i] = entityIDConverter.ConvertToTarget(hierarchyComponent.children[i]);
 			}
+
+            RemapComponentEntityIDs(ecs, newEntityID, entityIDConverter.GetSourceToTargetMap(), dataTypeRegistry);
 		}
 	}
 }

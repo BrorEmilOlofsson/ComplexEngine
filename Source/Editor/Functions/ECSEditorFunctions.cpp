@@ -94,67 +94,12 @@ namespace CLX
         ecs.DestroyEntity(entityID);
     }
 
-    [[nodiscard]] bool HasVariableEntity(const std::type_index& type)
-    {
-        return type == typeid(EntityID) || type == typeid(std::vector<EntityID>);
-    }
-
-    static void RemapEntityIDs(ECS& ecs, const EntityID newEntityID, const std::map<EntityID, EntityID>& oldToNewEntityIDMap, const DataTypeRegistry& dataTypeRegistry)
-    {
-        for (auto [typeinfo, componentPtr] : ECS::EntityView(&ecs, newEntityID))
-        {
-            const DataType* dataType = dataTypeRegistry.Find(GetDataTypeID(typeinfo));
-            ASSERT(dataType != nullptr);
-            auto& members = dataType->memberVariables;
-
-            auto membersFiltered = members | std::views::filter([&dataTypeRegistry](const DataTypeMemberVariable& member)
-                {
-                    const auto& dataType = dataTypeRegistry.Find(member.dataTypeID);
-                    ASSERT(dataType != nullptr);
-                    return HasVariableEntity(dataType->type);
-                });
-
-            auto memberPair = membersFiltered | std::views::transform([&dataTypeRegistry, &componentPtr](const DataTypeMemberVariable& member)
-                {
-                    return std::pair<std::type_index, void*>{ dataTypeRegistry.Find(member.dataTypeID)->type, componentPtr + std::get<ByteOffset>(member.memberType) };
-                })
-                | std::ranges::to<std::vector>();
-
-            for (const auto& [memberTypeInfo, memberPtr] : memberPair)
-            {
-                if (memberTypeInfo == typeid(EntityID))
-                {
-                    EntityID& entityRef = *static_cast<EntityID*>(memberPtr);
-                    if (oldToNewEntityIDMap.contains(entityRef))
-                    {
-                        entityRef = oldToNewEntityIDMap.at(entityRef);
-                    }
-                }
-                else if (memberTypeInfo == typeid(std::vector<EntityID>))
-                {
-                    std::vector<EntityID>& entityVectorRef = *static_cast<std::vector<EntityID>*>(memberPtr);
-                    for (EntityID& entityIDInVector : entityVectorRef)
-                    {
-                        if (oldToNewEntityIDMap.contains(entityIDInVector))
-                        {
-                            entityIDInVector = oldToNewEntityIDMap.at(entityIDInVector);
-                        }
-                    }
-                }
-                else
-                {
-                    ASSERT_NEW(false, "Unexpected type info for member variable when duplicating entity and children");
-                }
-            }
-        }
-    }
-
     static std::map<EntityID, EntityID> DuplicateEntityAndChildren(ECS& ecs, const EntityID entityID, const DataTypeRegistry& dataTypeRegistry)
     {
         const EntityID createdEntityID = ecs.DuplicateEntity(entityID);
         std::map<EntityID, EntityID> oldToNewEntityIDMap;
         oldToNewEntityIDMap[entityID] = createdEntityID;
-        auto children = GetAllEntityChildren(ecs, entityID);
+        std::vector<EntityID> children = GetAllEntityChildren(ecs, entityID);
 
         for (auto child : children)
         {
@@ -163,12 +108,12 @@ namespace CLX
         }
 
         // Remap parent-child relationships in the duplicated entities
-        RemapEntityIDs(ecs, createdEntityID, oldToNewEntityIDMap, dataTypeRegistry);
+        RemapComponentEntityIDs(ecs, createdEntityID, oldToNewEntityIDMap, dataTypeRegistry);
 
         for (auto child : children)
         {
             const EntityID createdChildEntityID = oldToNewEntityIDMap.at(child);
-            RemapEntityIDs(ecs, createdChildEntityID, oldToNewEntityIDMap, dataTypeRegistry);
+            RemapComponentEntityIDs(ecs, createdChildEntityID, oldToNewEntityIDMap, dataTypeRegistry);
         }
 
         return oldToNewEntityIDMap;
@@ -1786,10 +1731,11 @@ namespace CLX
             entityConverter1[entity.GetEntityID()] = createdEntityID;
             entityConverter2[createdEntityID] = entity.GetEntityID();
         }
-        return EntityIDConverter(std::move(entityConverter1), std::move(entityConverter2));
+        const EntityIDConverter entityConverter(std::move(entityConverter1), std::move(entityConverter2));
+        return entityConverter;
     }
 
-    EntityID InstantiateEntityComposition(const ECSHandle targetECSHandle, const EntityCompositionAssetHandle& compositionAsset, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker)
+    EntityID InstantiateEntityComposition(const ECSHandle targetECSHandle, const EntityCompositionAssetHandle& compositionAsset, std::vector<EntityID>& rootEntities, const DataTypeRegistry& dataTypeRegistry, EditorCommandTracker& commandTracker)
     {
         ASSERT(compositionAsset.IsValid());
         ASSERT(targetECSHandle.Get() != nullptr);
@@ -1797,7 +1743,7 @@ namespace CLX
         commandTracker;
         const EntityComposition& entityComposition = compositionAsset.Get();
         const EntityIDConverter entityConverter = MergeECS(targetECS, entityComposition.GetECS());
-        UpdateEntityIDs(entityComposition.GetECS(), targetECS, entityConverter);
+        UpdateEntityIDs(entityComposition.GetECS(), targetECS, entityConverter, dataTypeRegistry);
         const EntityID instantiatedRootEntity = entityConverter.ConvertToTarget(entityComposition.GetRootEntity());
         targetECS.AddComponent<EntityCompositionInstantiationComponent>(instantiatedRootEntity).asset = compositionAsset;
         targetECS.AddComponent<EntityCompositionInstantiationComponent>(instantiatedRootEntity).mappedEntityID = entityComposition.GetRootEntity();

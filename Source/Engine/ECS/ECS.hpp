@@ -99,25 +99,35 @@ namespace CLX
     {
     public:
 
-        explicit EntityIDConverter(std::unordered_map<EntityID, EntityID> entityIDConverter1, std::unordered_map<EntityID, EntityID> entityIDConverter2)
-            : mEntityIDConverter1(std::move(entityIDConverter1))
-            , mEntityIDConverter2(std::move(entityIDConverter2))
+        explicit EntityIDConverter(std::unordered_map<EntityID, EntityID> sourceToTargetMap, std::unordered_map<EntityID, EntityID> targetToSourceMap)
+            : mSourceToTargetMap(std::move(sourceToTargetMap))
+            , mTargetToSourceMap(std::move(targetToSourceMap))
         {}
 
         [[nodiscard]] EntityID ConvertToTarget(const EntityID sourceEntityID) const
         {
-            return mEntityIDConverter1.at(sourceEntityID);
+            return mSourceToTargetMap.at(sourceEntityID);
         }
 
         [[nodiscard]] EntityID ConvertToSource(const EntityID targetEntityID) const
         {
-
-            return mEntityIDConverter2.at(targetEntityID);
+            return mTargetToSourceMap.at(targetEntityID);
         }
+
+        [[nodiscard]] decltype(auto) GetSourceToTargetMap() const
+        {
+            return mSourceToTargetMap;
+        }
+
+        [[nodiscard]] decltype(auto) GetTargetToSourceMap() const
+        {
+            return mTargetToSourceMap;
+        }
+
     private:
 
-        std::unordered_map<EntityID, EntityID> mEntityIDConverter1;
-        std::unordered_map<EntityID, EntityID> mEntityIDConverter2;
+        std::unordered_map<EntityID, EntityID> mSourceToTargetMap;
+        std::unordered_map<EntityID, EntityID> mTargetToSourceMap;
     };
 
 
@@ -429,8 +439,8 @@ namespace CLX
             class ConstTypeErasedComponentIterator final
             {
             public:
-                
-                using difference_type = std::ptrdiff_t; 
+
+                using difference_type = std::ptrdiff_t;
                 using value_type = std::pair<const std::type_info&, const void*>;
 
 
