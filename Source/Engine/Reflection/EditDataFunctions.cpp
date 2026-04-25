@@ -63,11 +63,17 @@ namespace CLX
 
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, (ImVec2(0, 0)));
 
-        viewAndEditResult |= CustomDragFloat1("X", x, width, label, Colors::Red, speed, min, max);
+        ViewAndEditResult viewAndEditResultX = CustomDragFloat1("X", x, width, label, Colors::Red, speed, min, max);
+        viewAndEditResult.isEdited |= viewAndEditResultX.isEdited;
+        viewAndEditResult.isActive |= viewAndEditResultX.isActive;
         ImGui::SameLine();
-        viewAndEditResult |= CustomDragFloat1("Y", y, width, label, Color(0, 0.7f, 0), speed, min, max);
+        ViewAndEditResult viewAndEditResultY = CustomDragFloat1("Y", y, width, label, Color(0, 0.7f, 0), speed, min, max);
+        viewAndEditResult.isEdited |= viewAndEditResultY.isEdited;
+        viewAndEditResult.isActive |= viewAndEditResultY.isActive;
         ImGui::SameLine();
-        viewAndEditResult |= CustomDragFloat1("Z", z, width, label, Colors::Blue, speed, min, max);
+        ViewAndEditResult viewAndEditResultZ = CustomDragFloat1("Z", z, width, label, Colors::Blue, speed, min, max);
+        viewAndEditResult.isEdited |= viewAndEditResultZ.isEdited;
+        viewAndEditResult.isActive |= viewAndEditResultZ.isActive;
 
         ImGui::PopStyleVar();
 
@@ -385,7 +391,9 @@ namespace CLX
             return viewAndEditResult;
         }
 
-        viewAndEditResult |= VisualizeInScene(value, referencePoint, currentCamera, renderList);
+        ViewAndEditResult viewAndEditResultScene = VisualizeInScene(value, referencePoint, currentCamera, renderList);
+        viewAndEditResult.isEdited |= viewAndEditResultScene.isEdited;
+        viewAndEditResult.isActive |= viewAndEditResultScene.isActive;
 
         return viewAndEditResult;
     }
@@ -449,7 +457,8 @@ namespace CLX
             Point3f position = value.GetPosition();
 
             const ViewAndEditResult viewAndEditPosition = CustomDragFloat3("Position", position);
-            viewAndEditResult |= viewAndEditPosition;
+            viewAndEditResult.isEdited |= viewAndEditPosition.isEdited;
+            viewAndEditResult.isActive |= viewAndEditPosition.isActive;
 
             if (viewAndEditPosition.isEdited)
             {
@@ -462,7 +471,8 @@ namespace CLX
             Rotatorf rotation = value.GetRotation();
 
             const ViewAndEditResult viewAndEditRotation = CustomDragFloat3("Rotation", rotation);
-            viewAndEditResult |= viewAndEditRotation;
+            viewAndEditResult.isEdited |= viewAndEditRotation.isEdited;
+            viewAndEditResult.isActive |= viewAndEditRotation.isActive;
 
             if (viewAndEditRotation.isEdited)
             {
@@ -474,7 +484,8 @@ namespace CLX
             Vector3f scale = value.GetScale();
 
             const ViewAndEditResult viewAndEditScale = CustomDragFloat3("Scale", scale, 0.01f, 0.1f, 0.f);
-            viewAndEditResult |= viewAndEditScale;
+            viewAndEditResult.isEdited |= viewAndEditScale.isEdited;
+            viewAndEditResult.isActive |= viewAndEditScale.isActive;
 
             if (viewAndEditScale.isEdited)
             {
@@ -548,18 +559,30 @@ namespace CLX
     {
         memberData;
         ViewAndEditResult viewAndEditResult;
-        viewAndEditResult |= ViewAndEditValue(pointLight.color, "Color");
-        viewAndEditResult |= ViewAndEditValue(pointLight.intensity, "Intensity", 0.01f, 0.0f, 10.f);
-        viewAndEditResult |= ViewAndEditValue(pointLight.range, "Radius", 0.01f, 0.01f, FLT_MAX);
+        ViewAndEditResult viewAndEditResultColor = ViewAndEditValue(pointLight.color, "Color");
+        viewAndEditResult.isEdited |= viewAndEditResultColor.isEdited;
+        viewAndEditResult.isActive |= viewAndEditResultColor.isActive;
+        ViewAndEditResult viewAndEditResultIntensity = ViewAndEditValue(pointLight.intensity, "Intensity", 0.01f, 0.0f, 10.f);
+        viewAndEditResult.isEdited |= viewAndEditResultIntensity.isEdited;
+        viewAndEditResult.isActive |= viewAndEditResultIntensity.isActive;
+        ViewAndEditResult viewAndEditResultRange = ViewAndEditValue(pointLight.range, "Radius", 0.01f, 0.01f, FLT_MAX);
+        viewAndEditResult.isEdited |= viewAndEditResultRange.isEdited;
+        viewAndEditResult.isActive |= viewAndEditResultRange.isActive;
         return viewAndEditResult;
     }
 
     ViewAndEditResult ViewAndEditValue(DirectionalLight& directionalLight, const Blackboard& blackboard)
     {
         ViewAndEditResult viewAndEditResult;
-        viewAndEditResult |= ViewAndEditValue(directionalLight.direction, "Direction", blackboard);
-        viewAndEditResult |= ViewAndEditValue(directionalLight.color, "Color");
-        viewAndEditResult |= ViewAndEditValue(directionalLight.intensity, "Intensity", 0.01f, 0.0f, 1.f);
+        ViewAndEditResult viewAndEditResultDirection = ViewAndEditValue(directionalLight.direction, "Direction", blackboard);
+        viewAndEditResult.isEdited |= viewAndEditResultDirection.isEdited;
+        viewAndEditResult.isActive |= viewAndEditResultDirection.isActive;
+        ViewAndEditResult viewAndEditResultColor = ViewAndEditValue(directionalLight.color, "Color");
+        viewAndEditResult.isEdited |= viewAndEditResultColor.isEdited;
+        viewAndEditResult.isActive |= viewAndEditResultColor.isActive;
+        ViewAndEditResult viewAndEditResultIntensity = ViewAndEditValue(directionalLight.intensity, "Intensity", 0.01f, 0.0f, 1.f);
+        viewAndEditResult.isEdited |= viewAndEditResultIntensity.isEdited;
+        viewAndEditResult.isActive |= viewAndEditResultIntensity.isActive;
         return viewAndEditResult;
     }
 
@@ -638,7 +661,8 @@ namespace CLX
         {
             Point3f center = aabb.GetCenter();
             ViewAndEditResult centerViewAndEditResult = ViewAndEditValue(center, "Center");
-            viewAndEditResult |= centerViewAndEditResult;
+            viewAndEditResult.isEdited |= centerViewAndEditResult.isEdited;
+            viewAndEditResult.isActive |= centerViewAndEditResult.isActive;
             if (centerViewAndEditResult.isEdited)
             {
                 aabb.SetCenter(center);
@@ -647,7 +671,8 @@ namespace CLX
         {
             Vector3f extent = aabb.GetExtent();
             ViewAndEditResult extentViewAndEditResult = ViewAndEditValue(extent, "Extent");
-            viewAndEditResult |= extentViewAndEditResult;
+            viewAndEditResult.isEdited |= extentViewAndEditResult.isEdited;
+            viewAndEditResult.isActive |= extentViewAndEditResult.isActive;
             if (extentViewAndEditResult.isEdited)
             {
                 aabb.SetExtent(extent);
@@ -664,7 +689,8 @@ namespace CLX
         {
             Point3f origin = ray.GetOrigin();
             ViewAndEditResult originViewAndEditResult = ViewAndEditValue(origin, "Origin");
-            viewAndEditResult |= originViewAndEditResult;
+            viewAndEditResult.isEdited |= originViewAndEditResult.isEdited;
+            viewAndEditResult.isActive |= originViewAndEditResult.isActive;
             if (originViewAndEditResult.isEdited)
             {
                 ray.SetOrigin(origin);
@@ -675,7 +701,8 @@ namespace CLX
             Blackboard newBlackboard = blackboard;
             newBlackboard.Insert<Key_VariableName>("Direction");
             ViewAndEditResult directionViewAndEditResult = ViewAndEditValue(direction, newBlackboard, nullptr);
-            viewAndEditResult |= directionViewAndEditResult;
+            viewAndEditResult.isEdited |= directionViewAndEditResult.isEdited;
+            viewAndEditResult.isActive |= directionViewAndEditResult.isActive;
             if (directionViewAndEditResult.isEdited)
             {
                 ray.SetDirection(direction);

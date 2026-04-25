@@ -1250,16 +1250,12 @@ namespace CLX
 
     [[nodiscard]] static std::optional<EntityID> FindEntity(const ECS& ecs, auto&& predicate, const EntityID startEntityID)
     {
-        if (predicate(startEntityID))
+        if (std::invoke(predicate, startEntityID))
         {
             return startEntityID;
         }
         for (const EntityID entityID : GetEntityChildren(ecs, startEntityID))
         {
-            if (predicate(entityID))
-            {
-                return entityID;
-            }
             if (const std::optional<EntityID> foundInChildren = FindEntity(ecs, predicate, entityID))
             {
                 return foundInChildren;
@@ -1276,7 +1272,7 @@ namespace CLX
     std::map<EntityCompositionAssetHandle, std::vector<EntityCompositionInstantiation>> instantiationsByEntityComposition;
 
     void HandleEntityCompositionModification(EntityCompositionAssetHandle entityCompopsitionAssetHandle, const EntityID modifiedEntityID,
-        const void* sourcePtr, const DataTypeID modifiedDataTypeID, const DataTypeID componentTypeID, const PropertyPath& propertyPath, const DataTypeRegistry& dataTypeRegistry)
+        const void* sourcePtr, const DataTypeID modifiedDataTypeID, const DataTypeID componentTypeID, const PropertyPath& propertyPath, const std::optional<VectorEditOperation>& vectorOperation, const DataTypeRegistry& dataTypeRegistry)
     {
         dataTypeRegistry;
         if (!entityCompopsitionAssetHandle)
@@ -1312,7 +1308,7 @@ namespace CLX
             if (modifiedDataTypeID == GetDataTypeID<EntityID>())
             {
                 const EntityID newEntityID = *static_cast<const EntityID*>(sourcePtr);
-                
+
                 std::optional<EntityID> f = FindEntity(*instantiationECS, [&](const EntityID entityID)
                     {
                         auto* compositionComponent = instantiationECS->GetComponent<EntityCompositionInstantiationComponent>(entityID);
@@ -1324,6 +1320,7 @@ namespace CLX
             }
             else if (modifiedDataTypeID == GetDataTypeID<std::vector<EntityID>>())
             {
+                ASSERT(vectorOperation.has_value());
                 const std::vector<EntityID> newEntityIDs = *static_cast<const std::vector<EntityID>*>(sourcePtr);
 
                 void* componentPtr = instantiationECS->GetComponent(correspondingEntityID, componentTypeID.typeIndex);
@@ -1332,29 +1329,50 @@ namespace CLX
                 std::vector<EntityID>& entityIDVector = *static_cast<std::vector<EntityID>*>(s);
                 entityIDVector;
 
-                ASSERT(newEntityIDs.size() == entityIDVector.size());
-                
-                int i = 0;
-                for (EntityID newEntityID : newEntityIDs)
-                {
-                    if (newEntityID == InvalidEntityID)
-                    {
-                        continue;
-                    }
-                    std::optional<EntityID> f = FindEntity(*instantiationECS, [&](const EntityID entityID)
+                std::visit(Visitor{
+                        [&](const VectorEditOperations::PushBack&)
                         {
-                            auto* compositionComponent = instantiationECS->GetComponent<EntityCompositionInstantiationComponent>(entityID);
-                            ASSERT(compositionComponent != nullptr);
-                            return compositionComponent->mappedEntityID == newEntityID;
-                        }, entityID);
+                            entityIDVector.push_back(InvalidEntityID);
+                        },
+                        [&](const VectorEditOperations::Insert& insert)
+                        {
+                            entityIDVector.insert(entityIDVector.begin() + insert.index, InvalidEntityID);
+                        },
+                        [&](const VectorEditOperations::EraseElement& remove)
+                        {
+                            entityIDVector.erase(entityIDVector.begin() + remove.index);
+                        },
+                        [&](const VectorEditOperations::Clear&)
+                        {
+                            entityIDVector.clear();
+                        },
+                        [&](const auto&)
+                        {
+                            ASSERT(newEntityIDs.size() == entityIDVector.size());
 
-                    ASSERT(f.has_value());
+                            for (auto [i, newEntityID] : std::views::enumerate(newEntityIDs))
+                            {
+                                if (newEntityID == InvalidEntityID)
+                                {
+                                    continue;
+                                }
+                                std::optional<EntityID> f = FindEntity(*instantiationECS, [&](const EntityID entityID)
+                                    {
+                                        auto* compositionComponent = instantiationECS->GetComponent<EntityCompositionInstantiationComponent>(entityID);
+                                        ASSERT(compositionComponent != nullptr);
+                                        return compositionComponent->mappedEntityID == newEntityID;
+                                    }, entityID);
 
-                    const EntityID correspondingEntityID2 = f.value();
-                   
-                    entityIDVector[i] = correspondingEntityID2;
-                    i++;
-                }
+                                ASSERT(f.has_value());
+
+                                const EntityID correspondingEntityID2 = f.value();
+
+                                entityIDVector[i] = correspondingEntityID2;
+                            }
+                        }
+                    }, vectorOperation.value());
+
+
             }
 
         }
@@ -1409,12 +1427,13 @@ namespace CLX
             if (viewAndEditResult.isEdited)
             {
                 HandleEntityCompositionModification(
-                    entityCompositionAsset, 
-                    entityID, 
-                    viewAndEditResult.dataPtr, 
-                    viewAndEditResult.dataTypeID, 
-                    componentDataTypeID, 
+                    entityCompositionAsset,
+                    entityID,
+                    viewAndEditResult.dataPtr,
+                    viewAndEditResult.dataTypeID,
+                    componentDataTypeID,
                     viewAndEditResult.propertyPath,
+                    viewAndEditResult.vectorEditOperation,
                     dataTypeRegistry
                 );
 
@@ -1774,7 +1793,7 @@ namespace CLX
     {
         ASSERT(compositionAsset.IsValid());
         ASSERT(targetECSHandle.Get() != nullptr);
-            ECS& targetECS = *targetECSHandle.Get();
+        ECS& targetECS = *targetECSHandle.Get();
         commandTracker;
         const EntityComposition& entityComposition = compositionAsset.Get();
         const EntityIDConverter entityConverter = MergeECS(targetECS, entityComposition.GetECS());

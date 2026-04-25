@@ -57,7 +57,7 @@ namespace CLX
                 newBlackboard.Insert<Key_CurrentPropertyPath>(propertyPath);
                 std::println("Viewing member: {}", member.name);
                 std::println("Property Path: {}", propertyPath);
-                viewAndEditResult |= ViewAndEditData(member.dataTypeID, memberDataPtr, newBlackboard, &member);
+                viewAndEditResult |= ViewAndEditData(member.dataTypeID, memberDataPtr, newBlackboard, &member); 
                 if (viewAndEditResult.isEdited)
                 {
                     viewAndEditResult.dataTypeID = member.dataTypeID;
@@ -75,7 +75,7 @@ namespace CLX
                 void* allocatedDataPtr = arena.AllocateTypeErased(memberDataType->size, memberDataType->alignment, memberDataType->destroy, memberDataType->copy, memberDataType->type);
                 FunctionMember functionMember = std::get<FunctionMember>(member.memberType);
                 functionMember.getFunction(ownerPtr, allocatedDataPtr);
-                viewAndEditResult |= ViewAndEditData(member.dataTypeID, allocatedDataPtr, blackboard);
+                viewAndEditResult = ViewAndEditData(member.dataTypeID, allocatedDataPtr, blackboard);
             }
 
             if (viewAndEditResult.isActive)

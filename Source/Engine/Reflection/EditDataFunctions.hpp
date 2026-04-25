@@ -107,7 +107,8 @@ namespace CLX
 		{
 			Point2<T> center = aabb.GetCenter();
 			ViewAndEditResult centerViewAndEditResult = ViewAndEditValue(center, "Center");
-			viewAndEditResult |= centerViewAndEditResult;
+			viewAndEditResult.isEdited |= centerViewAndEditResult.isEdited;
+			viewAndEditResult.isActive |= centerViewAndEditResult.isActive;
 			if (centerViewAndEditResult.isEdited)
 			{
 				aabb.SetCenter(center);
@@ -116,7 +117,8 @@ namespace CLX
 		{
 			auto extent = aabb.GetExtent();
 			ViewAndEditResult extentViewAndEditResult = ViewAndEditValue(extent, "Extent");
-			viewAndEditResult |= extentViewAndEditResult;
+			viewAndEditResult.isEdited |= extentViewAndEditResult.isEdited;
+			viewAndEditResult.isActive |= extentViewAndEditResult.isActive;
 			if (extentViewAndEditResult.isEdited)
 			{
 				aabb.SetExtent(extent);
@@ -133,7 +135,8 @@ namespace CLX
 		{
 			T height = cylinder.GetHeight();
 			ViewAndEditResult heightViewAndEditResult = ViewAndEditValue(height, "Height");
-			viewAndEditResult |= heightViewAndEditResult;
+			viewAndEditResult.isEdited |= heightViewAndEditResult.isEdited;
+			viewAndEditResult.isActive |= heightViewAndEditResult.isActive;
 			if (heightViewAndEditResult.isEdited)
 			{
 				cylinder.SetHeight(height);
@@ -142,7 +145,8 @@ namespace CLX
 		{
 			T radius = cylinder.GetRadius().Value();
 			ViewAndEditResult radiusViewAndEditResult = ViewAndEditValue(radius, "Radius", 0.01f, 0.01f, FLT_MAX);
-			viewAndEditResult |= radiusViewAndEditResult;
+			viewAndEditResult.isEdited |= radiusViewAndEditResult.isEdited;
+			viewAndEditResult.isActive |= radiusViewAndEditResult.isActive;
 			if (radiusViewAndEditResult.isEdited)
 			{
 				cylinder.SetRadius(Radius<T>(radius));
@@ -151,7 +155,8 @@ namespace CLX
 		{
 			Point3<T> center = cylinder.GetCenter();
 			ViewAndEditResult centerViewAndEditResult = ViewAndEditValue(center, "Center");
-			viewAndEditResult |= centerViewAndEditResult;
+			viewAndEditResult.isEdited |= centerViewAndEditResult.isEdited;
+			viewAndEditResult.isActive |= centerViewAndEditResult.isActive;
 			if (centerViewAndEditResult.isEdited)
 			{
 				cylinder.SetCenter(center);
@@ -163,7 +168,8 @@ namespace CLX
             Blackboard axisBlackboard = blackboard;
             axisBlackboard.Insert<Key_VariableName>("Axis");
 			ViewAndEditResult axisViewAndEditResult = ViewAndEditValue(axis, axisBlackboard, nullptr);
-			viewAndEditResult |= axisViewAndEditResult;
+			viewAndEditResult.isEdited |= axisViewAndEditResult.isEdited;
+			viewAndEditResult.isActive |= axisViewAndEditResult.isActive;
 			if (axisViewAndEditResult.isEdited)
 			{
 				cylinder.SetAxis(axis);
@@ -272,6 +278,16 @@ namespace CLX
 
         const std::string variableName = memberData ? memberData->customName : "Vector";
         ImGui::Text(variableName.c_str());
+		ImGui::SameLine();
+		ImGui::BeginDisabled(vector.empty());
+		if (ImGui::Button("Clear"))
+		{
+			vector.clear();
+			result.isEdited = true;
+            result.isActive = true;
+			result.vectorEditOperation = VectorEditOperations::Clear{};
+		}
+        ImGui::EndDisabled();
 
 		for (size_t i = 0; i < vector.size(); ++i)
 		{
@@ -279,8 +295,11 @@ namespace CLX
 			if constexpr (std::same_as<T, bool>)
 			{
 				bool b = vector[i];
-				result |= ViewAndEditDataPtr(GetDataTypeID<T>(), &b, blackboard);
+				ViewAndEditResult resultIteration = ViewAndEditDataPtr(GetDataTypeID<T>(), &b, blackboard);
 				vector[i] = b;
+				result.isEdited |= resultIteration.isEdited;
+				result.isActive |= resultIteration.isActive;
+                result.vectorEditOperation = VectorEditOperations::ModifyElement{ i };
 
 				ImGui::SameLine();
 
@@ -292,7 +311,10 @@ namespace CLX
 			else
 			{
 				T& data = vector[i];
-				result |= ViewAndEditDataPtr(GetDataTypeID<T>(), &data, blackboard);
+				ViewAndEditResult resultIteration = ViewAndEditDataPtr(GetDataTypeID<T>(), &data, blackboard);
+				result.isEdited |= resultIteration.isEdited;
+				result.isActive |= resultIteration.isActive;
+				result.vectorEditOperation = VectorEditOperations::ModifyElement{ i };
 				ImGui::SameLine();
 
 				ImGui::PushID(&data);
@@ -313,18 +335,21 @@ namespace CLX
 			{
 				vector.erase(begin(vector) + currentPopupIndex);
 				result.isEdited = true;
+                result.vectorEditOperation = VectorEditOperations::EraseElement{ currentPopupIndex };
 			}
 
 			if (ImGui::MenuItem("Insert Before"))
 			{
-				vector.insert(begin(vector) + currentPopupIndex, T());
+				vector.insert(begin(vector) + currentPopupIndex, T{});
 				result.isEdited = true;
+                result.vectorEditOperation = VectorEditOperations::Insert{ currentPopupIndex };
 			}
 
 			if (ImGui::MenuItem("Reset Value"))
 			{
-				vector[currentPopupIndex] = T();
+				vector[currentPopupIndex] = T{};
 				result.isEdited = true;
+				result.vectorEditOperation = VectorEditOperations::ResetElement{ currentPopupIndex };
 			}
 
 			result.isActive = true;
@@ -337,7 +362,8 @@ namespace CLX
 			vector.emplace_back();
 
 			result.isEdited = true;
-			result.isActive |= ImGui::IsItemActive();
+			result.isActive = true;
+			result.vectorEditOperation = VectorEditOperations::PushBack{};
 		}
 
 		return result;
