@@ -91,7 +91,7 @@ struct std::formatter<CLX::PropertyPath> : std::formatter<std::string, char>
                     },
                     [&](const CLX::Index& index)
                     {
-                        result += "[" + std::to_string(index.mIndex) + "]";
+                        result += "[" + std::to_string(index.value) + "]";
                     }
                 }, element);
         }

@@ -57,7 +57,7 @@ namespace CLX
     }
 
 
-    static std::size_t GetEntityIndexInParent(const ECS& ecs, const EntityID entityID, std::vector<EntityID>& rootEntities)
+    std::size_t GetEntityIndexInParent(const ECS& ecs, const EntityID entityID, const std::vector<EntityID>& rootEntities)
     {
         const EntityID parentID = GetParentEntity(ecs, entityID);
         if (parentID == InvalidEntityID)
@@ -94,7 +94,7 @@ namespace CLX
         ecs.DestroyEntity(entityID);
     }
 
-    static std::map<EntityID, EntityID> DuplicateEntityHierarchy(ECS& ecs, const EntityID entityID, const DataTypeRegistry& dataTypeRegistry)
+    static std::map<EntityID, EntityID> DuplicateEntityHierarchy(ECS& ecs, const EntityID entityID, const ChildIndexSetting indexSetting, const DataTypeRegistry& dataTypeRegistry)
     {
         const EntityID createdEntityID = ecs.DuplicateEntity(entityID);
         std::map<EntityID, EntityID> oldToNewEntityIDMap;
@@ -114,6 +114,13 @@ namespace CLX
         {
             const EntityID createdChildEntityID = oldToNewEntityIDMap.at(child);
             RemapComponentEntityIDs(ecs, createdChildEntityID, oldToNewEntityIDMap, dataTypeRegistry);
+        }
+
+        const EntityID parentID = GetParentEntity(ecs, entityID);
+        ASSERT(parentID == GetParentEntity(ecs, createdEntityID));
+        if (parentID != InvalidEntityID)
+        {
+            AddBasedOnChildIndexSetting(ecs.GetComponent<TransformHierarchyComponent>(parentID)->children, createdEntityID, indexSetting);
         }
 
         return oldToNewEntityIDMap;
@@ -171,10 +178,9 @@ namespace CLX
     }
 
 
-    EntityID DuplicateEntityHierarchy(ECS& ecs, const EntityID entityID, std::vector<EntityID>& rootEntities, const DataTypeRegistry& dataTypeRegistry, EditorCommandTracker& commandTracker)
+    EntityID DuplicateEntityHierarchy(ECS& ecs, const EntityID entityID, std::vector<EntityID>& rootEntities, const ChildIndexSetting indexSetting, const DataTypeRegistry& dataTypeRegistry, EditorCommandTracker& commandTracker)
     {
-
-        std::map<EntityID, EntityID> oldToNewEntityIDMap = DuplicateEntityHierarchy(ecs, entityID, dataTypeRegistry);
+        std::map<EntityID, EntityID> oldToNewEntityIDMap = DuplicateEntityHierarchy(ecs, entityID, indexSetting, dataTypeRegistry);
         const EntityID newEntityID = oldToNewEntityIDMap.at(entityID);
 
 
@@ -185,6 +191,7 @@ namespace CLX
             std::reference_wrapper<ECS> ecs;
             std::reference_wrapper<std::vector<EntityID>> rootEntities;
             EntityID parentID;
+            ChildIndexSetting indexSetting;
         };
 
 
@@ -195,6 +202,7 @@ namespace CLX
             .ecs = ecs,
             .rootEntities = rootEntities,
             .parentID = GetParentEntity(ecs, entityID),
+            .indexSetting = indexSetting
         };
 
         auto doCommand = [](const DuplicateEntityHierarchyData& data)
@@ -203,13 +211,7 @@ namespace CLX
 
                 if (data.parentID == InvalidEntityID)
                 {
-                    data.rootEntities.get().push_back(data.duplicatedEntityID);
-                }
-                else
-                {
-                    TransformHierarchyComponent* parentTransformComponent = data.ecs.get().GetComponent<TransformHierarchyComponent>(data.parentID);
-                    ASSERT(parentTransformComponent != nullptr);
-                    parentTransformComponent->children.push_back(data.duplicatedEntityID);
+                    AddBasedOnChildIndexSetting(data.rootEntities.get(), data.duplicatedEntityID, data.indexSetting);
                 }
             };
 
@@ -219,13 +221,7 @@ namespace CLX
 
                 if (data.parentID == InvalidEntityID)
                 {
-                    data.rootEntities.get().pop_back();
-                }
-                else
-                {
-                    TransformHierarchyComponent* parentTransformComponent = data.ecs.get().GetComponent<TransformHierarchyComponent>(data.parentID);
-                    ASSERT(parentTransformComponent != nullptr);
-                    parentTransformComponent->children.pop_back();
+                    RemoveBasedOnIndexSetting(data.rootEntities.get(), data.indexSetting);
                 }
             };
 
@@ -790,21 +786,7 @@ namespace CLX
                 }
                 else if (data.parentID == InvalidEntityID)
                 {
-                    std::visit(Visitor
-                        {
-                            [&](const Index& index)
-                            {
-                                data.rootEntities.get().insert(begin(data.rootEntities.get()) + index.mIndex, data.childID);
-                            },
-                            [&](const FirstIndex&)
-                            {
-                                data.rootEntities.get().insert(data.rootEntities.get().begin(), data.childID);
-                            },
-                            [&](const LastIndex&)
-                            {
-                                data.rootEntities.get().push_back(data.childID);
-                            }
-                        }, data.indexSetting);
+                    AddBasedOnChildIndexSetting(data.rootEntities, data.childID, data.indexSetting);
                 }
             };
 
@@ -818,21 +800,7 @@ namespace CLX
                 }
                 else if (data.parentID == InvalidEntityID)
                 {
-                    std::visit(Visitor
-                        {
-                            [&](const Index& index)
-                            {
-                                data.rootEntities.get().erase(begin(data.rootEntities.get()) + index.mIndex);
-                            },
-                            [&](const FirstIndex&)
-                            {
-                                data.rootEntities.get().erase(data.rootEntities.get().begin());
-                            },
-                            [&](const LastIndex&)
-                            {
-                                data.rootEntities.get().pop_back();
-                            }
-                        }, data.indexSetting);
+                    RemoveBasedOnIndexSetting(data.rootEntities, data.indexSetting);
                 }
             };
 
@@ -939,7 +907,8 @@ namespace CLX
                 editorActions.push_back([&ecs, entityID, &rootEntities, &selectedEntities, &dataTypeRegistry](EditorCommandTracker& commandTracker)
                     {
                         commandTracker.BeginComposite("Duplicate Entity Composite");
-                        const EntityID newEntityID = DuplicateEntityHierarchy(ecs, entityID, rootEntities, dataTypeRegistry, commandTracker);
+                        const Index index = Index{ GetEntityIndexInParent(ecs, entityID, rootEntities) + 1 };
+                        const EntityID newEntityID = DuplicateEntityHierarchy(ecs, entityID, rootEntities, index, dataTypeRegistry, commandTracker);
                         SetEntitySelection({ newEntityID }, selectedEntities, commandTracker);
                         commandTracker.EndComposite();
                     });

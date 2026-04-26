@@ -8,116 +8,154 @@
 namespace CLX
 {
 
-	constexpr ImGuizmo::MODE ToImGuizmoMode(eTransformMode transformMode)
-	{
-		return transformMode == eTransformMode::Local ? ImGuizmo::MODE::LOCAL : ImGuizmo::MODE::WORLD;
-	}
+    constexpr ImGuizmo::MODE ToImGuizmoMode(eTransformMode transformMode)
+    {
+        return transformMode == eTransformMode::Local ? ImGuizmo::MODE::LOCAL : ImGuizmo::MODE::WORLD;
+    }
 
-	void ShowEntityImGuizmo(ECS& ecs, const EntityID selectedEntityID, const eTransformMode transformMode, const Camera& camera, 
-		const AABB2i renderRect, const bool useSnap, const float snapValue, bool& isDraggingEntity,
-		SetEntityTransformCommand& setEntityTransformCommand, const InputState& input, const bool isCursorVisible, EditorCommandTracker& commandTracker)
-	{
-		if (selectedEntityID == InvalidEntityID)
-		{
-			return;
-		}
+    constexpr ImGuizmo::OPERATION ToImGuizmoOperation(eTransformOperation operation)
+    {
+        switch (operation)
+        {
+        case eTransformOperation::None:
+            return static_cast<ImGuizmo::OPERATION>(0);
+        case eTransformOperation::TranslateX:
+            return ImGuizmo::OPERATION::TRANSLATE_X;
+        case eTransformOperation::TranslateY:
+            return ImGuizmo::OPERATION::TRANSLATE_Y;
+        case eTransformOperation::TranslateZ:
+            return ImGuizmo::OPERATION::TRANSLATE_Z;
+        case eTransformOperation::RotateX:
+            return ImGuizmo::OPERATION::ROTATE_X;
+        case eTransformOperation::RotateY:
+            return ImGuizmo::OPERATION::ROTATE_Y;
+        case eTransformOperation::RotateZ:
+            return ImGuizmo::OPERATION::ROTATE_Z;
+        case eTransformOperation::ScaleX:
+            return ImGuizmo::OPERATION::SCALE_X;
+        case eTransformOperation::ScaleY:
+            return ImGuizmo::OPERATION::SCALE_Y;
+        case eTransformOperation::ScaleZ:
+            return ImGuizmo::OPERATION::SCALE_Z;
+        case eTransformOperation::Translate:
+            return ImGuizmo::OPERATION::TRANSLATE;
+        case eTransformOperation::Rotate:
+            return ImGuizmo::OPERATION::ROTATE;
+        case eTransformOperation::Scale:
+            return ImGuizmo::OPERATION::SCALE;
+        case eTransformOperation::All:
+            return static_cast<ImGuizmo::OPERATION>(~0);
+        default:
+            ASSERT_NEW(false, "Invalid transform operation.");
+            return static_cast<ImGuizmo::OPERATION>(0);
+        }
+    }
 
-		ImGuizmo::AllowAxisFlip(false);
+    void ShowEntityImGuizmo(ECS& ecs, const EntityID selectedEntityID, const eTransformMode transformMode, eTransformOperation& transformOperation, const Camera& camera,
+        const AABB2i renderRect, const bool useSnap, const float snapValue, bool& isDraggingEntity,
+        SetEntityTransformCommand& setEntityTransformCommand, const InputState& input, const bool isCursorVisible, EditorCommandTracker& commandTracker)
+    {
+        if (selectedEntityID == InvalidEntityID)
+        {
+            return;
+        }
 
-		ImGuizmo::SetOrthographic(false);
-		ImGuizmo::SetDrawlist(ImGui::GetWindowDrawList());
-		//const Point2f topLeft = Point2f(GetTopLeftCorner(renderRect));
-		ImGuizmo::SetRect((float)renderRect.GetMin().x, (float)renderRect.GetMin().y, (float)renderRect.GetExtent().x, (float)renderRect.GetExtent().y);
+        ImGuizmo::AllowAxisFlip(false);
 
-		TransformComponent* transformComponent = ecs.GetComponent<TransformComponent>(selectedEntityID);
-		ASSERT_NEW(transformComponent != nullptr, "Selected entity does not have a TransformComponent.");
+        ImGuizmo::SetOrthographic(false);
+        ImGuizmo::SetDrawlist(ImGui::GetWindowDrawList());
+        //const Point2f topLeft = Point2f(GetTopLeftCorner(renderRect));
+        ImGuizmo::SetRect((float)renderRect.GetMin().x, (float)renderRect.GetMin().y, (float)renderRect.GetExtent().x, (float)renderRect.GetExtent().y);
 
-		Matrix4x4f objectMatrix = GetEntityWorldTransform(ecs, selectedEntityID).GetMatrix();
-		const Matrix4x4f view = camera.GetViewMatrix();
-		const Matrix4x4f proj = camera.GetProjectionMatrix();
+        TransformComponent* transformComponent = ecs.GetComponent<TransformComponent>(selectedEntityID);
+        ASSERT_NEW(transformComponent != nullptr, "Selected entity does not have a TransformComponent.");
 
-		static ImGuizmo::OPERATION operation = ImGuizmo::OPERATION::TRANSLATE;
+        Matrix4x4f objectMatrix = GetEntityWorldTransform(ecs, selectedEntityID).GetMatrix();
+        const Matrix4x4f view = camera.GetViewMatrix();
+        const Matrix4x4f proj = camera.GetProjectionMatrix();
 
-		if (isCursorVisible && !input.IsKeyHeld(eInputKey::Ctrl))
-		{
-			if (input.IsKeyPressed(eInputKey::E))
-			{
-				operation = ImGuizmo::OPERATION::TRANSLATE;
-			}
-			else if (input.IsKeyPressed(eInputKey::R))
-			{
-				operation = ImGuizmo::OPERATION::ROTATE;
-			}
-			else if (input.IsKeyPressed(eInputKey::T))
-			{
-				operation = ImGuizmo::OPERATION::SCALE;
-			}
-		}
 
-		const float snapV = useSnap ? snapValue : 0.f;
-		const Vector3f gridSnapValues(snapV, snapV, snapV);
+        if (isCursorVisible && !input.IsKeyHeld(eInputKey::Ctrl))
+        {
+            if (input.IsKeyPressed(eInputKey::E))
+            {
+                transformOperation = eTransformOperation::Translate;
+            }
+            else if (input.IsKeyPressed(eInputKey::R))
+            {
+                transformOperation = eTransformOperation::Rotate;
+            }
+            else if (input.IsKeyPressed(eInputKey::T))
+            {
+                transformOperation = eTransformOperation::Scale;
+            }
+        }
 
-		const bool isManipulatingEntityTransform = ImGuizmo::Manipulate(
-			view.GetDataPtr(),
-			proj.GetDataPtr(),
-			operation,
-			ToImGuizmoMode(transformMode),
-			objectMatrix.GetDataPtr(), 
-			nullptr, 
-			&gridSnapValues.x
-		);
+        const ImGuizmo::OPERATION guizmoOperation = ToImGuizmoOperation(transformOperation);
 
-		if (isManipulatingEntityTransform && input.IsKeyDown(eInputKey::LMB) && !isDraggingEntity)
-		{
-			isDraggingEntity = true;
-			setEntityTransformCommand.entityID = selectedEntityID;
-			setEntityTransformCommand.oldTransform = transformComponent->transform;
-		}
+        const float snapV = useSnap ? snapValue : 0.f;
+        const Vector3f gridSnapValues(snapV, snapV, snapV);
 
-		if (isManipulatingEntityTransform)
-		{
-			const Transform localTransform = GetEntityLocalTransform(ecs, selectedEntityID, Transform::FromMatrix(objectMatrix));
+        const bool isManipulatingEntityTransform = ImGuizmo::Manipulate(
+            view.GetDataPtr(),
+            proj.GetDataPtr(),
+            guizmoOperation,
+            ToImGuizmoMode(transformMode),
+            objectMatrix.GetDataPtr(),
+            nullptr,
+            &gridSnapValues.x
+        );
 
-			switch (operation)
-			{
-			case ImGuizmo::OPERATION::TRANSLATE:
-				transformComponent->transform.SetPosition(localTransform.GetPosition());
-				break;
-			case ImGuizmo::OPERATION::ROTATE:
-				transformComponent->transform.SetMatrix(localTransform.GetMatrix());
-				break;
-			case ImGuizmo::OPERATION::SCALE:
-				transformComponent->transform.SetScale(localTransform.GetScale());
-				break;
-			default:
-				break;
-			}
-		}
+        if (isManipulatingEntityTransform && input.IsKeyDown(eInputKey::LMB) && !isDraggingEntity)
+        {
+            isDraggingEntity = true;
+            setEntityTransformCommand.entityID = selectedEntityID;
+            setEntityTransformCommand.oldTransform = transformComponent->transform;
+        }
 
-		if (input.IsKeyReleased(eInputKey::LMB) && isDraggingEntity && selectedEntityID == setEntityTransformCommand.entityID)
-		{
-			isDraggingEntity = false;
-			setEntityTransformCommand.newTransform = transformComponent->transform;
-			setEntityTransformCommand.ecs = &ecs;
-			commandTracker.ExecuteCommand(EditorCommand(setEntityTransformCommand, "Set Entity Transform"));
-		}
-	}
+        if (isManipulatingEntityTransform)
+        {
+            const Transform localTransform = GetEntityLocalTransform(ecs, selectedEntityID, Transform::FromMatrix(objectMatrix));
 
-	void TransformEntityTool::ShowEntityImGuizmo(ECS& ecs, const EntityID selectedEntityID, const eTransformMode transformMode, AABB2i renderRect,
-		const bool useSnap, const float snapValue, const Camera& camera, const InputState& input, const bool isCursorVisible, EditorCommandTracker& commandTracker)
-	{
-		::CLX::ShowEntityImGuizmo(
-			ecs, 
-			selectedEntityID, 
-			transformMode, 
-			camera,
-			renderRect,
-			useSnap,
-			snapValue, 
-			mIsDraggingEntity, 
-			mSetEntityTransformCommand,
-			input,
-			isCursorVisible,
-			commandTracker);
-	}
+            if (HasAnyFlag(transformOperation, eTransformOperation::Translate))
+            {
+                transformComponent->transform.SetPosition(localTransform.GetPosition());
+            }
+            else if (HasAnyFlag(transformOperation, eTransformOperation::Rotate))
+            {
+                transformComponent->transform.SetMatrix(localTransform.GetMatrix());
+            }
+            else if (HasAnyFlag(transformOperation, eTransformOperation::Scale))
+            {
+                transformComponent->transform.SetScale(localTransform.GetScale());
+            }
+        }
+
+        if (input.IsKeyReleased(eInputKey::LMB) && isDraggingEntity && selectedEntityID == setEntityTransformCommand.entityID)
+        {
+            isDraggingEntity = false;
+            setEntityTransformCommand.newTransform = transformComponent->transform;
+            setEntityTransformCommand.ecs = &ecs;
+            commandTracker.ExecuteCommand(EditorCommand(setEntityTransformCommand, "Set Entity Transform"));
+        }
+    }
+
+    void TransformEntityTool::ShowEntityImGuizmo(ECS& ecs, const EntityID selectedEntityID, const eTransformMode transformMode, eTransformOperation& transformOperation, AABB2i renderRect,
+        const bool useSnap, const float snapValue, const Camera& camera, const InputState& input, const bool isCursorVisible, EditorCommandTracker& commandTracker)
+    {
+        ::CLX::ShowEntityImGuizmo(
+            ecs,
+            selectedEntityID,
+            transformMode,
+            transformOperation,
+            camera,
+            renderRect,
+            useSnap,
+            snapValue,
+            mIsDraggingEntity,
+            mSetEntityTransformCommand,
+            input,
+            isCursorVisible,
+            commandTracker);
+    }
 }

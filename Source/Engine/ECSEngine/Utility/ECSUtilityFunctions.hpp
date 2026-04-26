@@ -2,6 +2,7 @@
 #include <vector>
 
 #include "Engine/Utility/Index.hpp"
+#include "Engine/Utility/Visitor.hpp"
 
 #include "Engine/Math/Transform3.hpp"
 #include "Engine/ECS/ECS.hpp"
@@ -54,6 +55,45 @@ namespace CLX
         return true;
     }
 
+    constexpr void AddBasedOnChildIndexSetting(std::vector<EntityID>& entities, const EntityID entityID, ChildIndexSetting setting)
+    {
+        std::visit(Visitor
+            {
+            [&](const FirstIndex&)
+            {
+                entities.insert(begin(entities), entityID);
+            },
+            [&](const Index& index)
+            {
+                ASSERT(index.value <= entities.size());
+                    entities.insert(begin(entities) + index.value, entityID);
+                    },
+            [&](const LastIndex&)
+            {
+                entities.push_back(entityID);
+                }
+            }, setting);
+    }
+
+    constexpr void RemoveBasedOnIndexSetting(std::vector<EntityID>& entities, ChildIndexSetting indexSetting)
+    {
+        std::visit(Visitor
+            {
+                [&](const FirstIndex&)
+                {
+                    entities.erase(entities.begin());
+                },
+                [&](const Index& index)
+                {
+                   entities.erase(begin(entities) + index.value);
+                },
+                [&](const LastIndex&)
+                {
+                   entities.pop_back();
+                }
+            }, indexSetting);
+    }
+
     inline bool SetParentEntity(ECS& ecs, const EntityID childID, const EntityID parentID, ChildIndexSetting indexSetting = LastIndex{})
     {
         if (parentID == InvalidEntityID)
@@ -89,30 +129,8 @@ namespace CLX
             std::erase(hierarchyComponentPreviousParent.children, childID);
         }
         hierachyComponentChild.parent = parentID;
-        if (std::holds_alternative<FirstIndex>(indexSetting))
-        {
-            hierarchyComponentParent.children.insert(begin(hierarchyComponentParent.children), childID);
-        }
-        else if (std::holds_alternative<Index>(indexSetting))
-        {
-            const std::size_t index = std::get<Index>(indexSetting).mIndex;
-            if (index >= hierarchyComponentParent.children.size())
-            {
-                hierarchyComponentParent.children.push_back(childID);
-            }
-            else
-            {
-                hierarchyComponentParent.children.insert(begin(hierarchyComponentParent.children) + index, childID);
-            }
-        }
-        else if (std::holds_alternative<LastIndex>(indexSetting))
-        {
-            hierarchyComponentParent.children.push_back(childID);
-        }
-        else
-        {
-            ASSERT_NEW(false, "Invalid ChildIndexSetting");
-        }
+        
+        AddBasedOnChildIndexSetting(hierarchyComponentParent.children, childID, indexSetting);
 
         return true;
     }

@@ -6,6 +6,6 @@ namespace CLX
 {
 	struct LastIndex {};
 	struct FirstIndex {};
-	struct Index { std::size_t mIndex = 0; };
+	struct Index { std::size_t value = 0; };
 	using ChildIndexSetting = std::variant<Index, FirstIndex, LastIndex>;
 }

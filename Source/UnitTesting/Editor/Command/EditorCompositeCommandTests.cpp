@@ -6,7 +6,6 @@ using namespace CLX;
 
 TEST_CASE("EditorCompositeCommand::Commands execute in correct order")
 {
-
-    EditorCompositeCommand command("Test Command", {});
-    command.Execute(false);
+    EditorCompositeCommand command({});
+    command.Execute();
 }

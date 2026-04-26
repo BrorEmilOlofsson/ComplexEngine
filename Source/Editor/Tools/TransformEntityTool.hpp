@@ -1,13 +1,14 @@
 #pragma once
 #include "Editor/Command/Commands/SetEntityTransformCommand.hpp"
 #include "Engine/Math/TransformMode.hpp"
+#include "Engine/Math/TransformOperation.hpp"
 #include "Engine/Utility/Camera.hpp"
 #include "Engine/Math/Shapes/AABB2.hpp"
 
 namespace CLX
 {
 
-	void ShowEntityImGuizmo(ECS& ecs, const EntityID selectedEntityID, const eTransformMode transformMode, const Camera& camera, AABB2i renderRect,
+	void ShowEntityImGuizmo(ECS& ecs, const EntityID selectedEntityID, const eTransformMode transformMode, eTransformOperation& transformOperation, const Camera& camera, AABB2i renderRect,
 		const bool useSnap, const float snapValue, bool& isDraggingEntity, SetEntityTransformCommand& setEntityTransformCommand,
 		const InputState& input, bool isCursorVisible, EditorCommandTracker& commandTracker);
 
@@ -17,7 +18,8 @@ namespace CLX
 
 		TransformEntityTool() = default;
 
-		void ShowEntityImGuizmo(ECS& ecs, const EntityID selectedEntityID, const eTransformMode transformMode, AABB2i renderRect, const bool useSnap, const float snapValue, const Camera& camera, 
+		void ShowEntityImGuizmo(ECS& ecs, const EntityID selectedEntityID, const eTransformMode transformMode, eTransformOperation& transformOperation, 
+			AABB2i renderRect, const bool useSnap, const float snapValue, const Camera& camera,
 			const InputState& input, bool isCursorVisible, EditorCommandTracker& commandTracker);
 
 	private:

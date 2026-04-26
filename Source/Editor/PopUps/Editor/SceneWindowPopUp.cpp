@@ -292,6 +292,7 @@ namespace CLX
                     activeScene.GetECS(),
                     *mHierarchyPopUp.GetSelectedEntityIDs().begin(),
                     editorSceneSettings.transformMode,
+                    editorSceneSettings.transformOperation,
                     sceneRenderState.GetRenderRect().value(),
                     editorSceneSettings.useSnap,
                     editorSceneSettings.snapValue,

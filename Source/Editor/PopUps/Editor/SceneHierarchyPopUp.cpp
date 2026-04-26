@@ -79,7 +79,8 @@ namespace CLX
             {
                 const EntityID entityID = *selectedEntityIDs.begin();
                 commandTracker.BeginComposite("Duplicate Entity + Select Entity");
-                const EntityID newEntityID = DuplicateEntityHierarchy(ecs, entityID, rootEntities, dataTypeRegistry, commandTracker);
+                const Index index = Index{ GetEntityIndexInParent(ecs, entityID, rootEntities) + 1 };
+                const EntityID newEntityID = DuplicateEntityHierarchy(ecs, entityID, rootEntities, index, dataTypeRegistry, commandTracker);
                 SetEntitySelection(newEntityID, selectedEntityIDs, commandTracker);
                 commandTracker.EndComposite();
             }

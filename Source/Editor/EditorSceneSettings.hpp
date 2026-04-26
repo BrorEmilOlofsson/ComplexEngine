@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/Math/TransformMode.hpp"
+#include "Engine/Math/TransformOperation.hpp"
 
 namespace CLX
 {
@@ -9,6 +10,7 @@ namespace CLX
 		float snapValue = 1.0f;
 		bool showGrid = false;
 		eTransformMode transformMode = eTransformMode::Local;
+        eTransformOperation transformOperation = eTransformOperation::Translate;
 		bool showUnitVectorInScene = false;
 	};
 }

@@ -244,6 +244,7 @@ namespace CLX
                         mEntityCompositionAsset->GetECS(),
                         selectedEntityID,
                         editorSceneSettings.transformMode,
+                        editorSceneSettings.transformOperation,
                         renderRect,
                         editorSceneSettings.useSnap,
                         editorSceneSettings.snapValue,
