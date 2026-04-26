@@ -1,25 +1,21 @@
 #include "Editor/Precompiled/EditorPch.hpp"
 #include "EditorCommand.hpp"
-#include <iostream>
 
 namespace CLX
 {
 
-	void EditorCommand::ExecuteCommand(const bool debugPrint) const
+	void EditorCommand::ExecuteCommand() const
 	{
-		if (debugPrint)
-		{
-			std::cout << "Do Command: " << mName << std::endl;
-		}
-		mConcept->ExecuteCommand(debugPrint);
+		mConcept->ExecuteCommand();
 	}
 
-	void EditorCommand::UndoCommand(const bool debugPrint) const
+	void EditorCommand::UndoCommand() const
 	{
-		if (debugPrint)
-		{
-			std::cout << "Undo Command: " << mName << std::endl;
-		}
-		mConcept->UndoCommand(debugPrint);
+		mConcept->UndoCommand();
 	}
+
+	std::string EditorCommand::ToString() const
+	{
+		return mConcept->ToString();
+    }
 }

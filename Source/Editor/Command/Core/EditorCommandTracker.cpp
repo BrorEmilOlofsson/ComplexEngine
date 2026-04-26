@@ -21,18 +21,18 @@ namespace CLX
 		ExecuteCommandInternal(false, std::move(command));
 	}
 
-	void EditorCommandTracker::BeginComposite(std::string_view name)
+	void EditorCommandTracker::BeginComposite(std::string name)
 	{
-		mCompositeCommandBuilder.Begin(name);
+		mCompositeCommandBuilder.Begin(std::move(name));
 	}
 
 	void EditorCommandTracker::EndComposite()
 	{
-		std::optional<EditorCompositeCommand> compositeCommand = mCompositeCommandBuilder.End();
+		std::optional<std::pair<EditorCompositeCommand, std::string>> compositeCommand = mCompositeCommandBuilder.End();
 
 		if (compositeCommand)
 		{
-			ExecuteCommandInternal(false, EditorCommand(compositeCommand.value(), compositeCommand->GetName()));
+			ExecuteCommandInternal(false, EditorCommand(compositeCommand->first, compositeCommand->second));
 		}
 	}
 
@@ -42,8 +42,12 @@ namespace CLX
 		{
 			return;
 		}
-		EditorCommand& topCommand = mUndoStack.top();
-		topCommand.UndoCommand(debugPrint);
+		EditorCommand& topCommand = mUndoStack.top(); 
+		if (debugPrint)
+		{
+			std::println("Undoing command:\n{}", topCommand);
+		}
+		topCommand.UndoCommand();
 		mRedoStack.push(std::move(topCommand));
 		mUndoStack.pop();
 	}
@@ -55,7 +59,11 @@ namespace CLX
 			return;
 		}
 		EditorCommand& topCommand = mRedoStack.top();
-		topCommand.ExecuteCommand(debugPrint);
+		if (debugPrint)
+		{
+			std::println("Redoing command:\n{}", topCommand);
+        }
+		topCommand.ExecuteCommand();
 		mUndoStack.push(std::move(topCommand));
 		mRedoStack.pop();
 	}
@@ -74,7 +82,7 @@ namespace CLX
 	{
 		if (execute)
 		{
-			command.ExecuteCommand(false);
+			command.ExecuteCommand();
 		}
 
 		if (mCompositeCommandBuilder.IsActive())

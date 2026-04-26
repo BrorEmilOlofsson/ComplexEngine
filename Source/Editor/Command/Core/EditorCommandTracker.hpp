@@ -21,7 +21,7 @@ namespace CLX
 		// Register Command without executing it
 		void RegisterCommand(EditorCommand command);
 
-		void BeginComposite(std::string_view name);
+		void BeginComposite(std::string name);
 		void EndComposite();
 
 		void UndoCommand(const bool debugPrint = false);

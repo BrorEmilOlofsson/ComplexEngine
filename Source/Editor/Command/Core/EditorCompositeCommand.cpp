@@ -4,25 +4,33 @@
 namespace CLX
 {
 
-	EditorCompositeCommand::EditorCompositeCommand(std::string name, std::vector<EditorCommand> commands)
-		: mName(std::move(name))
-		, mCommands(std::move(commands))
-	{
-	}
+    EditorCompositeCommand::EditorCompositeCommand(std::vector<EditorCommand> commands)
+        : mCommands(std::move(commands))
+    {}
 
-	void EditorCompositeCommand::Execute(const bool debugPrint) const
-	{
-		for (const EditorCommand& command : mCommands)
-		{
-			command.ExecuteCommand(debugPrint);
-		}
-	}
+    void EditorCompositeCommand::Execute() const
+    {
+        for (const EditorCommand& command : mCommands)
+        {
+            command.ExecuteCommand();
+        }
+    }
 
-	void EditorCompositeCommand::Undo(const bool debugPrint) const
-	{
-		for (auto& command : std::views::reverse(mCommands))
-		{
-			command.UndoCommand(debugPrint);
-		}
-	}
+    void EditorCompositeCommand::Undo() const
+    {
+        for (auto& command : std::views::reverse(mCommands))
+        {
+            command.UndoCommand();
+        }
+    }
+
+    std::string EditorCompositeCommand::ToString() const
+    {
+        std::string result;
+        for (const auto& command : mCommands)
+        {
+            result += "  " + command.ToString() + "\n";
+        }
+        return result;
+    }
 }

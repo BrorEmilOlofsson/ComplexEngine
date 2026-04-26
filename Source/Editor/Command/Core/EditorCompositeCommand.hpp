@@ -8,30 +8,16 @@ namespace CLX
 	{
 	public:
 
-		EditorCompositeCommand(std::string name, std::vector<EditorCommand> commands);
+		EditorCompositeCommand(std::vector<EditorCommand> commands);
 
 
-		void Execute(bool debugPrint) const;
-		void Undo(bool debugPrint) const;
+		void Execute() const;
+		void Undo() const;
 
-		const std::string& GetName() const
-		{
-			return mName;
-		}
-
-		void AddCommand(EditorCommand&& command)
-		{
-			mCommands.push_back(std::move(command));
-		}
-
-		void AddCommand(const EditorCommand& command)
-		{
-			mCommands.push_back(command);
-		}
+        std::string ToString() const;
 
 	private:
 
 		std::vector<EditorCommand> mCommands;
-		std::string mName;
 	};
 }

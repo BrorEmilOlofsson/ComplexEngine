@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <memory>
+#include <concepts>
 
 namespace CLX
 {
@@ -36,23 +37,19 @@ namespace CLX
 		EditorCommand() = default;
 
 		template<typename T> requires EditorCommandable<T> || EditorMemberCommandable<T> || EditorInternalMemberCommandable<T>
-		EditorCommand(const T & data, const std::string & name)
-			: mConcept(std::make_unique<CommandModel<T>>(data))
-			, mName(name)
+		EditorCommand(const T & data, std::string name)
+			: mConcept(std::make_unique<CommandModel<T>>(data, std::move(name)))
 		{
 		}
 
-
 		template<typename T, std::invocable<const T&> DoFunc, std::invocable<const T&> UndoFunc>
-		EditorCommand(const T& data, DoFunc doFunction, UndoFunc undoFunction, const std::string& name)
-			: mConcept(std::make_unique<CommandModel<T, EditorCommandFunctionType<T>*, EditorCommandFunctionType<T>*>>(data, doFunction, undoFunction))
-			, mName(name)
+		EditorCommand(const T& data, DoFunc doFunction, UndoFunc undoFunction, std::string name)
+			: mConcept(std::make_unique<CommandModel<T, EditorCommandFunctionType<T>*, EditorCommandFunctionType<T>*>>(data, doFunction, undoFunction, std::move(name)))
 		{
 		}
 
 		EditorCommand(const EditorCommand& other)
 			: mConcept(other.mConcept ? other.mConcept->Clone() : nullptr)
-			, mName(other.mName)
 		{
 		}
 
@@ -62,14 +59,14 @@ namespace CLX
 		{
 			EditorCommand temp(other);
 			std::swap(mConcept, temp.mConcept);
-			mName = other.mName;
 			return *this;
 		}
 
 		EditorCommand& operator=(EditorCommand&&) = default;
 
-		void ExecuteCommand(bool debugPrint) const;
-		void UndoCommand(bool debugPrint) const;
+		void ExecuteCommand() const;
+		void UndoCommand() const;
+		std::string ToString() const;
 
 	private:
 
@@ -79,8 +76,9 @@ namespace CLX
 
 			virtual ~CommandConcept() = default;
 
-			virtual void ExecuteCommand(bool debugPrint) const = 0;
-			virtual void UndoCommand(bool debugPrint) const = 0;
+			virtual void ExecuteCommand() const = 0;
+			virtual void UndoCommand() const = 0;
+			virtual std::string ToString() const = 0;
 
 			virtual std::unique_ptr<CommandConcept> Clone() const = 0;
 
@@ -94,20 +92,26 @@ namespace CLX
 		{
 		public:
 
-			CommandModel(const T& data)
-				: mData(data)
+			CommandModel(T data, std::string name)
+				: mData(std::move(data))
+                , mName(std::move(name))
 			{
 			}
 
-			void ExecuteCommand(const bool) override
+			void ExecuteCommand() override
 			{
 				Do(mData);
 			}
 
-			void UndoCommand(const bool) const override
+			void UndoCommand() const override
 			{
 				Undo(mData);
 			}
+
+			std::string ToString() const override
+			{
+				return mName;
+            }
 
 			std::unique_ptr<CommandConcept> Clone() const override
 			{
@@ -117,6 +121,7 @@ namespace CLX
 		private:
 
 			T mData;
+			std::string mName;
 		};
 
 		template<EditorMemberCommandable T>
@@ -124,19 +129,25 @@ namespace CLX
 		{
 		public:
 
-			CommandModel(const T& data)
-				: mData(data)
+			CommandModel(T data, std::string name)
+				: mData(std::move(data))
+				, mName(std::move(name))
 			{
 			}
 
-			void ExecuteCommand(const bool) const override
+			void ExecuteCommand() const override
 			{
 				mData.Execute();
 			}
 
-			void UndoCommand(const bool) const override
+			void UndoCommand() const override
 			{
 				mData.Undo();
+			}
+
+			std::string ToString() const override
+			{
+				return mName;
 			}
 
 			std::unique_ptr<CommandConcept> Clone() const override
@@ -147,6 +158,7 @@ namespace CLX
 		private:
 
 			T mData;
+			std::string mName;
 		};
 
 		template<EditorInternalMemberCommandable T>
@@ -154,19 +166,30 @@ namespace CLX
 		{
 		public:
 
-			explicit CommandModel(const T& data)
-				: mData(data)
+			explicit CommandModel(T data, std::string name)
+				: mData(std::move(data))
+				, mName(std::move(name))
 			{
 			}
 
-			void ExecuteCommand(const bool debugPrint) const override
+			void ExecuteCommand() const override
 			{
-				mData.Execute(debugPrint);
+				mData.Execute();
 			}
 
-			void UndoCommand(const bool debugPrint) const override
+			void UndoCommand() const override
 			{
-				mData.Undo(debugPrint);
+				mData.Undo();
+			}
+
+			std::string ToString() const override
+			{
+				std::string result = mName;
+				if constexpr (requires { mData.ToString(); })
+				{
+					result += mData.ToString();
+				}
+				return result;
 			}
 
 			std::unique_ptr<CommandConcept> Clone() const override
@@ -177,6 +200,7 @@ namespace CLX
 		private:
 
 			T mData;
+			std::string mName;
 		};
 
 		template<typename T>
@@ -185,21 +209,27 @@ namespace CLX
 			using FunctionType = EditorCommandFunctionType<T>*;
 		public:
 
-			CommandModel(const T& data, FunctionType executeFunction, FunctionType undoFunction)
-				: mData(data)
+			CommandModel(T data, FunctionType executeFunction, FunctionType undoFunction, std::string name)
+				: mData(std::move(data))
 				, mExecuteFunction(executeFunction)
 				, mUndoFunction(undoFunction)
+				, mName(std::move(name))
 			{
 			}
 
-			void ExecuteCommand(const bool) const override
+			void ExecuteCommand() const override
 			{
 				mExecuteFunction(mData);
 			}
 
-			void UndoCommand(const bool) const override
+			void UndoCommand() const override
 			{
 				mUndoFunction(mData);
+			}
+
+			std::string ToString() const override
+			{
+				return mName;
 			}
 
 			std::unique_ptr<CommandConcept> Clone() const override
@@ -212,12 +242,22 @@ namespace CLX
 			T mData;
 			FunctionType mExecuteFunction;
 			FunctionType mUndoFunction;
+			std::string mName;
 		};
 
 	private:
 
 		std::unique_ptr<CommandConcept> mConcept;
-		std::string mName;
 	};
 
 }
+
+template<>
+struct std::formatter<CLX::EditorCommand> : std::formatter<std::string>
+{
+	auto format(const CLX::EditorCommand& command, auto& context) const
+	{
+        std::string s = command.ToString();
+		return std::format_to(context.out(), "{}", s);
+	}
+};

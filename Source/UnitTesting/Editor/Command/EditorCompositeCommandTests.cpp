@@ -4,7 +4,9 @@
 
 using namespace CLX;
 
-TEST_CASE("Command does not exeucte twice")
+TEST_CASE("EditorCompositeCommand::Commands execute in correct order")
 {
 
+    EditorCompositeCommand command("Test Command", {});
+    command.Execute(false);
 }

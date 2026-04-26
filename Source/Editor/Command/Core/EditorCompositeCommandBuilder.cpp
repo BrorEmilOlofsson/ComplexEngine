@@ -9,7 +9,7 @@ namespace CLX
 		mCurrentCompositeCommand->AddCommand(std::move(command), execute);
 	}
 
-	void EditorCompositeCommandBuilder::Begin(std::string_view name)
+	void EditorCompositeCommandBuilder::Begin(std::string name)
 	{
 		if (mCurrentCompositeCommand)
 		{
@@ -21,7 +21,7 @@ namespace CLX
 		}
 	}
 
-	std::optional<EditorCompositeCommand> EditorCompositeCommandBuilder::End()
+	std::optional<std::pair<EditorCompositeCommand, std::string>> EditorCompositeCommandBuilder::End()
 	{
 		if (!mCurrentCompositeCommand)
 		{
@@ -34,16 +34,15 @@ namespace CLX
 		{
 			std::unique_ptr<CompositeCommandInternal> internalComposite = std::move(mCurrentCompositeCommand);
 			mCurrentCompositeCommand.reset();
-			return internalComposite->Build();
+			return std::make_pair(internalComposite->Build(), internalComposite->GetName());
 		}
 
 		return std::nullopt;
-
 	}
 
 	EditorCompositeCommand EditorCompositeCommandBuilder::CompositeCommandInternal::Build() const
 	{
-		return EditorCompositeCommand(mName, mCommands);
+		return EditorCompositeCommand(mCommands);
 	}
 
 	void EditorCompositeCommandBuilder::CompositeCommandInternal::AddCommand(EditorCommand command, const bool execute)
@@ -57,7 +56,6 @@ namespace CLX
 			mCommands.emplace_back(std::move(command));
 		}
 	}
-
 
 	void EditorCompositeCommandBuilder::CompositeCommandInternal::Begin(std::string_view name)
 	{

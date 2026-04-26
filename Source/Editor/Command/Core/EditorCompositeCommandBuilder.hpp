@@ -24,8 +24,8 @@ namespace CLX
 
 		void AddCommand(EditorCommand command, bool execute);
 
-		void Begin(std::string_view name);
-		[[nodiscard]] std::optional<EditorCompositeCommand> End();
+		void Begin(std::string name);
+		[[nodiscard]] std::optional<std::pair<EditorCompositeCommand, std::string>> End();
 
 		[[nodiscard]] bool IsActive() const
 		{
@@ -50,6 +50,11 @@ namespace CLX
 			[[nodiscard]] eEndCode End();
 
 			[[nodiscard]] EditorCompositeCommand Build() const;
+
+			[[nodiscard]] const std::string& GetName() const
+			{
+				return mName;
+            }
 
 		private:
 

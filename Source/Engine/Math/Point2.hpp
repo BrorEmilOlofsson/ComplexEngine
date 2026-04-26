@@ -174,8 +174,7 @@ namespace CLX
 template<typename T>
 struct std::formatter<CLX::Point2<T>> : std::formatter<std::string>
 {
-    template<typename FormatContext>
-    auto format(const CLX::Point2<T>& point, FormatContext& ctx) const
+    auto format(const CLX::Point2<T>& point, auto& ctx) const
     {
         return std::format_to(ctx.out(), "{{ x: {}, y: {} }}", point.x, point.y);
     }
