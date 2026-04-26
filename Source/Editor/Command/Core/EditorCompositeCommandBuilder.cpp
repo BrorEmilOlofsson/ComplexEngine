@@ -4,9 +4,9 @@
 namespace CLX
 {
 
-	void EditorCompositeCommandBuilder::AddCommand(EditorCommand&& command)
+	void EditorCompositeCommandBuilder::AddCommand(EditorCommand command, const bool execute)
 	{
-		mCurrentCompositeCommand->AddCommand(std::move(command));
+		mCurrentCompositeCommand->AddCommand(std::move(command), execute);
 	}
 
 	void EditorCompositeCommandBuilder::Begin(std::string_view name)
@@ -46,11 +46,11 @@ namespace CLX
 		return EditorCompositeCommand(mName, mCommands);
 	}
 
-	void EditorCompositeCommandBuilder::CompositeCommandInternal::AddCommand(EditorCommand&& command)
+	void EditorCompositeCommandBuilder::CompositeCommandInternal::AddCommand(EditorCommand command, const bool execute)
 	{
 		if (mCurrentChild)
 		{
-			mCurrentChild->AddCommand(std::move(command));
+			mCurrentChild->AddCommand(std::move(command), execute);
 		}
 		else
 		{
@@ -82,7 +82,7 @@ namespace CLX
 				mCommands.push_back(EditorCommand(mCurrentChild->Build(), compositeName));
 				mCurrentChild.reset();
 			}
-			else if (endCode == eEndCode::Ended_Empty) // If the child's commands are empty we don't want to add the child to our commands
+			else if (endCode == eEndCode::EndedEmpty) // If the child's commands are empty we don't want to add the child to our commands
 			{
 				mCurrentChild.reset();
 			}
@@ -90,7 +90,7 @@ namespace CLX
 		}
 		else if (mCommands.empty())
 		{
-			return eEndCode::Ended_Empty;
+			return eEndCode::EndedEmpty;
 		}
 
 		return eEndCode::Ended;

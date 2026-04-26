@@ -6,9 +6,9 @@ namespace CLX
 
     void AddAnchorPointToCurve(CubicBezierCurve2f& curve, const Point2f& point, EditorCommandTracker& commandTracker)
     {
-        const std::vector<Point2f> oldPoints = curve.GetPoints();
+        std::vector<Point2f> oldPoints = curve.GetPoints();
         curve.AddAnchorPoint(point);
-        const std::vector<Point2f> newPoints = curve.GetPoints();
+        std::vector<Point2f> newPoints = curve.GetPoints();
 
         struct AddAnchorPointData
         {
@@ -17,7 +17,13 @@ namespace CLX
             std::vector<Point2f> newPoints;
         };
 
-        AddAnchorPointData data{ curve, oldPoints, newPoints };
+        AddAnchorPointData data
+        {
+            .curveRef = curve,
+            .oldPoints = std::move(oldPoints),
+            .newPoints = std::move(newPoints)
+        };
+
         auto doCommand = [](const AddAnchorPointData& data)
             {
                 data.curveRef.SetPoints(data.newPoints);
@@ -28,7 +34,7 @@ namespace CLX
                 data.curveRef.SetPoints(data.oldPoints);
             };
 
-        commandTracker.RegisterCommand(EditorCommand(data, doCommand, undoCommand, "Add Anchor Point To Curve"));
+        commandTracker.ExecuteCommand(EditorCommand(data, doCommand, undoCommand, "Add Anchor Point To Curve"));
     }
 
 

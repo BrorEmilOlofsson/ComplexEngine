@@ -1,6 +1,9 @@
 #pragma once
 #include <string>
 #include <memory>
+#include <optional>
+#include <string_view>
+#include <vector>
 #include "Editor/Command/Core/EditorCommand.hpp"
 #include "Editor/Command/Core/EditorCompositeCommand.hpp"
 
@@ -13,20 +16,20 @@ namespace CLX
 		{
 			Ended,
 			InProgress,
-			Ended_Empty,
+			EndedEmpty,
 		};
 	public:
 
 		EditorCompositeCommandBuilder() = default;
 
-		void AddCommand(EditorCommand&& command);
+		void AddCommand(EditorCommand command, bool execute);
 
 		void Begin(std::string_view name);
 		[[nodiscard]] std::optional<EditorCompositeCommand> End();
 
 		[[nodiscard]] bool IsActive() const
 		{
-			return mCurrentCompositeCommand.operator bool();
+			return mCurrentCompositeCommand != nullptr;
 		}
 
 	private:
@@ -39,10 +42,9 @@ namespace CLX
 			CompositeCommandInternal(std::string name = std::string())
 				: mName(std::move(name))
 			{
-
 			}
 
-			void AddCommand(EditorCommand&& command);
+			void AddCommand(EditorCommand command, bool execute);
 
 			void Begin(std::string_view name);
 			[[nodiscard]] eEndCode End();

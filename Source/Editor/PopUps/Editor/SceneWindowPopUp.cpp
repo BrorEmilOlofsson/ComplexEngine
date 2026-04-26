@@ -136,8 +136,9 @@ namespace CLX
                     const EntityID rootEntity = InstantiateEntityComposition(
                         ecsHandle,
                         assetManager.GetEntityComposition(path),
-                        rootEntities,
+                        InvalidEntityID,
                         dataTypeRegistry,
+                        rootEntities,
                         commandTracker
                     );
 

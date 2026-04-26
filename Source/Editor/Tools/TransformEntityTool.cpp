@@ -99,7 +99,7 @@ namespace CLX
 			isDraggingEntity = false;
 			setEntityTransformCommand.newTransform = transformComponent->transform;
 			setEntityTransformCommand.ecs = &ecs;
-			commandTracker.RegisterCommand(EditorCommand(setEntityTransformCommand, "Set Entity Transform"));
+			commandTracker.ExecuteCommand(EditorCommand(setEntityTransformCommand, "Set Entity Transform"));
 		}
 	}
 

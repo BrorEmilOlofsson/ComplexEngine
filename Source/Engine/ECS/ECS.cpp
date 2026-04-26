@@ -65,7 +65,7 @@ namespace CLX
         mEntityData[entityID.id].isActive = false;
         mEntityData[entityID.id].generation++;
 
-        for (auto [typeIndex, _] : EntityView(this, entityID))
+        for (const auto& [typeIndex, _] : ConstEntityView(this, entityID))
         {
             const ECSComponentType& componentType = mRegistry.GetComponentType(typeIndex);
             componentType.removeComponentFunction(*this, entityID);

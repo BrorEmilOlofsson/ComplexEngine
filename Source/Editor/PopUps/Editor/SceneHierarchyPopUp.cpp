@@ -55,7 +55,7 @@ namespace CLX
         if (input.IsKeyPressed(eInputKey::Delete))
         {
             commandTracker.BeginComposite("Remove Entity + Select Entity");
-            DestroyEntitiesAndChildren(ecs, selectedEntityIDs, rootEntities, commandTracker);
+            DestroyEntityHierarchies(ecs, selectedEntityIDs, rootEntities, commandTracker);
            
             ClearEntitySelection(selectedEntityIDs, commandTracker);
             commandTracker.EndComposite();
@@ -79,7 +79,7 @@ namespace CLX
             {
                 const EntityID entityID = *selectedEntityIDs.begin();
                 commandTracker.BeginComposite("Duplicate Entity + Select Entity");
-                const EntityID newEntityID = DuplicateEntityAndChildren(ecs, entityID, rootEntities, dataTypeRegistry, commandTracker);
+                const EntityID newEntityID = DuplicateEntityHierarchy(ecs, entityID, rootEntities, dataTypeRegistry, commandTracker);
                 SetEntitySelection(newEntityID, selectedEntityIDs, commandTracker);
                 commandTracker.EndComposite();
             }
@@ -124,7 +124,14 @@ namespace CLX
             ImGui::BeginDisabled(!openedEntityComposition.IsValid());
             if (ImGui::Button("Instantiate"))
             {
-                InstantiateEntityComposition(sceneManager.GetActiveScene()->GetECSHandle(), openedEntityComposition, mRootEntities, dataTypeRegistry, commandTracker);
+                InstantiateEntityComposition(
+                    sceneManager.GetActiveScene()->GetECSHandle(), 
+                    openedEntityComposition, 
+                    InvalidEntityID,
+                    dataTypeRegistry,
+                    mRootEntities, 
+                    commandTracker
+                );
             }
             ImGui::EndDisabled();
         }

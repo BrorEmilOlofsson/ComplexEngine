@@ -27,7 +27,7 @@ namespace CLX
 	};
 
 	template<typename T>
-	using FunctionType = void(*)(const T&);
+	using EditorCommandFunctionType = void(const T&);
 
 	class EditorCommand final
 	{
@@ -45,7 +45,7 @@ namespace CLX
 
 		template<typename T, std::invocable<const T&> DoFunc, std::invocable<const T&> UndoFunc>
 		EditorCommand(const T& data, DoFunc doFunction, UndoFunc undoFunction, const std::string& name)
-			: mConcept(std::make_unique<CommandModel<T, FunctionType<T>, FunctionType<T>>>(data, doFunction, undoFunction))
+			: mConcept(std::make_unique<CommandModel<T, EditorCommandFunctionType<T>*, EditorCommandFunctionType<T>*>>(data, doFunction, undoFunction))
 			, mName(name)
 		{
 		}
@@ -99,7 +99,7 @@ namespace CLX
 			{
 			}
 
-			void ExecuteCommand(const bool) const override
+			void ExecuteCommand(const bool) override
 			{
 				Do(mData);
 			}
@@ -180,9 +180,9 @@ namespace CLX
 		};
 
 		template<typename T>
-		class CommandModel<T, FunctionType<T>, FunctionType<T>> final : public CommandConcept
+		class CommandModel<T, EditorCommandFunctionType<T>*, EditorCommandFunctionType<T>*> final : public CommandConcept
 		{
-			using FunctionType = void(*)(const T&);
+			using FunctionType = EditorCommandFunctionType<T>*;
 		public:
 
 			CommandModel(const T& data, FunctionType executeFunction, FunctionType undoFunction)

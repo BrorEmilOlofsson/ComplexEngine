@@ -32,7 +32,7 @@ namespace CLX
 
 		if (compositeCommand)
 		{
-			ExecuteCommand(EditorCommand(compositeCommand.value(), compositeCommand->GetName()));
+			ExecuteCommandInternal(false, EditorCommand(compositeCommand.value(), compositeCommand->GetName()));
 		}
 	}
 
@@ -72,15 +72,15 @@ namespace CLX
 
 	void EditorCommandTracker::ExecuteCommandInternal(const bool execute, EditorCommand&& command)
 	{
-		if (mCompositeCommandBuilder.IsActive())
-		{
-			mCompositeCommandBuilder.AddCommand(std::move(command));
-			return;
-		}
-
 		if (execute)
 		{
 			command.ExecuteCommand(false);
+		}
+
+		if (mCompositeCommandBuilder.IsActive())
+		{
+			mCompositeCommandBuilder.AddCommand(std::move(command), execute);
+			return;
 		}
 
 		mUndoStack.push(std::move(command));

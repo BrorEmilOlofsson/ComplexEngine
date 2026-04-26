@@ -139,7 +139,7 @@ namespace CLX
         return ecs.GetComponent<TransformHierarchyComponent>(entityID)->children;
     }
 
-    [[nodiscard]] inline std::vector<EntityID> GetAllEntityChildren(const ECS& ecs, const EntityID entityID)
+    [[nodiscard]] inline std::vector<EntityID> GetEntityDescendants(const ECS& ecs, const EntityID entityID)
     {
         std::vector<EntityID> allChildren;
         auto* tch = ecs.GetComponent<TransformHierarchyComponent>(entityID);
@@ -148,7 +148,7 @@ namespace CLX
         allChildren.insert(allChildren.end(), children.begin(), children.end());
         for (const auto& child : children)
         {
-            const auto& grandChildren = GetAllEntityChildren(ecs, child);
+            const auto& grandChildren = GetEntityDescendants(ecs, child);
             allChildren.insert(allChildren.end(), grandChildren.begin(), grandChildren.end());
         }
         return allChildren;
