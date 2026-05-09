@@ -1,11 +1,12 @@
 #pragma once
+#include <cstdint>
 #include <vector>
 #include <filesystem>
 
 namespace CLX
 {
 
-	enum class eQuit : unsigned char
+	enum class eQuit : uint8_t
 	{
 		Yes,
 		No

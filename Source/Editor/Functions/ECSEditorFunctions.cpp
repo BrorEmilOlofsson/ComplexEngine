@@ -1202,20 +1202,120 @@ namespace CLX
     };
     std::map<EntityCompositionAssetHandle, std::vector<EntityCompositionInstantiation>> instantiationsByEntityComposition;
 
-    void HandleEntityCompositionModification(EntityCompositionAssetHandle entityCompopsitionAssetHandle, const EntityID modifiedEntityID,
-        const void* sourcePtr, const DataTypeID modifiedDataTypeID, const DataTypeID componentTypeID, const PropertyPath& propertyPath, 
+
+    void HandleEntityCompositionModification(const EntityID entityID, ECS& instantiationECS, const EntityID modifiedEntityID, 
+        const DataTypeID modifiedDataTypeID, const void* sourcePtr, const DataTypeID componentTypeID, const PropertyPath& propertyPath,
         const std::optional<VectorEditOperation>& vectorOperation, const DataTypeRegistry& dataTypeRegistry)
     {
-        dataTypeRegistry;
+        auto* compositionComponent = instantiationECS.GetComponent<EntityCompositionInstantiationComponent>(entityID);
+        ASSERT(compositionComponent != nullptr);
+
+        std::optional<EntityID> foundEntityID = FindEntity(instantiationECS, [&instantiationECS, modifiedEntityID](const EntityID entityID)
+            {
+                auto* compositionComponent = instantiationECS.GetComponent<EntityCompositionInstantiationComponent>(entityID);
+                ASSERT(compositionComponent != nullptr);
+                return compositionComponent->mappedEntityID == modifiedEntityID;
+            }, entityID);
+
+        ASSERT(foundEntityID.has_value());
+        const EntityID correspondingEntityID = foundEntityID.value();
+
+        const EntityCompositionInstantiationComponent* correspondingCompositionComponent = instantiationECS.GetComponent<EntityCompositionInstantiationComponent>(correspondingEntityID);
+        ASSERT(correspondingCompositionComponent != nullptr);
+        if (std::ranges::find_if(correspondingCompositionComponent->overrides, [&](const EntityCompositionOverride& ecOverride) { return ecOverride.path == propertyPath; }) != correspondingCompositionComponent->overrides.end())
+        {
+            // This property has been overridden in this instantiation, so we should not apply the modification
+            return;
+        }
+
+
+        if (modifiedDataTypeID == GetDataTypeID<EntityID>())
+        {
+            const EntityID newEntityID = *static_cast<const EntityID*>(sourcePtr);
+
+            std::optional<EntityID> f = FindEntity(instantiationECS, [&instantiationECS, newEntityID](const EntityID entityID)
+                {
+                    auto* compositionComponent = instantiationECS.GetComponent<EntityCompositionInstantiationComponent>(entityID);
+                    ASSERT(compositionComponent != nullptr);
+                    return compositionComponent->mappedEntityID == newEntityID;
+                }, entityID);
+
+            ASSERT(f.has_value());
+        }
+        else if (modifiedDataTypeID == GetDataTypeID<std::vector<EntityID>>())
+        {
+            ASSERT(vectorOperation.has_value());
+            const std::vector<EntityID> newEntityIDs = *static_cast<const std::vector<EntityID>*>(sourcePtr);
+
+            void* componentPtr = instantiationECS.GetComponent(correspondingEntityID, componentTypeID.typeIndex);
+            ASSERT(componentPtr != nullptr);
+            void* destinationPtr = dataTypeRegistry.GetPropertyPathDataPtr(componentPtr, propertyPath);
+            std::vector<EntityID>& entityIDVector = *static_cast<std::vector<EntityID>*>(destinationPtr);
+            entityIDVector;
+
+            std::visit(Visitor{
+                    [&](const VectorEditOperations::PushBack&)
+                    {
+                        entityIDVector.push_back(InvalidEntityID);
+                    },
+                    [&](const VectorEditOperations::Insert& insert)
+                    {
+                        entityIDVector.insert(entityIDVector.begin() + insert.index, InvalidEntityID);
+                    },
+                    [&](const VectorEditOperations::EraseElement& remove)
+                    {
+                        entityIDVector.erase(entityIDVector.begin() + remove.index);
+                    },
+                    [&](const VectorEditOperations::Clear&)
+                    {
+                        entityIDVector.clear();
+                    },
+                    [&](const auto&)
+                    {
+                        ASSERT(newEntityIDs.size() == entityIDVector.size());
+
+                        for (auto [i, newEntityID] : std::views::enumerate(newEntityIDs))
+                        {
+                            if (newEntityID == InvalidEntityID)
+                            {
+                                continue;
+                            }
+                            std::optional<EntityID> f = FindEntity(instantiationECS, [&](const EntityID entityID)
+                                {
+                                    auto* compositionComponent = instantiationECS.GetComponent<EntityCompositionInstantiationComponent>(entityID);
+                                    ASSERT(compositionComponent != nullptr);
+                                    return compositionComponent->mappedEntityID == newEntityID;
+                                }, entityID);
+
+                            ASSERT(f.has_value());
+
+                            const EntityID correspondingEntityID2 = f.value();
+
+                            entityIDVector[i] = correspondingEntityID2;
+                        }
+                    }
+                }, vectorOperation.value());
+        }
+        else
+        {
+
+            void* componentPtr = instantiationECS.GetComponent(correspondingEntityID, componentTypeID.typeIndex);
+            void* destinationPtr = dataTypeRegistry.GetPropertyPathDataPtr(componentPtr, propertyPath);
+            dataTypeRegistry.CopyData(modifiedDataTypeID, destinationPtr, sourcePtr);
+        }
+    }
+
+    void HandleEntityCompositionModification(EntityCompositionAssetHandle entityCompopsitionAssetHandle, const EntityID modifiedEntityID,
+        const void* sourcePtr, const DataTypeID modifiedDataTypeID, const DataTypeID componentTypeID, const PropertyPath& propertyPath,
+        const std::optional<VectorEditOperation>& vectorOperation, const DataTypeRegistry& dataTypeRegistry)
+    {
         if (!entityCompopsitionAssetHandle)
         {
             return;
         }
 
-        const ECS& ecs = entityCompopsitionAssetHandle.Get().GetECS();
-        ecs;
         auto& instantiations = instantiationsByEntityComposition[entityCompopsitionAssetHandle];
-        for (const auto& [entityID, ecsHandle] : instantiations)
+        for (const auto& [rootEntityID, ecsHandle] : instantiations)
         {
             // Find the instantiation that corresponds to the modified entity
             ECS* instantiationECS = ecsHandle.Get();
@@ -1224,93 +1324,35 @@ namespace CLX
                 // TODO: Handle this case (probably by removing the instantiation from the list)
                 continue;
             }
-            auto* compositionComponent = instantiationECS->GetComponent<EntityCompositionInstantiationComponent>(entityID);
-            ASSERT(compositionComponent != nullptr);
 
-            std::optional<EntityID> foundEntityID = FindEntity(*instantiationECS, [&instantiationECS, modifiedEntityID](const EntityID entityID)
-                {
-                    auto* compositionComponent = instantiationECS->GetComponent<EntityCompositionInstantiationComponent>(entityID);
-                    ASSERT(compositionComponent != nullptr);
-                    return compositionComponent->mappedEntityID == modifiedEntityID;
-                }, entityID);
+            HandleEntityCompositionModification(rootEntityID, *instantiationECS, modifiedEntityID, modifiedDataTypeID, sourcePtr, componentTypeID, propertyPath, vectorOperation, dataTypeRegistry);
+        }
+    }
 
-            ASSERT(foundEntityID.has_value());
-            const EntityID correspondingEntityID = foundEntityID.value();
+    void HandleOverrideModification(const EntityID entityID, ECS& ecs, const PropertyPath& modifiedValuePropertyPath)
+    {
+        EntityCompositionInstantiationComponent* compositionComponent = ecs.GetComponent<EntityCompositionInstantiationComponent>(entityID);
+        if (compositionComponent == nullptr)
+        {
+            return;
+        }
+        // Handle override logic for components that are part of the entity's composition
 
-            if (modifiedDataTypeID == GetDataTypeID<EntityID>())
-            {
-                const EntityID newEntityID = *static_cast<const EntityID*>(sourcePtr);
+        EntityCompositionOverride newOverride;
+        newOverride.path = modifiedValuePropertyPath;
+      
+        std::vector<EntityCompositionOverride>& overrides = compositionComponent->overrides;
+        auto it = std::ranges::find_if(overrides, [&](const EntityCompositionOverride& ecOverride) { return ecOverride.path == modifiedValuePropertyPath; });
 
-                std::optional<EntityID> f = FindEntity(*instantiationECS, [&instantiationECS, newEntityID](const EntityID entityID)
-                    {
-                        auto* compositionComponent = instantiationECS->GetComponent<EntityCompositionInstantiationComponent>(entityID);
-                        ASSERT(compositionComponent != nullptr);
-                        return compositionComponent->mappedEntityID == newEntityID;
-                    }, entityID);
-
-                ASSERT(f.has_value());
-            }
-            else if (modifiedDataTypeID == GetDataTypeID<std::vector<EntityID>>())
-            {
-                ASSERT(vectorOperation.has_value());
-                const std::vector<EntityID> newEntityIDs = *static_cast<const std::vector<EntityID>*>(sourcePtr);
-
-                void* componentPtr = instantiationECS->GetComponent(correspondingEntityID, componentTypeID.typeIndex);
-                ASSERT(componentPtr != nullptr);
-                void* destinationPtr = dataTypeRegistry.GetPropertyPathDataPtr(componentPtr, propertyPath);
-                std::vector<EntityID>& entityIDVector = *static_cast<std::vector<EntityID>*>(destinationPtr);
-                entityIDVector;
-
-                std::visit(Visitor{
-                        [&](const VectorEditOperations::PushBack&)
-                        {
-                            entityIDVector.push_back(InvalidEntityID);
-                        },
-                        [&](const VectorEditOperations::Insert& insert)
-                        {
-                            entityIDVector.insert(entityIDVector.begin() + insert.index, InvalidEntityID);
-                        },
-                        [&](const VectorEditOperations::EraseElement& remove)
-                        {
-                            entityIDVector.erase(entityIDVector.begin() + remove.index);
-                        },
-                        [&](const VectorEditOperations::Clear&)
-                        {
-                            entityIDVector.clear();
-                        },
-                        [&](const auto&)
-                        {
-                            ASSERT(newEntityIDs.size() == entityIDVector.size());
-
-                            for (auto [i, newEntityID] : std::views::enumerate(newEntityIDs))
-                            {
-                                if (newEntityID == InvalidEntityID)
-                                {
-                                    continue;
-                                }
-                                std::optional<EntityID> f = FindEntity(*instantiationECS, [&](const EntityID entityID)
-                                    {
-                                        auto* compositionComponent = instantiationECS->GetComponent<EntityCompositionInstantiationComponent>(entityID);
-                                        ASSERT(compositionComponent != nullptr);
-                                        return compositionComponent->mappedEntityID == newEntityID;
-                                    }, entityID);
-
-                                ASSERT(f.has_value());
-
-                                const EntityID correspondingEntityID2 = f.value();
-
-                                entityIDVector[i] = correspondingEntityID2;
-                            }
-                        }
-                    }, vectorOperation.value());
-            }
-            else
-            {
-
-                void* componentPtr = instantiationECS->GetComponent(correspondingEntityID, componentTypeID.typeIndex);
-                void* destinationPtr = dataTypeRegistry.GetPropertyPathDataPtr(componentPtr, propertyPath);
-                dataTypeRegistry.CopyData(modifiedDataTypeID, destinationPtr, sourcePtr);
-            }
+        if (it == overrides.end())
+        {
+            // No existing override for this property path, add a new one
+            compositionComponent->overrides.push_back(newOverride);
+        }
+        else
+        {
+            // Existing override found, update it
+            *it = newOverride;
         }
     }
 
@@ -1373,11 +1415,11 @@ namespace CLX
                     dataTypeRegistry
                 );
 
-                if (HasAncestorComponent<EntityCompositionInstantiationComponent>(ecs, entityID, true))
-                {
-                    // Handle override logic for components that are part of the entity's composition
-
-                }
+                HandleOverrides(
+                    entityID,
+                    ecs,
+                    viewAndEditResult.propertyPath
+                );
             }
         }
 

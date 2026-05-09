@@ -39,16 +39,5 @@ namespace CLX
         void* dataPtr = nullptr;
 		PropertyPath propertyPath;
         std::optional<VectorEditOperation> vectorEditOperation;
-
-        ViewAndEditResult& operator|=(const ViewAndEditResult& other)
-		{
-			isActive |= other.isActive;
-			isEdited |= other.isEdited;
-			dataTypeID = other.dataTypeID;
-			dataPtr = other.dataPtr;
-			propertyPath = other.propertyPath;
-            vectorEditOperation = other.vectorEditOperation;
-			return *this;
-		}
 	};
 }

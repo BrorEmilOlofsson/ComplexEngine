@@ -58,12 +58,15 @@ namespace CLX
                 newBlackboard.Insert<Key_CurrentPropertyPath>(propertyPath);
                 //std::println("Viewing member: {}", member.name);
                 //std::println("Property Path: {}", propertyPath);
-                viewAndEditResult |= ViewAndEditData(member.dataTypeID, memberDataPtr, newBlackboard, &member); 
-                if (viewAndEditResult.isEdited)
+                ViewAndEditResult result = ViewAndEditData(member.dataTypeID, memberDataPtr, newBlackboard, &member); 
+                if (result.isEdited)
                 {
+                    viewAndEditResult.isEdited = result.isEdited;
+                    viewAndEditResult.isActive = result.isActive;
                     viewAndEditResult.dataTypeID = member.dataTypeID;
                     viewAndEditResult.dataPtr = dataPtr + std::get<ByteOffset>(member.memberType);
                     viewAndEditResult.propertyPath = propertyPath;
+                    viewAndEditResult.vectorEditOperation = result.vectorEditOperation;
                 }
             }
             else
