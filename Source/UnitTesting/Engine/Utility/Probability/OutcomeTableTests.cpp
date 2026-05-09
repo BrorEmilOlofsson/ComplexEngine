@@ -1,28 +1,31 @@
-#include <External/Catch2/catch_amalgamated.hpp>
-
 #include "Engine/Utility/Probability/OutcomeTable.hpp"
+#include <External/Catch2/catch_amalgamated.hpp>
 
 using namespace CLX;
 
-int Add(int a, int b)
+TEST_CASE("GetOutcome")
 {
-    return a + b;
+	OutcomeTableUInt<std::string_view> table;
+
+	table.Insert("Emil", 500);
+	table.Insert("Emil 2", 500);
+	table.Insert("Emil 3", 500);
+
+	REQUIRE(table.GetOutcome(0U) == "Emil");
+	REQUIRE(table.GetOutcome(499) == "Emil");
+	REQUIRE(table.GetOutcome(500) == "Emil 2");
+	REQUIRE(table.GetOutcome(999) == "Emil 2");
+	REQUIRE(table.GetOutcome(1000) == "Emil 3");
+	REQUIRE(table.GetOutcome(1499) == "Emil 3");
 }
 
-int Subtract(int a, int b)
+TEST_CASE("WeightSum")
 {
-    return a - b;
-}
+	OutcomeTableUInt<std::string_view> table;
 
-TEST_CASE("OutcomeTable::GetOutcome", "[OutcomeTable]")
-{
-    OutcomeTable<int(*)(int, int), uint64_t> table;
-    table.Insert(Add, 60);
-    table.Insert(Subtract, 40);
-    
-    REQUIRE(table.Count() == 2);
-    REQUIRE(table.GetOutcome(0) == Add);
-    REQUIRE(table.GetOutcome(59) == Add);
-    REQUIRE(table.GetOutcome(60) == Subtract);
-    REQUIRE(table.GetOutcome(99) == Subtract);
+	table.Insert("Emil", 500);
+	table.Insert("Emil 2", 500);
+	table.Insert("Emil 3", 500);
+
+	REQUIRE(table.WeightSum() == 1500);
 }
