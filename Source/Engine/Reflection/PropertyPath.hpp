@@ -23,6 +23,35 @@ namespace CLX
         std::vector<PropertyElement> elements;
     };
 
+    [[nodiscard]] constexpr bool operator==(const PropertyElement& lhs, const PropertyElement& rhs)
+    {
+        if (lhs.index() != rhs.index())
+        {
+            return false;
+        }
+
+        return std::visit(Visitor
+            {
+                [&](const std::string_view memberNameLhs, const std::string_view memberNameRhs)
+                {
+                    return memberNameLhs == memberNameRhs;
+                },
+                [&](const Index indexLhs, const Index indexRhs)
+                {
+                    return indexLhs.value == indexRhs.value;
+                },
+                [](const auto&, const auto&)
+                {
+                    return false;
+                }
+            }, lhs, rhs);
+    }
+
+    [[nodiscard]] inline bool operator==(const PropertyPath& lhs, const PropertyPath& rhs)
+    {
+        return lhs.dataTypeID == rhs.dataTypeID && lhs.elements == rhs.elements;
+    }
+
     /*void* GetPropertyPtr(void* currentDataPtr, const PropertyElement& element)
     {
         if (member.name == std::get<std::string>(element))

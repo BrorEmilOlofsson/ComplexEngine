@@ -239,7 +239,7 @@ struct EnumCount;
 template<>
 struct EnumCount<eNationalAssociation> : std::integral_constant<std::size_t, static_cast<std::size_t>(eNationalAssociation::Count)> {};
 
-constexpr std::string EnumToString(eNationalAssociation pAssociation)
+constexpr std::string ToString(eNationalAssociation pAssociation)
 {
 	switch (pAssociation)
 	{

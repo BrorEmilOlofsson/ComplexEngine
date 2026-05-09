@@ -127,7 +127,7 @@ namespace CLX
     template<>
     struct EnumCount<eInputKey> : std::integral_constant<std::size_t, 256> {};
 
-    constexpr std::string_view EnumToString(const eInputKey key)
+    constexpr std::string_view ToString(const eInputKey key)
     {
         switch (key)
         {

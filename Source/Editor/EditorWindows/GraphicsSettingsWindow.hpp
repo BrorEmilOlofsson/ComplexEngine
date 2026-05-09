@@ -13,9 +13,9 @@ namespace CLX
 	inline auto GetRasterizerStateNames()
 	{
 		std::array<std::string_view, static_cast<std::size_t>(eRasterizerState::Count)> names;
-		ForEachEnum<eRasterizerState>([&names](EnumIterator<eRasterizerState> iterator)
+		ForEachEnum<eRasterizerState>([&names](EnumIteratorValue<eRasterizerState> iterator)
 			{
-				names[static_cast<unsigned int>(iterator.value)] = iterator.name;
+				names[static_cast<unsigned int>(iterator.value)] = ToString(iterator.value);
 			});
 
 		return names;

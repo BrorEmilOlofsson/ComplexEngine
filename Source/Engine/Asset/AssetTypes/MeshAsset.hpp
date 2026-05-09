@@ -19,7 +19,7 @@ namespace CLX
 		SkyBox
 	};
 
-	constexpr std::string_view EnumToString(const ePrimitiveShape type)
+	constexpr std::string_view ToString(const ePrimitiveShape type)
 	{
 		switch (type)
 		{

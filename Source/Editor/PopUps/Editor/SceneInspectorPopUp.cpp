@@ -26,8 +26,8 @@ namespace CLX
 			}
 
 			ECS& ecs = sceneManager.GetActiveScene()->GetECS();
-			
-			auto entityNameAction = ShowEntityName(ecs, selectedEntityID, input);
+
+			auto entityNameAction = ShowEntityName(ecs, selectedEntityID, input, true);
 
 			const Transform worldTransform = GetEntityWorldTransform(ecs, selectedEntityID);
 

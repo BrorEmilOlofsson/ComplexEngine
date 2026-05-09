@@ -24,6 +24,6 @@ namespace CLX
     };
 
     template<>
-    struct IsEnumMask<eTransformOperation> : std::true_type
+    struct IsEnumBitfield<eTransformOperation> : std::true_type
     {};
 }

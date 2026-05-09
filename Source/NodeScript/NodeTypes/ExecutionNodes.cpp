@@ -45,7 +45,7 @@ namespace FLY_NAMESPACE
 	template<typename T>
 	struct IsLayeredEnum : std::false_type {};
 
-	std::string EnumToString(const eComparatorType aComparatorType)
+	std::string ToString(const eComparatorType aComparatorType)
 	{
 		switch (aComparatorType)
 		{
@@ -84,7 +84,7 @@ namespace FLY_NAMESPACE
 			{
 				const T current = static_cast<T>(static_cast<size_t>(1) << i);
 				const bool isActive = (aEnumValue & current) != static_cast<T>(0);
-				if (ImGui::RadioButton(EnumToString(current).c_str(), isActive))
+				if (ImGui::RadioButton(ToString(current).c_str(), isActive))
 				{
 					if (isActive)
 					{
@@ -100,12 +100,12 @@ namespace FLY_NAMESPACE
 		}
 		else
 		{
-			if (ImGui::BeginCombo("##", EnumToString(aEnumValue).c_str()))
+			if (ImGui::BeginCombo("##", ToString(aEnumValue).c_str()))
 			{
 				for (size_t i = 0; i < EnumCount<T>::value; i++)
 				{
 					const T current = static_cast<T>(i);
-					if (ImGui::Selectable(EnumToString(current).c_str(), aEnumValue == current))
+					if (ImGui::Selectable(ToString(current).c_str(), aEnumValue == current))
 					{
 						aEnumValue = current;
 					}
@@ -141,7 +141,7 @@ namespace FLY_NAMESPACE
 		Item = 1 << 3
 	};
 
-	std::string EnumToString(const eColLayer aColLayer)
+	std::string ToString(const eColLayer aColLayer)
 	{
 		switch (aColLayer)
 		{

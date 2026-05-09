@@ -94,7 +94,7 @@ namespace CLX
         ecs.DestroyEntity(entityID);
     }
 
-    static std::map<EntityID, EntityID> DuplicateEntityHierarchy(ECS& ecs, const EntityID entityID, const ChildIndexSetting indexSetting, const DataTypeRegistry& dataTypeRegistry)
+    static std::map<EntityID, EntityID> DuplicateEntityHierarchy(ECS& ecs, const EntityID entityID, const IndexVariant childIndex, const DataTypeRegistry& dataTypeRegistry)
     {
         const EntityID createdEntityID = ecs.DuplicateEntity(entityID);
         std::map<EntityID, EntityID> oldToNewEntityIDMap;
@@ -120,7 +120,7 @@ namespace CLX
         ASSERT(parentID == GetParentEntity(ecs, createdEntityID));
         if (parentID != InvalidEntityID)
         {
-            AddBasedOnChildIndexSetting(ecs.GetComponent<TransformHierarchyComponent>(parentID)->children, createdEntityID, indexSetting);
+            AddBasedOnChildIndexVariant(ecs.GetComponent<TransformHierarchyComponent>(parentID)->children, createdEntityID, childIndex);
         }
 
         return oldToNewEntityIDMap;
@@ -178,9 +178,9 @@ namespace CLX
     }
 
 
-    EntityID DuplicateEntityHierarchy(ECS& ecs, const EntityID entityID, std::vector<EntityID>& rootEntities, const ChildIndexSetting indexSetting, const DataTypeRegistry& dataTypeRegistry, EditorCommandTracker& commandTracker)
+    EntityID DuplicateEntityHierarchy(ECS& ecs, const EntityID entityID, std::vector<EntityID>& rootEntities, const IndexVariant indexVariant, const DataTypeRegistry& dataTypeRegistry, EditorCommandTracker& commandTracker)
     {
-        std::map<EntityID, EntityID> oldToNewEntityIDMap = DuplicateEntityHierarchy(ecs, entityID, indexSetting, dataTypeRegistry);
+        std::map<EntityID, EntityID> oldToNewEntityIDMap = DuplicateEntityHierarchy(ecs, entityID, indexVariant, dataTypeRegistry);
         const EntityID newEntityID = oldToNewEntityIDMap.at(entityID);
 
 
@@ -191,7 +191,7 @@ namespace CLX
             std::reference_wrapper<ECS> ecs;
             std::reference_wrapper<std::vector<EntityID>> rootEntities;
             EntityID parentID;
-            ChildIndexSetting indexSetting;
+            IndexVariant indexVariant;
         };
 
 
@@ -202,7 +202,7 @@ namespace CLX
             .ecs = ecs,
             .rootEntities = rootEntities,
             .parentID = GetParentEntity(ecs, entityID),
-            .indexSetting = indexSetting
+            .indexVariant = indexVariant
         };
 
         auto doCommand = [](const DuplicateEntityHierarchyData& data)
@@ -211,7 +211,7 @@ namespace CLX
 
                 if (data.parentID == InvalidEntityID)
                 {
-                    AddBasedOnChildIndexSetting(data.rootEntities.get(), data.duplicatedEntityID, data.indexSetting);
+                    AddBasedOnChildIndexVariant(data.rootEntities.get(), data.duplicatedEntityID, data.indexVariant);
                 }
             };
 
@@ -221,7 +221,7 @@ namespace CLX
 
                 if (data.parentID == InvalidEntityID)
                 {
-                    RemoveBasedOnIndexSetting(data.rootEntities.get(), data.indexSetting);
+                    RemoveBasedOnIndexVariant(data.rootEntities.get(), data.indexVariant);
                 }
             };
 
@@ -717,7 +717,7 @@ namespace CLX
         commandTracker.ExecuteCommand(EditorCommand(data, doCommand, undoCommand, "Reorder Entity"));
     }
 
-    void SetParentEntity(ECS& ecs, const EntityID parentID, const EntityID childID, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker, ChildIndexSetting indexSetting = LastIndex{})
+    void SetParentEntity(ECS& ecs, const EntityID parentID, const EntityID childID, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker, IndexVariant indexVariant = LastIndex{})
     {
         if (!IsEntityChildable(ecs, parentID, childID))
         {
@@ -735,7 +735,7 @@ namespace CLX
             EntityID oldParentID;
             std::reference_wrapper<std::vector<EntityID>> rootEntities;
             std::size_t childIndex = 0;
-            ChildIndexSetting indexSetting;
+            IndexVariant indexVariant;
         };
 
         const EntityID oldParent = GetParentEntity(ecs, childID);
@@ -746,7 +746,7 @@ namespace CLX
             .childID = childID,
             .oldParentID = oldParent,
             .rootEntities = rootEntities,
-            .indexSetting = indexSetting
+            .indexVariant = indexVariant
         };
 
         if (data.oldParentID == data.parentID)
@@ -778,7 +778,7 @@ namespace CLX
 
         auto doCommand = [](const SetParentEntityData& data)
             {
-                SetParentEntity(data.ecs, data.childID, data.parentID, data.indexSetting);
+                SetParentEntity(data.ecs, data.childID, data.parentID, data.indexVariant);
 
                 if (data.oldParentID == InvalidEntityID)
                 {
@@ -786,7 +786,7 @@ namespace CLX
                 }
                 else if (data.parentID == InvalidEntityID)
                 {
-                    AddBasedOnChildIndexSetting(data.rootEntities, data.childID, data.indexSetting);
+                    AddBasedOnChildIndexVariant(data.rootEntities, data.childID, data.indexVariant);
                 }
             };
 
@@ -800,7 +800,7 @@ namespace CLX
                 }
                 else if (data.parentID == InvalidEntityID)
                 {
-                    RemoveBasedOnIndexSetting(data.rootEntities, data.indexSetting);
+                    RemoveBasedOnIndexVariant(data.rootEntities, data.indexVariant);
                 }
             };
 
@@ -1203,7 +1203,8 @@ namespace CLX
     std::map<EntityCompositionAssetHandle, std::vector<EntityCompositionInstantiation>> instantiationsByEntityComposition;
 
     void HandleEntityCompositionModification(EntityCompositionAssetHandle entityCompopsitionAssetHandle, const EntityID modifiedEntityID,
-        const void* sourcePtr, const DataTypeID modifiedDataTypeID, const DataTypeID componentTypeID, const PropertyPath& propertyPath, const std::optional<VectorEditOperation>& vectorOperation, const DataTypeRegistry& dataTypeRegistry)
+        const void* sourcePtr, const DataTypeID modifiedDataTypeID, const DataTypeID componentTypeID, const PropertyPath& propertyPath, 
+        const std::optional<VectorEditOperation>& vectorOperation, const DataTypeRegistry& dataTypeRegistry)
     {
         dataTypeRegistry;
         if (!entityCompopsitionAssetHandle)
@@ -1226,7 +1227,7 @@ namespace CLX
             auto* compositionComponent = instantiationECS->GetComponent<EntityCompositionInstantiationComponent>(entityID);
             ASSERT(compositionComponent != nullptr);
 
-            std::optional<EntityID> foundEntityID = FindEntity(*instantiationECS, [&](const EntityID entityID)
+            std::optional<EntityID> foundEntityID = FindEntity(*instantiationECS, [&instantiationECS, modifiedEntityID](const EntityID entityID)
                 {
                     auto* compositionComponent = instantiationECS->GetComponent<EntityCompositionInstantiationComponent>(entityID);
                     ASSERT(compositionComponent != nullptr);
@@ -1240,7 +1241,7 @@ namespace CLX
             {
                 const EntityID newEntityID = *static_cast<const EntityID*>(sourcePtr);
 
-                std::optional<EntityID> f = FindEntity(*instantiationECS, [&](const EntityID entityID)
+                std::optional<EntityID> f = FindEntity(*instantiationECS, [&instantiationECS, newEntityID](const EntityID entityID)
                     {
                         auto* compositionComponent = instantiationECS->GetComponent<EntityCompositionInstantiationComponent>(entityID);
                         ASSERT(compositionComponent != nullptr);
@@ -1256,8 +1257,8 @@ namespace CLX
 
                 void* componentPtr = instantiationECS->GetComponent(correspondingEntityID, componentTypeID.typeIndex);
                 ASSERT(componentPtr != nullptr);
-                void* s = dataTypeRegistry.GetPropertyPathDataPtr(componentPtr, propertyPath);
-                std::vector<EntityID>& entityIDVector = *static_cast<std::vector<EntityID>*>(s);
+                void* destinationPtr = dataTypeRegistry.GetPropertyPathDataPtr(componentPtr, propertyPath);
+                std::vector<EntityID>& entityIDVector = *static_cast<std::vector<EntityID>*>(destinationPtr);
                 entityIDVector;
 
                 std::visit(Visitor{
@@ -1302,10 +1303,14 @@ namespace CLX
                             }
                         }
                     }, vectorOperation.value());
-
-
             }
+            else
+            {
 
+                void* componentPtr = instantiationECS->GetComponent(correspondingEntityID, componentTypeID.typeIndex);
+                void* destinationPtr = dataTypeRegistry.GetPropertyPathDataPtr(componentPtr, propertyPath);
+                dataTypeRegistry.CopyData(modifiedDataTypeID, destinationPtr, sourcePtr);
+            }
         }
     }
 
@@ -1453,7 +1458,7 @@ namespace CLX
             };
     }
 
-    [[nodiscard]] std::optional<EditorAction> ShowEntityName(ECS& ecs, const EntityID selectedEntityID, const InputState& input)
+    [[nodiscard]] std::optional<EditorAction> ShowEntityName(ECS& ecs, const EntityID selectedEntityID, const InputState& input, const bool canChangeName)
     {
         if (selectedEntityID == InvalidEntityID)
         {
@@ -1468,6 +1473,7 @@ namespace CLX
 
         ImGui::PushItemWidth(200);
 
+        ImGui::BeginDisabled(!canChangeName);
         std::optional<EditorAction> setNameAction;
         if (ImGui::InputTextWithHint("Name", "Entity Name", nameBuffer, sizeof(nameBuffer)))
         {
@@ -1476,6 +1482,7 @@ namespace CLX
                 setNameAction = CreateSetEntityNameAction(ecs, selectedEntityID, nameBuffer);
             }
         }
+        ImGui::EndDisabled();
 
         ImGui::PopItemWidth();
 
@@ -1538,7 +1545,6 @@ namespace CLX
         }
 
         bool anyActiveItem = false;
-
         std::vector<EditorAction> editorActions;
 
         static bool showAllComponents = false;

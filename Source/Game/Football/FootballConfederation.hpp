@@ -11,7 +11,7 @@ enum class eConfederation
 	UEFA,
 };
 
-constexpr std::string EnumToString(eConfederation pConfederation)
+constexpr std::string ToString(eConfederation pConfederation)
 {
 	switch (pConfederation)
 	{

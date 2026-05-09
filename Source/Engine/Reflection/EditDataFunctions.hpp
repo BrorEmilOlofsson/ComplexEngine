@@ -230,14 +230,14 @@ namespace CLX
 	ViewAndEditResult ViewAndEditValue(T& value, const std::string& variableName)
 	{
 		ViewAndEditResult viewAndEditResult;
-		std::string_view currentName = EnumToString(value);
+		std::string_view currentName = ToString(value);
 		if (ImGui::BeginCombo(variableName.c_str(), std::string(currentName).c_str()))
 		{
 			constexpr std::size_t enumCount = EnumCount<T>::value;
 			for (size_t i = 0; i < enumCount; i++)
 			{
 				const T v = static_cast<T>(i);
-				if (ImGui::Selectable(std::string(EnumToString(v)).c_str()))
+				if (ImGui::Selectable(std::string(ToString(v)).c_str()))
 				{
 					value = v;
 					viewAndEditResult.isEdited = true;

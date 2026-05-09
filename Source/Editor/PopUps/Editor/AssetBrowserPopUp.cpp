@@ -109,12 +109,12 @@ namespace CLX
         assetManager.Rename(path, newName);
     }
 
-    EntityComposition CreateEntityComposition(const ECSRegistry& ecsRegistry)
+    EntityComposition CreateEntityComposition(const ECSRegistry& ecsRegistry, std::string name)
     {
         EntityComposition entityComposition(ecsRegistry);
         NameComponent* nameComponent = entityComposition.GetECS().GetComponent<NameComponent>(entityComposition.GetRootEntity());
         ASSERT(nameComponent);
-        nameComponent->name = "Root";
+        nameComponent->name = std::move(name);
         return entityComposition;
     }
 
@@ -182,7 +182,7 @@ namespace CLX
             if (ImGui::Button("Create"))
             {
                 const std::filesystem::path path = directoryPath / (ToWString(name) + std::wstring(AssetExtensions::EntityComposition));
-                EntityCompositionAsset asset(CreateEntityComposition(ecsRegistry), path);
+                EntityCompositionAsset asset(CreateEntityComposition(ecsRegistry, name), path);
                 auto assetHandle = assetManager.AddEntityComposition(asset);
                 SaveEntityCompositionAsset(assetHandle, dataTypeRegistry);
 

@@ -291,17 +291,17 @@ namespace CLX
 
 		return [context, device](AssetManager& assetManager)
 			{
-				AddMesh(assetManager, ShapeCreator3000::CreateCube(), EnumToString(ePrimitiveShape::Cube), *device.Get(), context);
-				AddMesh(assetManager, ShapeCreator3000::CreatePyramid(), EnumToString(ePrimitiveShape::Pyramid), *device.Get(), context);
-				AddMesh(assetManager, ShapeCreator3000::CreatePlane(), EnumToString(ePrimitiveShape::Plane), *device.Get(), context);
-				AddMesh(assetManager, ShapeCreator3000::CreateSkyBox(Vector3f(100, 100, 100)), EnumToString(ePrimitiveShape::SkyBox), *device.Get(), context);
-				AddMesh(assetManager, ShapeCreator3000::CreateSphere(), EnumToString(ePrimitiveShape::Sphere), *device.Get(), context);
+				AddMesh(assetManager, ShapeCreator3000::CreateCube(), ToString(ePrimitiveShape::Cube), *device.Get(), context);
+				AddMesh(assetManager, ShapeCreator3000::CreatePyramid(), ToString(ePrimitiveShape::Pyramid), *device.Get(), context);
+				AddMesh(assetManager, ShapeCreator3000::CreatePlane(), ToString(ePrimitiveShape::Plane), *device.Get(), context);
+				AddMesh(assetManager, ShapeCreator3000::CreateSkyBox(Vector3f(100, 100, 100)), ToString(ePrimitiveShape::SkyBox), *device.Get(), context);
+				AddMesh(assetManager, ShapeCreator3000::CreateSphere(), ToString(ePrimitiveShape::Sphere), *device.Get(), context);
 
-				AddModel(assetManager, ShapeCreator3000::CreateCube(), EnumToString(ePrimitiveShape::Cube), *device.Get(), context);
-				AddModel(assetManager, ShapeCreator3000::CreatePyramid(), EnumToString(ePrimitiveShape::Pyramid), *device.Get(), context);
-				AddModel(assetManager, ShapeCreator3000::CreatePlane(), EnumToString(ePrimitiveShape::Plane), *device.Get(), context);
-				AddModel(assetManager, ShapeCreator3000::CreateSkyBox(Vector3f(100, 100, 100)), EnumToString(ePrimitiveShape::SkyBox), *device.Get(), context);
-				AddModel(assetManager, ShapeCreator3000::CreateSphere(), EnumToString(ePrimitiveShape::Sphere), *device.Get(), context);
+				AddModel(assetManager, ShapeCreator3000::CreateCube(), ToString(ePrimitiveShape::Cube), *device.Get(), context);
+				AddModel(assetManager, ShapeCreator3000::CreatePyramid(), ToString(ePrimitiveShape::Pyramid), *device.Get(), context);
+				AddModel(assetManager, ShapeCreator3000::CreatePlane(), ToString(ePrimitiveShape::Plane), *device.Get(), context);
+				AddModel(assetManager, ShapeCreator3000::CreateSkyBox(Vector3f(100, 100, 100)), ToString(ePrimitiveShape::SkyBox), *device.Get(), context);
+				AddModel(assetManager, ShapeCreator3000::CreateSphere(), ToString(ePrimitiveShape::Sphere), *device.Get(), context);
 			};
 	}
 

@@ -55,7 +55,7 @@ namespace CLX
         return true;
     }
 
-    constexpr void AddBasedOnChildIndexSetting(std::vector<EntityID>& entities, const EntityID entityID, ChildIndexSetting setting)
+    constexpr void AddBasedOnChildIndexVariant(std::vector<EntityID>& entities, const EntityID entityID, IndexVariant childIndex)
     {
         std::visit(Visitor
             {
@@ -72,10 +72,10 @@ namespace CLX
             {
                 entities.push_back(entityID);
                 }
-            }, setting);
+            }, childIndex);
     }
 
-    constexpr void RemoveBasedOnIndexSetting(std::vector<EntityID>& entities, ChildIndexSetting indexSetting)
+    constexpr void RemoveBasedOnIndexVariant(std::vector<EntityID>& entities, IndexVariant childIndex)
     {
         std::visit(Visitor
             {
@@ -91,10 +91,10 @@ namespace CLX
                 {
                    entities.pop_back();
                 }
-            }, indexSetting);
+            }, childIndex);
     }
 
-    inline bool SetParentEntity(ECS& ecs, const EntityID childID, const EntityID parentID, ChildIndexSetting indexSetting = LastIndex{})
+    inline bool SetParentEntity(ECS& ecs, const EntityID childID, const EntityID parentID, IndexVariant childIndex = LastIndex{})
     {
         if (parentID == InvalidEntityID)
         {
@@ -130,7 +130,7 @@ namespace CLX
         }
         hierachyComponentChild.parent = parentID;
         
-        AddBasedOnChildIndexSetting(hierarchyComponentParent.children, childID, indexSetting);
+        AddBasedOnChildIndexVariant(hierarchyComponentParent.children, childID, childIndex);
 
         return true;
     }

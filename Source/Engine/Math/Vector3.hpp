@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <array>
 #include <type_traits>
+#include <format>
 #include "Engine/Math/Math.hpp"
 #include "Engine/Utility/ValueType.hpp"
 #include "Engine/Utility/Rebind.hpp"
@@ -215,3 +216,13 @@ namespace CLX
         return NearlyEqual(a.x, b.x, tolerance) && NearlyEqual(a.y, b.y, tolerance) && NearlyEqual(a.z, b.z, tolerance);
 	}
 }
+
+template<typename T>
+struct std::formatter<CLX::Vector3<T>, char> : std::formatter<std::string, char>
+{
+	template<typename FormatContext>
+	auto format(const CLX::Vector3<T>& vector, FormatContext& ctx) const
+	{
+		return std::format_to(ctx.out(), "{{ X: {} Y: {} Z: {} }}", vector.x, vector.y, vector.z);
+	}
+};

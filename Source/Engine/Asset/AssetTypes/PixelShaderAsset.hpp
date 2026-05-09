@@ -21,7 +21,7 @@ namespace CLX
 		SkyBox
 	};
 
-	constexpr std::string_view EnumToString(ePixelShaderType pixelShaderType)
+	constexpr std::string_view ToString(ePixelShaderType pixelShaderType)
 	{
 		switch (pixelShaderType)
 		{
@@ -50,6 +50,6 @@ namespace CLX
 
 	inline std::filesystem::path GetPath(const ePixelShaderType type)
 	{
-		return std::string("Shaders/") + std::string(EnumToString(type)) + std::string("PS.cso");
+		return std::string("Shaders/") + std::string(ToString(type)) + std::string("PS.cso");
 	}
 }

@@ -278,7 +278,7 @@ namespace CLX
 
 	void PrintPlayer(const FootballPlayer& pPlayer)
 	{
-		std::cout << pPlayer.GetName() << ", " << EnumToString(pPlayer.GetMainCitizenship()) << "\n";
+		std::cout << pPlayer.GetName() << ", " << ToString(pPlayer.GetMainCitizenship()) << "\n";
 	}
 
 	void PrintSquad(const FootballTeamSquad& pSquad, const std::span<const FootballPlayer> pPlayers)

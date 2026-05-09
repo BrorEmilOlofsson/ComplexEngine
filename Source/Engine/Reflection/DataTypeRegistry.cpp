@@ -3,6 +3,7 @@
 #include <External/imgui/imgui.h>
 #include "PropertyPath.hpp"
 #include "Engine/Utility/Memory/GenericBufferArena.hpp"
+#include <fstream>
 
 namespace CLX
 {
@@ -55,8 +56,8 @@ namespace CLX
                 PropertyPath propertyPath = newBlackboard.Get<Key_CurrentPropertyPath>();
                 propertyPath.elements.push_back(member.name);
                 newBlackboard.Insert<Key_CurrentPropertyPath>(propertyPath);
-                std::println("Viewing member: {}", member.name);
-                std::println("Property Path: {}", propertyPath);
+                //std::println("Viewing member: {}", member.name);
+                //std::println("Property Path: {}", propertyPath);
                 viewAndEditResult |= ViewAndEditData(member.dataTypeID, memberDataPtr, newBlackboard, &member); 
                 if (viewAndEditResult.isEdited)
                 {

@@ -33,7 +33,8 @@ namespace CLX
                 newBlackboard.Insert<Key_ReferenceTransform>(transform);
             }
 
-            auto entityNameAction = ShowEntityName(entityCompositionAsset->GetECS(), selectedEntityID, input);
+            const bool canChangeName = entityCompositionAsset ? entityCompositionAsset->GetRootEntity() != selectedEntityID : false;
+            auto entityNameAction = ShowEntityName(entityCompositionAsset->GetECS(), selectedEntityID, input, canChangeName);
 
             auto editorActions = ShowEntityInspector(
                 entityCompositionAsset->GetECS(),
@@ -116,8 +117,8 @@ namespace CLX
                 const PrimitiveGrid3 grid
                 {
                     .minPos = Point3f::Zero(),
-                    .gridSize = Vector3u(50, 0, 50),
-                    .cellSize = Vector3f(10, 0, 10),
+                    .gridSize = Dimension3u(50, 0, 50),
+                    .cellSize = Dimension3f(10, 0, 10),
                     .offset = Vector3f(250.f, 0.f, 250.f),
                 };
                 RenderGrid3(grid, Colors::Gray, mRenderState.GetRenderList());

@@ -118,23 +118,6 @@ namespace CLX
                 mEntitySearchBuffer,
                 dataTypeRegistry
             );
-
-
-            EntityCompositionPopUp& popup = blackboard.Get<Key_EntityCompositionPopUp>();
-            EntityCompositionAssetHandle openedEntityComposition = popup.GetCompositionAsset();
-            ImGui::BeginDisabled(!openedEntityComposition.IsValid());
-            if (ImGui::Button("Instantiate"))
-            {
-                InstantiateEntityComposition(
-                    sceneManager.GetActiveScene()->GetECSHandle(), 
-                    openedEntityComposition, 
-                    InvalidEntityID,
-                    dataTypeRegistry,
-                    mRootEntities, 
-                    commandTracker
-                );
-            }
-            ImGui::EndDisabled();
         }
 
         CheckCopyInputs(

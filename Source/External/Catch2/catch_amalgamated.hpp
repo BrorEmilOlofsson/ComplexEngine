@@ -2510,7 +2510,7 @@ namespace Catch {
         };
 
         template<typename E>
-        std::string convertUnknownEnumToString( E e );
+        std::string convertUnknownToString( E e );
 
         template<typename T>
         std::enable_if_t<
@@ -2530,7 +2530,7 @@ namespace Catch {
         std::enable_if_t<
             std::is_enum<T>::value,
         std::string> convertUnstreamable( T const& value ) {
-            return convertUnknownEnumToString( value );
+            return convertUnknownToString( value );
         }
 
 #if defined(_MANAGED)
@@ -2583,7 +2583,7 @@ namespace Catch {
         }
 
         template<typename E>
-        std::string convertUnknownEnumToString( E e ) {
+        std::string convertUnknownToString( E e ) {
             return ::Catch::Detail::stringify(static_cast<std::underlying_type_t<E>>(e));
         }
 

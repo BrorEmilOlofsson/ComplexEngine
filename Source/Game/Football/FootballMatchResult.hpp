@@ -8,7 +8,7 @@ enum class eFootballMatchResult : unsigned char
 	Loss
 };
 
-constexpr std::string EnumToString(eFootballMatchResult aResult)
+constexpr std::string ToString(eFootballMatchResult aResult)
 {
 	switch (aResult)
 	{

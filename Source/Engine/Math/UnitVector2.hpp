@@ -1,4 +1,6 @@
 #pragma once
+#include <format>
+
 #include "Engine/Math/Vector2.hpp"
 #include "Engine/Math/Math.hpp"
 #include "Engine/Utility/ValueType.hpp"
@@ -205,3 +207,13 @@ namespace CLX
 			&& NearlyEqual(a.Y(), b.Y(), tolerance);
 	}
 }
+
+template<typename T>
+struct std::formatter<CLX::UnitVector2<T>, char> : std::formatter<std::string, char>
+{
+	template<typename FormatContext>
+	auto format(const CLX::UnitVector2<T>& vector, FormatContext& ctx) const
+	{
+		return std::format_to(ctx.out(), "{{ X: {} Y: {} }}", vector.X(), vector.Y());
+	}
+};

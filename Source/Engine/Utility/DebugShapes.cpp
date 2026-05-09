@@ -149,12 +149,12 @@ namespace CLX
 		renderList.AddLines(lines);
 	}
 
-	void RenderGrid3(const Point3f& min, const Vector3u& gridSize, const Vector3f& cellSize, const Vector3f& offset, const Color& color, RenderList& renderList)
+	void RenderGrid3(const Point3f& min, const Dimension3u& gridSize, const Dimension3f& cellSize, const Vector3f& offset, const Color& color, RenderList& renderList)
 	{
 		std::vector<DrawLine> lines;
-		const std::size_t xCount = gridSize.x;
-		const std::size_t yCount = gridSize.y;
-		const std::size_t zCount = gridSize.z;
+		const std::size_t xCount = gridSize.GetWidth();
+		const std::size_t yCount = gridSize.GetHeight();
+		const std::size_t zCount = gridSize.GetDepth();
 
 		const std::size_t estimatedLineCount =
 			(xCount + 1) * (yCount + 1) +
@@ -170,8 +170,8 @@ namespace CLX
 		{
 			for (unsigned int y = 0; y <= yCount; ++y)
 			{
-				const Point3f start = actualMin + Vector3f(0.0f, y * cellSize.y, z * cellSize.z);
-				const Point3f end = start + Vector3f(xCount * cellSize.x, 0.0f, 0.0f);
+				const Point3f start = actualMin + Vector3f(0.0f, y * cellSize.GetHeight(), z * cellSize.GetDepth());
+				const Point3f end = start + Vector3f(xCount * cellSize.GetWidth(), 0.0f, 0.0f);
 				lines.emplace_back(start, end, color);
 			}
 		}
@@ -181,8 +181,8 @@ namespace CLX
 		{
 			for (unsigned int x = 0; x <= xCount; ++x)
 			{
-				const Point3f start = actualMin + Vector3f(x * cellSize.x, 0.0f, z * cellSize.z);
-				const Point3f end = start + Vector3f(0.0f, yCount * cellSize.y, 0.0f);
+				const Point3f start = actualMin + Vector3f(x * cellSize.GetWidth(), 0.0f, z * cellSize.GetDepth());
+				const Point3f end = start + Vector3f(0.0f, yCount * cellSize.GetHeight(), 0.0f);
 				lines.emplace_back(start, end, color);
 			}
 		}
@@ -192,8 +192,8 @@ namespace CLX
 		{
 			for (unsigned int x = 0; x <= xCount; ++x)
 			{
-				const Point3f start = actualMin + Vector3f(x * cellSize.x, y * cellSize.y, 0.0f);
-				const Point3f end = start + Vector3f(0.0f, 0.0f, zCount * cellSize.z);
+				const Point3f start = actualMin + Vector3f(x * cellSize.GetWidth(), y * cellSize.GetHeight(), 0.0f);
+				const Point3f end = start + Vector3f(0.0f, 0.0f, zCount * cellSize.GetDepth());
 				lines.emplace_back(start, end, color);
 			}
 		}

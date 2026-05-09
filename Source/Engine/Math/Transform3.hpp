@@ -5,6 +5,7 @@
 #include "Engine/Math/Rotator.hpp"
 #include "Engine/Math/Matrix4x4.hpp"
 #include "Engine/Math/RotationMath.hpp"
+#include "Engine/Math/Angle.hpp"
 
 namespace CLX
 {
@@ -147,17 +148,17 @@ namespace CLX
 
 	constexpr UnitVector3f Transform3::GetRightVector() const
 	{
-		return GetRotatorRight(GetRotation());
+		return mMatrix.GetRight();
 	}
 
 	constexpr UnitVector3f Transform3::GetUpVector() const
 	{
-		return GetRotatorUp(GetRotation());
+		return mMatrix.GetUp();
 	}
 
 	constexpr UnitVector3f Transform3::GetForwardVector() const
 	{
-		return GetRotatorForward(GetRotation());
+		return mMatrix.GetForward();
 	}
 
 	constexpr Transform3 Transform3::ToWorld(const Transform3& parent) const

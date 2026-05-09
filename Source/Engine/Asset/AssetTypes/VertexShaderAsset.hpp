@@ -18,7 +18,7 @@ namespace CLX
 		FullScreen
 	};
 
-	constexpr std::string_view EnumToString(eVertexShaderType type)
+	constexpr std::string_view ToString(eVertexShaderType type)
 	{
 		switch (type)
 		{
@@ -35,6 +35,6 @@ namespace CLX
 
 	inline std::filesystem::path GetPath(const eVertexShaderType type)
 	{
-		return std::string("Shaders/") + std::string(EnumToString(type)) + std::string("VS.cso");
+		return std::string("Shaders/") + std::string(ToString(type)) + std::string("VS.cso");
 	}
 }

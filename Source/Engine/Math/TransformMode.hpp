@@ -10,7 +10,7 @@ namespace CLX
 		World
 	};
 
-	constexpr std::string_view EnumToString(eTransformMode transformMode) noexcept
+	constexpr std::string_view ToString(eTransformMode transformMode) noexcept
 	{
 		switch (transformMode)
 		{

@@ -201,8 +201,8 @@ namespace CLX
                 const PrimitiveGrid3 grid
                 {
                     .minPos = Point3f::Zero(),
-                    .gridSize = Vector3u(500, 0, 500),
-                    .cellSize = Vector3f(10, 0, 10),
+                    .gridSize = Dimension3u(500, 0, 500),
+                    .cellSize = Dimension3f(10, 0, 10),
                     .offset = Vector3f(250.f, 0.f, 250.f),
                 };
                 RenderGrid3(grid, Colors::Gray, sceneRenderState.GetRenderList());

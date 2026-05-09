@@ -46,7 +46,7 @@ namespace CLX
         ImGui::SetNextItemWidth(width);
         const std::string floatX = "##" + std::string(str) + imguiTag;
         ImGui::PushID(&value);
-        if (ImGui::DragFloat(floatX.c_str(), &value, speed, min, max))
+        if (ImGui::DragFloat(floatX.c_str(), &value, speed, min, max, "%.3f", ImGuiSliderFlags_AlwaysClamp))
         {
             viewAndEditResult.isEdited = true;
         }
@@ -489,22 +489,10 @@ namespace CLX
 
             if (viewAndEditScale.isEdited)
             {
-                if (scale.x < 0.001f)
-                {
-                    scale.x = 0.001f;
-                }
-
-                if (scale.y < 0.001f)
-                {
-                    scale.y = 0.001f;
-                }
-
-                if (scale.z < 0.001f)
-                {
-                    scale.z = 0.001f;
-                }
+                scale = Max(scale, Vector3f(0.001f)); // Prevent scale from being zero or negative
 
                 value.SetScale(scale);
+                std::println("{}", scale);
             }
         }
 

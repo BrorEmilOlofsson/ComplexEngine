@@ -22,7 +22,7 @@ namespace CLX
 	template<>
 	struct EnumCount<eRasterizerState> : std::integral_constant<std::size_t, 5> {};
 
-	constexpr std::string_view EnumToString(eRasterizerState rasterizerState)
+	constexpr std::string_view ToString(eRasterizerState rasterizerState)
 	{
 		switch (rasterizerState)
 		{

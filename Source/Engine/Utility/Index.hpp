@@ -7,5 +7,5 @@ namespace CLX
 	struct LastIndex {};
 	struct FirstIndex {};
 	struct Index { std::size_t value = 0; };
-	using ChildIndexSetting = std::variant<Index, FirstIndex, LastIndex>;
+	using IndexVariant = std::variant<Index, FirstIndex, LastIndex>;
 }

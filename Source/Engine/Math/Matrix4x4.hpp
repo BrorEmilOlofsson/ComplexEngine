@@ -143,17 +143,25 @@ namespace CLX
 	}
 
 	template<typename T>
+	constexpr Vector3<T> GetScaled(const Vector3<T>& scale, const T& length)
+	{
+		const Vector3<T> normalized = ToNormalized(scale);
+        return normalized * length;
+	}
+
+	template<typename T>
 	constexpr void Matrix4x4<T>::SetScale(const Vector3<T>& scale)
 	{
 		constexpr float minScale = 0.001f;
+        const Vector3<T> clampedScale = Max(scale, Vector3<T>(minScale));
 
 		const Vector3<T> xAxis = GetRightScaled();
 		const Vector3<T> yAxis = GetUpScaled();
 		const Vector3<T> zAxis = GetForwardScaled();
 
-		SetRight(xAxis * Max(scale.x, minScale));
-		SetUp(yAxis * Max(scale.y, minScale));
-		SetForward(zAxis * Max(scale.z, minScale));
+		SetRight(GetScaled(xAxis, clampedScale.x));
+		SetUp(GetScaled(yAxis, clampedScale.y));
+		SetForward(GetScaled(zAxis, clampedScale.z));
 	}
 
 	template<typename T>
