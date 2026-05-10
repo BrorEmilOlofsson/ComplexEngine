@@ -14,11 +14,18 @@
 namespace CLX
 {
 
+    std::string GetEntityCompositionName(EntityCompositionAssetHandle handle)
+    {
+        ASSERT(handle.IsValid());
+        return handle.GetRelativePath().stem().string();
+    }
+
     static void ShowInspector(std::set<EntityID>& selectedEntityIDs, ECS& ecsBuffer, EditorCommandTracker& commandTracker,
-        EntityCompositionAssetHandle entityCompositionAsset, bool& anyItemActiveLastFrame, EntityID& copyEntityID, uint32_t& selectedComponentPopupIndex,
+        EntityCompositionAssetHandle entityCompositionAsset, EntityCompositionInstantiationManager& entityInstantiations,
+        bool& anyItemActiveLastFrame, EntityID& copyEntityID, uint32_t& selectedComponentPopupIndex,
         std::string& componentSearchBuffer, JsonAny& copiedComponent, const InputState& input, Blackboard& newBlackboard)
     {
-        if (ImGui::Begin("Entity Composition Inspector"))
+        if (ImGui::Begin((GetEntityCompositionName(entityCompositionAsset) + " Inspector").c_str()))
         {
             if (!entityCompositionAsset.IsValid())
             {
@@ -36,17 +43,20 @@ namespace CLX
             const bool canChangeName = entityCompositionAsset ? entityCompositionAsset->GetRootEntity() != selectedEntityID : false;
             auto entityNameAction = ShowEntityName(entityCompositionAsset->GetECS(), selectedEntityID, input, canChangeName);
 
-            auto editorActions = ShowEntityInspector(
-                entityCompositionAsset->GetECS(),
-                selectedEntityID,
-                anyItemActiveLastFrame,
-                ecsBuffer,
-                copyEntityID,
-                selectedComponentPopupIndex,
-                componentSearchBuffer,
-                copiedComponent,
-                entityCompositionAsset,
-                newBlackboard
+            auto editorActions = ShowEntityInspector(ShowEntityInspectorData
+                {
+                    entityCompositionAsset->GetECS(),
+                    selectedEntityID,
+                    anyItemActiveLastFrame,
+                    ecsBuffer,
+                    copyEntityID,
+                    selectedComponentPopupIndex,
+                    componentSearchBuffer,
+                    copiedComponent,
+                    entityCompositionAsset,
+                    entityInstantiations,
+                    newBlackboard
+                }
             );
 
             if (entityNameAction)
@@ -61,17 +71,24 @@ namespace CLX
         ImGui::End();
     }
 
-    EntityCompositionPopUp::EntityCompositionPopUp(RenderContext&& renderContext)
+    EntityCompositionPopUp::EntityCompositionPopUp(EntityCompositionAssetHandle assetHandle, RenderContext&& renderContext)
+        : mRenderState(std::move(renderContext))
     {
-        mRenderState.SetRenderContext(std::move(renderContext));
+        SetCompositionAsset(assetHandle);
     }
+
+    EntityCompositionPopUp::EntityCompositionPopUp(RenderContext&& renderContext)
+        : mRenderState(std::move(renderContext))
+    {}
 
     void EntityCompositionPopUp::Update(const Blackboard& blackboard)
     {
 
-        mIsOpen = ImGui::Begin(PopUpName);
+        mIsOpen = ImGui::Begin(GetEntityCompositionName(mEntityCompositionAsset).c_str());
+        const bool isFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
         const AABB2i renderRect = GetImGuiRenderRect();
         ImGui::End();
+
 
         if (!mEntityCompositionAsset.IsValid())
         {
@@ -93,21 +110,20 @@ namespace CLX
         EditorCommandTracker& commandTracker = blackboard.Get<Key_CommandTracker>();
         OperatingSystem& os = blackboard.Get<Key_OperatingSystem>();
 
-
-
         if (hasValidEntityComposition)
         {
             mEntityCompositionAsset->GetECS().EditorUpdate(newBlackboard);
         }
 
-
         if (mIsOpen)
         {
-            FreeFlyCameraSettings& cameraSettings = blackboard.Get<Key_FreeFlyCameraSettings>();
-            const float deltaTime = blackboard.Get<Key_DeltaTime>();
-            WindowView window = blackboard.Get<Key_WindowView>();
-            UpdateEditorCamera(mCamera, cameraSettings, deltaTime, window, input, os);
-
+            if (isFocused)
+            {
+                FreeFlyCameraSettings& cameraSettings = blackboard.Get<Key_FreeFlyCameraSettings>();
+                const float deltaTime = blackboard.Get<Key_DeltaTime>();
+                WindowView window = blackboard.Get<Key_WindowView>();
+                UpdateEditorCamera(mCamera, cameraSettings, deltaTime, window, input, os);
+            }
 
             constexpr Spheref drawSphere = Spheref::FromCenterAndRadius(Point3f(0, 0, 10), Radiusf(5.f));
             mRenderState.GetRenderList().AddSphere(DrawSphere{ drawSphere, Colors::Salmon }, true);
@@ -167,6 +183,8 @@ namespace CLX
         const DataTypeRegistry& dataTypeRegistry = blackboard.Get<Key_DataTypeRegistry>();
         EditorSceneSettings& editorSceneSettings = blackboard.Get<Key_EditorSceneSettings>();
         const InputState& input = blackboard.Get<Key_InputState>();
+        AssetManager& assetManager = blackboard.Get<Key_AssetManager>();
+        EntityCompositionInstantiationManager& compositionInstantiations = blackboard.Get<Key_EntityCompositionInstantiationManager>();
 
         const bool hasValidEntityComposition = mEntityCompositionAsset.IsValid();
 
@@ -189,7 +207,9 @@ namespace CLX
             }
         }
 
-        if (ImGui::Begin("Entity Composition Hierarchy"))
+
+
+        if (ImGui::Begin((GetEntityCompositionName(mEntityCompositionAsset) + " Hierarchy").c_str()))
         {
 
             if (hasValidEntityComposition)
@@ -199,16 +219,19 @@ namespace CLX
                     SaveEntityCompositionAsset(mEntityCompositionAsset, blackboard.Get<Key_DataTypeRegistry>());
                 }
                 ShowEntityHierarchyWithAddButtons(
-                    mEntityCompositionAsset->GetECS(),
+                    mEntityCompositionAsset->GetECSHandle(),
                     ecsBuffer,
                     mRootEntities,
                     commandTracker,
-                    "##EntityComposition",
+                    std::string("##") + GetEntityCompositionName(mEntityCompositionAsset) + "EntityComposition",
                     mSelectedEntityIDs,
                     mEntityCompositionAsset->GetRootEntity(),
                     { mEntityCompositionAsset->GetRootEntity() },
                     mEntitySearchBuffer,
-                    dataTypeRegistry
+                    mEntityCompositionAsset,
+                    compositionInstantiations,
+                    dataTypeRegistry,
+                    assetManager
                 );
             }
         }
@@ -220,6 +243,7 @@ namespace CLX
             ecsBuffer,
             commandTracker,
             mEntityCompositionAsset,
+            compositionInstantiations,
             mAnyItemActiveLastFrame,
             mCopyEntityID,
             mSelectedComponentPopupIndex,
@@ -229,7 +253,7 @@ namespace CLX
             newBlackboard
         );
 
-        if (ImGui::Begin(PopUpName))
+        if (ImGui::Begin(GetEntityCompositionName(mEntityCompositionAsset).c_str()))
         {
             if (hasValidEntityComposition)
             {

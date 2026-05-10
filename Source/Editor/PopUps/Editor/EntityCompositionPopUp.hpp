@@ -18,6 +18,7 @@ namespace CLX
 	{
 	public:
 
+		explicit EntityCompositionPopUp(EntityCompositionAssetHandle assetHandle, RenderContext&& renderContext);
 		explicit EntityCompositionPopUp(RenderContext&& renderContext);
 
 		void Update(const Blackboard& blackboard);
@@ -45,6 +46,5 @@ namespace CLX
         uint32_t mSelectedComponentPopupIndex = 0;
 		std::string mComponentSearchBuffer;
         JsonAny mCopiedComponent;
-		static constexpr const char* PopUpName = "Entity Composition Viewer";
 	};
 }

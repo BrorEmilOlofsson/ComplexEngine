@@ -1,5 +1,6 @@
 #pragma once
-#include "Engine/ECS/ECS.hpp"
+#include "Engine/ECS/ECSManager.hpp"
+#include "Engine/ECS/ECSHandle.hpp"
 
 namespace CLX
 {
@@ -8,10 +9,11 @@ namespace CLX
 	{
 	public:
 
-		explicit EntityComposition(const ECSRegistry& ecsRegistry);
+		explicit EntityComposition(ECSManager& ecsManager, ECSID ecsID);
 
-		[[nodiscard]] constexpr ECS& GetECS() noexcept;
-		[[nodiscard]] constexpr const ECS& GetECS() const noexcept;
+		[[nodiscard]] constexpr ECSHandle GetECSHandle() noexcept;
+		[[nodiscard]] ECS& GetECS() noexcept;
+		[[nodiscard]] const ECS& GetECS() const noexcept;
 
 		[[nodiscard]] EntityID GetRootEntity() const noexcept;
 
@@ -27,20 +29,25 @@ namespace CLX
 
 	private:
 
-		ECS mECS;
+		ECSOwningHandle mECSHandle;
 		EntityID mRootEntityID = InvalidEntityID;
 
 		bool mHasChanged = false;
 	};
 
-	constexpr ECS& EntityComposition::GetECS() noexcept
+	constexpr ECSHandle EntityComposition::GetECSHandle() noexcept
 	{
-		return mECS;
+		return ECSHandle(mECSHandle.GetManager(), mECSHandle.GetID());
+    }
+
+	inline ECS& EntityComposition::GetECS() noexcept
+	{
+		return mECSHandle.Get();
 	}
 
-	constexpr const ECS& EntityComposition::GetECS() const noexcept
+	inline  const ECS& EntityComposition::GetECS() const noexcept
 	{
-		return mECS;
+		return mECSHandle.Get();
 	}
 
 }

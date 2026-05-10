@@ -50,6 +50,7 @@ namespace CLX
 		[[nodiscard]] GraphicsFoundation& GetGraphicsFoundation();
         [[nodiscard]] const GraphicsFoundation& GetGraphicsFoundation() const;
         [[nodiscard]] ECSRegistry& GetECSRegistry() { return mECSRegistry; }
+        [[nodiscard]] ECSManager& GetECSManager() { return mECSManager; }
         [[nodiscard]] const ECSRegistry& GetECSRegistry() const { return mECSRegistry; }
 		void SetShouldExit(bool shouldExit = true);
 		void SetCurrentDropPath(const std::filesystem::path& path);

@@ -19,6 +19,7 @@ namespace CLX
 	public:
 
 		constexpr RenderState() = default;
+		constexpr RenderState(RenderContext&& renderContext);
 
 		[[nodiscard]] constexpr RenderList& GetRenderList() noexcept;
 		[[nodiscard]] constexpr const RenderList& GetRenderList() const noexcept;
@@ -49,6 +50,11 @@ namespace CLX
 		std::optional<AABB2i> mRenderRect;
 		std::unique_ptr<RenderContext> mRenderContext;
 	};
+
+	constexpr RenderState::RenderState(RenderContext&& renderContext)
+        : mRenderContext(std::make_unique<RenderContext>(std::move(renderContext)))
+	{
+    }
 
 	constexpr RenderList& RenderState::GetRenderList() noexcept
 	{

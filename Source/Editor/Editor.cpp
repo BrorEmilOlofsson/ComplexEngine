@@ -124,10 +124,6 @@ namespace CLX
             //mSceneWindow
         );
 
-        mEntityCompositionWindow = std::make_unique<EntityCompositionPopUp>(
-            mEngine->GetOperatingSystem().GetGraphicsFoundation().CreateRenderContext(mEngine->GetMainWindow().GetClientSize())
-        );
-
         for (auto& menuTab : mMainMenuTabs)
         {
             menuTab->Init();
@@ -209,8 +205,8 @@ namespace CLX
         editorBlackboard.Insert<Key_FreeFlyCameraSettings>(mFreeFlyCameraSettings);
         editorBlackboard.Insert<Key_EditorSceneSettings>(mEditorSceneSettings);
         editorBlackboard.Insert<Key_ShowUnitVectorInScene>(mEditorSceneSettings.showUnitVectorInScene);
-        editorBlackboard.Insert<Key_EntityCompositionPopUp>(*mEntityCompositionWindow);
         editorBlackboard.Insert<Key_NodeScriptingWindow>(mNodeScriptingWindow);
+        editorBlackboard.Insert<Key_EntityCompositionInstantiationManager>(mEntityCompositionInstantiationManager);
 
         for (const std::shared_ptr<PopUp> popUp : mPopUpWindows)
         {
@@ -219,7 +215,8 @@ namespace CLX
 
         mSceneWindow.UpdateInternal(editorBlackboard);
         mAssetBrowserWindow.Update(editorBlackboard);
-        mEntityCompositionWindow->Update(editorBlackboard);
+
+        mWindowManager.UpdateWindows(editorBlackboard);
     }
 
     void Editor::Render()
@@ -236,6 +233,7 @@ namespace CLX
         editorBlackboard.Insert<Key_AssetManager>(*mEngine->GetAssetManager().lock());
         editorBlackboard.Insert<Key_DataTypeRegistry>(mEngine->GetDataTypeRegistry());
         editorBlackboard.Insert<Key_ECSRegistry>(mEngine->GetECSRegistry());
+        editorBlackboard.Insert<Key_ECSManager>(mEngine->GetECSManager());
         editorBlackboard.Insert<Key_ImGuiStyleManager>(GetImGuiStyleManager());
         editorBlackboard.Insert<Key_GraphicsSettings>(mEngine->GetGraphicsSettings());
         editorBlackboard.Insert<Key_InputState>(mEngine->GetInputState());
@@ -243,9 +241,10 @@ namespace CLX
         editorBlackboard.Insert<Key_EditorSceneSettings>(mEditorSceneSettings);
         editorBlackboard.Insert<Key_ShowUnitVectorInScene>(mEditorSceneSettings.showUnitVectorInScene);
         editorBlackboard.Insert<Key_OperatingSystem>(mEngine->GetOperatingSystem());
-        editorBlackboard.Insert<Key_EntityCompositionPopUp>(*mEntityCompositionWindow);
         editorBlackboard.Insert<Key_FreeFlyCameraSettings>(mFreeFlyCameraSettings);
         editorBlackboard.Insert<Key_NodeScriptingWindow>(mNodeScriptingWindow);
+        editorBlackboard.Insert<Key_EditorWindowManager>(mWindowManager);
+        editorBlackboard.Insert<Key_EntityCompositionInstantiationManager>(mEntityCompositionInstantiationManager);
 
         for (auto& tab : mMainMenuTabs)
         {
@@ -264,7 +263,7 @@ namespace CLX
         ShowGraphicsSettingsWindow(mGraphicsSettingsData, mIsGraphicsSettingsPopUpActive, editorBlackboard);
         mSceneWindow.Render(editorBlackboard);
         mAssetBrowserWindow.Render(editorBlackboard);
-        mEntityCompositionWindow->Render(editorBlackboard);
+        mWindowManager.RenderWindows(editorBlackboard);
         mNodeScriptingWindow.Render(editorBlackboard);
         static CubicBezierCurve2f demoCurve;
         static bool curveEditorActive = true;

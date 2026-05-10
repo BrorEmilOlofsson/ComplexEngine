@@ -9,5 +9,6 @@ namespace CLX
 	using AssetPath = StrongType<FixedString<256>, Tag>;
 
 	using AssetPath_OBJ = AssetPath<struct Tag_OBJ>;
+    using AssetPath_EntityComposition = AssetPath<struct Tag_EntityComposition>;
 	
 }

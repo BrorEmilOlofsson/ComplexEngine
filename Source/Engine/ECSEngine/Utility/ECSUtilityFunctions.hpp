@@ -129,7 +129,7 @@ namespace CLX
             std::erase(hierarchyComponentPreviousParent.children, childID);
         }
         hierachyComponentChild.parent = parentID;
-        
+
         AddBasedOnChildIndexVariant(hierarchyComponentParent.children, childID, childIndex);
 
         return true;
@@ -260,22 +260,6 @@ namespace CLX
         }
 
         return worldTransform;
-    }
-
-    inline std::vector<EntityID> GetEntityParents(const ECS& ecs, const EntityID entityID)
-    {
-        std::vector<EntityID> parents;
-
-        const auto hierarchyComponent = ecs.GetComponent<TransformHierarchyComponent>(entityID);
-        ASSERT(hierarchyComponent != nullptr);
-        if (hierarchyComponent->parent != InvalidEntityID)
-        {
-            parents.push_back(hierarchyComponent->parent);
-            auto p = GetEntityParents(ecs, hierarchyComponent->parent);
-            parents.insert(end(parents), begin(p), end(p));
-        }
-
-        return parents;
     }
 
     [[nodiscard]] inline const std::string& GetEntityName(const ECS& ecs, const EntityID entityID)

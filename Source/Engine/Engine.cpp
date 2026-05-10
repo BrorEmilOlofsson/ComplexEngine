@@ -42,13 +42,14 @@ namespace CLX
 
         std::shared_ptr<Blackboard> blackboard = mBlackboard;
         ECSRegistry* ecsRegistry = &mECSRegistry;
-        auto a = [blackboard, ecsRegistry](const std::filesystem::path& path)
+        ECSManager* ecsManager = &mECSManager;
+        auto entityCompositionLoader = [blackboard, ecsRegistry, ecsManager](const std::filesystem::path& path)
             {
-                EntityComposition entityComposition(*ecsRegistry);
+                EntityComposition entityComposition(*ecsManager, ecsManager->CreateECS(*ecsRegistry));
                 LoadEntityComposition(path, entityComposition, *blackboard);
                 return EntityCompositionAsset(std::move(entityComposition), path);
             };
-        mAssetManager->GetAssetLoader().SetEntityCompositionLoader(a);
+        mAssetManager->GetAssetLoader().SetEntityCompositionLoader(entityCompositionLoader);
 
         mBlackboard->Insert<Key_ECSRegistry>(mECSRegistry);
 

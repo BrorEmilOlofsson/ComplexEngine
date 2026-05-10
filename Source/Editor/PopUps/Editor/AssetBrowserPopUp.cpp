@@ -1,6 +1,7 @@
 #include "Editor/Precompiled/EditorPch.hpp"
 #include "Editor/PopUps/Editor/AssetBrowserPopUp.hpp"
 #include "Editor/Core/Tabs/MenuTabWindow.hpp"
+#include "Editor/EditorWindows/EditorWindowManager.hpp"
 #include "Engine/Utility/Win/WinConsole.hpp"
 #include "Editor/FlyScript/NodeScriptingWindow.hpp"
 #include "Engine/Utility/File/FileUtility.hpp"
@@ -10,10 +11,11 @@
 #include "Engine/Utility/BlackboardKeys.hpp"
 #include "Engine/Graphics/Texture/Texture.hpp"
 #include "Engine/Utility/Algorithm.hpp"
-#include "Editor/PopUps/Editor/EntityCompositionPopUp.hpp"
 #include "Engine/ECS/EntityComposition.hpp"
 #include "Engine/ECS/ECSSerializer.hpp"
 #include "Engine/Graphics/GraphicsConstants.hpp"
+#include "Engine/OperatingSystem/OperatingSystem.hpp"
+#include "Engine/OperatingSystem/WindowView.hpp"
 
 namespace CLX
 {
@@ -53,7 +55,7 @@ namespace CLX
 
     static void OnAssetClicked(const std::filesystem::path& path, std::filesystem::path& currentDirectory,
         NodeScriptingWindow& nodeScriptingWindow, MenuTabWindow& nodeScriptParentTab, MenuItemPopUp& nodeScriptButton,
-        SceneManager& sceneManager, AssetManager& assetManager, EntityCompositionPopUp& entityCompositionPopUp, const ImTextureID textureID)
+        SceneManager& sceneManager, AssetManager& assetManager, EditorWindowManager& windowManager, OperatingSystem& os, WindowView mainWindowView, const ImTextureID textureID)
     {
         const std::wstring extension = path.extension().wstring();
         if (std::filesystem::is_directory(path))
@@ -78,7 +80,7 @@ namespace CLX
             EntityCompositionAssetHandle entityCompositionAsset = assetManager.GetEntityComposition(path);
             if (entityCompositionAsset.IsValid())
             {
-                entityCompositionPopUp.SetCompositionAsset(entityCompositionAsset);
+                windowManager.CreateWindow(entityCompositionAsset, os.GetGraphicsFoundation().CreateRenderContext(mainWindowView.GetClientSize()));
             }
         }
     }
@@ -109,16 +111,17 @@ namespace CLX
         assetManager.Rename(path, newName);
     }
 
-    EntityComposition CreateEntityComposition(const ECSRegistry& ecsRegistry, std::string name)
+    EntityComposition CreateEntityComposition(ECSManager& ecsManager, const ECSRegistry& ecsRegistry, std::string name)
     {
-        EntityComposition entityComposition(ecsRegistry);
+        EntityComposition entityComposition(ecsManager, ecsManager.CreateECS(ecsRegistry));
         NameComponent* nameComponent = entityComposition.GetECS().GetComponent<NameComponent>(entityComposition.GetRootEntity());
         ASSERT(nameComponent);
         nameComponent->name = std::move(name);
         return entityComposition;
     }
 
-    static void ShowAssetCreationPopUp(const std::filesystem::path& directoryPath, bool& canOpenPopUp, AssetManager& assetManager, const DataTypeRegistry& dataTypeRegistry, const ECSRegistry& ecsRegistry)
+    static void ShowAssetCreationPopUp(const std::filesystem::path& directoryPath, bool& canOpenPopUp, AssetManager& assetManager,
+        const DataTypeRegistry& dataTypeRegistry, const ECSRegistry& ecsRegistry, ECSManager& ecsManager)
     {
         static constexpr const char* CreateAssetMenuPopupName = "CreateAssetMenu";
         static constexpr const char* CreateEntityCompositionAssetName = "CreateEntityCompositionAsset";
@@ -182,7 +185,7 @@ namespace CLX
             if (ImGui::Button("Create"))
             {
                 const std::filesystem::path path = directoryPath / (ToWString(name) + std::wstring(AssetExtensions::EntityComposition));
-                EntityCompositionAsset asset(CreateEntityComposition(ecsRegistry, name), path);
+                EntityCompositionAsset asset(CreateEntityComposition(ecsManager, ecsRegistry, name), path);
                 auto assetHandle = assetManager.AddEntityComposition(asset);
                 SaveEntityCompositionAsset(assetHandle, dataTypeRegistry);
 
@@ -238,10 +241,13 @@ namespace CLX
         AssetManager& assetManager;
         DataTypeRegistry& dataTypeRegistry;
         const ECSRegistry& ecsRegistry;
+        ECSManager& ecsManager;
         NodeScriptingWindow& nodeScriptingWindow;
         MenuTabWindow& nodeScriptParentTab;
         MenuItemPopUp& nodeScriptButton;
-        EntityCompositionPopUp& entityCompositionPopUp;
+        EditorWindowManager& windowManager;
+        OperatingSystem& os;
+        WindowView mainWindowView;
         bool& canOpenPopup;
         std::string& filePopUpID;
         std::filesystem::path& selectedFilePath;
@@ -282,10 +288,17 @@ namespace CLX
             ImGui::ImageButton(stem.c_str(), textureID, { thumbnailSize, thumbnailSize });
             if (extension == ".obj")
             {
-                static AssetPath_OBJ obj;
+                static AssetPath_OBJ assetPath;
                 std::string pathStr = path.string();
-                obj = AssetPath_OBJ(FixedString<256>(pathStr.begin(), pathStr.end()));
-                ObjectSource(obj, "OBJ");
+                assetPath = AssetPath_OBJ(FixedString<256>(pathStr.begin(), pathStr.end()));
+                ObjectSource(assetPath, "OBJ");
+            }
+            else if (extension == AssetExtensions::EntityComposition)
+            {
+                static AssetPath_EntityComposition assetPath;
+                std::string pathStr = path.string();
+                assetPath = AssetPath_EntityComposition(FixedString<256>(pathStr.begin(), pathStr.end()));
+                ObjectSource(assetPath, std::string("EntityComposition: ") + path.string());
             }
             else if (ImGui::BeginDragDropSource())
             {
@@ -321,7 +334,9 @@ namespace CLX
                         data.nodeScriptButton,
                         data.sceneManager,
                         data.assetManager,
-                        data.entityCompositionPopUp,
+                        data.windowManager,
+                        data.os,
+                        data.mainWindowView,
                         textureID
                     );
                 }
@@ -372,7 +387,7 @@ namespace CLX
 
         RenamePopup(RenamePopupID, data.selectedFilePath, data.renameBuffer, data.assetManager);
 
-        ShowAssetCreationPopUp(directory, data.canOpenPopup, data.assetManager, data.dataTypeRegistry, data.ecsRegistry);
+        ShowAssetCreationPopUp(directory, data.canOpenPopup, data.assetManager, data.dataTypeRegistry, data.ecsRegistry, data.ecsManager);
     }
 
 
@@ -472,18 +487,25 @@ namespace CLX
         AssetManager& assetManager = blackboard.Get<Key_AssetManager>();
         DataTypeRegistry& dataTypeRegistry = blackboard.Get<Key_DataTypeRegistry>();
         const ECSRegistry& ecsRegistry = blackboard.Get<Key_ECSRegistry>();
-        EntityCompositionPopUp& entityCompositionPopUp = blackboard.Get<Key_EntityCompositionPopUp>();
+        ECSManager& ecsManager = blackboard.Get<Key_ECSManager>();
+        EditorWindowManager& windowManager = blackboard.Get<Key_EditorWindowManager>();
         NodeScriptingWindow& nodeScriptingWindow = blackboard.Get<Key_NodeScriptingWindow>();
+        OperatingSystem& os = blackboard.Get<Key_OperatingSystem>();
+        WindowView windowView = blackboard.Get<Key_WindowView>();
+        
         const DrawFilesInFolderData data
         {
             .sceneManager = sceneManager,
             .assetManager = assetManager,
             .dataTypeRegistry = dataTypeRegistry,
             .ecsRegistry = ecsRegistry,
+            .ecsManager = ecsManager,
             .nodeScriptingWindow = nodeScriptingWindow,
             .nodeScriptParentTab = *mNodeScriptParentTab,
             .nodeScriptButton = *mNodeScriptButton,
-            .entityCompositionPopUp = entityCompositionPopUp,
+            .windowManager = windowManager,
+            .os = os,
+            .mainWindowView = windowView,
             .canOpenPopup = mCanOpenPopup,
             .filePopUpID = mFilePopUpID,
             .selectedFilePath = mFileToRemove,

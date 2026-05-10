@@ -12,10 +12,13 @@
 
 namespace CLX
 {
+
 	class Camera;
 	class ECS;
 	class InputState;
 	class EditorCommandTracker;
+	class AssetManager;
+    class EntityCompositionInstantiationManager;
 
 	using EditorAction = std::function<void(EditorCommandTracker&)>;
 
@@ -41,21 +44,55 @@ namespace CLX
 	void ShowEntityHierarchy(ECS& ecs, ECS& ecsBuffer, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker, const std::string& imGuiTag,
 		EntityID& selectedEntityID, const std::set<EntityID>& uneditableEntities, std::string& entitySearchBuffer);
 
-	void ShowEntityHierarchyWithAddButtons(ECS& ecs, ECS& ecsBuffer, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker,
+	void ShowEntityHierarchyWithAddButtons(ECSHandle ecsHandle, ECS& ecsBuffer, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker,
 		const std::string& imGuiTag, std::set<EntityID>& selectedEntityID, EntityID defaultParentID, const std::set<EntityID>& uneditableEntities, 
-		std::string& entitySearchBuffer, const class DataTypeRegistry& dataTypeRegistry);
+		std::string& entitySearchBuffer, EntityCompositionAssetHandle compositionHandle, EntityCompositionInstantiationManager& compositionInstantiations, const class DataTypeRegistry& dataTypeRegistry, AssetManager& assetManager);
 	
 	[[nodiscard]] std::optional<EditorAction> ShowEntityName(ECS& ecs, const EntityID selectedEntityID, const InputState& input, bool canChangeName);
-	[[nodiscard]] std::vector<EditorAction> ShowEntityComponents(ECS& ecs, EntityID entityID, bool& anyItemActiveLastFrame,
-		ECS& ecsBuffer, EntityID& copyEntityID, JsonAny& copiedComponent, EntityCompositionAssetHandle entityCompositionAsset, const Blackboard& blackboard);
-	[[nodiscard]] std::optional<EditorAction> ShowEntityAddComponentButtons(ECS& ecs, EntityID entityID, uint32_t& selectedIndex, std::string& searchBuffer, const class DataTypeRegistry& dataTypeRegistry);
-	[[nodiscard]] std::vector<EditorAction> ShowEntityInspector(ECS& ecs, EntityID selectedEntityID, bool& anyItemActiveLastFrame,
-		ECS& ecsBuffer, EntityID& copyEntityID, uint32_t& selectedComponentPopupIndex, std::string& componentSearchString, JsonAny& copiedComponent,
-		EntityCompositionAssetHandle entityCompositionAsset, const Blackboard& blackboard);
 
+	struct ShowEntityComponentsData final
+	{
+		ECS& ecs;
+		EntityID entityID;
+		bool& anyItemActiveLastFrame;
+		ECS& ecsBuffer;
+		EntityID& copyEntityID;
+		JsonAny& copiedComponent;
+		EntityCompositionAssetHandle entityCompositionAsset;
+		EntityCompositionInstantiationManager& entityInstantiations;
+        const Blackboard& blackboard;
+	};
+
+	[[nodiscard]] std::vector<EditorAction> ShowEntityComponents(const ShowEntityComponentsData& data);
+	[[nodiscard]] std::optional<EditorAction> ShowEntityAddComponentButtons(ECS& ecs, EntityID entityID, uint32_t& selectedIndex, std::string& searchBuffer, 
+		const class DataTypeRegistry& dataTypeRegistry);
+
+
+	struct ShowEntityInspectorData final
+	{
+		ECS& ecs;
+		EntityID entityID;
+		bool& anyItemActiveLastFrame;
+		ECS& ecsBuffer;
+		EntityID& copyEntityID;
+        uint32_t& selectedComponentPopupIndex;
+        std::string& componentSearchString;
+        JsonAny& copiedComponent;
+        EntityCompositionAssetHandle entityCompositionAsset;
+        EntityCompositionInstantiationManager& entityInstantiations;
+        const Blackboard& blackboard;
+	};
+
+	[[nodiscard]] std::vector<EditorAction> ShowEntityInspector(const ShowEntityInspectorData& data);
 	// Returns root entity of instantiated entity composition
-	EntityID InstantiateEntityComposition(ECSHandle targetECSHandle, const EntityCompositionAssetHandle& compositionAsset, EntityID parentID, const DataTypeRegistry& dataTypeRegistry,
+	EntityID InstantiateEntityComposition(ECSHandle targetECSHandle, const EntityCompositionAssetHandle& compositionAsset, EntityID parentID, 
+		EntityCompositionInstantiationManager& entityInstantiations, const DataTypeRegistry& dataTypeRegistry,
 		std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker);
+
+
+	void InstantiateEntityCompositionAndSelectRoot(ECSHandle& ecsHandle, EntityCompositionAssetHandle assetHandle, EntityID parentID, 
+		EntityCompositionInstantiationManager& entityInstantiations, std::vector<EntityID>& rootEntities,
+		std::set<EntityID>& selectedEntityIDs, const DataTypeRegistry& dataTypeRegistry, EditorCommandTracker& commandTracker);
 
 	void TeleportCameraToEntity(const ECS& ecs, EntityID entityID, Camera& camera, bool changeRotation = true, const float offsetDistance = 5.f);
 }

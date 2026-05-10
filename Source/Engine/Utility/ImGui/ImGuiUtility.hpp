@@ -48,7 +48,7 @@ namespace CLX
 		return (std::string("DD_") + typeid(T).name()).substr(0, 32);
 	}
 
-	template<typename T>
+	template<typename T> requires std::is_trivially_copyable_v<T>
 	[[nodiscard]] std::optional<T> ObjectTarget()
 	{
 		std::optional<T> obj;
@@ -67,7 +67,7 @@ namespace CLX
 		return obj;
 	}
 
-	template<typename T>
+	template<typename T> requires std::is_trivially_copyable_v<T>
 	void ObjectSource(const T& value, const std::string& name = "Object")
 	{
 		if (ImGui::BeginDragDropSource())
@@ -77,8 +77,6 @@ namespace CLX
 			ImGui::EndDragDropSource();
 		}
 	}
-
-
 }
 
 namespace CLX

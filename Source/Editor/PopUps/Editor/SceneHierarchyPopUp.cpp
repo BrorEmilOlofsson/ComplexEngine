@@ -98,16 +98,18 @@ namespace CLX
         EditorCommandTracker& commandTracker = blackboard.Get<Key_CommandTracker>();
         SceneManager& sceneManager = blackboard.Get<Key_SceneManager>();
         DataTypeRegistry& dataTypeRegistry = blackboard.Get<Key_DataTypeRegistry>();
-        ECS& ecs = sceneManager.GetActiveScene()->GetECS();
+        ECSHandle ecsHandle = sceneManager.GetActiveScene()->GetECSHandle();
         ECS& ecsBuffer = blackboard.Get<Key_ECSBuffer>();
         const InputState& input = blackboard.Get<Key_InputState>();
+        AssetManager& assetManager = blackboard.Get<Key_AssetManager>();
+        EntityCompositionInstantiationManager& compositionInstantiations = blackboard.Get<Key_EntityCompositionInstantiationManager>();
 
-        CheckSelectedEntity(mSelectedEntityIDs, ecs);
+        CheckSelectedEntity(mSelectedEntityIDs, *ecsHandle.Get());
 
         if (ImGui::Begin(mImGuiName.c_str(), &IsActive()))
         {
             ShowEntityHierarchyWithAddButtons(
-                ecs,
+                ecsHandle,
                 ecsBuffer,
                 mRootEntities,
                 commandTracker,
@@ -116,13 +118,16 @@ namespace CLX
                 InvalidEntityID,
                 {},
                 mEntitySearchBuffer,
-                dataTypeRegistry
+                EntityCompositionAssetHandle::Empty(),
+                compositionInstantiations,
+                dataTypeRegistry,
+                assetManager
             );
         }
 
         CheckCopyInputs(
             input, 
-            ecs, 
+            *ecsHandle.Get(), 
             mSelectedEntityIDs, 
             ecsBuffer, 
             mCopiedEntityID, 

@@ -121,33 +121,25 @@ namespace CLX
         }
     }
 
-
-    static void CheckForEntityCompositionDrops(ECSHandle ecsHandle, AssetManager& assetManager, std::vector<EntityID>& rootEntities, std::set<EntityID>& selectedEntityIDs, const DataTypeRegistry& dataTypeRegistry, EditorCommandTracker& commandTracker)
+    static void CheckForEntityCompositionDrops(ECSHandle ecsHandle, AssetManager& assetManager, EntityCompositionInstantiationManager& entityInstantiations, 
+        std::vector<EntityID>& rootEntities, std::set<EntityID>& selectedEntityIDs,
+        const DataTypeRegistry& dataTypeRegistry, EditorCommandTracker& commandTracker)
     {
-        if (ImGui::BeginDragDropTarget())
+        if (auto entityCompositionPath = ObjectTarget<AssetPath_EntityComposition>())
         {
-            if (const ImGuiPayload* data = ImGui::AcceptDragDropPayload("Asset"))
-            {
-                const std::filesystem::path path = std::filesystem::path(reinterpret_cast<const char*>(data->Data));
-                if (path.extension() == AssetExtensions::EntityComposition)
-                {
-                    commandTracker.BeginComposite("Instantiate Entity Composition + Select Root");
+            const std::filesystem::path path(entityCompositionPath->Value().mData);
+            ASSERT(path.extension() == AssetExtensions::EntityComposition);
 
-                    const EntityID rootEntity = InstantiateEntityComposition(
-                        ecsHandle,
-                        assetManager.GetEntityComposition(path),
-                        InvalidEntityID,
-                        dataTypeRegistry,
-                        rootEntities,
-                        commandTracker
-                    );
-
-                    SetEntitySelection({ rootEntity }, selectedEntityIDs, commandTracker);
-
-                    commandTracker.EndComposite();
-                }
-            }
-            ImGui::EndDragDropTarget();
+            InstantiateEntityCompositionAndSelectRoot(
+                ecsHandle,
+                assetManager.GetEntityComposition(path),
+                InvalidEntityID,
+                entityInstantiations,
+                rootEntities,
+                selectedEntityIDs,
+                dataTypeRegistry,
+                commandTracker
+            );
         }
     }
 
@@ -257,6 +249,7 @@ namespace CLX
         AssetManager& assetManager = blackboard.Get<Key_AssetManager>();
         EditorSceneSettings& editorSceneSettings = blackboard.Get<Key_EditorSceneSettings>();
         const DataTypeRegistry& dataTypeRegistry = blackboard.Get<Key_DataTypeRegistry>();
+        EntityCompositionInstantiationManager& compositionInstantiations = blackboard.Get<Key_EntityCompositionInstantiationManager>();
 
         const WindowView windowView = blackboard.Get<Key_WindowView>();
         void* sceneTextureID = activeScene.GetRenderState().GetRenderContext()->GetOutputSRV();
@@ -279,6 +272,7 @@ namespace CLX
             CheckForEntityCompositionDrops(
                 activeScene.GetECSHandle(),
                 assetManager,
+                compositionInstantiations,
                 mHierarchyPopUp.GetRootEntities(),
                 mHierarchyPopUp.GetSelectedEntityIDs(),
                 dataTypeRegistry,

@@ -13,7 +13,8 @@
 #include "Editor/FlyScript/NodeScriptingWindow.hpp"
 #include "Editor/PopUps/Editor/SceneWindowPopUp.hpp"
 #include "Editor/PopUps/Editor/AssetBrowserPopUp.hpp"
-#include "Editor/PopUps/Editor/EntityCompositionPopUp.hpp"
+#include "Editor/EntityCompositionInstantiationManager.hpp"
+#include "Editor/EditorWindows/EditorWindowManager.hpp"
 
 namespace CLX
 {
@@ -46,9 +47,10 @@ namespace CLX
         bool mIsCameraSettingsPopUpActive = false;
         bool mIsGraphicsSettingsPopUpActive = false;
         GraphicsSettingsData mGraphicsSettingsData = { };
+        EditorWindowManager mWindowManager;
 		NodeScriptingWindow mNodeScriptingWindow;
 		SceneWindowPopUp mSceneWindow;
 		AssetBrowserPopUp mAssetBrowserWindow;
-        std::unique_ptr<EntityCompositionPopUp> mEntityCompositionWindow;
+		EntityCompositionInstantiationManager mEntityCompositionInstantiationManager;
 	};
 }

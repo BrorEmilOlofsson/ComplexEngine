@@ -5,9 +5,9 @@
 namespace CLX
 {
 
-	EntityComposition::EntityComposition(const ECSRegistry& ecsRegistry)
-		: mECS(ecsRegistry)
-		, mRootEntityID(mECS.CreateEntity())
+	EntityComposition::EntityComposition(ECSManager& ecsManager, ECSID ecsID)
+		: mECSHandle(ecsManager, ecsID)
+		, mRootEntityID(mECSHandle.Get().CreateEntity())
 	{
 	}
 
