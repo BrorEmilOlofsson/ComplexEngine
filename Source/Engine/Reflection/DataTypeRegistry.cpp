@@ -197,10 +197,9 @@ namespace CLX
             return equalsFunction(dataPtr1, dataPtr2);
         }
 
-        for (auto member : mDataTypes.at(dataTypeID).memberVariables)
+        for (auto& member : mDataTypes.at(dataTypeID).memberVariables)
         {
-            const DataType* memberDataType = Find(member.dataTypeID);
-            ASSERT(memberDataType != nullptr);
+            ASSERT(Find(member.dataTypeID) != nullptr);
             const void* memberDataPtr1 = dataPtr1 + std::get<ByteOffset>(member.memberType);
             const void* memberDataPtr2 = dataPtr2 + std::get<ByteOffset>(member.memberType);
             if (!EqualsData(member.dataTypeID, memberDataPtr1, memberDataPtr2))

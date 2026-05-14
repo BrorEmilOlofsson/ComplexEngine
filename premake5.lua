@@ -119,6 +119,10 @@ workspace "FootballGame" -- Workspace, is not same as Project. Anything configur
 
     filter "configurations:Debug_*"
         defines { "BUILD_WITH_EASY_PROFILER" }
+		
+    filter "configurations:Release_Editor"
+        defines { "BUILD_WITH_EASY_PROFILER" }
+
 
 	filter "system:windows"
 		systemversion "latest"

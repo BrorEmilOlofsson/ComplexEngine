@@ -39,9 +39,41 @@ namespace CLX
         return shapeTransform.ToWorld(GetEntityWorldTransform(ecs, entityID));
     }
 
+    void UpdateTriggerStates(std::span<const TriggerData> previousFrameTriggers, std::vector<TriggerData>& newTriggers)
+    {
+        for (TriggerData& triggerData : newTriggers)
+        {
+            const auto it = std::ranges::find_if(previousFrameTriggers, [&triggerData](const TriggerData& previousTrigger)
+                {
+                    return previousTrigger.entityID == triggerData.entityID;
+                });
+            
+            if (it != end(previousFrameTriggers))
+            {
+                triggerData.state = eTriggerState::Stay;
+            }
+            else
+            {
+                triggerData.state = eTriggerState::Enter;
+            }
+        }
+
+        for (const TriggerData& previousTrigger : previousFrameTriggers)
+        {
+            const auto it = std::ranges::find_if(newTriggers, [&previousTrigger](const TriggerData& triggerData)
+                {
+                    return triggerData.entityID == previousTrigger.entityID;
+                });
+            if (it == end(newTriggers))
+            {
+                newTriggers.push_back({ previousTrigger.entityID, eTriggerState::Exit });
+            }
+        }
+    }
+
     void CheckTriggerCollisions(ECS& ecs)
     {
-        ecs.ForEach([&ecs](const EntityID entityID, const TriggerComponent& trigger)
+        ecs.ForEach([&ecs](const EntityID entityID, TriggerComponent& trigger)
             {
                 const auto& shape = trigger.shape;
 
@@ -49,9 +81,9 @@ namespace CLX
 
                 const auto transformedShape = std::visit(ShapeWorldTransformer{ entityWorldTransform }, shape);
 
-                std::vector<EntityID> collidingEntities;
+                std::vector<TriggerData> triggers;
 
-                ecs.ForEach([&ecs, entityID, &transformedShape, &collidingEntities](const EntityID otherEntity, const TriggerComponent& otherTrigger)
+                ecs.ForEach([&ecs, entityID, &transformedShape, &triggers](const EntityID otherEntity, const TriggerComponent& otherTrigger)
                     {
                         if (entityID == otherEntity)
                         {
@@ -65,9 +97,25 @@ namespace CLX
                                 return DetectCollision(s, o);
                             }, transformedShape, transformedOtherShape))
                         {
-                            collidingEntities.push_back(otherEntity);
+                            triggers.push_back({ otherEntity });
                         }
                     });
+
+                UpdateTriggerStates(trigger.triggers, triggers);
+
+                if (trigger.triggers.empty() && !triggers.empty())
+                {
+                    // Trigger entered
+                    trigger.savedDebugColor = trigger.debugColor;
+                    trigger.debugColor = Colors::Red;
+                }
+                else if (!trigger.triggers.empty() && triggers.empty())
+                {
+                    // Trigger exited
+                    trigger.debugColor = trigger.savedDebugColor;
+                }
+
+                trigger.triggers = std::move(triggers);
             });
     }
 
@@ -109,5 +157,10 @@ namespace CLX
     void TriggerSystem::Render(const ECS& ecs, const Blackboard& blackboard)
     {
         RenderTriggers(ecs, blackboard.Get<Key_CurrentRenderState>().GetRenderList());
+    }
+
+    void TriggerSystem::EditorUpdate(ECS& ecs, const Blackboard&)
+    {
+        CheckTriggerCollisions(ecs);
     }
 }

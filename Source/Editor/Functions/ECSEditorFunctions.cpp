@@ -1265,8 +1265,7 @@ namespace CLX
         const DataTypeID modifiedDataTypeID, const void* sourcePtr, const DataTypeID componentTypeID, const PropertyPath& propertyPath,
         const std::optional<VectorEditOperation>& vectorOperation, const DataTypeRegistry& dataTypeRegistry)
     {
-        auto* compositionComponent = instantiationECS.GetComponent<EntityCompositionInstantiationComponent>(entityID);
-        ASSERT(compositionComponent != nullptr);
+        ASSERT(instantiationECS.GetComponent<EntityCompositionInstantiationComponent>(entityID) != nullptr);
 
         std::optional<EntityID> foundEntityID = FindEntity(instantiationECS, [&instantiationECS, modifiedEntityID](const EntityID entityID)
             {
