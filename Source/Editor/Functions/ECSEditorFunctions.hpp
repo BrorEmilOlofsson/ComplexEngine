@@ -89,8 +89,12 @@ namespace CLX
 		EntityCompositionInstantiationManager& entityInstantiations, const DataTypeRegistry& dataTypeRegistry,
 		std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker);
 
+	void InstantiateEntityCompositionAndSelectRoot(EntityCompositionAssetHandle target, EntityCompositionAssetHandle source, EntityID parentID,
+		EntityCompositionInstantiationManager& entityInstantiations, std::vector<EntityID>& rootEntities,
+		std::set<EntityID>& selectedEntityIDs, const DataTypeRegistry& dataTypeRegistry, EditorCommandTracker& commandTracker);
 
-	void InstantiateEntityCompositionAndSelectRoot(ECSHandle& ecsHandle, EntityCompositionAssetHandle assetHandle, EntityID parentID, 
+
+	void InstantiateEntityCompositionAndSelectRoot(ECSHandle ecsHandle, EntityCompositionAssetHandle assetHandle, EntityID parentID, 
 		EntityCompositionInstantiationManager& entityInstantiations, std::vector<EntityID>& rootEntities,
 		std::set<EntityID>& selectedEntityIDs, const DataTypeRegistry& dataTypeRegistry, EditorCommandTracker& commandTracker);
 

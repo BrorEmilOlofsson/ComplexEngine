@@ -119,22 +119,22 @@ namespace CLX
 		return Vector3<T>(a.x * b.x, a.y * b.y, a.z * b.z);
 	}
 
-	template<typename T>
-	[[nodiscard]] constexpr Vector3<T> operator*(const Vector3<T>& vector, const T& scalar) noexcept
+	template<typename T, typename U>
+	[[nodiscard]] constexpr Vector3<T> operator*(const Vector3<T>& vector, const U& scalar) noexcept
 	{
-		return Vector3<T>(vector.x * scalar, vector.y * scalar, vector.z * scalar);
+		return Vector3<T>(vector.x * static_cast<T>(scalar), vector.y * static_cast<T>(scalar), vector.z * static_cast<T>(scalar));
 	}
 
-	template<typename T>
-	[[nodiscard]] constexpr Vector3<T> operator*(const T& scalar, const Vector3<T>& vector) noexcept
+	template<typename T, typename U>
+	[[nodiscard]] constexpr Vector3<T> operator*(const U& scalar, const Vector3<T>& vector) noexcept
 	{
 		return vector * scalar;
 	}
 
-	template<typename T>
-	[[nodiscard]] constexpr Vector3<T> operator/(const Vector3<T>& vector, const T& scalar)
+	template<typename T, typename U>
+	[[nodiscard]] constexpr Vector3<T> operator/(const Vector3<T>& vector, const U& scalar) noexcept
 	{
-		return Vector3<T>(vector.x / scalar, vector.y / scalar, vector.z / scalar);
+		return Vector3<T>(vector.x / static_cast<T>(scalar), vector.y / static_cast<T>(scalar), vector.z / static_cast<T>(scalar));
 	}
 
 	template<typename T>

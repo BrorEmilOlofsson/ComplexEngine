@@ -26,6 +26,9 @@ DataTypeRegistry CreateDataTypeRegistry()
     registry.RegisterType<NameComponent>(true);
     registry.RegisterType<TransformHierarchyComponent>(true);
     registry.RegisterType<EntityCompositionInstantiationComponent>(true);
+    registry.RegisterType<EntityID>(false);
+    registry.RegisterMemberVariable(&TransformHierarchyComponent::parent, "Parent", MemberMetaData{});
+    registry.RegisterMemberVariable(&TransformHierarchyComponent::children, "Children", MemberMetaData{});
     return registry;
 }
 
@@ -193,6 +196,14 @@ TEST_CASE("Instantiate Entity Composition")
         ECSOwningHandle targetECS(ecsManager, ecsManager.CreateECS(CreateECSRegistry()));
 
         const EntityID parentID = targetECS.Get().CreateEntity();
+        const EntityID child1 = compositionAsset->GetECS().CreateEntity();
+        const EntityID child2 = compositionAsset->GetECS().CreateEntity();
+        const EntityID child3 = compositionAsset->GetECS().CreateEntity();
+        const EntityID child4 = compositionAsset->GetECS().CreateEntity();
+        SetParentEntity(compositionAsset->GetECS(), child1, compositionAsset->GetRootEntity(), LastIndex{});
+        SetParentEntity(compositionAsset->GetECS(), child2, compositionAsset->GetRootEntity(), LastIndex{});
+        SetParentEntity(compositionAsset->GetECS(), child3, compositionAsset->GetRootEntity(), LastIndex{});
+        SetParentEntity(compositionAsset->GetECS(), child4, compositionAsset->GetRootEntity(), LastIndex{});
 
         EditorCommandTracker commandTracker;
         const DataTypeRegistry dataTypeRegistry = CreateDataTypeRegistry();
@@ -210,8 +221,68 @@ TEST_CASE("Instantiate Entity Composition")
         );
 
         TransformHierarchyComponent* transformHierarchy = targetECS.Get().GetComponent<TransformHierarchyComponent>(instantiatedRootEntityID);
-        REQUIRE(targetECS.Get().GetEntityCount() == 2);
+        TransformHierarchyComponent* transformHierarchy2 = targetECS.Get().GetComponent<TransformHierarchyComponent>(parentID);
+        REQUIRE(targetECS.Get().GetEntityCount() == 6);
         REQUIRE(transformHierarchy->parent == parentID);
-        REQUIRE(transformHierarchy->children.empty());
+        REQUIRE(transformHierarchy->children.size() == 4);
+        REQUIRE(transformHierarchy2->children.size() == 1);
+        REQUIRE(transformHierarchy2->children[0] == instantiatedRootEntityID);
+
+        for (EntityID childID : transformHierarchy->children)
+        {
+            TransformHierarchyComponent* childTransformHierarchy = targetECS.Get().GetComponent<TransformHierarchyComponent>(childID);
+            REQUIRE(childTransformHierarchy->parent == instantiatedRootEntityID);
+            REQUIRE(childTransformHierarchy->children.empty());
+        }
+    }
+
+
+    {
+
+        ECSManager ecsManager;
+
+        EntityCompositionAsset compositionAsset1(EntityComposition(ecsManager, ecsManager.CreateECS(CreateECSRegistry())), std::filesystem::path("path/to/asset"));
+        EntityCompositionAsset compositionAsset2(EntityComposition(ecsManager, ecsManager.CreateECS(CreateECSRegistry())), std::filesystem::path("path/to/asset"));
+
+        const EntityID child1 = compositionAsset1->GetECS().CreateEntity();
+        const EntityID child2 = compositionAsset1->GetECS().CreateEntity();
+        const EntityID child3 = compositionAsset1->GetECS().CreateEntity();
+        const EntityID child4 = compositionAsset1->GetECS().CreateEntity();
+        SetParentEntity(compositionAsset1->GetECS(), child1, compositionAsset1->GetRootEntity(), LastIndex{});
+        SetParentEntity(compositionAsset1->GetECS(), child2, compositionAsset1->GetRootEntity(), LastIndex{});
+        SetParentEntity(compositionAsset1->GetECS(), child3, compositionAsset1->GetRootEntity(), LastIndex{});
+        SetParentEntity(compositionAsset1->GetECS(), child4, compositionAsset1->GetRootEntity(), LastIndex{});
+
+        EditorCommandTracker commandTracker;
+        const DataTypeRegistry dataTypeRegistry = CreateDataTypeRegistry();
+        std::vector<EntityID> rootEntities;
+        EntityCompositionInstantiationManager instantiationManager;
+
+        const EntityID instantiatedRootEntityID = InstantiateEntityComposition(
+            compositionAsset2->GetECSHandle(),
+            EntityCompositionAssetHandle(compositionAsset1),
+            compositionAsset2->GetRootEntity(),
+            instantiationManager,
+            dataTypeRegistry,
+            rootEntities,
+            commandTracker
+        );
+
+        ECS& targetECS = compositionAsset2->GetECS();
+
+        TransformHierarchyComponent* instantiatedRootEntityTransformHierarchy = targetECS.GetComponent<TransformHierarchyComponent>(instantiatedRootEntityID);
+        TransformHierarchyComponent* targetRootEntityTransformHierarchy = targetECS.GetComponent<TransformHierarchyComponent>(compositionAsset2->GetRootEntity());
+        REQUIRE(targetECS.GetEntityCount() == 6);
+        REQUIRE(instantiatedRootEntityTransformHierarchy->parent == compositionAsset2->GetRootEntity());
+        REQUIRE(instantiatedRootEntityTransformHierarchy->children.size() == 4);
+        REQUIRE(targetRootEntityTransformHierarchy->children.size() == 1);
+        REQUIRE(targetRootEntityTransformHierarchy->children[0] == instantiatedRootEntityID);
+
+        for (EntityID childID : instantiatedRootEntityTransformHierarchy->children)
+        {
+            TransformHierarchyComponent* childTransformHierarchy = targetECS.GetComponent<TransformHierarchyComponent>(childID);
+            REQUIRE(childTransformHierarchy->parent == instantiatedRootEntityID);
+            REQUIRE(childTransformHierarchy->children.empty());
+        }
     }
 }

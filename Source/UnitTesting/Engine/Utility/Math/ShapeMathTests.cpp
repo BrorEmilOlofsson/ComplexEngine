@@ -823,3 +823,35 @@ TEST_CASE("ShapeMath::Scale (Sphere)", "[ShapeMath]")
     Scale(sphere, 5.0);
     REQUIRE(sphere == Sphered::FromCenterAndRadius(Point3d(3, 3, 3), Radiusd(25.0)));
 }
+
+TEST_CASE("ShapeMath::ToTransform (Sphere)", "[ShapeMath]")
+{
+    const Sphered sphere = Sphered::FromCenterAndRadius(Point3d(1, 2, 3), Radiusd(4.0));
+    const Transform3d transform = ToTransform(sphere);
+    REQUIRE(transform.GetPosition() == Point3d(1, 2, 3));
+    REQUIRE(transform.GetRotationMatrix() == RotationMatrix3d::Identity());
+    REQUIRE(transform.GetScale() == Vector3d(4.0));
+}
+
+TEST_CASE("ShapeMath::ToTransform (AABB3)", "[ShapeMath]")
+{
+    const AABB3d aabb = AABB3d::FromMinAndMax(Point3d(1, 2, 3), Point3d(5, 7, 9));
+    const Transform3d transform = ToTransform(aabb);
+    REQUIRE(transform.GetPosition() == Point3d(3, 4.5, 6));
+    REQUIRE(transform.GetRotationMatrix() == RotationMatrix3d::Identity());
+    REQUIRE(transform.GetScale() == Vector3d(4, 5, 6));
+}
+
+TEST_CASE("ShapeMath::ToTransform (Cylinder)", "[ShapeMath]")
+{
+    const Cylinderd cylinder = Cylinderd::FromCenterAndRadiusAndAxisAndHeight(
+        Point3d(1, 2, 3),
+        Radiusd(4.0),
+        UnitVector3d::Up(),
+        10.0
+    );
+    const Transform3d transform = ToTransform(cylinder);
+    REQUIRE(transform.GetPosition() == Point3d(1, 2, 3));
+    REQUIRE(transform.GetUpVector() == UnitVector3d::Up());
+    REQUIRE(transform.GetScale() == Vector3d(4.0, 5.0, 4.0));
+}

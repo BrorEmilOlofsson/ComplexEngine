@@ -46,6 +46,12 @@ namespace CLX
 		return GetRandomNumber(engine, 0, 1) == 1;
 	}
 
+	template<typename Rand>
+	[[nodiscard]] constexpr bool GetRandomBool()
+	{
+		return GetRandomNumber(0, 1) == 1;
+	}
+
 	template<typename ValueType, typename WeightType, typename Rand>
 	[[nodiscard]] constexpr const ValueType& GetRandomValue(const OutcomeTable<ValueType, WeightType>& table, Rand&& randomEngine)
 	{

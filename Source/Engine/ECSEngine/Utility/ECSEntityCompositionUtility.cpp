@@ -13,7 +13,7 @@ namespace CLX
 		for (auto entityView : previousECS.ViewEntities())
 		{
 			const EntityID newEntityID = entityIDConverter.ConvertToTarget(entityView.GetEntityID());
-			auto newEntityView = ecs.ViewEntity(newEntityID);
+			/*auto newEntityView = ecs.ViewEntity(newEntityID);
 			TransformHierarchyComponent& hierarchyComponent = *newEntityView.GetComponent<TransformHierarchyComponent>();
 
 			if (hierarchyComponent.parent != InvalidEntityID)
@@ -24,7 +24,7 @@ namespace CLX
 			for (std::size_t i = 0; i < hierarchyComponent.children.size(); i++)
 			{
 				hierarchyComponent.children[i] = entityIDConverter.ConvertToTarget(hierarchyComponent.children[i]);
-			}
+			}*/
 
             RemapComponentEntityIDs(ecs, newEntityID, entityIDConverter.GetSourceToTargetMap(), dataTypeRegistry);
 		}

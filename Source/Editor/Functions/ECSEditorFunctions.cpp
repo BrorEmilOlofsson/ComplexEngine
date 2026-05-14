@@ -1157,22 +1157,32 @@ namespace CLX
             {
                 EntityCompositionAssetHandle handle = assetManager.GetEntityComposition(std::filesystem::path(entityCompositionPath.value().Value().mData));
 
-                EntityID parentEntityID = InvalidEntityID;
                 if (compositionHandle.IsValid())
                 {
-                    parentEntityID = compositionHandle.Get().GetRootEntity();
+                    InstantiateEntityCompositionAndSelectRoot(
+                        compositionHandle,
+                        handle,
+                        compositionHandle.Get().GetRootEntity(),
+                        compositionInstantiations,
+                        rootEntities,
+                        selectedEntityIDs,
+                        dataTypeRegistry,
+                        commandTracker
+                    );
                 }
-
-                InstantiateEntityCompositionAndSelectRoot(
-                    ecsHandle,
-                    handle,
-                    parentEntityID,
-                    compositionInstantiations,
-                    rootEntities,
-                    selectedEntityIDs,
-                    dataTypeRegistry,
-                    commandTracker
-                );
+                else
+                {
+                    InstantiateEntityCompositionAndSelectRoot(
+                        ecsHandle,
+                        handle,
+                        InvalidEntityID,
+                        compositionInstantiations,
+                        rootEntities,
+                        selectedEntityIDs,
+                        dataTypeRegistry,
+                        commandTracker
+                    );
+                }
             }
 
             ImGui::EndListBox();
@@ -1880,6 +1890,31 @@ namespace CLX
             SetParentEntity(targetECS, instantiatedRootEntity, parentID);
         }
 
+        auto checkEntityRelationships = [&targetECS](const EntityID entityID)
+            {
+                const auto children = GetEntityChildren(targetECS, entityID);
+        const EntityID parentIDCheck = GetParentEntity(targetECS, entityID);
+        if (parentIDCheck == entityID)
+        {
+            ASSERT(false);
+        }
+        if (Contains(children, parentIDCheck))
+        {
+            ASSERT(false);
+        }
+        if (Contains(children, entityID))
+        {
+            ASSERT(false);
+        }
+            };
+        {
+            checkEntityRelationships(instantiatedRootEntity);
+        }
+        for (EntityID entityIDCheck : GetEntityDescendants(targetECS, instantiatedRootEntity))
+        {
+            checkEntityRelationships(entityIDCheck);
+        }
+
         entityInstantiations.Get(compositionAsset).push_back(EntityCompositionInstantiation{ instantiatedRootEntity, targetECSHandle });
         return instantiatedRootEntity;
     }
@@ -1946,8 +1981,33 @@ namespace CLX
         return instantiatedRootEntity;
     }
 
-    void InstantiateEntityCompositionAndSelectRoot(ECSHandle& ecsHandle, EntityCompositionAssetHandle assetHandle, const EntityID parentID, EntityCompositionInstantiationManager& compositionInstantiations, 
-        std::vector<EntityID>& rootEntities, std::set<EntityID>& selectedEntityIDs,
+    bool IsRecursiveInstantiation(ECSHandle ecsHandle, EntityCompositionAssetHandle assetHandle)
+    {
+        bool found = false;
+        ecsHandle.Get()->ForEach([&](const EntityCompositionInstantiationComponent& compositionComponent)
+            {
+                if (compositionComponent.asset == assetHandle)
+                {
+                    found = true;
+                }
+            });
+        return found;
+    }
+
+    void InstantiateEntityCompositionAndSelectRoot(const EntityCompositionAssetHandle target, EntityCompositionAssetHandle source, const EntityID parentID,
+        EntityCompositionInstantiationManager& compositionInstantiations, std::vector<EntityID>& rootEntities, std::set<EntityID>& selectedEntityIDs,
+        const DataTypeRegistry& dataTypeRegistry, EditorCommandTracker& commandTracker)
+    {
+        if (IsRecursiveInstantiation(source.Get().GetECSHandle(), target))
+        {
+            return;
+        }
+        ECSHandle targetECSHandle = target.Get().GetECSHandle();
+        InstantiateEntityCompositionAndSelectRoot(targetECSHandle, source, parentID, compositionInstantiations, rootEntities, selectedEntityIDs, dataTypeRegistry, commandTracker);
+    }
+
+    void InstantiateEntityCompositionAndSelectRoot(const ECSHandle ecsHandle, EntityCompositionAssetHandle assetHandle, const EntityID parentID,
+        EntityCompositionInstantiationManager& compositionInstantiations, std::vector<EntityID>& rootEntities, std::set<EntityID>& selectedEntityIDs,
         const DataTypeRegistry& dataTypeRegistry, EditorCommandTracker& commandTracker)
     {
         if (ecsHandle == assetHandle.Get().GetECSHandle())

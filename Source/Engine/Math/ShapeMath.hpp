@@ -22,6 +22,7 @@
 #include "Engine/Utility/Percent.hpp"
 #include "Engine/Math/Dimension2.hpp"
 #include "Engine/Utility/Approximation.hpp"
+#include "Engine/Math/Transform3.hpp"
 
 namespace CLX
 {
@@ -663,5 +664,31 @@ namespace CLX
     constexpr void Scale(Sphere<T>& sphere, const T& scalar)
     {
         sphere.SetRadius(sphere.GetRadius() * scalar);
+    }
+
+    template<std::floating_point T>
+    [[nodiscard]] constexpr Transform3<T> ToTransform(const Sphere<T>& sphere)
+    {
+        Transform3<T> transform = Transform3<T>::FromPosition(sphere.GetCenter());
+        transform.SetScale(Vector3<T>(sphere.GetRadius().Value()));
+        return transform;
+    }
+
+    template<std::floating_point T>
+    [[nodiscard]] constexpr Transform3<T> ToTransform(const AABB3<T>& aabb)
+    {
+        Transform3<T> transform = Transform3<T>::FromPosition(aabb.GetCenter());
+        transform.SetScale(aabb.GetExtent());
+        return transform;
+    }
+
+    template<std::floating_point T>
+    [[nodiscard]] constexpr Transform3<T> ToTransform(const Cylinder<T>& cylinder)
+    {
+        Transform3<T> transform = Transform3<T>::FromPosition(cylinder.GetCenter());
+        transform.SetRotation(RotationMatrix3<T>::FromY(cylinder.GetAxis()));
+        const Vector3<T> scale = Vector3<T>(cylinder.GetRadius().Value(), cylinder.GetHeight() / T{ 2 }, cylinder.GetRadius().Value());
+        transform.SetScale(scale);
+        return transform;
     }
 }

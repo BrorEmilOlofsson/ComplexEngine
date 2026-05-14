@@ -1,4 +1,5 @@
 #pragma once
+#include <format>
 #include "Engine/Math/Vector3.hpp"
 #include "Engine/Math/UnitVector3.hpp"
 #include "Engine/Math/Point3.hpp"
@@ -9,160 +10,209 @@
 
 namespace CLX
 {
+
+	template<std::floating_point T>
 	class Transform3 final
 	{
 	public:
 
 		constexpr Transform3() = default;
 
-		[[nodiscard]] static constexpr Transform3 FromPosition(const Point3f& position);
-        [[nodiscard]] static constexpr Transform3 FromPositionRotationScale(const Point3f& position, const RotationMatrix3f& rotation, const Vector3f& scale);
-        [[nodiscard]] static constexpr Transform3 FromMatrix(const Matrix4x4f& matrix);
+		[[nodiscard]] static constexpr Transform3 FromPosition(const Point3<T>& position);
+		[[nodiscard]] static constexpr Transform3 FromPositionRotationScale(const Point3<T>& position, const RotationMatrix3<T>& rotation, const Vector3<T>& scale);
+        [[nodiscard]] static constexpr Transform3 FromMatrix(const Matrix4x4<T>& matrix);
 
 	public:
 
-		constexpr void SetPosition(const Point3f& position);
-		constexpr void SetRotation(const Rotatorf& rotation);
-		constexpr void SetRotation(const RotationMatrix3f& rotationMatrix);
-		constexpr void SetScale(const Vector3f& scale);
-		constexpr void SetMatrix(const Matrix4x4f& matrix);
-		constexpr void MovePosition(const Vector3f& change);
-		constexpr void RotateOnAxis(const UnitVector3f& axis, Radiansf angle);
-		constexpr void RotateOnAxis(const UnitVector3f& axis, Degreesf angle);
+		constexpr void SetPosition(const Point3<T>& position);
+		constexpr void SetRotation(const Rotator<T>& rotation);
+		constexpr void SetRotation(const RotationMatrix3<T>& rotationMatrix);
+		constexpr void SetScale(const Vector3<T>& scale);
+		constexpr void SetMatrix(const Matrix4x4<T>& matrix);
+		constexpr void MovePosition(const Vector3<T>& change);
+		constexpr void RotateOnAxis(const UnitVector3<T>& axis, Radians<T> angle);
+		constexpr void RotateOnAxis(const UnitVector3<T>& axis, Degrees<T> angle);
 
 	public:
 
-		[[nodiscard]] constexpr const Matrix4x4f& GetMatrix() const;
-		[[nodiscard]] constexpr Point3f GetPosition() const;
-		[[nodiscard]] constexpr Rotatorf GetRotation() const;
-		[[nodiscard]] constexpr Vector3f GetScale() const;
-		[[nodiscard]] constexpr UnitVector3f GetRightVector() const;
-		[[nodiscard]] constexpr UnitVector3f GetUpVector() const;
-		[[nodiscard]] constexpr UnitVector3f GetForwardVector() const;
+		[[nodiscard]] constexpr const Matrix4x4<T>& GetMatrix() const;
+		[[nodiscard]] constexpr Point3<T> GetPosition() const;
+		[[nodiscard]] constexpr Rotator<T> GetRotation() const;
+		[[nodiscard]] constexpr RotationMatrix3<T> GetRotationMatrix() const;
+		[[nodiscard]] constexpr Vector3<T> GetScale() const;
+		[[nodiscard]] constexpr UnitVector3<T> GetRightVector() const;
+		[[nodiscard]] constexpr UnitVector3<T> GetUpVector() const;
+		[[nodiscard]] constexpr UnitVector3<T> GetForwardVector() const;
 		[[nodiscard]] constexpr Transform3 ToWorld(const Transform3& parent) const;
 
 	private:
 
-		constexpr explicit Transform3(const Matrix4x4f& matrix);
+		constexpr explicit Transform3(const Matrix4x4<T>& matrix);
 
 	private:
 
-		Matrix4x4f mMatrix;
+		Matrix4x4<T> mMatrix;
 	};
 
-	using Transform = Transform3;
+    using Transform3f = Transform3<float>;
+    using Transform3d = Transform3<double>;
+	using Transform = Transform3f;
 
-	constexpr Transform3::Transform3(const Matrix4x4f& matrix)
+	template<std::floating_point T>
+	constexpr Transform3<T>::Transform3(const Matrix4x4<T>& matrix)
 		: mMatrix(matrix)
 	{
 	}
 
-	constexpr Transform3 Transform3::FromPosition(const Point3f& position)
+	template<std::floating_point T>
+	constexpr Transform3<T> Transform3<T>::FromPosition(const Point3<T>& position)
 	{
-		Transform3 transform;
+		Transform3<T> transform;
 		transform.SetPosition(position);
         return transform;
 	}
 
-	constexpr Transform3 Transform3::FromPositionRotationScale(const Point3f& position, const RotationMatrix3f& rotation, const Vector3f& scale)
+	template<std::floating_point T>
+	constexpr Transform3<T> Transform3<T>::FromPositionRotationScale(const Point3<T>& position, const RotationMatrix3<T>& rotation, const Vector3<T>& scale)
 	{
-		Transform3 transform;
+		Transform3<T> transform;
 		transform.SetScale(scale);
 		transform.SetRotation(rotation);
 		transform.SetPosition(position);
         return transform;
 	}
 
-	constexpr Transform3 Transform3::FromMatrix(const Matrix4x4f& matrix)
+	template<std::floating_point T>
+	constexpr Transform3<T> Transform3<T>::FromMatrix(const Matrix4x4<T>& matrix)
 	{
-		return Transform3(matrix);
+		return Transform3<T>(matrix);
     }
 
-	constexpr void Transform3::SetPosition(const Point3f& position)
+	template<std::floating_point T>
+	constexpr void Transform3<T>::SetPosition(const Point3<T>& position)
 	{
 		mMatrix.SetTranslation(position);
 	}
 
-	constexpr void Transform3::SetRotation(const Rotatorf& rotation)
+	template<std::floating_point T>
+	constexpr void Transform3<T>::SetRotation(const Rotator<T>& rotation)
 	{
-		const Vector3f scale = mMatrix.GetScale();
-		const Point3f position = mMatrix.GetTranslation();
-		const Rotatorf rotationInDegrees = GetNormalized360(rotation);
-		Matrix4x4f matrix = CreateRotationMatrix(rotationInDegrees);
+		const Vector3<T> scale = mMatrix.GetScale();
+		const Point3<T> position = mMatrix.GetTranslation();
+		const Rotator<T> rotationInDegrees = GetNormalized360(rotation);
+		Matrix4x4<T> matrix = CreateRotationMatrix(rotationInDegrees);
 
-		mMatrix = Matrix4x4f::CreateScaleMatrix(scale) * matrix;
+		mMatrix = Matrix4x4<T>::CreateScaleMatrix(scale) * matrix;
 		mMatrix.SetTranslation(position);
 	}
 
-	constexpr void Transform3::SetRotation(const RotationMatrix3f& rotationMatrix)
+	template<std::floating_point T>
+	constexpr void Transform3<T>::SetRotation(const RotationMatrix3<T>& rotationMatrix)
 	{
-		const Vector3f scale = mMatrix.GetScale();
-		const Point3f position = mMatrix.GetTranslation();
-		mMatrix = Matrix4x4f::CreateRotationMatrix(rotationMatrix) * Matrix4x4f::CreateScaleMatrix(scale) * Matrix4x4f::CreateTranslationMatrix(position);
+		const Vector3<T> scale = mMatrix.GetScale();
+		const Point3<T> position = mMatrix.GetTranslation();
+		mMatrix = Matrix4x4<T>::CreateRotationMatrix(rotationMatrix) * Matrix4x4<T>::CreateScaleMatrix(scale) * Matrix4x4<T>::CreateTranslationMatrix(position);
 	}
 
-	constexpr void Transform3::SetScale(const Vector3f& scale)
+	template<std::floating_point T>
+	constexpr void Transform3<T>::SetScale(const Vector3<T>& scale)
 	{
 		mMatrix.SetScale(scale);
 	}
 
-	constexpr void Transform3::SetMatrix(const Matrix4x4f& matrix)
+	template<std::floating_point T>
+	constexpr void Transform3<T>::SetMatrix(const Matrix4x4<T>& matrix)
 	{
 		mMatrix = matrix;
 	}
 
-	constexpr void Transform3::MovePosition(const Vector3f& change)
+	template<std::floating_point T>
+	constexpr void Transform3<T>::MovePosition(const Vector3<T>& change)
 	{
 		SetPosition(mMatrix.GetTranslation() + change);
 	}
 
-	constexpr void Transform3::RotateOnAxis(const UnitVector3f& axis, Radiansf angle)
+	template<std::floating_point T>
+	constexpr void Transform3<T>::RotateOnAxis(const UnitVector3<T>& axis, Radians<T> angle)
 	{
 		RotateMatrixAroundAxis(mMatrix, axis, angle);
 	}
 
-	constexpr void Transform3::RotateOnAxis(const UnitVector3f& axis, Degreesf angle)
+	template<std::floating_point T>
+	constexpr void Transform3<T>::RotateOnAxis(const UnitVector3<T>& axis, Degrees<T> angle)
 	{
 		RotateMatrixAroundAxis(mMatrix, axis, angle);
 	}
 
-	constexpr const Matrix4x4f& Transform3::GetMatrix() const
+	template<std::floating_point T>
+	constexpr const Matrix4x4<T>& Transform3<T>::GetMatrix() const
 	{
 		return mMatrix;
 	}
 
-	constexpr Point3f Transform3::GetPosition() const
+	template<std::floating_point T>
+	constexpr Point3<T> Transform3<T>::GetPosition() const
 	{
 		return mMatrix.GetTranslation();
 	}
 
-	constexpr Rotatorf Transform3::GetRotation() const
+	template<std::floating_point T>
+	constexpr Rotator<T> Transform3<T>::GetRotation() const
 	{
 		return ToRotator(mMatrix);
 	}
 
-	constexpr Vector3f Transform3::GetScale() const
+	template<std::floating_point T>
+	constexpr RotationMatrix3<T> Transform3<T>::GetRotationMatrix() const
+	{
+		return mMatrix.GetRotationMatrix();
+	}
+
+	template<std::floating_point T>
+	constexpr Vector3<T> Transform3<T>::GetScale() const
 	{
 		return mMatrix.GetScale();
 	}
 
-	constexpr UnitVector3f Transform3::GetRightVector() const
+	template<std::floating_point T>
+	constexpr UnitVector3<T> Transform3<T>::GetRightVector() const
 	{
 		return mMatrix.GetRight();
 	}
 
-	constexpr UnitVector3f Transform3::GetUpVector() const
+	template<std::floating_point T>
+	constexpr UnitVector3<T> Transform3<T>::GetUpVector() const
 	{
 		return mMatrix.GetUp();
 	}
 
-	constexpr UnitVector3f Transform3::GetForwardVector() const
+	template<std::floating_point T>
+	constexpr UnitVector3<T> Transform3<T>::GetForwardVector() const
 	{
 		return mMatrix.GetForward();
 	}
 
-	constexpr Transform3 Transform3::ToWorld(const Transform3& parent) const
+	template<std::floating_point T>
+	constexpr Transform3<T> Transform3<T>::ToWorld(const Transform3<T>& parent) const
 	{
-		return Transform3(ToWorldSpace(mMatrix, parent.mMatrix));
+		return Transform3<T>(ToWorldSpace(mMatrix, parent.mMatrix));
 	}
+
+	template<std::floating_point T>
+    [[nodiscard]] constexpr bool operator==(const Transform3<T>& a, const Transform3<T>& b) noexcept
+    {
+        return a.GetMatrix() == b.GetMatrix();
+    }
 }
+
+template<std::floating_point T>
+struct std::formatter<CLX::Transform3<T>, char> : std::formatter<std::string, char>
+{
+    template<typename FormatContext>
+    [[nodiscard]] auto format(const CLX::Transform3<T>& transform, FormatContext& context) const
+    {
+        const CLX::Point3<T> position = transform.GetPosition();
+        const CLX::Rotator<T> rotation = transform.GetRotation();
+        return std::format_to(context.out(), "Transform3(Position: {}, Rotation: {})", position, rotation);
+    }
+};

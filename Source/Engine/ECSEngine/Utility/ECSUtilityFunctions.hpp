@@ -14,7 +14,7 @@ namespace CLX
 {
 
     template<typename T>
-    [[nodiscard]] constexpr bool Contains(const std::vector<T>& a, const T& value)
+    [[nodiscard]] constexpr bool Contains(const std::ranges::range auto& a, const T& value)
     {
         return std::ranges::find(a, value) != end(a);
     }
@@ -231,14 +231,14 @@ namespace CLX
         return false;
     }
 
-    inline const Transform& GetEntityTransform(const ECS& ecs, const EntityID entityID)
+    [[nodiscard]] inline const Transform& GetEntityTransform(const ECS& ecs, const EntityID entityID)
     {
         const TransformComponent* transformComponent = ecs.GetComponent<TransformComponent>(entityID);
         ASSERT(transformComponent != nullptr);
         return transformComponent->transform;
     }
 
-    inline Transform GetEntityWorldTransform(const ECS& ecs, const EntityID entityID)
+    [[nodiscard]] inline Transform GetEntityWorldTransform(const ECS& ecs, const EntityID entityID)
     {
         const Transform& localTransform = GetEntityTransform(ecs, entityID);
         const EntityID parentID = GetParentEntity(ecs, entityID);
@@ -250,7 +250,7 @@ namespace CLX
         return localTransform;
     }
 
-    inline Transform GetEntityLocalTransform(const ECS& ecs, const EntityID entityID, const Transform& worldTransform)
+    [[nodiscard]] inline Transform GetEntityLocalTransform(const ECS& ecs, const EntityID entityID, const Transform& worldTransform)
     {
         const TransformHierarchyComponent* hierarchyComponent = ecs.GetComponent<TransformHierarchyComponent>(entityID);
         ASSERT(hierarchyComponent != nullptr);
