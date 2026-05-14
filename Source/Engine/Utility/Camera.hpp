@@ -38,7 +38,7 @@ namespace CLX
 		constexpr void SetCameraType(const eCameraType cameraType);
 
 		constexpr void SetPosition(const Point3f& position);
-		constexpr void SetRotation(const Rotatorf& rotationInDegree);
+		//constexpr void SetRotation(const Rotatorf& rotationInDegree);
 		constexpr void SetRotation(const RotationMatrix3f& rotationMatrix);
         constexpr void SetTransform(const Transform& transform);
 		constexpr void SetNearPlane(const float nearPlane);
@@ -57,7 +57,7 @@ namespace CLX
 		[[nodiscard]] constexpr const Transform& GetTransform() const noexcept;
 
 		[[nodiscard]] constexpr Point3f GetPosition() const noexcept;
-		[[nodiscard]] constexpr Rotatorf GetRotation() const noexcept;
+		//[[nodiscard]] constexpr Rotatorf GetRotation() const noexcept;
 		[[nodiscard]] constexpr UnitVector3f GetForward() const noexcept;
 		[[nodiscard]] constexpr UnitVector3f GetUp() const noexcept;
 		[[nodiscard]] constexpr UnitVector3f GetRight() const noexcept;
@@ -123,10 +123,10 @@ namespace CLX
 		return mTransform.GetPosition();
 	}
 
-	constexpr Rotatorf Camera::GetRotation() const noexcept
-	{
-		return mTransform.GetRotation();
-	}
+	//constexpr Rotatorf Camera::GetRotation() const noexcept
+	//{
+	//	return mTransform.GetRotation();
+	//}
 
 	constexpr float Camera::GetNearPlane() const noexcept
 	{
@@ -218,10 +218,10 @@ namespace CLX
 		mTransform.SetPosition(position);
 	}
 
-	constexpr void Camera::SetRotation(const Rotatorf& rotation)
+	/*constexpr void Camera::SetRotation(const Rotatorf& rotation)
 	{
 		mTransform.SetRotation(rotation);
-	}
+	}*/
 
 	constexpr void Camera::SetRotation(const RotationMatrix3f& rotationMatrix)
 	{

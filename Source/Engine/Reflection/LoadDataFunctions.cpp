@@ -77,7 +77,7 @@ namespace CLX
 		scale.z = data["Scale"]["z"];
 
 		transform.SetScale(scale);
-		transform.SetRotation(rotation);
+		transform.SetRotation(ToRotationMatrix(rotation));
 		transform.SetPosition(position);
 	}
 

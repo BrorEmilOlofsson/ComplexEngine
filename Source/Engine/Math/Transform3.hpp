@@ -1,9 +1,9 @@
 #pragma once
 #include <format>
+#include <concepts>
 #include "Engine/Math/Vector3.hpp"
 #include "Engine/Math/UnitVector3.hpp"
 #include "Engine/Math/Point3.hpp"
-#include "Engine/Math/Rotator.hpp"
 #include "Engine/Math/Matrix4x4.hpp"
 #include "Engine/Math/RotationMath.hpp"
 #include "Engine/Math/Angle.hpp"
@@ -25,7 +25,6 @@ namespace CLX
 	public:
 
 		constexpr void SetPosition(const Point3<T>& position);
-		constexpr void SetRotation(const Rotator<T>& rotation);
 		constexpr void SetRotation(const RotationMatrix3<T>& rotationMatrix);
 		constexpr void SetScale(const Vector3<T>& scale);
 		constexpr void SetMatrix(const Matrix4x4<T>& matrix);
@@ -37,8 +36,7 @@ namespace CLX
 
 		[[nodiscard]] constexpr const Matrix4x4<T>& GetMatrix() const;
 		[[nodiscard]] constexpr Point3<T> GetPosition() const;
-		[[nodiscard]] constexpr Rotator<T> GetRotation() const;
-		[[nodiscard]] constexpr RotationMatrix3<T> GetRotationMatrix() const;
+		[[nodiscard]] constexpr RotationMatrix3<T> GetRotation() const;
 		[[nodiscard]] constexpr Vector3<T> GetScale() const;
 		[[nodiscard]] constexpr UnitVector3<T> GetRightVector() const;
 		[[nodiscard]] constexpr UnitVector3<T> GetUpVector() const;
@@ -95,18 +93,6 @@ namespace CLX
 	}
 
 	template<std::floating_point T>
-	constexpr void Transform3<T>::SetRotation(const Rotator<T>& rotation)
-	{
-		const Vector3<T> scale = mMatrix.GetScale();
-		const Point3<T> position = mMatrix.GetTranslation();
-		const Rotator<T> rotationInDegrees = GetNormalized360(rotation);
-		Matrix4x4<T> matrix = CreateRotationMatrix(rotationInDegrees);
-
-		mMatrix = Matrix4x4<T>::CreateScaleMatrix(scale) * matrix;
-		mMatrix.SetTranslation(position);
-	}
-
-	template<std::floating_point T>
 	constexpr void Transform3<T>::SetRotation(const RotationMatrix3<T>& rotationMatrix)
 	{
 		const Vector3<T> scale = mMatrix.GetScale();
@@ -157,13 +143,7 @@ namespace CLX
 	}
 
 	template<std::floating_point T>
-	constexpr Rotator<T> Transform3<T>::GetRotation() const
-	{
-		return ToRotator(mMatrix);
-	}
-
-	template<std::floating_point T>
-	constexpr RotationMatrix3<T> Transform3<T>::GetRotationMatrix() const
+	constexpr RotationMatrix3<T> Transform3<T>::GetRotation() const
 	{
 		return mMatrix.GetRotationMatrix();
 	}

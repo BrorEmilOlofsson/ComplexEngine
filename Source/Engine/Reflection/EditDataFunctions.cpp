@@ -468,7 +468,7 @@ namespace CLX
         }
 
         {
-            Rotatorf rotation = value.GetRotation();
+            Rotatorf rotation = ToRotator(value.GetRotation());
 
             const ViewAndEditResult viewAndEditRotation = CustomDragFloat3("Rotation", rotation);
             viewAndEditResult.isEdited |= viewAndEditRotation.isEdited;
@@ -476,7 +476,7 @@ namespace CLX
 
             if (viewAndEditRotation.isEdited)
             {
-                value.SetRotation(rotation);
+                value.SetRotation(ToRotationMatrix(rotation));
             }
         }
 

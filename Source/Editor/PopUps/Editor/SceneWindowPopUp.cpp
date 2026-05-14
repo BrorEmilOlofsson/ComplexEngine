@@ -148,7 +148,7 @@ namespace CLX
         : mHierarchyPopUp("Hierarchy")
         , mInspectorPopUp("Inspector", &mHierarchyPopUp, &mCamera)
     {
-        mCamera.SetRotation(Rotatorf(Degreesf(25), Degreesf(0), Degreesf(0)));
+        mCamera.SetRotation(ToRotationMatrix(Rotatorf(Degreesf(25), Degreesf(0), Degreesf(0))));
         mCamera.SetPosition(Point3f(1, 9, -12));
     }
 

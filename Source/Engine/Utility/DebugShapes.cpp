@@ -42,11 +42,11 @@ namespace CLX
 		renderList.AddLine(line);
 	}
 
-	void RenderCoordinateSystem(const Point3f& point, const Rotatorf& rotator, const float size, RenderList& renderList)
+	void RenderCoordinateSystem(const Point3f& point, const RotationMatrix3f& rotationMatrix, const float size, RenderList& renderList)
 	{
-		const UnitVector3f xAxis = GetRotatorRight(rotator);
-		const UnitVector3f yAxis = GetRotatorUp(rotator);
-		const UnitVector3f zAxis = GetRotatorForward(rotator);
+		const UnitVector3f xAxis = rotationMatrix.GetRight();
+		const UnitVector3f yAxis = rotationMatrix.GetUp();
+		const UnitVector3f zAxis = rotationMatrix.GetForward();
 		RenderLineSegment(point, point + xAxis * size, Colors::Red, renderList);
 		RenderLineSegment(point, point + yAxis * size, Colors::Green, renderList);
 		RenderLineSegment(point, point + zAxis * size, Colors::Blue, renderList);

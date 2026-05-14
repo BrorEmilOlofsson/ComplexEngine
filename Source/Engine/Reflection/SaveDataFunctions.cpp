@@ -62,7 +62,7 @@ namespace CLX
 		nlohmann::json json;
 
 		const Point3f position = transform.GetPosition();
-		const Rotatorf rotation = transform.GetRotation();
+		const Rotatorf rotation = ToRotator(transform.GetRotation());
 		const Vector3f scale = transform.GetScale();
 
 		json["Position"]["x"] = position.x;
