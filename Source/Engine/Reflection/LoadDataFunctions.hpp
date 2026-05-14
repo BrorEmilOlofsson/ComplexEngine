@@ -14,6 +14,7 @@
 #include "Engine/Asset/AssetTypes/AssetTypes.hpp"
 #include "Engine/Graphics/Light/PointLight.hpp"
 #include "Engine/Graphics/Light/DirectionalLight.hpp"
+#include "Engine/Math/Shapes/Shape.hpp"
 #include <External/nlohmann/json.hpp>
 #include <string>
 #include <array>
@@ -126,7 +127,7 @@ namespace CLX
 		Point3<T> max;
 		FromJSON(min, json.at("Min"));
 		FromJSON(max, json.at("Max"));
-		aabb = AABB3<T>(min, max);
+		aabb = AABB3<T>::FromMinAndMax(min, max);
 	}
 
 	template<typename T>
@@ -142,6 +143,18 @@ namespace CLX
 		::FromJSON(height, json.at("Height"));
 		cylinder = Cylinder<T>::FromCenterAndRadiusAndAxisAndHeight(center, Radius<T>(radius), axis, height);
 	}
+
+    template<typename T>
+    void FromJSON(Sphere<T>& sphere, const nlohmann::json& json)
+    {
+        Point3<T> center;
+        T radius = T{};
+        FromJSON(center, json.at("Center"));
+        ::FromJSON(radius, json.at("Radius"));
+        sphere = Sphere<T>::FromCenterAndRadius(center, Radius<T>(radius));
+    }
+
+	void FromJSON(Shape& shape, const nlohmann::json& json, const Blackboard& blackboard);
 
 	void FromJSON(EntityID& entityID, const nlohmann::json& json);
 

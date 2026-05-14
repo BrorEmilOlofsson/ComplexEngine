@@ -829,7 +829,7 @@ TEST_CASE("ShapeMath::ToTransform (Sphere)", "[ShapeMath]")
     const Sphered sphere = Sphered::FromCenterAndRadius(Point3d(1, 2, 3), Radiusd(4.0));
     const Transform3d transform = ToTransform(sphere);
     REQUIRE(transform.GetPosition() == Point3d(1, 2, 3));
-    REQUIRE(transform.GetRotationMatrix() == RotationMatrix3d::Identity());
+    REQUIRE(transform.GetRotation() == RotationMatrix3d::Identity());
     REQUIRE(transform.GetScale() == Vector3d(4.0));
 }
 
@@ -838,7 +838,7 @@ TEST_CASE("ShapeMath::ToTransform (AABB3)", "[ShapeMath]")
     const AABB3d aabb = AABB3d::FromMinAndMax(Point3d(1, 2, 3), Point3d(5, 7, 9));
     const Transform3d transform = ToTransform(aabb);
     REQUIRE(transform.GetPosition() == Point3d(3, 4.5, 6));
-    REQUIRE(transform.GetRotationMatrix() == RotationMatrix3d::Identity());
+    REQUIRE(transform.GetRotation() == RotationMatrix3d::Identity());
     REQUIRE(transform.GetScale() == Vector3d(4, 5, 6));
 }
 

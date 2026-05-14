@@ -32,6 +32,7 @@ namespace CLX
         mECSRegistry.RegisterSystem<AnimationSystem>();
         mECSRegistry.RegisterSystem<NavmeshSystem>();
         mECSRegistry.RegisterSystem<DebugShapeSystem>();
+        mECSRegistry.RegisterSystem<TriggerSystem>();
 
         TypeRegistration::ExecuteRegistrations(mDataTypeRegistry, mECSRegistry);
 

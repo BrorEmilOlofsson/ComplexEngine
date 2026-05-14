@@ -19,6 +19,7 @@
 #include "Engine/ECSEngine/Components/RotatingMovementComponent.hpp"
 #include "Engine/ECSEngine/Components/ArrowComponent.hpp"
 #include "Engine/ECSEngine/Components/CylinderComponent.hpp"
+#include "Engine/ECSEngine/Components/TriggerComponent.hpp"
 
 namespace CLX
 {
@@ -45,5 +46,6 @@ namespace CLX
 		RegisterRotatingMovementComponent();
 		RegisterArrowComponent();
         RegisterCylinderComponent();
+		RegisterTriggerComponent();
 	}
 }

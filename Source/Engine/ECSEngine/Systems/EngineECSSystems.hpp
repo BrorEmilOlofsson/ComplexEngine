@@ -7,3 +7,4 @@
 #include "Engine/ECSEngine/Systems/RotatingMovementSystem.hpp"
 #include "Engine/ECSEngine/Systems/NavmeshSystem.hpp"
 #include "Engine/ECSEngine/Systems/DebugShapeSystem.hpp"
+#include "Engine/ECSEngine/Systems/TriggerSystem.hpp"

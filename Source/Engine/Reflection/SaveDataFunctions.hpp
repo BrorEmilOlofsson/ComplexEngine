@@ -17,6 +17,7 @@
 #include "Engine/Asset/AssetTypes/AssetTypes.hpp"
 #include "Engine/Graphics/Light/PointLight.hpp"
 #include "Engine/Graphics/Light/DirectionalLight.hpp"
+#include "Engine/Math/Shapes/Shape.hpp"
 
 namespace CLX
 {
@@ -175,6 +176,7 @@ namespace CLX
 	[[nodiscard]] nlohmann::json ToJSON(const PointLight& pointlight);
 	[[nodiscard]] nlohmann::json ToJSON(const DirectionalLight& directionalLight);
 	[[nodiscard]] nlohmann::json ToJSON(const Camera& camera);
+    [[nodiscard]] nlohmann::json ToJSON(const Shape& shape, const DataTypeRegistry& dataTypeRegistry);
 
 	[[nodiscard]] nlohmann::json ToJSON(const MeshAssetHandle& meshAsset);
 	[[nodiscard]] nlohmann::json ToJSON(const ModelAssetHandle& modelAsset);

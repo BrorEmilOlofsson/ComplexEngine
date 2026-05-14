@@ -343,6 +343,18 @@ namespace CLX
 	}
 
 	template<typename T>
+    [[nodiscard]] constexpr T MaxComponent(const Vector2<T>& vector) noexcept
+    {
+        return Max(vector.x, vector.y);
+    }
+
+	template<typename T>
+	[[nodiscard]] constexpr T MaxComponent(const Vector3<T>& vector) noexcept
+	{
+		return Max(Max(vector.x, vector.y), vector.z);
+	}
+
+	template<typename T>
 	[[nodiscard]] constexpr T DistanceSquared(const Point2<T>& a, const Point2<T>& b) noexcept
 	{
 		return Square(a.x - b.x) + Square(a.y - b.y);

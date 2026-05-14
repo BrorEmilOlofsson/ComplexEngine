@@ -1,18 +1,15 @@
 #include "Engine/Precompiled/EnginePch.hpp"
 #include "SaveDataFunctions.hpp"
 #include "Engine/Math/Transform3.hpp"
-#include "Engine/Graphics/Model/Skeleton.hpp"
 #include "Engine/Graphics/Animation/Animation.hpp"
-#include "Engine/Graphics/Shader/PixelShader.hpp"
-#include "Engine/Graphics/Shader/VertexShader.hpp"
 #include "Engine/Utility/Camera.hpp"
-#include "Engine/Graphics/Texture/Texture.hpp"
 #include "Engine/Graphics/Mesh/Mesh.hpp"
 #include "Engine/Graphics/Model/Model.hpp"
 #include "Engine/Graphics/Model/AnimatedModel.hpp"
 #include "Engine/Graphics/GraphicsConstants.hpp"
 #include "Engine/Reflection/DataTypeRegistry.hpp"
 #include "Engine/Scene/Scene.hpp"
+#include "Engine/Reflection/VariantReflection.hpp"
 
 namespace CLX
 {
@@ -213,6 +210,15 @@ namespace CLX
 		json["NearPlane"] = camera.GetNearPlane();
 		json["FarPlane"] = camera.GetFarPlane();
 
+		return json;
+	}
+
+	nlohmann::json ToJSON(const Shape& shape, const DataTypeRegistry& dataTypeRegistry)
+	{
+		auto variantInfo = GetVariantInfo(shape);
+		nlohmann::json json;
+        json["ShapeType"] = dataTypeRegistry.Find(variantInfo.first)->name;
+        json["ShapeData"] = dataTypeRegistry.SaveDataJSON(variantInfo.first, variantInfo.second);
 		return json;
 	}
 

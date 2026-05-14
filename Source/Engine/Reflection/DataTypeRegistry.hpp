@@ -273,6 +273,7 @@ namespace CLX
         }
 
         ASSERT(Find<OwnerType>() != nullptr);
+        ASSERT(Find<MemberType>() != nullptr);
 
         auto& ownerMembers = Find<OwnerType>()->memberVariables;
         auto it = std::ranges::find_if(ownerMembers, [&variableName](const DataTypeMemberVariable& obj) { return obj.name == variableName; });

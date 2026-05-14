@@ -21,6 +21,7 @@
 #include "Engine/Graphics/Light/PointLight.hpp"
 #include "Engine/Graphics/Light/DirectionalLight.hpp"
 #include "Engine/Utility/Camera.hpp"
+#include "Engine/Math/Shapes/Shape.hpp"
 
 #include <string>
 #include <array>
@@ -182,6 +183,7 @@ namespace CLX
 	ViewAndEditResult ViewAndEditValue(PointLight& pointLight, const DataTypeMemberVariable* memberData);
 	ViewAndEditResult ViewAndEditValue(DirectionalLight& directionalLight, const Blackboard& blackboard);
 	ViewAndEditResult ViewAndEditValue(Camera& camera, const Blackboard& blackboard);
+	ViewAndEditResult ViewAndEditValue(Shape& shape, const Blackboard& blackboard);
 
 	template<typename T>
 	ViewAndEditResult ViewAndEditValue(AABB3<T>& aabb, const std::string&)
@@ -191,7 +193,8 @@ namespace CLX
 		{
 			Point3<T> center = aabb.GetCenter();
 			ViewAndEditResult centerViewAndEditResult = ViewAndEditValue(center, "Center");
-			viewAndEditResult |= centerViewAndEditResult;
+            viewAndEditResult.isEdited |= centerViewAndEditResult.isEdited;
+            viewAndEditResult.isActive |= centerViewAndEditResult.isActive;
 			if (centerViewAndEditResult.isEdited)
 			{
 				aabb.SetCenter(center);
@@ -200,10 +203,41 @@ namespace CLX
 		{
 			Vector3<T> extent = aabb.GetExtent();
 			ViewAndEditResult extentViewAndEditResult = ViewAndEditValue(extent, "Extent");
-			viewAndEditResult |= extentViewAndEditResult;
+            viewAndEditResult.isEdited |= extentViewAndEditResult.isEdited;
+            viewAndEditResult.isActive |= extentViewAndEditResult.isActive;
 			if (extentViewAndEditResult.isEdited)
 			{
 				aabb.SetExtent(extent);
+			}
+		}
+
+		return viewAndEditResult;
+	}
+
+
+	template<typename T>
+	ViewAndEditResult ViewAndEditValue(Sphere<T>& sphere, const std::string&)
+	{
+		ViewAndEditResult viewAndEditResult;
+
+		{
+			Point3<T> center = sphere.GetCenter();
+			ViewAndEditResult centerViewAndEditResult = ViewAndEditValue(center, "Center");
+            viewAndEditResult.isEdited |= centerViewAndEditResult.isEdited;
+			viewAndEditResult.isActive |= centerViewAndEditResult.isActive;
+			if (centerViewAndEditResult.isEdited)
+			{
+				sphere.SetCenter(center);
+			}
+		}
+		{
+			T radius = sphere.GetRadius().Value();
+			ViewAndEditResult radiusViewAndEditResult = ViewAndEditValue(radius, "Radius", 0.01f, 0.01f, FLT_MAX);
+            viewAndEditResult.isEdited |= radiusViewAndEditResult.isEdited;
+			viewAndEditResult.isActive |= radiusViewAndEditResult.isActive;
+			if (radiusViewAndEditResult.isEdited)
+			{
+				sphere.SetRadius(Radius<T>(radius));
 			}
 		}
 

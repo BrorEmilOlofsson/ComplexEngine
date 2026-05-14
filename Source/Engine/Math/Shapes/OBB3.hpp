@@ -28,6 +28,9 @@ namespace CLX
         Transform3<T> mTransform;
     };
 
+    using OBB3f = OBB3<float>;
+    using OBB3d = OBB3<double>;
+
     template<typename T>
     constexpr OBB3<T> OBB3<T>::FromCenterAndExtents(const Point3<T>& center, const Vector3<T>& extents)
     {

@@ -15,6 +15,7 @@
 #include "Engine/Reflection/DataTypeRegistry.hpp"
 #include "Engine/ECS/ECS.hpp"
 #include "Engine/ECSEngine/Components/NameComponent.hpp"
+#include "Engine/Reflection/VariantReflection.hpp"
 
 #include "Engine/Utility/ImGui/ImGuiUtility.hpp"
 #include "Engine/Utility/File/FileUtility.hpp"
@@ -257,7 +258,7 @@ namespace CLX
     ViewAndEditResult ViewAndEditValue(Vector3f& value, const std::string& variableName)
     {
         ViewAndEditResult viewAndEditResult;
-        viewAndEditResult.isEdited = ImGui::DragFloat3(variableName.c_str(), &value.x);
+        viewAndEditResult.isEdited = ImGui::DragFloat3(variableName.c_str(), &value.x, 0.01f);
         viewAndEditResult.isActive = ImGui::IsItemActive();
         return viewAndEditResult;
     }
@@ -639,6 +640,51 @@ namespace CLX
     ViewAndEditResult ViewAndEditValue(Camera& camera, const Blackboard& blackboard)
     {
         return ViewAndEditCamera(camera, blackboard.Get<Key_WindowView>().GetClientSize());
+    }
+
+    template<typename T, typename... Args>
+    void ShowVariantSelectable(auto& variant, const DataTypeRegistry& dataTypeRegistry)
+    {
+        DataTypeID dataTypeID = GetDataTypeID<T>();
+        const bool isSelected = std::holds_alternative<T>(variant);
+        if (ImGui::Selectable(dataTypeRegistry.Find(dataTypeID)->name.c_str(), isSelected))
+        {
+            variant = T{};
+        }
+
+        if constexpr (sizeof...(Args) > 0)
+        {
+            ShowVariantSelectable<Args...>(variant, dataTypeRegistry);
+        }
+    }
+
+    template<typename... Args>
+    void ShowVariantCombo(std::variant<Args...>& variant, const DataTypeRegistry& dataTypeRegistry)
+    {
+        std::pair<DataTypeID, void*> variantResult = GetVariantInfo(variant);
+
+        const DataType* currentDataType = dataTypeRegistry.Find(variantResult.first);
+        ASSERT(currentDataType != nullptr);
+
+        if (ImGui::BeginCombo("Shape Type", currentDataType->name.c_str()))
+        {
+            ShowVariantSelectable<Args...>(variant, dataTypeRegistry);
+            ImGui::EndCombo();
+        }
+    }
+
+    ViewAndEditResult ViewAndEditValue(Shape& shape, const DataTypeRegistry& dataTypeRegistry, const Blackboard& blackboard)
+    {
+        ShowVariantCombo(shape, dataTypeRegistry);
+        const std::pair<DataTypeID, void*> variantResult = GetVariantInfo(shape);
+        dataTypeRegistry.ViewAndEditData(variantResult.first, variantResult.second, blackboard);
+
+        return {};
+    }
+
+    ViewAndEditResult ViewAndEditValue(Shape& shape, const Blackboard& blackboard)
+    {
+        return ViewAndEditValue(shape, blackboard.Get<Key_DataTypeRegistry>(), blackboard);
     }
 
     ViewAndEditResult ViewAndEditValue(AABB3f& aabb, const DataTypeMemberVariable* memberData)
