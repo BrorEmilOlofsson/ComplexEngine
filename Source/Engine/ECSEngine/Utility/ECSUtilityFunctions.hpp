@@ -9,6 +9,7 @@
 #include "Engine/ECSEngine/Components/TransformHierarchyComponent.hpp"
 #include "Engine/ECSEngine/Components/TransformComponent.hpp"
 #include "Engine/ECSEngine/Components/NameComponent.hpp"
+#include "Engine/ECSEngine/Components/EntityCompositionInstantiationComponent.hpp"
 
 namespace CLX
 {

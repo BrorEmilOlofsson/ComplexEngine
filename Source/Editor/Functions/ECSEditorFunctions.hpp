@@ -85,16 +85,16 @@ namespace CLX
 
 	[[nodiscard]] std::vector<EditorAction> ShowEntityInspector(const ShowEntityInspectorData& data);
 	// Returns root entity of instantiated entity composition
-	EntityID InstantiateEntityComposition(ECSHandle targetECSHandle, const EntityCompositionAssetHandle& compositionAsset, EntityID parentID, 
+	EntityID InstantiateEntityComposition(ECSHandle targetECSHandle, EntityCompositionAssetHandle compositionAsset, EntityCompositionAssetHandle parentComposition, EntityID parentID,
 		EntityCompositionInstantiationManager& entityInstantiations, const DataTypeRegistry& dataTypeRegistry,
 		std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker);
 
-	void InstantiateEntityCompositionAndSelectRoot(EntityCompositionAssetHandle target, EntityCompositionAssetHandle source, EntityID parentID,
+	void InstantiateEntityCompositionAndSelectRoot(EntityCompositionAssetHandle target, EntityCompositionAssetHandle toInstantiate, EntityID parentID,
 		EntityCompositionInstantiationManager& entityInstantiations, std::vector<EntityID>& rootEntities,
 		std::set<EntityID>& selectedEntityIDs, const DataTypeRegistry& dataTypeRegistry, EditorCommandTracker& commandTracker);
 
 
-	void InstantiateEntityCompositionAndSelectRoot(ECSHandle ecsHandle, EntityCompositionAssetHandle assetHandle, EntityID parentID, 
+	void InstantiateEntityCompositionAndSelectRoot(ECSHandle ecsHandle, EntityCompositionAssetHandle toInstantiate, EntityID parentID,
 		EntityCompositionInstantiationManager& entityInstantiations, std::vector<EntityID>& rootEntities,
 		std::set<EntityID>& selectedEntityIDs, const DataTypeRegistry& dataTypeRegistry, EditorCommandTracker& commandTracker);
 

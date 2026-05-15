@@ -1362,7 +1362,7 @@ namespace CLX
         }
     }
 
-    void HandleEntityCompositionModification(EntityCompositionAssetHandle entityCompopsitionAssetHandle, EntityCompositionInstantiationManager& entityInstantiations,
+    void HandleEntityCompositionModification(EntityCompositionAssetHandle entityCompopsitionAssetHandle, const EntityCompositionInstantiationManager& entityInstantiations,
         const EntityID modifiedEntityID, const void* sourcePtr, const DataTypeID modifiedDataTypeID, const DataTypeID componentTypeID, const PropertyPath& propertyPath,
         const std::optional<VectorEditOperation>& vectorOperation, const DataTypeRegistry& dataTypeRegistry)
     {
@@ -1371,8 +1371,8 @@ namespace CLX
             return;
         }
 
-        auto& instantiations = entityInstantiations.Get(entityCompopsitionAssetHandle);
-        for (const auto& [rootEntityID, ecsHandle] : instantiations)
+        auto instantiations = entityInstantiations.GetInstantiations(entityCompopsitionAssetHandle);
+        for (const auto& [rootEntityID, ecsHandle, instantiatedInAssetHandle] : instantiations)
         {
             // Find the instantiation that corresponds to the modified entity
             ECS* instantiationECS = ecsHandle.Get();
@@ -1842,20 +1842,6 @@ namespace CLX
         return editorActions;
     }
 
-    EntityIDConverter MergeECS(ECS& targetECS, const ECS& sourceECS)
-    {
-        auto entityCollectionView = sourceECS.ViewEntities();
-        std::unordered_map<EntityID, EntityID> entityConverter1(entityCollectionView.GetCount());
-        std::unordered_map<EntityID, EntityID> entityConverter2(entityCollectionView.GetCount());
-        for (auto entity : entityCollectionView)
-        {
-            const EntityID createdEntityID = sourceECS.CopyEntity(entity.GetEntityID(), targetECS);
-            entityConverter1[entity.GetEntityID()] = createdEntityID;
-            entityConverter2[createdEntityID] = entity.GetEntityID();
-        }
-        return EntityIDConverter(std::move(entityConverter1), std::move(entityConverter2));
-    }
-
     void UpdateRootEntities(const ECS& ecs, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker)
     {
         SetDataPtrCommand<std::vector<EntityID>> command;
@@ -1866,55 +1852,18 @@ namespace CLX
         commandTracker.ExecuteCommand(EditorCommand(command, "Set Root Entities"));
     }
 
-    EntityID InstantiateEntityComp(const ECSHandle targetECSHandle, const EntityCompositionAssetHandle& compositionAsset, const EntityID parentID,
+    EntityID InstantiateEntityComposition(const EntityCompositionAssetHandle compositionAsset, const ECSHandle targetECSHandle,
+        const EntityCompositionAssetHandle parentComposition, const EntityID parentID,
         EntityCompositionInstantiationManager& entityInstantiations, const DataTypeRegistry& dataTypeRegistry)
     {
-        ECS& targetECS = *targetECSHandle.Get();
-        const EntityComposition& entityComposition = compositionAsset.Get();
-        const EntityIDConverter entityConverter = MergeECS(targetECS, entityComposition.GetECS());
-        UpdateEntityIDs(entityComposition.GetECS(), targetECS, entityConverter, dataTypeRegistry);
-        const EntityID instantiatedRootEntity = entityConverter.ConvertToTarget(entityComposition.GetRootEntity());
-        targetECS.AddComponent<EntityCompositionInstantiationComponent>(instantiatedRootEntity).asset = compositionAsset;
-        targetECS.AddComponent<EntityCompositionInstantiationComponent>(instantiatedRootEntity).mappedEntityID = entityComposition.GetRootEntity();
+        EntityID instantiatedRootEntity = InstantiateEntityComposition(
+            compositionAsset,
+            *targetECSHandle.Get(),
+            parentID,
+            dataTypeRegistry
+        );
 
-        for (const EntityID entityID : GetEntityDescendants(targetECS, instantiatedRootEntity))
-        {
-            auto& compositionComponent = targetECS.AddComponent<EntityCompositionInstantiationComponent>(entityID);
-            compositionComponent.asset = compositionAsset;
-            compositionComponent.mappedEntityID = entityConverter.ConvertToSource(entityID);
-        }
-
-        if (parentID != InvalidEntityID)
-        {
-            SetParentEntity(targetECS, instantiatedRootEntity, parentID);
-        }
-
-        auto checkEntityRelationships = [&targetECS](const EntityID entityID)
-            {
-                const auto children = GetEntityChildren(targetECS, entityID);
-        const EntityID parentIDCheck = GetParentEntity(targetECS, entityID);
-        if (parentIDCheck == entityID)
-        {
-            ASSERT(false);
-        }
-        if (Contains(children, parentIDCheck))
-        {
-            ASSERT(false);
-        }
-        if (Contains(children, entityID))
-        {
-            ASSERT(false);
-        }
-            };
-        {
-            checkEntityRelationships(instantiatedRootEntity);
-        }
-        for (EntityID entityIDCheck : GetEntityDescendants(targetECS, instantiatedRootEntity))
-        {
-            checkEntityRelationships(entityIDCheck);
-        }
-
-        entityInstantiations.Get(compositionAsset).push_back(EntityCompositionInstantiation{ instantiatedRootEntity, targetECSHandle });
+        entityInstantiations.Add(compositionAsset, EntityCompositionInstantiation{ instantiatedRootEntity, targetECSHandle, parentComposition });
         return instantiatedRootEntity;
     }
 
@@ -1929,8 +1878,8 @@ namespace CLX
     }
 
 
-    EntityID InstantiateEntityComposition(const ECSHandle targetECSHandle, const EntityCompositionAssetHandle& compositionAsset, const EntityID parentID, EntityCompositionInstantiationManager& entityInstantiations,
-        const DataTypeRegistry& dataTypeRegistry, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker)
+    EntityID InstantiateEntityComposition(const ECSHandle targetECSHandle, const EntityCompositionAssetHandle compositionAsset, const EntityCompositionAssetHandle parentComposition,
+        const EntityID parentID, EntityCompositionInstantiationManager& entityInstantiations, const DataTypeRegistry& dataTypeRegistry, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker)
     {
         ASSERT(compositionAsset.IsValid());
         ASSERT(targetECSHandle.Get() != nullptr);
@@ -1938,12 +1887,19 @@ namespace CLX
 
         commandTracker.BeginComposite("Instantiate Entity Composition (" + compositionAsset.GetRelativePath().string() + ")");
 
-        const EntityID instantiatedRootEntity = InstantiateEntityComp(targetECSHandle, compositionAsset, parentID, entityInstantiations, dataTypeRegistry);
+        const EntityID instantiatedRootEntity = InstantiateEntityComposition(
+            compositionAsset,
+            targetECSHandle, 
+            parentComposition, 
+            parentID, 
+            entityInstantiations, 
+            dataTypeRegistry);
 
         struct InstantiateEntityCompositionData final
         {
             ECSHandle targetECSHandle;
             EntityCompositionAssetHandle compositionAsset;
+            EntityCompositionAssetHandle parentComposition;
             EntityID parentID;
             std::reference_wrapper<EntityCompositionInstantiationManager> entityInstantiations;
             std::reference_wrapper<const DataTypeRegistry> dataTypeRegistry;
@@ -1960,7 +1916,7 @@ namespace CLX
 
         auto doCommand = [](const InstantiateEntityCompositionData& data)
             {
-                InstantiateEntityComp(data.targetECSHandle, data.compositionAsset, data.parentID, data.entityInstantiations.get(), data.dataTypeRegistry.get());
+                InstantiateEntityComposition(data.compositionAsset, data.targetECSHandle, data.parentComposition, data.parentID, data.entityInstantiations.get(), data.dataTypeRegistry.get());
             };
 
         auto undoCommand = [](const InstantiateEntityCompositionData& data)
@@ -1993,31 +1949,20 @@ namespace CLX
         return found;
     }
 
-    void InstantiateEntityCompositionAndSelectRoot(const EntityCompositionAssetHandle target, EntityCompositionAssetHandle source, const EntityID parentID,
-        EntityCompositionInstantiationManager& compositionInstantiations, std::vector<EntityID>& rootEntities, std::set<EntityID>& selectedEntityIDs,
+    static void InstantiateEntityCompositionAndSelectRoot(const ECSHandle targetECSHandle, EntityCompositionAssetHandle toInstantiate, EntityCompositionAssetHandle parentComposition,
+        const EntityID parentID, EntityCompositionInstantiationManager& compositionInstantiations, std::vector<EntityID>& rootEntities, std::set<EntityID>& selectedEntityIDs,
         const DataTypeRegistry& dataTypeRegistry, EditorCommandTracker& commandTracker)
     {
-        if (IsRecursiveInstantiation(source.Get().GetECSHandle(), target))
-        {
-            return;
-        }
-        ECSHandle targetECSHandle = target.Get().GetECSHandle();
-        InstantiateEntityCompositionAndSelectRoot(targetECSHandle, source, parentID, compositionInstantiations, rootEntities, selectedEntityIDs, dataTypeRegistry, commandTracker);
-    }
-
-    void InstantiateEntityCompositionAndSelectRoot(const ECSHandle ecsHandle, EntityCompositionAssetHandle assetHandle, const EntityID parentID,
-        EntityCompositionInstantiationManager& compositionInstantiations, std::vector<EntityID>& rootEntities, std::set<EntityID>& selectedEntityIDs,
-        const DataTypeRegistry& dataTypeRegistry, EditorCommandTracker& commandTracker)
-    {
-        if (ecsHandle == assetHandle.Get().GetECSHandle())
+        if (targetECSHandle == toInstantiate.Get().GetECSHandle())
         {
             return;
         }
         commandTracker.BeginComposite("Instantiate Entity Composition + Select Root");
 
         const EntityID rootEntity = InstantiateEntityComposition(
-            ecsHandle,
-            assetHandle,
+            targetECSHandle,
+            toInstantiate,
+            parentComposition,
             parentID,
             compositionInstantiations,
             dataTypeRegistry,
@@ -2028,6 +1973,45 @@ namespace CLX
         SetEntitySelection({ rootEntity }, selectedEntityIDs, commandTracker);
 
         commandTracker.EndComposite();
+    }
+
+
+    void InstantiateEntityCompositionAndSelectRoot(const EntityCompositionAssetHandle target, EntityCompositionAssetHandle toInstantiate, const EntityID parentID,
+        EntityCompositionInstantiationManager& compositionInstantiations, std::vector<EntityID>& rootEntities, std::set<EntityID>& selectedEntityIDs,
+        const DataTypeRegistry& dataTypeRegistry, EditorCommandTracker& commandTracker)
+    {
+        if (IsRecursiveInstantiation(toInstantiate.Get().GetECSHandle(), target))
+        {
+            return;
+        }
+        const ECSHandle targetECSHandle = target.Get().GetECSHandle();
+        InstantiateEntityCompositionAndSelectRoot(
+            targetECSHandle, 
+            toInstantiate,
+            target, 
+            parentID, 
+            compositionInstantiations, 
+            rootEntities, 
+            selectedEntityIDs, 
+            dataTypeRegistry, 
+            commandTracker);
+    }
+
+    void InstantiateEntityCompositionAndSelectRoot(const ECSHandle targetECSHandle, EntityCompositionAssetHandle toInstantiate, const EntityID parentID,
+        EntityCompositionInstantiationManager& compositionInstantiations, std::vector<EntityID>& rootEntities, std::set<EntityID>& selectedEntityIDs,
+        const DataTypeRegistry& dataTypeRegistry, EditorCommandTracker& commandTracker)
+    {
+        InstantiateEntityCompositionAndSelectRoot(
+            targetECSHandle,
+            toInstantiate,
+            EntityCompositionAssetHandle::Empty(),
+            parentID,
+            compositionInstantiations,
+            rootEntities,
+            selectedEntityIDs,
+            dataTypeRegistry,
+            commandTracker
+        );
     }
 
     void TeleportCameraToEntity(const ECS& ecs, const EntityID entityID, Camera& camera, const bool changeRotation, const float offsetDistance)

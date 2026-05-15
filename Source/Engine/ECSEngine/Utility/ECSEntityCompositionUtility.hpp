@@ -4,6 +4,9 @@
 #include "Engine/Reflection/DataTypeRegistry.hpp"
 #include "Engine/ECS/EntityID.hpp"
 #include "Engine/ECS/ECSHandle.hpp"
+#include "Engine/ECSEngine/Utility/ECSUtilityFunctions.hpp"
+#include "Engine/ECSEngine/Components/EntityCompositionInstantiationComponent.hpp"
+#include "Editor/EntityCompositionInstantiationManager.hpp"
 
 namespace CLX
 {
@@ -63,5 +66,45 @@ namespace CLX
 	void UpdateEntityIDs(const ECS& previousECS, ECS& ecs, const EntityIDConverter& entityIDConverter, const DataTypeRegistry& dataTypeRegistry);
 
     // Returns root entity of instantiated entity composition
-    EntityID InstantiateEntityComposition(ECSHandle targetECSHandle, const EntityCompositionAssetHandle& compositionAsset);
+    //EntityID InstantiateEntityComposition(ECSHandle targetECSHandle, const EntityCompositionAssetHandle& compositionAsset);
+
+    inline EntityIDConverter MergeECS(ECS& targetECS, const ECS& sourceECS)
+    {
+        auto entityCollectionView = sourceECS.ViewEntities();
+        std::unordered_map<EntityID, EntityID> entityConverter1(entityCollectionView.GetCount());
+        std::unordered_map<EntityID, EntityID> entityConverter2(entityCollectionView.GetCount());
+        for (auto entity : entityCollectionView)
+        {
+            const EntityID createdEntityID = sourceECS.CopyEntity(entity.GetEntityID(), targetECS);
+            entityConverter1[entity.GetEntityID()] = createdEntityID;
+            entityConverter2[createdEntityID] = entity.GetEntityID();
+        }
+        return EntityIDConverter(std::move(entityConverter1), std::move(entityConverter2));
+    }
+
+
+    inline EntityID InstantiateEntityComposition(const EntityCompositionAssetHandle compositionAsset, ECS& targetECS, 
+        const EntityID parentID, const DataTypeRegistry& dataTypeRegistry)
+    {
+        const EntityComposition& entityComposition = compositionAsset.Get();
+        const EntityIDConverter entityConverter = MergeECS(targetECS, entityComposition.GetECS());
+        UpdateEntityIDs(entityComposition.GetECS(), targetECS, entityConverter, dataTypeRegistry);
+        const EntityID instantiatedRootEntity = entityConverter.ConvertToTarget(entityComposition.GetRootEntity());
+        targetECS.AddComponent<EntityCompositionInstantiationComponent>(instantiatedRootEntity).asset = compositionAsset;
+        targetECS.AddComponent<EntityCompositionInstantiationComponent>(instantiatedRootEntity).mappedEntityID = entityComposition.GetRootEntity();
+
+        for (const EntityID entityID : GetEntityDescendants(targetECS, instantiatedRootEntity))
+        {
+            auto& compositionComponent = targetECS.AddComponent<EntityCompositionInstantiationComponent>(entityID);
+            compositionComponent.asset = compositionAsset;
+            compositionComponent.mappedEntityID = entityConverter.ConvertToSource(entityID);
+        }
+
+        if (parentID != InvalidEntityID)
+        {
+            SetParentEntity(targetECS, instantiatedRootEntity, parentID);
+        }
+
+        return instantiatedRootEntity;
+    }
 }
