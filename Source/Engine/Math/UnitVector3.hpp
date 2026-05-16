@@ -28,12 +28,12 @@ namespace CLX
 		constexpr void SetY(const T& y);
 		constexpr void SetZ(const T& z);
 
-		[[nodiscard]] static constexpr UnitVector3<T> Right() noexcept;
-		[[nodiscard]] static constexpr UnitVector3<T> Up() noexcept;
-		[[nodiscard]] static constexpr UnitVector3<T> Forward() noexcept;
-		[[nodiscard]] static constexpr UnitVector3<T> Left() noexcept;
-		[[nodiscard]] static constexpr UnitVector3<T> Down() noexcept;
-		[[nodiscard]] static constexpr UnitVector3<T> Backward() noexcept;
+		[[nodiscard]] static consteval UnitVector3<T> Right() noexcept;
+		[[nodiscard]] static consteval UnitVector3<T> Up() noexcept;
+		[[nodiscard]] static consteval UnitVector3<T> Forward() noexcept;
+		[[nodiscard]] static consteval UnitVector3<T> Left() noexcept;
+		[[nodiscard]] static consteval UnitVector3<T> Down() noexcept;
+		[[nodiscard]] static consteval UnitVector3<T> Backward() noexcept;
 
 		[[nodiscard]] friend constexpr UnitVector3<T> operator-(const UnitVector3<T>& vector) noexcept
 		{
@@ -145,37 +145,37 @@ namespace CLX
 	}
 
 	template<typename T>
-	constexpr UnitVector3<T> UnitVector3<T>::Right() noexcept
+	consteval UnitVector3<T> UnitVector3<T>::Right() noexcept
 	{
 		return UnitVector3<T>(UnsafeTag{}, 1, 0, 0);
 	}
 
 	template<typename T>
-	constexpr UnitVector3<T> UnitVector3<T>::Up() noexcept
+	consteval UnitVector3<T> UnitVector3<T>::Up() noexcept
 	{
 		return UnitVector3<T>(UnsafeTag{}, 0, 1, 0);
 	}
 
 	template<typename T>
-	constexpr UnitVector3<T> UnitVector3<T>::Forward() noexcept
+	consteval UnitVector3<T> UnitVector3<T>::Forward() noexcept
 	{
 		return UnitVector3<T>(UnsafeTag{}, 0, 0, 1);
 	}
 
 	template<typename T>
-	constexpr UnitVector3<T> UnitVector3<T>::Left() noexcept
+	consteval UnitVector3<T> UnitVector3<T>::Left() noexcept
 	{
 		return -Right();
 	}
 
 	template<typename T>
-	constexpr UnitVector3<T> UnitVector3<T>::Down() noexcept
+	consteval UnitVector3<T> UnitVector3<T>::Down() noexcept
 	{
 		return -Up();
 	}
 
 	template<typename T>
-	constexpr UnitVector3<T> UnitVector3<T>::Backward() noexcept
+	consteval UnitVector3<T> UnitVector3<T>::Backward() noexcept
 	{
 		return -Forward();
 	}

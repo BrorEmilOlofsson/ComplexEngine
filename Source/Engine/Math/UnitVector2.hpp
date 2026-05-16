@@ -28,10 +28,10 @@ namespace CLX
 		constexpr void SetX(const T& x);
 		constexpr void SetY(const T& y);
 
-		[[nodiscard]] static constexpr UnitVector2<T> Right();
-		[[nodiscard]] static constexpr UnitVector2<T> Up();
-		[[nodiscard]] static constexpr UnitVector2<T> Left();
-		[[nodiscard]] static constexpr UnitVector2<T> Down();
+		[[nodiscard]] static consteval UnitVector2<T> Right();
+		[[nodiscard]] static consteval UnitVector2<T> Up();
+		[[nodiscard]] static consteval UnitVector2<T> Left();
+		[[nodiscard]] static consteval UnitVector2<T> Down();
 
 		[[nodiscard]] friend constexpr UnitVector2<T> operator-(const UnitVector2<T>& vector) noexcept
 		{
@@ -117,25 +117,25 @@ namespace CLX
 	}
 
 	template<typename T>
-	constexpr UnitVector2<T> UnitVector2<T>::Right()
+	consteval UnitVector2<T> UnitVector2<T>::Right()
 	{
-		return UnitVector2<T>(1, 0);
+		return UnitVector2<T>(UnsafeTag{}, 1, 0);
 	}
 
 	template<typename T>
-	constexpr UnitVector2<T> UnitVector2<T>::Up()
+	consteval UnitVector2<T> UnitVector2<T>::Up()
 	{
-		return UnitVector2<T>(0, 1);
+		return UnitVector2<T>(UnsafeTag{}, 0, 1);
 	}
 
 	template<typename T>
-	constexpr UnitVector2<T> UnitVector2<T>::Left()
+	consteval UnitVector2<T> UnitVector2<T>::Left()
 	{
 		return -Right();
 	}
 
 	template<typename T>
-	constexpr UnitVector2<T> UnitVector2<T>::Down()
+	consteval UnitVector2<T> UnitVector2<T>::Down()
 	{
 		return -Up();
 	}
