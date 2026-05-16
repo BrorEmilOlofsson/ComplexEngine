@@ -1372,17 +1372,20 @@ namespace CLX
         }
 
         auto instantiations = entityInstantiations.GetInstantiations(entityCompopsitionAssetHandle);
-        for (const auto& [rootEntityID, ecsHandle, instantiatedInAssetHandle] : instantiations)
+        if (instantiations.has_value())
         {
-            // Find the instantiation that corresponds to the modified entity
-            ECS* instantiationECS = ecsHandle.Get();
-            if (instantiationECS == nullptr)
+            for (const auto& [rootEntityID, ecsHandle, instantiatedInAssetHandle] : instantiations.value())
             {
-                // TODO: Handle this case (probably by removing the instantiation from the list)
-                continue;
-            }
+                // Find the instantiation that corresponds to the modified entity
+                ECS* instantiationECS = ecsHandle.Get();
+                if (instantiationECS == nullptr)
+                {
+                    // TODO: Handle this case (probably by removing the instantiation from the list)
+                    continue;
+                }
 
-            HandleEntityCompositionModification(rootEntityID, *instantiationECS, modifiedEntityID, modifiedDataTypeID, sourcePtr, componentTypeID, propertyPath, vectorOperation, dataTypeRegistry);
+                HandleEntityCompositionModification(rootEntityID, *instantiationECS, modifiedEntityID, modifiedDataTypeID, sourcePtr, componentTypeID, propertyPath, vectorOperation, dataTypeRegistry);
+            }
         }
     }
 
@@ -1889,10 +1892,10 @@ namespace CLX
 
         const EntityID instantiatedRootEntity = InstantiateEntityComposition(
             compositionAsset,
-            targetECSHandle, 
-            parentComposition, 
-            parentID, 
-            entityInstantiations, 
+            targetECSHandle,
+            parentComposition,
+            parentID,
+            entityInstantiations,
             dataTypeRegistry);
 
         struct InstantiateEntityCompositionData final
@@ -1986,14 +1989,14 @@ namespace CLX
         }
         const ECSHandle targetECSHandle = target.Get().GetECSHandle();
         InstantiateEntityCompositionAndSelectRoot(
-            targetECSHandle, 
+            targetECSHandle,
             toInstantiate,
-            target, 
-            parentID, 
-            compositionInstantiations, 
-            rootEntities, 
-            selectedEntityIDs, 
-            dataTypeRegistry, 
+            target,
+            parentID,
+            compositionInstantiations,
+            rootEntities,
+            selectedEntityIDs,
+            dataTypeRegistry,
             commandTracker);
     }
 

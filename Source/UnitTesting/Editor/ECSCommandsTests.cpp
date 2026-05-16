@@ -174,6 +174,7 @@ TEST_CASE("Instantiate Entity Composition")
         const EntityID instantiatedRootEntityID = InstantiateEntityComposition(
             ToHandle(targetECS),
             EntityCompositionAssetHandle(compositionAsset),
+            EntityCompositionAssetHandle::Empty(),
             InvalidEntityID,
             instantiationManager,
             dataTypeRegistry,
@@ -213,6 +214,7 @@ TEST_CASE("Instantiate Entity Composition")
         const EntityID instantiatedRootEntityID = InstantiateEntityComposition(
             ToHandle(targetECS),
             EntityCompositionAssetHandle(compositionAsset),
+            EntityCompositionAssetHandle::Empty(),
             parentID,
             instantiationManager,
             dataTypeRegistry,
@@ -261,6 +263,7 @@ TEST_CASE("Instantiate Entity Composition")
         const EntityID instantiatedRootEntityID = InstantiateEntityComposition(
             compositionAsset2->GetECSHandle(),
             EntityCompositionAssetHandle(compositionAsset1),
+            EntityCompositionAssetHandle(compositionAsset2),
             compositionAsset2->GetRootEntity(),
             instantiationManager,
             dataTypeRegistry,

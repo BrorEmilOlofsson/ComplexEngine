@@ -24,9 +24,14 @@ namespace CLX
             return map[entityCompositionAssetHandle];
 		}*/
 
-		std::span<const EntityCompositionInstantiation> GetInstantiations(EntityCompositionAssetHandle entityCompositionAssetHandle) const
+		std::optional<std::span<const EntityCompositionInstantiation>> GetInstantiations(EntityCompositionAssetHandle entityCompositionAssetHandle) const
 		{
-			return map.at(entityCompositionAssetHandle);
+			auto it = map.find(entityCompositionAssetHandle);
+			if (it != map.end())
+			{
+				return std::span<const EntityCompositionInstantiation>(it->second);
+			}
+			return std::nullopt;
 		}
 
 		void Add(EntityCompositionAssetHandle entityCompositionAssetHandle, EntityCompositionInstantiation instantiation)

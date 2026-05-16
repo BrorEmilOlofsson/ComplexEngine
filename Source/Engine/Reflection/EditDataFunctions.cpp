@@ -1090,7 +1090,7 @@ namespace CLX
 
         if (animationAsset)
         {
-            filePath = animationAsset->path;
+            filePath = animationAsset.GetRelativePath();
         }
 
         ImGui::AlignTextToFramePadding();

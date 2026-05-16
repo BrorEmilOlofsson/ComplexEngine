@@ -314,7 +314,7 @@ TEST_CASE("Matrix4x4 Get Unscaled Vectors")
 	REQUIRE(forward == UnitVector3f(1.f, 0.f, 0.f));
 }
 
-TEST_CASE("Matrix4x4 GetTransposed", "[Matrix4x4]")
+TEST_CASE("Matrix4x4 ToTransposed", "[Matrix4x4]")
 {
 	const Matrix4x4f matrix
 	(
@@ -325,7 +325,7 @@ TEST_CASE("Matrix4x4 GetTransposed", "[Matrix4x4]")
 			13.f, 14.f, 15.f, 16.f
 		}
 	);
-	const Matrix4x4f transposedMatrix = Matrix4x4f::GetTransposed(matrix);
+	const Matrix4x4f transposedMatrix = Matrix4x4f::ToTransposed(matrix);
 
 	REQUIRE(matrix[0] == transposedMatrix[0]);
 	REQUIRE(matrix[1] == transposedMatrix[4]);

@@ -31,11 +31,6 @@ namespace CLX
 
 	Matrix4x4f SampleBoneTransform(const float time, const BoneKeyFrames& keyframes, const Bone& bone)
 	{
-		if (true)
-		{
-			return bone.localBindPose;
-		}
-
 		if (keyframes.positions.empty() &&
 			keyframes.rotations.empty() &&
 			keyframes.scales.empty())

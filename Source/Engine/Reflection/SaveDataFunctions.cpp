@@ -320,7 +320,7 @@ namespace CLX
 
 		if (animationAsset)
 		{
-			animationRelativePath = animationAsset->path;
+			animationRelativePath = animationAsset.GetRelativePath();
 		}
 
 		json = animationRelativePath;

@@ -105,7 +105,7 @@ namespace CLX
 
 	constexpr Matrix4x4f Camera::GetViewMatrix() const noexcept
 	{
-		return Matrix4x4f::GetInverse(mTransform.GetMatrix());
+		return Matrix4x4f::ToInverse(mTransform.GetMatrix());
 	}
 
 	constexpr Transform& Camera::GetTransform() noexcept

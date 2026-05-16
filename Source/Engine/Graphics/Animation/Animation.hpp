@@ -1,9 +1,7 @@
 #pragma once
 #include "Engine/Math/Matrix4x4.hpp"
-#include <unordered_map>
 #include <vector>
 #include <string>
-#include <filesystem>
 
 namespace CLX
 {
@@ -24,7 +22,6 @@ namespace CLX
 
 		std::vector<BoneKeyFrames> boneKeyFrames;
 		std::string name;
-		std::filesystem::path path;
 
 		float duration = 0.0f;
 		float framesPerSecond = 0.0f;

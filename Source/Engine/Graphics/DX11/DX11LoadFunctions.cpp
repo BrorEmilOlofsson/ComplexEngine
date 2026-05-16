@@ -10,6 +10,7 @@
 #include "Engine/Graphics/DX11/Model/DX11Model.hpp"
 #include "Engine/Graphics/Animation/Animation.hpp"
 #include <External/assimp/Importer.hpp>
+#include <External/assimp/config.h>
 #include <External/assimp/scene.h>
 #include <External/assimp/postprocess.h>
 
@@ -43,7 +44,7 @@ namespace CLX
 
 	[[nodiscard]] constexpr Matrix4x4f ToMatrix(const aiMatrix4x4& mat)
 	{
-		return Matrix4x4f::GetTransposed(Matrix4x4f({
+		return Matrix4x4f::ToTransposed(Matrix4x4f({
 			mat.a1, mat.a2, mat.a3, mat.a4,
 			mat.b1, mat.b2, mat.b3, mat.b4,
 			mat.c1, mat.c2, mat.c3, mat.c4,
@@ -184,7 +185,7 @@ namespace CLX
 		{
 			Bone& b = bones[i];
 
-			Matrix4x4f globalBind = Matrix4x4f::GetFastInverse(b.inverseBindPose);
+			Matrix4x4f globalBind = Matrix4x4f::ToInverse(b.inverseBindPose);
 			
 			if (b.parentIndex == UINT32_MAX)
 			{
@@ -193,10 +194,10 @@ namespace CLX
 			else
 			{
 				const Bone& parent = bones[b.parentIndex];
-				Matrix4x4f parentGlobal = Matrix4x4f::GetFastInverse(parent.inverseBindPose);
+				Matrix4x4f parentGlobal = Matrix4x4f::ToInverse(parent.inverseBindPose);
 
 				b.localBindPose =
-					Matrix4x4f::GetFastInverse(parentGlobal) * globalBind;
+					globalBind * Matrix4x4f::ToInverse(parentGlobal);
 			}
 		}
 	}
@@ -242,8 +243,13 @@ namespace CLX
 	{
 		Animation animation;
 		animation.name = aiAnim.mName.C_Str();
-		animation.duration = static_cast<float>(aiAnim.mDuration);
-		animation.framesPerSecond = static_cast<float>(aiAnim.mTicksPerSecond != 0.0 ? aiAnim.mTicksPerSecond : 25.0);
+
+		const float ticksPerSecond = static_cast<float>(
+			aiAnim.mTicksPerSecond != 0.0 ? aiAnim.mTicksPerSecond : 25.0
+		);
+
+		animation.framesPerSecond = ticksPerSecond;
+		animation.duration = static_cast<float>(aiAnim.mDuration / ticksPerSecond);
 
 		
 		animation.boneKeyFrames.resize(skeletonBoneCount);
@@ -270,7 +276,7 @@ namespace CLX
 
 			for (uint32_t i = 0; i < aiChannel.mNumPositionKeys; i++)
 			{
-				float t = static_cast<float>(aiChannel.mPositionKeys[i].mTime / aiAnim.mTicksPerSecond);
+				float t = static_cast<float>(aiChannel.mPositionKeys[i].mTime / ticksPerSecond);
 				
 				keyframes.positionTimestamps.push_back(t);
 				keyframes.positions.push_back(ToPoint3(aiChannel.mPositionKeys[i].mValue));
@@ -278,7 +284,7 @@ namespace CLX
 
 			for (uint32_t i = 0; i < aiChannel.mNumRotationKeys; i++)
 			{
-				const float t = static_cast<float>(aiChannel.mRotationKeys[i].mTime / aiAnim.mTicksPerSecond);
+				const float t = static_cast<float>(aiChannel.mRotationKeys[i].mTime / ticksPerSecond);
 
 				keyframes.rotationTimestamps.push_back(t);
 				keyframes.rotations.push_back(ToQuaternion(aiChannel.mRotationKeys[i].mValue));
@@ -286,7 +292,7 @@ namespace CLX
 
 			for (size_t i = 0; i < aiChannel.mNumScalingKeys; i++)
 			{
-				const float t = static_cast<float>(aiChannel.mScalingKeys[i].mTime / aiAnim.mTicksPerSecond);
+				const float t = static_cast<float>(aiChannel.mScalingKeys[i].mTime / ticksPerSecond);
 
 				keyframes.scaleTimestamps.push_back(t);
 				keyframes.scales.push_back(ToVector3(aiChannel.mScalingKeys[i].mValue));
@@ -363,10 +369,13 @@ namespace CLX
 	{
 		PROFILER_FUNCTION();
 		Assimp::Importer importer;
+		importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
+		importer.SetPropertyFloat(AI_CONFIG_GLOBAL_SCALE_FACTOR_KEY, 1.0f);
 
 		const aiScene* scene = importer.ReadFile(
 			path.string().c_str(),  // path to your .fbx
 			aiProcess_Triangulate            // Convert everything to triangles
+			| aiProcess_GlobalScale
 			//| aiProcess_JoinIdenticalVertices // Merge duplicate vertices
 			//| aiProcess_CalcTangentSpace      // Generate tangents/bitangents
 			//| aiProcess_GenSmoothNormals      // Generate normals if missing
@@ -399,7 +408,7 @@ namespace CLX
 			assert(false);
 		}
 		std::ranges::copy(boneVector, bones.begin());
-		bool hasBones = !bones.empty();
+		bool hasBones = !boneVector.empty();
 
 		if (scene->HasAnimations())
 		{

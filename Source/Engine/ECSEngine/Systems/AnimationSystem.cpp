@@ -137,10 +137,10 @@ namespace CLX
 
 	void AnimationTest(const float deltaTime)
 	{
-		isGoodFrame = !isGoodFrame;
+		//isGoodFrame = !isGoodFrame;
 		if (isGoodFrame)
 		{
-			return;
+			//return;
 		}
 
 
@@ -157,7 +157,7 @@ namespace CLX
 
 	void AnimationSystem::Update(ECS& ecs, const float deltaTime, const Blackboard& blackboard)
 	{
-		//AnimationTest(deltaTime);
+		AnimationTest(deltaTime);
 		AssetManager& assetManager = blackboard.Get<Key_AssetManager>();
 		ecs.ForEach([deltaTime, &assetManager](AnimatedModelComponent& animationComponent)
 			{
@@ -168,7 +168,7 @@ namespace CLX
 
 				if (!animationComponent.animationPlayer.mAnimationAsset.IsValid())
 				{
-					animationComponent.animationPlayer.mAnimationAsset = assetManager.GetAnimation(std::filesystem::path(SIMPLE_DIR_ASSETS) / "StellaQuest" / "Player" / "Stella_Idle.fbx");
+					animationComponent.animationPlayer.mAnimationAsset = animationComponent.defaultAnimation;
 				}
 
 				animationComponent.animationPlayer.Update(deltaTime, animationComponent.modelHandle->GetSkeleton().GetBones());
@@ -187,11 +187,11 @@ namespace CLX
 		{
 			return;
 		}
-		/*ImGui::Begin("Animation System Debug");
+		ImGui::Begin("Animation System Debug");
 
 		ImGui::SliderFloat("Animation Time", &animTest.mAnimationPlayer.mCurrentTime, 0.0f, animTest.mAnimationAsset->duration);
 		ImGui::Checkbox("Pause Animation", &pause);
-		ImGui::End();*/
+		ImGui::End();
 		RenderList& renderList = blackboard.Get<Key_CurrentRenderState>().GetRenderList();
 
 		auto globalBoneMatrices = ComputeGlobalTransforms(

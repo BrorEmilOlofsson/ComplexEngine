@@ -14,14 +14,14 @@ namespace CLX
 
 		const Vector4f clipCoords(clipCoords2.x, clipCoords2.y, 1.0f, 1.0f);
 
-		const Matrix4x4f invertedProjection = Matrix4x4f::GetInverse(projectionMatrix);
+		const Matrix4x4f invertedProjection = Matrix4x4f::ToInverse(projectionMatrix);
 
 		// TODO check multiplication order
 		Vector4f eyeCoords = clipCoords * invertedProjection;
 		eyeCoords.z = 1.0f;
 		eyeCoords.w = 0.0f;
 
-		const Matrix4x4f invertedViewMatrix = Matrix4x4f::GetInverse(viewMatrix);
+		const Matrix4x4f invertedViewMatrix = Matrix4x4f::ToInverse(viewMatrix);
 		const Vector4f rayWorld = eyeCoords * invertedViewMatrix;
 
 		const UnitVector3f mouseDir(rayWorld.x, rayWorld.y, rayWorld.z);

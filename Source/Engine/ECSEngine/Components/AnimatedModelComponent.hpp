@@ -9,6 +9,7 @@ namespace CLX
 	struct AnimatedModelComponent
 	{
 		AnimatedModelAssetHandle modelHandle;
+        AnimationAssetHandle defaultAnimation;
 		std::array<TextureAssetHandle, 3> textures;
 		AnimationPlayer animationPlayer;
 	};
