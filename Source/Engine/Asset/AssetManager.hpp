@@ -1,13 +1,12 @@
 #pragma once
-#include <vector>
 #include <filesystem>
 #include <functional>
-#include <string_view>
 #include <fstream>
 #include <unordered_map>
 #include "Engine/Asset/AssetTypes/AssetTypes.hpp"
 #include "Engine/Asset/AssetLoader.hpp"
 #include "Engine/Utility/File/FileUtility.hpp"
+#include "Engine/Asset/AssetExtensions.hpp"
 
 namespace CLX
 {
@@ -20,13 +19,6 @@ namespace CLX
             return it->second;
         }
         return decltype(it->second)();
-    }
-
-
-    namespace AssetExtensions
-    {
-        constexpr std::wstring_view Scene = L".clxscene";
-        constexpr std::wstring_view EntityComposition = L".clxec";
     }
 
     class AssetManager final
@@ -100,6 +92,51 @@ namespace CLX
         [[nodiscard]] SceneAssetHandle GetScene(const std::filesystem::path& path)
         {
             return ValidatedGet<SceneAssetHandle, true>(path, mSceneAssets);
+        }
+
+        template<typename T>
+        [[nodiscard]] auto GetAsset(const std::filesystem::path& path)
+        {
+            if constexpr (std::same_as<T, TextureAssetHandle>)
+            {
+                return GetTexture(path);
+            }
+            else if constexpr (std::same_as<T, MeshAssetHandle>)
+            {
+                return GetMesh(path);
+            }
+            else if constexpr (std::same_as<T, ModelAssetHandle>)
+            {
+                return GetModel(path);
+            }
+            else if constexpr (std::same_as<T, AnimatedModelAssetHandle>)
+            {
+                return GetAnimatedModel(path);
+            }
+            else if constexpr (std::same_as<T, AnimationAssetHandle>)
+            {
+                return GetAnimation(path);
+            }
+            else if constexpr (std::same_as<T, PixelShaderAssetHandle>)
+            {
+                return GetPixelShader(path);
+            }
+            else if constexpr (std::same_as<T, VertexShaderAssetHandle>)
+            {
+                return GetVertexShader(path);
+            }
+            else if constexpr (std::same_as<T, SceneAssetHandle>)
+            {
+                return GetScene(path);
+            }
+            else if constexpr (std::same_as<T, EntityCompositionAssetHandle>)
+            {
+                return GetEntityComposition(path);
+            }
+            else
+            {
+                static_assert(false, "Unsupported asset type");
+            }
         }
 
         [[nodiscard]] EntityCompositionAssetHandle GetEntityComposition(const std::filesystem::path& path)

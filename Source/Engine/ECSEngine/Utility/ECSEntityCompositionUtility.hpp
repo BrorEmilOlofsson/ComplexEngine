@@ -90,9 +90,12 @@ namespace CLX
         const EntityIDConverter entityConverter = MergeECS(targetECS, entityComposition.GetECS());
         UpdateEntityIDs(entityComposition.GetECS(), targetECS, entityConverter, dataTypeRegistry);
         const EntityID instantiatedRootEntity = entityConverter.ConvertToTarget(entityComposition.GetRootEntity());
-        targetECS.AddComponent<EntityCompositionInstantiationComponent>(instantiatedRootEntity).asset = compositionAsset;
-        targetECS.AddComponent<EntityCompositionInstantiationComponent>(instantiatedRootEntity).mappedEntityID = entityComposition.GetRootEntity();
-
+        targetECS.AddComponent(instantiatedRootEntity,
+            EntityCompositionInstantiationComponent
+            {
+                .asset = compositionAsset,
+                .mappedEntityID = entityComposition.GetRootEntity()
+            });
         for (const EntityID entityID : GetEntityDescendants(targetECS, instantiatedRootEntity))
         {
             auto& compositionComponent = targetECS.AddComponent<EntityCompositionInstantiationComponent>(entityID);

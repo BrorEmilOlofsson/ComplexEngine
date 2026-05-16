@@ -340,6 +340,18 @@ namespace CLX
 		return json;
     }
 
+    nlohmann::json ToJSON(const EntityCompositionAssetHandle& entityCompositionAsset)
+    {
+        nlohmann::json json;
+        std::filesystem::path entityCompositionRelativePath;
+        if (entityCompositionAsset)
+        {
+            entityCompositionRelativePath = entityCompositionAsset.GetRelativePath();
+        }
+        json["EntityCompositionPath"] = entityCompositionRelativePath;
+        return json;
+    }
+
 	nlohmann::json CustomToJSON(const std::array<TextureAssetHandle, 3>& textureAssets)
 	{
 		nlohmann::json json;

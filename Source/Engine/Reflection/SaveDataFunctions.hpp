@@ -186,6 +186,7 @@ namespace CLX
 	[[nodiscard]] nlohmann::json ToJSON(const TextureAssetHandle& textureAsset);
 	[[nodiscard]] nlohmann::json ToJSON(const AnimationAssetHandle& animationAsset);
 	[[nodiscard]] nlohmann::json ToJSON(const SceneAssetHandle& sceneAsset);
+    [[nodiscard]] nlohmann::json ToJSON(const EntityCompositionAssetHandle& entityCompositionAsset);
 
 	[[nodiscard]] nlohmann::json CustomToJSON(const std::array<TextureAssetHandle, 3>& textureAssets);
 

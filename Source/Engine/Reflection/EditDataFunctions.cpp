@@ -1129,6 +1129,47 @@ namespace CLX
         return ViewAndEditValue(animationAsset, blackboard.Get<Key_AssetManager>());
     }
 
+    template<typename T>
+    static ViewAndEditResult ViewAndEditAsset(T& assetHandle, const std::string* variableName, AssetManager& assetManager)
+    {
+        ViewAndEditResult viewAndEditResult;
+        const std::filesystem::path filePath = assetHandle ? assetHandle.GetRelativePath() : std::filesystem::path();
+
+        ImGui::AlignTextToFramePadding();
+
+        if (variableName)
+        {
+            ImGui::Text(variableName->c_str());
+        }
+        ImGui::Text("Path:");
+        ImGui::SameLine();
+        ImGui::BeginDisabled();
+        ImGui::InputText("", filePath.string().data(), filePath.string().size());
+        ImGui::EndDisabled();
+
+        if (const ImGuiPayload* currentPayload = ImGui::GetDragDropPayload())
+        {
+            const std::filesystem::path path = std::filesystem::path(reinterpret_cast<const char*>(currentPayload->Data));
+            const std::filesystem::path extension = path.extension();
+
+            if (std::wstring_view(extension.c_str()) == AssetExtensions::Scene)
+            {
+                if (ImGui::BeginDragDropTarget())
+                {
+                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Asset"))
+                    {
+                        assetHandle = assetManager.GetAsset<T>(path);
+                        viewAndEditResult.isEdited = true;
+                        viewAndEditResult.isActive = true;
+                    }
+                    ImGui::EndDragDropTarget();
+                }
+            }
+        }
+
+        return viewAndEditResult;
+    }
+
     static ViewAndEditResult ViewAndEditValue(SceneAssetHandle& sceneAsset, const std::string* variableName, AssetManager& assetManager)
     {
         ViewAndEditResult viewAndEditResult;
@@ -1172,6 +1213,16 @@ namespace CLX
     ViewAndEditResult ViewAndEditValue(SceneAssetHandle& sceneAsset, const Blackboard& blackboard, const DataTypeMemberVariable* memberData)
     {
         return ViewAndEditValue(sceneAsset, memberData ? &memberData->customName : nullptr, blackboard.Get<Key_AssetManager>());
+    }
+
+    ViewAndEditResult ViewAndEditValue(EntityCompositionAssetHandle& entityCompositionAsset, AssetManager& assetManager)
+    {
+        return ViewAndEditAsset(entityCompositionAsset, nullptr, assetManager);
+    }
+
+    ViewAndEditResult ViewAndEditValue(EntityCompositionAssetHandle& entityCompositionAsset, const Blackboard& blackboard)
+    {
+        return ViewAndEditValue(entityCompositionAsset, blackboard.Get<Key_AssetManager>());
     }
 
     /*ViewAndEditResult ViewAndEditValue(Fly::ClassInstanceProxy& aClassInstance, [[maybe_unused]] const std::string&)

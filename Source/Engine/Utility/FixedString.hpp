@@ -1,4 +1,6 @@
 #pragma once
+#include <string_view>
+#include <algorithm>
 
 namespace CLX
 {
@@ -20,11 +22,11 @@ namespace CLX
             assign(sv);
         }
 
-        constexpr FixedString(auto aStart, auto aEnd)
+        constexpr FixedString(auto start, auto end)
         {
-            const std::size_t distance = std::distance(aStart, aEnd);
+            const std::size_t distance = std::distance(start, end);
             if (distance >= N) throw std::length_error("Too long");
-            std::copy_n(&*aStart, distance, mData);
+            std::copy_n(&*start, distance, mData);
             mSize = distance;
         }
 
@@ -48,13 +50,13 @@ namespace CLX
         constexpr std::size_t size() const noexcept { return mSize; }
         constexpr std::size_t capacity() const noexcept { return N; }
 
-        constexpr const char* c_str() const noexcept { return mData; }
-        constexpr char* data() noexcept { return mData; }
+        [[nodiscard]] constexpr const char* c_str() const noexcept { return mData; }
+        [[nodiscard]] constexpr char* data() noexcept { return mData; }
 
-        constexpr const char& operator[](std::size_t i) const noexcept { return mData[i]; }
-        constexpr char& operator[](std::size_t i) noexcept { return mData[i]; }
+        [[nodiscard]] constexpr const char& operator[](std::size_t i) const noexcept { return mData[i]; }
+        [[nodiscard]] constexpr char& operator[](std::size_t i) noexcept { return mData[i]; }
 
-        constexpr std::string_view view() const noexcept { return std::string_view(mData, mSize); }
+        [[nodiscard]] constexpr std::string_view view() const noexcept { return std::string_view(mData, mSize); }
 
         constexpr auto operator<=>(const FixedString&) const noexcept = default;
 

@@ -8,5 +8,6 @@ namespace CLX
 	void RegisterEntityCompositionInstantiationComponent() {}
 
 	REGISTER_COMPONENT(EntityCompositionInstantiationComponent);
+	REGISTER_MEMBER(EntityCompositionInstantiationComponent::asset, NoEdit{});
 	REGISTER_MEMBER(EntityCompositionInstantiationComponent::mappedEntityID, NoEdit{});
 }

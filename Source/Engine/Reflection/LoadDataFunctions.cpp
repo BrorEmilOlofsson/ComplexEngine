@@ -319,6 +319,20 @@ namespace CLX
         FromJSON(sceneAsset, json, blackboard.Get<Key_AssetManager>());
     }
 
+    static void FromJSON(EntityCompositionAssetHandle& entityCompositionAsset, const nlohmann::json& json, AssetManager& assetManager)
+    {
+        std::filesystem::path entityCompositionPath = std::filesystem::path(std::string(json["EntityCompositionPath"]));
+        if (!entityCompositionPath.empty())
+        {
+            entityCompositionAsset = assetManager.GetEntityComposition(entityCompositionPath);
+        }
+    }
+
+    void FromJSON(EntityCompositionAssetHandle& entityCompositionAsset, const nlohmann::json& json, const Blackboard& blackboard)
+    {
+        FromJSON(entityCompositionAsset, json, blackboard.Get<Key_AssetManager>());
+    }
+
     constexpr std::string_view GetNameBySlot(const std::size_t slot)
     {
         switch (slot)
