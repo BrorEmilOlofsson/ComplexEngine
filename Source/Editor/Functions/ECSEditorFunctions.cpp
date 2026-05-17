@@ -5,7 +5,6 @@
 #include "Engine/ECSEngine/Components/TransformHierarchyComponent.hpp"
 #include "Editor/Command/Commands/SetDataPtrCommand.hpp"
 #include "Engine/ECSEngine/Components/MeshComponent.hpp"
-#include "Engine/ECSEngine/Components/EditorComponent.hpp"
 #include "Engine/ECSEngine/Utility/ECSUtilityFunctions.hpp"
 #include "Engine/Utility/Camera.hpp"
 #include "Engine/Utility/BlackboardKeys.hpp"
@@ -20,6 +19,7 @@
 #include "Engine/Asset/AssetManager.hpp"
 #include "Engine/ECS/ECSManager.hpp"
 #include "Editor/EntityCompositionInstantiationManager.hpp"
+#include "Editor/Command/Commands/SetEntityTransformCommand.hpp"
 
 namespace CLX
 {
@@ -1487,7 +1487,7 @@ namespace CLX
         std::optional<EditorAction> removeComponentAction;
         if (ImGui::BeginPopup("Component Options"))
         {
-            ImGui::BeginDisabled(ecs.GetRegistry().GetComponentType(componentDataTypeID.typeIndex).isDefault);
+            ImGui::BeginDisabled(HasAnyFlag(ecs.GetRegistry().GetComponentType(componentDataTypeID.typeIndex).traits, eECSComponentTrait::Default | eECSComponentTrait::NoManualAdd));
             if (ImGui::MenuItem("Remove"))
             {
                 removeComponentAction = CreateRemoveComponentAction(ecs, entityID, componentDataTypeID, ecsBuffer);
@@ -1634,7 +1634,9 @@ namespace CLX
 
     [[nodiscard]] bool ShouldHideComponent(const std::type_index type)
     {
-        return (type == typeid(NameComponent) || type == typeid(TransformHierarchyComponent)) || type == typeid(EditorComponent);
+        return (type == typeid(NameComponent) 
+            || type == typeid(TransformHierarchyComponent))
+            || type == typeid(EntityCompositionInstantiationComponent);
     }
 
     [[nodiscard]] std::vector<EditorAction> ShowEntityComponents(const ShowEntityComponentsData& data)
@@ -1751,15 +1753,15 @@ namespace CLX
                 return searchString.empty() || CaseInsensitiveContains(dataType.prettyName, searchString);
             };
 
-        auto isValidComponentDataType = [&ecs, entityID](const DataType& dataType)
+        auto shouldShowComponent = [&ecs, entityID](const DataType& dataType)
             {
                 return dataType.isComponent
-                    && !ecs.GetRegistry().GetComponentType(dataType.type).isDefault
+                    && !HasAnyFlag(ecs.GetRegistry().GetComponentType(dataType.type).traits, eECSComponentTrait::Default | eECSComponentTrait::NoManualAdd)
                     && !ecs.HasComponent(entityID, dataType.type);
             };
 
 
-        auto componentDataTypes = dataTypeRegistry.GetDataTypesFiltered(isValidComponentDataType)
+        auto componentDataTypes = dataTypeRegistry.GetDataTypesFiltered(shouldShowComponent)
             | std::views::values
             | std::views::filter(nameMatchesInput)
             | std::ranges::to<std::vector>();
@@ -2015,6 +2017,140 @@ namespace CLX
             dataTypeRegistry,
             commandTracker
         );
+    }
+
+    constexpr ImGuizmo::MODE ToImGuizmoMode(eTransformMode transformMode)
+    {
+        return transformMode == eTransformMode::Local ? ImGuizmo::MODE::LOCAL : ImGuizmo::MODE::WORLD;
+    }
+
+    constexpr ImGuizmo::OPERATION ToImGuizmoOperation(eTransformOperation operation)
+    {
+        switch (operation)
+        {
+        case eTransformOperation::None:
+            return static_cast<ImGuizmo::OPERATION>(0);
+        case eTransformOperation::TranslateX:
+            return ImGuizmo::OPERATION::TRANSLATE_X;
+        case eTransformOperation::TranslateY:
+            return ImGuizmo::OPERATION::TRANSLATE_Y;
+        case eTransformOperation::TranslateZ:
+            return ImGuizmo::OPERATION::TRANSLATE_Z;
+        case eTransformOperation::RotateX:
+            return ImGuizmo::OPERATION::ROTATE_X;
+        case eTransformOperation::RotateY:
+            return ImGuizmo::OPERATION::ROTATE_Y;
+        case eTransformOperation::RotateZ:
+            return ImGuizmo::OPERATION::ROTATE_Z;
+        case eTransformOperation::ScaleX:
+            return ImGuizmo::OPERATION::SCALE_X;
+        case eTransformOperation::ScaleY:
+            return ImGuizmo::OPERATION::SCALE_Y;
+        case eTransformOperation::ScaleZ:
+            return ImGuizmo::OPERATION::SCALE_Z;
+        case eTransformOperation::Translate:
+            return ImGuizmo::OPERATION::TRANSLATE;
+        case eTransformOperation::Rotate:
+            return ImGuizmo::OPERATION::ROTATE;
+        case eTransformOperation::Scale:
+            return ImGuizmo::OPERATION::SCALE;
+        case eTransformOperation::All:
+            return static_cast<ImGuizmo::OPERATION>(~0);
+        default:
+            ASSERT_NEW(false, "Invalid transform operation.");
+            return static_cast<ImGuizmo::OPERATION>(0);
+        }
+    }
+
+    void ShowEntityImGuizmo(ECS& ecs, const EntityID selectedEntityID, const eTransformMode transformMode, const eTransformOperation transformOperation, const Camera& camera,
+        const AABB2i renderRect, const bool useSnap, const float snapValue, const int guimzoID, const bool applyTransformation,
+        TransformEntityData& transformEntityData, EditorCommandTracker& commandTracker)
+    {
+        if (selectedEntityID == InvalidEntityID)
+        {
+            return;
+        }
+
+        ImGuizmo::AllowAxisFlip(false);
+
+        ImGuizmo::SetOrthographic(false);
+        ImGuizmo::SetDrawlist(ImGui::GetWindowDrawList());
+        //const Point2f topLeft = Point2f(GetTopLeftCorner(renderRect));
+        ImGuizmo::SetRect((float)renderRect.GetMin().x, (float)renderRect.GetMin().y, (float)renderRect.GetExtent().x, (float)renderRect.GetExtent().y);
+
+        TransformComponent* transformComponent = ecs.GetComponent<TransformComponent>(selectedEntityID);
+        ASSERT_NEW(transformComponent != nullptr, "Selected entity does not have a TransformComponent.");
+
+        Matrix4x4f entityMatrix = GetEntityWorldTransform(ecs, selectedEntityID).GetMatrix();
+        const Matrix4x4f view = camera.GetViewMatrix();
+        const Matrix4x4f proj = camera.GetProjectionMatrix();
+
+        const ImGuizmo::OPERATION guizmoOperation = ToImGuizmoOperation(transformOperation);
+
+        const float snapV = useSnap ? snapValue : 0.f;
+        const Vector3f gridSnapValues(snapV, snapV, snapV);
+
+        ImGuizmo::SetID(guimzoID);
+        const bool isManipulatingEntityTransform = ImGuizmo::Manipulate(
+            view.GetDataPtr(),
+            proj.GetDataPtr(),
+            guizmoOperation,
+            ToImGuizmoMode(transformMode),
+            entityMatrix.GetDataPtr(),
+            nullptr,
+            &gridSnapValues.x
+        );
+
+        if (!applyTransformation)
+        {
+            return;
+        }
+
+        const bool isDraggingPreviousFrame = transformEntityData.isDraggingEntity;
+        const bool isDraggingCurrentFrame = ImGuizmo::IsUsing();
+
+        if (isDraggingCurrentFrame && !isDraggingPreviousFrame)
+        {
+            // Start dragging the entity and record the initial transform for undo purposes
+            transformEntityData.entityID = selectedEntityID;
+            transformEntityData.savedTransform = transformComponent->transform;
+        }
+
+        if (isManipulatingEntityTransform)
+        {
+            const Transform localTransform = GetEntityLocalTransform(ecs, selectedEntityID, Transform::FromMatrix(entityMatrix));
+
+            if (HasAnyFlag(transformOperation, eTransformOperation::Translate))
+            {
+                transformComponent->transform.SetPosition(localTransform.GetPosition());
+            }
+            else if (HasAnyFlag(transformOperation, eTransformOperation::Rotate))
+            {
+                transformComponent->transform.SetMatrix(localTransform.GetMatrix());
+            }
+            else if (HasAnyFlag(transformOperation, eTransformOperation::Scale))
+            {
+                transformComponent->transform.SetScale(localTransform.GetScale());
+            }
+        }
+
+        if (isDraggingPreviousFrame && !isDraggingCurrentFrame)
+        {
+            if (transformEntityData.savedTransform != transformComponent->transform)
+            {
+                SetEntityTransformCommand setEntityTransformCommand
+                {
+                    .entityID = selectedEntityID,
+                    .ecs = &ecs,
+                    .oldTransform = transformEntityData.savedTransform,
+                    .newTransform = transformComponent->transform,
+                };
+                commandTracker.ExecuteCommand(EditorCommand(setEntityTransformCommand, "Set Entity Transform"));
+                setEntityTransformCommand = {};
+            }
+        }
+
+        transformEntityData.isDraggingEntity = isDraggingCurrentFrame;
     }
 
     void TeleportCameraToEntity(const ECS& ecs, const EntityID entityID, Camera& camera, const bool changeRotation, const float offsetDistance)

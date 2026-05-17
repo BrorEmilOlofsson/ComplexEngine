@@ -1,7 +1,7 @@
 #include "Editor/Precompiled/EditorPch.hpp"
 #include "SetEntityTransformCommand.hpp"
 #include "Engine/ECSEngine/Components/TransformComponent.hpp"
-#include "Engine/Scene/SceneManager.hpp"
+#include "Engine/ECS/ECS.hpp"
 
 namespace CLX
 {

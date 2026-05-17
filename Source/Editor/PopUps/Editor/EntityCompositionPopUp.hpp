@@ -10,7 +10,7 @@
 #include "Engine/Asset/AssetTypes/EntityCompositionAsset.hpp"
 #include "Engine/Reflection/JsonAny.hpp"
 
-#include "Editor/Tools/TransformEntityTool.hpp"
+#include "Editor/Utility/TransformEntityData.hpp"
 
 namespace CLX
 {
@@ -40,11 +40,15 @@ namespace CLX
 		std::vector<EntityID> mRootEntities;
 		Camera mCamera;
 		RenderState mRenderState;
-		TransformEntityTool mTransformEntityTool;
+		TransformEntityData mTransformEntityData;
 		bool mIsOpen = false;
         std::string mEntitySearchBuffer;
         uint32_t mSelectedComponentPopupIndex = 0;
 		std::string mComponentSearchBuffer;
         JsonAny mCopiedComponent;
+        int mGuizmoID = 0;
+		bool mIsWindowFocused = false;
+		// Refactor
+		inline static int sGuizmoIDCounter = 0;
 	};
 }

@@ -1,5 +1,5 @@
 #pragma once
-#include "Editor/Tools/TransformEntityTool.hpp"
+#include "Editor/Utility/TransformEntityData.hpp"
 #include "Editor/PopUps/Editor/SceneHierarchyPopUp.hpp"
 #include "Editor/PopUps/Editor/SceneInspectorPopUp.hpp"
 #include "Engine/Utility/Camera.hpp"
@@ -20,10 +20,12 @@ namespace CLX
 
 	private:
 
-		TransformEntityTool mTransformEntityTool;
+		TransformEntityData mTransformEntityData;
 		SceneHierarchyPopUp mHierarchyPopUp;
 		SceneInspectorPopUp mInspectorPopUp;
 		Camera mCamera;
+		// TODO: Refactor
+		int mGuizmoID = -1;
 
 		static constexpr const char* WindowName = "Scene";
 	};

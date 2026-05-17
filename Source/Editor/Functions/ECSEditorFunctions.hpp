@@ -9,6 +9,10 @@
 #include "Engine/ECSEngine/Utility/ECSUtilityFunctions.hpp"
 #include "Engine/ECS/ECSHandle.hpp"
 #include "Engine/Reflection/JsonAny.hpp"
+#include "Engine/Math/TransformMode.hpp"
+#include "Engine/Math/TransformOperation.hpp"
+#include "Editor/Utility/TransformEntityData.hpp"
+#include "Engine/Math/Shapes/AABB2.hpp"
 
 namespace CLX
 {
@@ -97,6 +101,10 @@ namespace CLX
 	void InstantiateEntityCompositionAndSelectRoot(ECSHandle ecsHandle, EntityCompositionAssetHandle toInstantiate, EntityID parentID,
 		EntityCompositionInstantiationManager& entityInstantiations, std::vector<EntityID>& rootEntities,
 		std::set<EntityID>& selectedEntityIDs, const DataTypeRegistry& dataTypeRegistry, EditorCommandTracker& commandTracker);
+
+	void ShowEntityImGuizmo(ECS& ecs, EntityID selectedEntityID, eTransformMode transformMode, eTransformOperation transformOperation,
+		const Camera& camera, AABB2i renderRect, bool useSnap, float snapValue, int guizmoID, bool applyTransformation,
+		TransformEntityData& transformEntityData, EditorCommandTracker& commandTracker);
 
 	void TeleportCameraToEntity(const ECS& ecs, EntityID entityID, Camera& camera, bool changeRotation = true, const float offsetDistance = 5.f);
 }

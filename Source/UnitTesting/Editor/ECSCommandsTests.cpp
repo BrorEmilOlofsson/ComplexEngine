@@ -2,6 +2,7 @@
 
 #include "Editor/Functions/ECSEditorFunctions.hpp"
 #include "Engine/ECS/ECS.hpp"
+#include "Engine/ECS/ECSRegistry.hpp"
 #include "Engine/ECSEngine/Components/AllEngineComponents.hpp"
 #include "Editor/Command/Core/EditorCommandTracker.hpp"
 #include "Engine/Reflection/DataTypeRegistry.hpp"
@@ -12,10 +13,10 @@ using namespace CLX;
 ECSRegistry CreateECSRegistry()
 {
     ECSRegistry registry;
-    registry.RegisterComponentType<TransformComponent>(true);
-    registry.RegisterComponentType<NameComponent>(true);
-    registry.RegisterComponentType<TransformHierarchyComponent>(true);
-    registry.RegisterComponentType<EntityCompositionInstantiationComponent>(false);
+    registry.RegisterComponentType<TransformComponent>(eECSComponentTrait::Default);
+    registry.RegisterComponentType<NameComponent>(eECSComponentTrait::Default);
+    registry.RegisterComponentType<TransformHierarchyComponent>(eECSComponentTrait::Default);
+    registry.RegisterComponentType<EntityCompositionInstantiationComponent>(eECSComponentTrait::Default);
     return registry;
 }
 

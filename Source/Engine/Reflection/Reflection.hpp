@@ -12,6 +12,7 @@ namespace CLX
 {
 
     struct IsDefaultComponent {};
+    struct NoManualAdd {};
 
     template<typename T>
     struct MinValue
@@ -91,6 +92,9 @@ namespace CLX
     {
         std::string_view customName;
     };
+    
+    template<typename T, typename... Args>
+    constexpr bool TypeExists = (std::is_same_v<T, std::decay_t<Args>> || ...);
 
     class TypeRegistration final
     {
@@ -100,9 +104,19 @@ namespace CLX
         {
             sRegistrationFunctions.push_back([](DataTypeRegistry& dataTypeRegistry, ECSRegistry& ecsRegistry)
                 {
-                    const bool isDefault = (std::is_same_v<IsDefaultComponent, std::decay_t<Args>> || ...);
+                    const bool isDefault = TypeExists<IsDefaultComponent, Args...>;
+                    const bool shouldExpose = TypeExists<NoManualAdd, Args...>;
+                    eECSComponentTrait traits = eECSComponentTrait::None;
+                    if (isDefault)
+                    {
+                        traits |= eECSComponentTrait::Default;
+                    }
+                    if (shouldExpose)
+                    {
+                        traits |= eECSComponentTrait::NoManualAdd;
+                    }
                     dataTypeRegistry.RegisterType<T>(true);
-                    ecsRegistry.RegisterComponentType<T>(isDefault);
+                    ecsRegistry.RegisterComponentType<T>(traits);
                 });
             return true;
         }

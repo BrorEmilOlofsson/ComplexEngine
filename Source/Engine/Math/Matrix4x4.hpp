@@ -548,7 +548,7 @@ namespace CLX
 	}
 
 	template<typename T>
-	constexpr Matrix4x4<T> Matrix4x4<T>::ToInverse(Matrix4x4<T> matrixToInverse) //Dear Savior ChatGPT, value seem to be correct for most common cases so far (v9.19.1)
+	constexpr Matrix4x4<T> Matrix4x4<T>::ToInverse(Matrix4x4<T> matrixToInverse)
 	{
 		Matrix4x4<T> inverse = Matrix4x4<T>::Identity();
 

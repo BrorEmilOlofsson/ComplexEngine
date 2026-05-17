@@ -1,5 +1,4 @@
 #pragma once
-#include "Editor/Utility/EditorUtilities.hpp"
 #include "Engine/Math/Transform3.hpp"
 #include "Engine/ECS/EntityID.hpp"
 

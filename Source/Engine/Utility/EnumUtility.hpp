@@ -63,16 +63,23 @@ namespace CLX
     }
 
     template<EnumMaskable T>
-    [[nodiscard]] constexpr T& operator|=(T& lhs, const T rhs) noexcept
+    constexpr T& operator|=(T& lhs, const T rhs) noexcept
     {
         lhs = lhs | rhs;
         return lhs;
     }
 
     template<EnumMaskable T>
-    [[nodiscard]] constexpr T& operator&=(T& lhs, const T rhs) noexcept
+    constexpr T& operator&=(T& lhs, const T rhs) noexcept
     {
         lhs = lhs & rhs;
+        return lhs;
+    }
+
+    template<EnumMaskable T>
+    constexpr T& operator^=(T& lhs, const T rhs) noexcept
+    {
+        lhs = lhs ^ rhs;
         return lhs;
     }
 

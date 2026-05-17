@@ -8,17 +8,29 @@
 #include "ComponentPool.hpp"
 #include "EntityID.hpp"
 #include "Engine/Reflection/DataTypeID.hpp"
+#include "Engine/Utility/EnumUtility.hpp"
 
 namespace CLX
 {
+
+	enum class eECSComponentTrait : uint8_t
+	{
+		None = 0,
+        Default = 1 << 0,
+        NoManualAdd = 1 << 1
+	};
+
+	template<>
+    struct IsEnumBitfield<eECSComponentTrait> : std::true_type {};
+
 
 	struct ECSComponentType final
 	{
 		ComponentPoolSBO(*createComponentPoolFunction)() = nullptr;
 		void(*copyComponentFunction)(void* destination, const void* source) = nullptr;
-		void* (*addComponentFunction)(ECS& ecs, const EntityID entityID, const void* defaultValue) = nullptr;
+		void*(*addComponentFunction)(ECS& ecs, const EntityID entityID, const void* defaultValue) = nullptr;
 		void(*removeComponentFunction)(ECS& ecs, const EntityID entityID) = nullptr;
-		bool isDefault = false;
+		eECSComponentTrait traits = eECSComponentTrait::None;
 	};
 
 
@@ -31,7 +43,7 @@ namespace CLX
 	public:
 
 		template<typename T>
-		void RegisterComponentType(bool isDefault = false);
+		void RegisterComponentType(eECSComponentTrait traits = eECSComponentTrait::None);
 
 		template<IsSystem T>
 		void RegisterSystem()

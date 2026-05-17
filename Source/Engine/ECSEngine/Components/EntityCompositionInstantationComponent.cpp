@@ -7,7 +7,7 @@ namespace CLX
 
 	void RegisterEntityCompositionInstantiationComponent() {}
 
-	REGISTER_COMPONENT(EntityCompositionInstantiationComponent);
+	REGISTER_COMPONENT(EntityCompositionInstantiationComponent, NoManualAdd{});
 	REGISTER_MEMBER(EntityCompositionInstantiationComponent::asset, NoEdit{});
 	REGISTER_MEMBER(EntityCompositionInstantiationComponent::mappedEntityID, NoEdit{});
 }

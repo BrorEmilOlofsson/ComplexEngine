@@ -75,17 +75,22 @@ namespace CLX
         : mRenderState(std::move(renderContext))
     {
         SetCompositionAsset(assetHandle);
+        sGuizmoIDCounter++;
+        mGuizmoID = sGuizmoIDCounter;
     }
 
     EntityCompositionPopUp::EntityCompositionPopUp(RenderContext&& renderContext)
         : mRenderState(std::move(renderContext))
-    {}
+    {
+        sGuizmoIDCounter++;
+        mGuizmoID = sGuizmoIDCounter;
+    }
 
     void EntityCompositionPopUp::Update(const Blackboard& blackboard)
     {
 
         mIsOpen = ImGui::Begin(GetEntityCompositionName(mEntityCompositionAsset).c_str());
-        const bool isFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
+        mIsWindowFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
         const AABB2i renderRect = GetImGuiRenderRect();
         ImGui::End();
 
@@ -117,7 +122,7 @@ namespace CLX
 
         if (mIsOpen)
         {
-            if (isFocused)
+            if (mIsWindowFocused)
             {
                 FreeFlyCameraSettings& cameraSettings = blackboard.Get<Key_FreeFlyCameraSettings>();
                 const float deltaTime = blackboard.Get<Key_DeltaTime>();
@@ -179,7 +184,7 @@ namespace CLX
         ECS& ecsBuffer = blackboard.Get<Key_ECSBuffer>();
         EditorCommandTracker& commandTracker = blackboard.Get<Key_CommandTracker>();
         const WindowView windowView = blackboard.Get<Key_WindowView>();
-        OperatingSystem& os = blackboard.Get<Key_OperatingSystem>();
+        //OperatingSystem& os = blackboard.Get<Key_OperatingSystem>();
         const DataTypeRegistry& dataTypeRegistry = blackboard.Get<Key_DataTypeRegistry>();
         EditorSceneSettings& editorSceneSettings = blackboard.Get<Key_EditorSceneSettings>();
         const InputState& input = blackboard.Get<Key_InputState>();
@@ -265,17 +270,18 @@ namespace CLX
                 if (mSelectedEntityIDs.size() == 1)
                 {
                     const EntityID selectedEntityID = *mSelectedEntityIDs.begin();
-                    mTransformEntityTool.ShowEntityImGuizmo(
+                    ShowEntityImGuizmo(
                         mEntityCompositionAsset->GetECS(),
                         selectedEntityID,
                         editorSceneSettings.transformMode,
                         editorSceneSettings.transformOperation,
+                        mCamera,
                         renderRect,
                         editorSceneSettings.useSnap,
                         editorSceneSettings.snapValue,
-                        mCamera,
-                        input,
-                        os.IsCursorVisible(),
+                        mGuizmoID,
+                        mIsWindowFocused,
+                        mTransformEntityData,
                         commandTracker
                     );
                 }

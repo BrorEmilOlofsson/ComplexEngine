@@ -50,7 +50,7 @@ namespace CLX
         ImGui::End();
     }
 
-    static void RenderOrientationCube(const Camera& camera)
+    static void RenderOrientationCube(Camera& camera)
     {
         Matrix4x4f view = camera.GetViewMatrix();
 
@@ -143,6 +143,24 @@ namespace CLX
         }
     }
 
+    static void UpdateTransformOperation(const bool isCursorVisible, const InputState& input, eTransformOperation& transformOperation)
+    {
+        if (isCursorVisible && !input.IsKeyHeld(eInputKey::Ctrl))
+        {
+            if (input.IsKeyPressed(eInputKey::E))
+            {
+                transformOperation = eTransformOperation::Translate;
+            }
+            else if (input.IsKeyPressed(eInputKey::R))
+            {
+                transformOperation = eTransformOperation::Rotate;
+            }
+            else if (input.IsKeyPressed(eInputKey::T))
+            {
+                transformOperation = eTransformOperation::Scale;
+            }
+        }
+    }
 
     SceneWindowPopUp::SceneWindowPopUp()
         : mHierarchyPopUp("Hierarchy")
@@ -178,8 +196,9 @@ namespace CLX
         SceneManager& sceneManager = blackboard.Get<Key_SceneManager>();
 
         RenderState& sceneRenderState = sceneManager.GetActiveScene()->GetRenderState();
-        const EditorSceneSettings& editorSceneSettings = blackboard.Get<Key_EditorSceneSettings>();
+        EditorSceneSettings& editorSceneSettings = blackboard.Get<Key_EditorSceneSettings>();
 
+        UpdateTransformOperation(os.IsCursorVisible(), input, editorSceneSettings.transformOperation);
 
         if (isOpen)
         {
@@ -244,8 +263,8 @@ namespace CLX
         Blackboard newBlackboard = blackboard;
         newBlackboard.Insert<Key_CurrentRenderState>(activeScene.GetRenderState());
         EditorCommandTracker& commandTracker = blackboard.Get<Key_CommandTracker>();
-        const InputState& input = blackboard.Get<Key_InputState>();
-        OperatingSystem& os = blackboard.Get<Key_OperatingSystem>();
+        //const InputState& input = blackboard.Get<Key_InputState>();
+        //OperatingSystem& os = blackboard.Get<Key_OperatingSystem>();
         AssetManager& assetManager = blackboard.Get<Key_AssetManager>();
         EditorSceneSettings& editorSceneSettings = blackboard.Get<Key_EditorSceneSettings>();
         const DataTypeRegistry& dataTypeRegistry = blackboard.Get<Key_DataTypeRegistry>();
@@ -262,7 +281,7 @@ namespace CLX
 
         if (ImGui::Begin(WindowName, nullptr, ImGuiWindowFlags_NoScrollbar))
         {
-
+            const bool isWindowFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
 
             RenderOrientationCube(mCamera);
 
@@ -281,18 +300,20 @@ namespace CLX
 
             if (mHierarchyPopUp.GetSelectedEntityIDs().size() == 1)
             {
-
-                mTransformEntityTool.ShowEntityImGuizmo(
+                ShowEntityImGuizmo(
                     activeScene.GetECS(),
                     *mHierarchyPopUp.GetSelectedEntityIDs().begin(),
                     editorSceneSettings.transformMode,
                     editorSceneSettings.transformOperation,
+                    mCamera,
                     sceneRenderState.GetRenderRect().value(),
                     editorSceneSettings.useSnap,
                     editorSceneSettings.snapValue,
-                    mCamera,
-                    input,
-                    os.IsCursorVisible(),
+                    mGuizmoID,
+                    isWindowFocused,
+                    mTransformEntityData,
+                    //input,
+                    //os.IsCursorVisible(),
                     commandTracker
                 );
             }

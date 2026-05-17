@@ -1216,14 +1216,14 @@ namespace CLX
     }
 
     template<typename T>
-    void ECSRegistry::RegisterComponentType(const bool isDefault)
+    void ECSRegistry::RegisterComponentType(const eECSComponentTrait traits)
     {
         [[maybe_unused]] const bool hasBeenRegistered = mComponentTypeToIDMap.contains(std::type_index(typeid(T)));
         ASSERT(!hasBeenRegistered);
 
         ECSComponentType componentType;
 
-        componentType.isDefault = isDefault;
+        componentType.traits = traits;
 
         componentType.createComponentPoolFunction = []() -> ComponentPoolSBO
             {
@@ -1264,7 +1264,7 @@ namespace CLX
         ECSRegisterComponentHelper::ComponentPoolID<T> = mCurrentID;
         mCurrentID++;
 
-        if (isDefault)
+        if (HasFlag(traits, eECSComponentTrait::Default))
         {
             mDefaultComponentTypeIndices.push_back(std::type_index(typeid(T)));
         }
