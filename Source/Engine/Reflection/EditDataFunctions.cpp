@@ -19,6 +19,7 @@
 
 #include "Engine/Utility/ImGui/ImGuiUtility.hpp"
 #include "Engine/Utility/File/FileUtility.hpp"
+#include "Engine/Math/RotationMath.hpp"
 
 #include <External/imgui/imgui.h>
 #include <External/imgui/imguizmo/imguizmo.h>

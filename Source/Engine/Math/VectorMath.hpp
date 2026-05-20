@@ -8,6 +8,7 @@
 #include "UnitVector2.hpp"
 #include "UnitVector3.hpp"
 #include "Dimension2.hpp"
+#include "Transform3.hpp"
 
 namespace CLX
 {
@@ -295,30 +296,6 @@ namespace CLX
 	}
 
 	template<typename T>
-	[[nodiscard]] constexpr Vector2<T> Min(const Vector2<T>& a, const Vector2<T>& b) noexcept
-	{
-		return Vector2<T>(Min(a.x, b.x), Min(a.y, b.y));
-	}
-
-	template<typename T>
-	[[nodiscard]] constexpr Vector2<T> Max(const Vector2<T>& a, const Vector2<T>& b) noexcept
-	{
-		return Vector2<T>(Max(a.x, b.x), Max(a.y, b.y));
-	}
-
-	template<typename T>
-	[[nodiscard]] constexpr Vector3<T> Min(const Vector3<T>& a, const Vector3<T>& b) noexcept
-	{
-		return Vector3<T>(Min(a.x, b.x), Min(a.y, b.y), Min(a.z, b.z));
-	}
-
-	template<typename T>
-	[[nodiscard]] constexpr Vector3<T> Max(const Vector3<T>& a, const Vector3<T>& b) noexcept
-	{
-		return Vector3<T>(Max(a.x, b.x), Max(a.y, b.y), Max(a.z, b.z));
-	}
-
-	template<typename T>
 	[[nodiscard]] constexpr Point2<T> Min(const Point2<T>& a, const Point2<T>& b) noexcept
 	{
 		return Point2<T>(Min(a.x, b.x), Min(a.y, b.y));
@@ -340,18 +317,6 @@ namespace CLX
 	[[nodiscard]] constexpr Point3<T> Max(const Point3<T>& a, const Point3<T>& b) noexcept
 	{
 		return Point3<T>(Max(a.x, b.x), Max(a.y, b.y), Max(a.z, b.z));
-	}
-
-	template<typename T>
-    [[nodiscard]] constexpr T MaxComponent(const Vector2<T>& vector) noexcept
-    {
-        return Max(vector.x, vector.y);
-    }
-
-	template<typename T>
-	[[nodiscard]] constexpr T MaxComponent(const Vector3<T>& vector) noexcept
-	{
-		return Max(Max(vector.x, vector.y), vector.z);
 	}
 
 	template<typename T>
@@ -379,76 +344,6 @@ namespace CLX
 	}
 
 	template<typename T>
-	[[nodiscard]] constexpr T LengthSquared(const Vector2<T>& vector) noexcept
-	{
-		return LengthSquared(vector.x, vector.y);
-	}
-
-	template<typename T>
-	[[nodiscard]] constexpr T LengthSquared(const Vector3<T>& vector) noexcept
-	{
-		return LengthSquared(vector.x, vector.y, vector.z);
-	}
-
-	template<typename T>
-	[[nodiscard]] constexpr T Length(const Vector2<T>& vector) noexcept
-	{
-		return Length(vector.x, vector.y);
-	}
-
-	template<typename T>
-	[[nodiscard]] constexpr T Length(const Vector3<T>& vector) noexcept
-	{
-		return Length(vector.x, vector.y, vector.z);
-	}
-
-	template<typename T>
-	[[nodiscard]] constexpr bool IsNormalized(const Vector2<T>& vector) noexcept
-	{
-		return IsNormalized(vector.x, vector.y);
-	}
-
-	template<typename T>
-	[[nodiscard]] constexpr bool IsNormalized(const Vector3<T>& vector) noexcept
-	{
-		return IsNormalized(vector.x, vector.y, vector.z);
-	}
-
-	template<typename T>
-	[[nodiscard]] constexpr void Normalize(Vector2<T>& vector)
-	{
-		Normalize<false>(vector.x, vector.y);
-	}
-
-	template<typename T>
-	[[nodiscard]] constexpr void Normalize(Vector3<T>& vector)
-	{
-		Normalize<false>(vector.x, vector.y, vector.z);
-	}
-
-	template<typename T>
-	[[nodiscard]] constexpr Vector2<T> ToNormalized(const Vector2<T>& vector)
-	{
-		Vector2<T> result = vector;
-		Normalize(result);
-		return result;
-	}
-
-	template<typename T>
-	[[nodiscard]] constexpr Vector3<T> ToNormalized(const Vector3<T>& vector)
-	{
-		Vector3<T> result = vector;
-		Normalize(result);
-		return result;
-	}
-
-	template<typename T>
-	[[nodiscard]] constexpr T Dot(const Vector2<T>& a, const Vector2<T>& b) noexcept
-	{
-		return Dot(a.x, a.y, b.x, b.y);
-	}
-
-	template<typename T>
 	[[nodiscard]] constexpr T Dot(const UnitVector2<T>& a, const UnitVector2<T>& b) noexcept
 	{
 		return Dot(a.X(), a.Y(), b.X(), b.Y());
@@ -464,12 +359,6 @@ namespace CLX
 	[[nodiscard]] constexpr T Dot(const UnitVector2<T>& a, const Vector2<T>& b) noexcept
 	{
 		return Dot(b, a);
-	}
-
-	template<typename T>
-	[[nodiscard]] constexpr T Dot(const Vector3<T>& a, const Vector3<T>& b) noexcept
-	{
-		return Dot(a.x, a.y, a.z, b.x, b.y, b.z);
 	}
 
 	template<typename T>
@@ -491,39 +380,9 @@ namespace CLX
 	}
 
 	template<typename T>
-	[[nodiscard]] constexpr T Cross(const Vector2<T>& a, const Vector2<T>& b) noexcept
-	{
-		return Cross(a.x, a.y, b.x, b.y);
-	}
-
-	template<typename T>
 	[[nodiscard]] constexpr T Cross(const UnitVector2<T>& a, const UnitVector2<T>& b) noexcept
 	{
 		return Cross(a.X(), a.Y(), b.X(), b.Y());
-	}
-
-	template<typename T>
-	[[nodiscard]] constexpr Vector3<T> Cross(const Vector3<T>& a, const Vector3<T>& b)
-	{
-		return Vector3<T>(Cross(a.x, a.y, a.z, b.x, b.y, b.z));
-	}
-
-	template<template<typename> typename Ret = UnitVector3, typename T>
-	[[nodiscard]] constexpr Ret<T> Cross(const UnitVector3<T>& a, const UnitVector3<T>& b)
-	{
-		return Ret<T>(Cross(a.X(), a.Y(), a.Z(), b.X(), b.Y(), b.Z()));
-	}
-
-	template<typename T>
-	[[nodiscard]] constexpr Vector3<T> Cross(const Vector3<T>& a, const UnitVector3<T>& b)
-	{
-		return Vector3<T>(Cross(a.x, a.y, a.z, b.X(), b.Y(), b.Z()));
-	}
-
-	template<typename T>
-	[[nodiscard]] constexpr Vector3<T> Cross(const UnitVector3<T>& a, const Vector3<T>& b)
-	{
-		return Vector3<T>(Cross(a.X(), a.Y(), a.Z(), b.x, b.y, b.z));
 	}
 
 	template<typename T, typename U, typename V>
@@ -734,4 +593,15 @@ namespace CLX
         ASSERT(resolution.GetWidth() != 0 && "Resolution height cannot be zero when calculating aspect ratio.");
 		return static_cast<float>(resolution.GetWidth()) / static_cast<float>(resolution.GetHeight());
 	}
+
+	template<typename T>
+    [[nodiscard]] constexpr Transform3<T> Lerp(const Transform3<T>& from, const Transform3<T>& to, const T& t)
+    {
+        return Transform3<T>
+            (
+                Lerp(from.GetPosition(), to.GetPosition(), t),
+                Slerp(from.GetRotation(), to.GetRotation(), t),
+                Lerp(from.GetScale(), to.GetScale(), t)
+            );
+    }
 }

@@ -4,7 +4,7 @@
 #include "Engine/Math/UnitVector3.hpp"
 #include "Engine/Math/Point3.hpp"
 #include "Engine/Math/Math.hpp"
-#include "Engine/Math/VectorMath.hpp"
+//#include "Engine/Math/VectorMath.hpp"
 #include "Engine/Math/Angle.hpp"
 #include "Engine/Math/Matrix3x3.hpp"
 #include "Engine/Math/RotationMatrix3.hpp"

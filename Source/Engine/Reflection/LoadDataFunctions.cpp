@@ -6,6 +6,7 @@
 #include "Engine/Reflection/DataTypeRegistry.hpp"
 #include "Engine/Graphics/GraphicsConstants.hpp"
 #include "Engine/Reflection/VariantReflection.hpp"
+#include "Engine/Math/RotationMath.hpp"
 #include <filesystem>
 
 namespace CLX

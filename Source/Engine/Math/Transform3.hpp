@@ -5,7 +5,7 @@
 #include "Engine/Math/UnitVector3.hpp"
 #include "Engine/Math/Point3.hpp"
 #include "Engine/Math/Matrix4x4.hpp"
-#include "Engine/Math/RotationMath.hpp"
+#include "Engine/Math/RotationMatrix3.hpp"
 #include "Engine/Math/Angle.hpp"
 
 namespace CLX
@@ -29,8 +29,6 @@ namespace CLX
 		constexpr void SetScale(const Vector3<T>& scale);
 		constexpr void SetMatrix(const Matrix4x4<T>& matrix);
 		constexpr void MovePosition(const Vector3<T>& change);
-		constexpr void RotateOnAxis(const UnitVector3<T>& axis, Radians<T> angle);
-		constexpr void RotateOnAxis(const UnitVector3<T>& axis, Degrees<T> angle);
 
 	public:
 
@@ -41,7 +39,6 @@ namespace CLX
 		[[nodiscard]] constexpr UnitVector3<T> GetRightVector() const;
 		[[nodiscard]] constexpr UnitVector3<T> GetUpVector() const;
 		[[nodiscard]] constexpr UnitVector3<T> GetForwardVector() const;
-		[[nodiscard]] constexpr Transform3 ToWorld(const Transform3& parent) const;
 
 	private:
 
@@ -119,18 +116,6 @@ namespace CLX
 	}
 
 	template<std::floating_point T>
-	constexpr void Transform3<T>::RotateOnAxis(const UnitVector3<T>& axis, Radians<T> angle)
-	{
-		RotateMatrixAroundAxis(mMatrix, axis, angle);
-	}
-
-	template<std::floating_point T>
-	constexpr void Transform3<T>::RotateOnAxis(const UnitVector3<T>& axis, Degrees<T> angle)
-	{
-		RotateMatrixAroundAxis(mMatrix, axis, angle);
-	}
-
-	template<std::floating_point T>
 	constexpr const Matrix4x4<T>& Transform3<T>::GetMatrix() const
 	{
 		return mMatrix;
@@ -170,12 +155,6 @@ namespace CLX
 	constexpr UnitVector3<T> Transform3<T>::GetForwardVector() const
 	{
 		return mMatrix.GetForward();
-	}
-
-	template<std::floating_point T>
-	constexpr Transform3<T> Transform3<T>::ToWorld(const Transform3<T>& parent) const
-	{
-		return Transform3<T>(ToWorldSpace(mMatrix, parent.mMatrix));
 	}
 
 	template<std::floating_point T>

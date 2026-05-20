@@ -1,8 +1,11 @@
 #pragma once
-#include <exception>
-#include <string>
 
 #ifdef _WIN32
+
+#define NOMINMAX
+
+#include <exception>
+#include <string>
 #include <Windows.h>
 
 namespace CLX

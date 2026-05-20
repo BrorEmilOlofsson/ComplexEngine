@@ -1,5 +1,6 @@
 #pragma once
 #include <limits>
+#include <cstdint>
 
 namespace CLX
 {
@@ -10,18 +11,18 @@ namespace CLX
 		
 		constexpr DepthStencilViewHandle() = default;
 
-		constexpr DepthStencilViewHandle(unsigned int id)
+		constexpr DepthStencilViewHandle(uint32_t id)
 			: mID(id)
 		{
 		}
 
-		[[nodiscard]] constexpr unsigned int GetID() const noexcept
+		[[nodiscard]] constexpr uint32_t GetID() const noexcept
 		{
 			return mID;
 		}
 
 	private:
 
-		unsigned int mID = std::numeric_limits<unsigned int>::max();
+		uint32_t mID = std::numeric_limits<uint32_t>::max();
 	};
 }

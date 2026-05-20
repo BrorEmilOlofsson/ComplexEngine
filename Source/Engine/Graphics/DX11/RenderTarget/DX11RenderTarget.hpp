@@ -1,11 +1,12 @@
 #pragma once
-#include <optional>
-#include "Engine/Utility/Color.hpp"
 
 #ifdef _WIN32
 
 #include <d3d11.h>
 #include <wrl/client.h>
+#include <optional>
+#include "Engine/Utility/Color.hpp"
+#include "Engine/Math/Dimension2.hpp"
 
 namespace CLX
 {

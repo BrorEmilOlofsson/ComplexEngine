@@ -2,6 +2,8 @@
 
 #ifdef _WIN32
 
+#define NOMINMAX
+
 #include "Engine/Math/Vector2.hpp"
 #include "Engine/Math/Dimension2.hpp"
 #include "Engine/Math/Point2.hpp"

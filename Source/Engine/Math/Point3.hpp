@@ -1,8 +1,8 @@
 #pragma once
-#include "Engine/Math/Vector3.hpp"
-#include "Engine/Math/UnitVector3.hpp"
 #include <cstdint>
 #include <format>
+#include "Engine/Math/Vector3.hpp"
+#include "Engine/Math/UnitVector3.hpp"
 
 namespace CLX
 {

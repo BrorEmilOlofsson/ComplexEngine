@@ -3,8 +3,9 @@
 #include "Engine/ECS/ECS.hpp"
 #include "Engine/Graphics/RenderState.hpp"
 #include "Engine/ECSEngine/Components/CylinderComponent.hpp"
-#include "Engine/ECSEngine/Components/TransformComponent.hpp"
 #include "Engine/Math/ShapeMath.hpp"
+#include "Engine/ECSEngine/Utility/ECSUtilityFunctions.hpp"
+#include "Engine/Math/RotationMath.hpp"
 
 namespace CLX
 {
@@ -13,14 +14,14 @@ namespace CLX
     {
         RenderState& renderState = blackboard.Get<Key_CurrentRenderState>();
         RenderList& renderList = renderState.GetRenderList();
-        ecs.ForEach([&renderList](const CylinderComponent& cylinderComponent, const TransformComponent& transformComponent)
+        ecs.ForEach([&renderList, &ecs](const EntityID entityID, const CylinderComponent& cylinderComponent)
             {
 
-                Transform localTransfom;
-                localTransfom.SetPosition(cylinderComponent.cylinder.GetCenter());
-                localTransfom.SetRotation(RotationMatrix3f::FromY(cylinderComponent.cylinder.GetAxis()));
+                Transform localTransform;
+                localTransform.SetPosition(cylinderComponent.cylinder.GetCenter());
+                localTransform.SetRotation(RotationMatrix3f::FromY(cylinderComponent.cylinder.GetAxis()));
 
-                const Transform worldTransform = localTransfom.ToWorld(transformComponent.transform);
+                const Transform worldTransform = ToWorldSpace(localTransform, GetEntityWorldTransform(ecs, entityID));
 
                 Cylinderf cylinder = cylinderComponent.cylinder;
                 cylinder.SetAxis(worldTransform.GetUpVector());

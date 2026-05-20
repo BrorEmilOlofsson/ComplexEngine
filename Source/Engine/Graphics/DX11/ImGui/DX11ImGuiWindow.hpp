@@ -2,6 +2,8 @@
 
 #ifdef _WIN32
 
+#define NOMINMAX
+
 #include <Windows.h>
 #include <windef.h>
 #include <exception>

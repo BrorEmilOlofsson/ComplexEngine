@@ -1,11 +1,16 @@
 #pragma once
-#include "Engine/Graphics/DepthBuffer/DepthStencilViewHandle.hpp"
-#include <unordered_map>
 
 #ifdef _WIN32
 
+
+#define NOMINMAX
+
+#include <unordered_map>
 #include <d3d11.h>
 #include <wrl/client.h>
+
+#include "Engine/Graphics/DepthBuffer/DepthStencilViewHandle.hpp"
+#include "Engine/Math/Dimension2.hpp"
 
 namespace CLX
 {

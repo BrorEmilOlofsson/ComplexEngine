@@ -9,6 +9,10 @@
 #include "Engine/Math/Angle.hpp"
 #include <array>
 #include <cassert>
+#include <concepts>
+#include "Vector2.hpp"
+#include "Matrix3x3.hpp"
+#include "Transform3.hpp"
 
 namespace CLX
 {
@@ -229,6 +233,18 @@ namespace CLX
         return local * parent;
     }
 
+    template<std::floating_point T>
+    [[nodiscard]] constexpr Transform3<T> ToWorldSpace(const Transform3<T>& local, const Transform3<T>& parent)
+    {
+        return Transform3<T>::FromMatrix(ToWorldSpace(local.GetMatrix(), parent.GetMatrix()));
+    }
+
+    template<std::floating_point T>
+    [[nodiscard]] constexpr Transform3<T> ToLocalSpace(const Transform3<T>& local, const Transform3<T>& parent)
+    {
+        return Transform3<T>::FromMatrix(ToLocalSpace(local.GetMatrix(), parent.GetMatrix()));
+    }
+
     template<typename T>
     [[nodiscard]] constexpr Matrix4x4<T> CreateRotationMatrix(const Rotator<T>& rotator)
     {
@@ -334,6 +350,20 @@ namespace CLX
     [[nodiscard]] constexpr Point3<T> RotatePointAroundAxis(const Point3<T>& rotateAroundPoint, const Point3<T>& point, const UnitVector3<T>& axis, const Degrees<T> angle)
     {
         return RotatePointAroundAxis(rotateAroundPoint, point, axis, ToRadians(angle));
+    }
+
+    template<std::floating_point T>
+    constexpr void RotateOnAxis(Transform& transform, const UnitVector3<T>& axis, Radians<T> angle)
+    {
+        Matrix4x4<T> m = transform.GetMatrix();
+        RotateMatrixAroundAxis(m, axis, angle);
+        transform.SetMatrix(m);
+    }
+
+    template<std::floating_point T>
+    constexpr void RotateOnAxis(Transform& transform, const UnitVector3<T>& axis, Degrees<T> angle)
+    {
+        RotateOnAxis(transform, axis, ToRadians(angle));
     }
 
     template<typename T>

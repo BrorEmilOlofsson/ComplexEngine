@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include "Engine/Math/Dimension2.hpp"
+#include "Engine/Math/Point2.hpp"
 
 namespace CLX
 {

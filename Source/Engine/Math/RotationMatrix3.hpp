@@ -2,7 +2,7 @@
 #include "Engine/Math/Matrix3x3.hpp"
 #include "Engine/Math/Vector3.hpp"
 #include "Engine/Math/UnitVector3.hpp"
-#include "Engine/Math/VectorMath.hpp"
+//#include "Engine/Math/VectorMath.hpp"
 #include "Engine/Utility/Assert.hpp"
 #include <array>
 #include <limits>
@@ -83,10 +83,6 @@ namespace CLX
 			, mUp(up)
 			, mForward(forward)
 		{
-			const auto det = GetDeterminant(ToMatrix());
-			det;
-			const auto dot = Dot(up, forward);
-			dot;
 			ASSERT(IsPure(ToMatrix()) && "The provided axes do not form a pure rotation matrix.");
 		}
 

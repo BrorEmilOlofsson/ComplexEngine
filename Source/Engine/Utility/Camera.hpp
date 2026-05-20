@@ -3,8 +3,9 @@
 #include "Engine/Math/Matrix4x4.hpp"
 #include "Engine/Math/Vector3.hpp"
 #include "Engine/Math/UnitVector3.hpp"
-#include "Engine/Math/Vector2.hpp"
 #include "Engine/Math/Angle.hpp"
+#include "Engine/Math/Dimension2.hpp"
+#include "Engine/Math/VectorMath.hpp"
 
 namespace CLX
 {
@@ -38,7 +39,6 @@ namespace CLX
 		constexpr void SetCameraType(const eCameraType cameraType);
 
 		constexpr void SetPosition(const Point3f& position);
-		//constexpr void SetRotation(const Rotatorf& rotationInDegree);
 		constexpr void SetRotation(const RotationMatrix3f& rotationMatrix);
         constexpr void SetTransform(const Transform& transform);
 		constexpr void SetNearPlane(const float nearPlane);

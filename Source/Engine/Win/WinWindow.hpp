@@ -1,6 +1,8 @@
 #pragma once
 #ifdef _WIN32
 
+#define NOMINMAX
+
 #include <memory>
 #include <string>
 #include "Engine/Math/Shapes/AABB2.hpp"

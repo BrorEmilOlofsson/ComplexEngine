@@ -1,7 +1,7 @@
 #pragma once
+#include <string>
 #include "Engine/Math/Point3.hpp"
 #include "Engine/Utility/Color.hpp"
-#include <string>
 
 namespace CLX
 {

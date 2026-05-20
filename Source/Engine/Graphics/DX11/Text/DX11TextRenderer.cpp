@@ -3,6 +3,9 @@
 #include "Engine/Utility/Win/WinAdapterFunctions.hpp"
 #include "Engine/Utility/CameraMath.hpp"
 
+#undef min
+#undef max
+
 namespace CLX
 {
 

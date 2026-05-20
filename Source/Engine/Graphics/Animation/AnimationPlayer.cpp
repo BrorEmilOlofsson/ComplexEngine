@@ -3,6 +3,7 @@
 #include "Engine/Graphics/Animation/Animation.hpp"
 #include <span>
 #include "Engine/Graphics/Model/Bone.hpp"
+#include "Engine/Math/RotationMath.hpp"
 
 namespace CLX
 {

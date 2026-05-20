@@ -3,6 +3,7 @@
 #include "Engine/ECSEngine/Components/RotatingMovementComponent.hpp"
 #include "Engine/ECS/ECS.hpp"
 #include "Engine/ECSEngine/Components/TransformComponent.hpp"
+#include "Engine/Math/RotationMath.hpp"
 
 namespace CLX
 {

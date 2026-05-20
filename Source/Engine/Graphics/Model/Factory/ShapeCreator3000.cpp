@@ -1,6 +1,7 @@
 #include "Engine/Precompiled/EnginePch.hpp"
 #include "ShapeCreator3000.hpp"
 #include <External/TheGameAssembly/Uppgift5/uppgift05_helper.h>
+#include "Engine/Math/RotationMath.hpp"
 
 namespace CLX
 {

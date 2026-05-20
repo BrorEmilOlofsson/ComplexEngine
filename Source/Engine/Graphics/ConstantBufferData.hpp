@@ -5,6 +5,7 @@
 #include "Engine/Math/Matrix4x4.hpp"
 #include "Engine/Utility/Color.hpp"
 #include "Engine/Graphics/GraphicsConstants.hpp"
+#include "Engine/Math/Dimension2.hpp"
 #include <array>
 #include <limits>
 

@@ -1,8 +1,15 @@
 #pragma once
 #ifdef _WIN32
 
-#include "Engine/Graphics/DX11/DX11GBuffer.hpp"
 #include <vector>
+
+#include <wrl/client.h>
+#include <d3d11.h>
+
+#include "Engine/Graphics/DX11/RenderTarget/DX11RenderTarget.hpp"
+#include "Engine/Graphics/DX11/DX11GBuffer.hpp"
+#include "Engine/Math/Dimension2.hpp"
+#include "Engine/Math/Point2.hpp"
 
 namespace CLX
 {

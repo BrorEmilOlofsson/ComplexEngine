@@ -215,6 +215,68 @@ namespace CLX
 	{
         return NearlyEqual(a.x, b.x, tolerance) && NearlyEqual(a.y, b.y, tolerance) && NearlyEqual(a.z, b.z, tolerance);
 	}
+
+	template<typename T>
+	[[nodiscard]] constexpr T Length(const Vector3<T>& vector) noexcept
+	{
+		return Length(vector.x, vector.y, vector.z);
+	}
+
+	template<typename T>
+	[[nodiscard]] constexpr T LengthSquared(const Vector3<T>& vector) noexcept
+	{
+		return LengthSquared(vector.x, vector.y, vector.z);
+	}
+
+	template<typename T>
+	[[nodiscard]] constexpr bool IsNormalized(const Vector3<T>& vector) noexcept
+	{
+		return IsNormalized(vector.x, vector.y, vector.z);
+	}
+
+	template<typename T>
+	[[nodiscard]] constexpr void Normalize(Vector3<T>& vector)
+	{
+		Normalize<false>(vector.x, vector.y, vector.z);
+	}
+
+	template<typename T>
+	[[nodiscard]] constexpr Vector3<T> ToNormalized(const Vector3<T>& vector)
+	{
+		Vector3<T> result = vector;
+		Normalize(result);
+		return result;
+	}
+
+	template<typename T>
+	[[nodiscard]] constexpr Vector3<T> Min(const Vector3<T>& a, const Vector3<T>& b) noexcept
+	{
+		return Vector3<T>(Min(a.x, b.x), Min(a.y, b.y), Min(a.z, b.z));
+	}
+
+	template<typename T>
+	[[nodiscard]] constexpr Vector3<T> Max(const Vector3<T>& a, const Vector3<T>& b) noexcept
+	{
+		return Vector3<T>(Max(a.x, b.x), Max(a.y, b.y), Max(a.z, b.z));
+	}
+
+	template<typename T>
+	[[nodiscard]] constexpr T MaxComponent(const Vector3<T>& vector) noexcept
+	{
+		return Max(Max(vector.x, vector.y), vector.z);
+	}
+
+	template<typename T>
+	[[nodiscard]] constexpr T Dot(const Vector3<T>& a, const Vector3<T>& b) noexcept
+	{
+		return Dot(a.x, a.y, a.z, b.x, b.y, b.z);
+	}
+
+	template<typename T>
+	[[nodiscard]] constexpr Vector3<T> Cross(const Vector3<T>& a, const Vector3<T>& b)
+	{
+		return Vector3<T>(Cross(a.x, a.y, a.z, b.x, b.y, b.z));
+	}
 }
 
 template<typename T>

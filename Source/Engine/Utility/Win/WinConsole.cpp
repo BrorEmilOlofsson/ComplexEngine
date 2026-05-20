@@ -1,5 +1,8 @@
 #include "Engine/Precompiled/EnginePch.hpp"
 #include "WinConsole.hpp"
+
+#define NOMINMAX
+
 #include <Windows.h>
 #include <consoleapi.h>
 #include <consoleapi2.h>

@@ -265,4 +265,24 @@ namespace CLX
 			   NearlyEqual(a.Y(), b.Y(), tolerance) &&
             NearlyEqual(a.Z(), b.Z(), tolerance);
 	}
+
+
+	template<template<typename> typename Ret = UnitVector3, typename T>
+	[[nodiscard]] constexpr Ret<T> Cross(const UnitVector3<T>& a, const UnitVector3<T>& b)
+	{
+		return Ret<T>(Cross(a.X(), a.Y(), a.Z(), b.X(), b.Y(), b.Z()));
+	}
+
+	template<typename T>
+	[[nodiscard]] constexpr Vector3<T> Cross(const Vector3<T>& a, const UnitVector3<T>& b)
+	{
+		return Vector3<T>(Cross(a.x, a.y, a.z, b.X(), b.Y(), b.Z()));
+	}
+
+	template<typename T>
+	[[nodiscard]] constexpr Vector3<T> Cross(const UnitVector3<T>& a, const Vector3<T>& b)
+	{
+		return Vector3<T>(Cross(a.X(), a.Y(), a.Z(), b.x, b.y, b.z));
+	}
+
 }

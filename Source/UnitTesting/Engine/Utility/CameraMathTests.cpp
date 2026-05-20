@@ -3,6 +3,7 @@
 #include "Engine/Utility/Win/WinAdapterFunctions.hpp"
 //#include <Windows.h>
 #include <DirectXMath.h>
+#include "Engine/Math/RotationMath.hpp"
 
 using namespace CLX;
 
@@ -41,8 +42,8 @@ TEST_CASE("GetScreenPosition", "[CameraMath]")
 
 	{
 		Camera camera;
-		camera.GetTransform().RotateOnAxis(UnitVector3f::Right(), Degreesf(32.f));
-		camera.GetTransform().RotateOnAxis(UnitVector3f::Up(), Degreesf(21.45f));
+		RotateOnAxis(camera.GetTransform(), UnitVector3f::Right(), Degreesf(32.f));
+		RotateOnAxis(camera.GetTransform(), UnitVector3f::Up(), Degreesf(21.45f));
 		auto viewMatrixXM = ToXMMATRIX(camera.GetViewMatrix());
 		auto projectionMatrixXM = ToXMMATRIX(camera.GetProjectionMatrix());
 		auto clipMatrixXM = viewMatrixXM * projectionMatrixXM;

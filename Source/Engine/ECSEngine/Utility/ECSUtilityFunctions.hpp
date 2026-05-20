@@ -9,7 +9,7 @@
 #include "Engine/ECSEngine/Components/TransformHierarchyComponent.hpp"
 #include "Engine/ECSEngine/Components/TransformComponent.hpp"
 #include "Engine/ECSEngine/Components/NameComponent.hpp"
-#include "Engine/ECSEngine/Components/EntityCompositionInstantiationComponent.hpp"
+#include "Engine/Math/RotationMath.hpp"
 
 namespace CLX
 {
@@ -245,7 +245,7 @@ namespace CLX
         const EntityID parentID = GetParentEntity(ecs, entityID);
         if (parentID != InvalidEntityID)
         {
-            return localTransform.ToWorld(GetEntityWorldTransform(ecs, parentID));
+            return ToWorldSpace(localTransform, GetEntityWorldTransform(ecs, parentID));
         }
 
         return localTransform;

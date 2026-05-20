@@ -1,17 +1,20 @@
 #pragma once
+#ifdef _WIN32
+
+#define NOMINMAX
+
 #include <memory>
 #include <string>
 #include <span>
-#include "Engine/Win/WinDefines.hpp"
-
-#include "Engine/Graphics/Text/Text3D.hpp"
-
-#ifdef _WIN32
 
 #include <External/DirectXTK/SpriteBatch.h>
 #include <External/DirectXTK/SpriteFont.h>
 
 #include <d3d11.h>
+
+#include "Engine/Graphics/Text/Text3D.hpp"
+#include "Engine/Utility/Camera.hpp"
+#include "Engine/Math/Dimension2.hpp"
 
 namespace CLX
 {

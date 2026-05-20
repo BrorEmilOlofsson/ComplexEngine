@@ -1,6 +1,9 @@
 #pragma once
 
 #ifdef _WIN32
+
+#define NOMINMAX
+
 #include <DirectXMath.h>
 #include <Windows.h>
 #include "Engine/Utility/Color.hpp"

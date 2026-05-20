@@ -1,6 +1,8 @@
 #pragma once
 #ifdef _WIN32
 
+#define NOMINMAX
+
 #include <string>
 #include <memory>
 

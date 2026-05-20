@@ -17,7 +17,7 @@ namespace CLX
         Shape operator()(const Spheref& sphere)
         {
             Spheref transformedSphere = sphere;
-            const Transform worldTransform = ToTransform(sphere).ToWorld(entityWorldTransform);
+            const Transform worldTransform = ToWorldSpace(ToTransform(sphere), entityWorldTransform);
             transformedSphere.SetCenter(worldTransform.GetPosition());
             transformedSphere.SetRadius(sphere.GetRadius() * MaxComponent(worldTransform.GetScale()));
             return transformedSphere;
@@ -26,7 +26,7 @@ namespace CLX
         Shape operator()(const AABB3f& aabb)
         {
             AABB3f transformedAABB = aabb;
-            const Transform worldTransform = ToTransform(aabb).ToWorld(entityWorldTransform);
+            const Transform worldTransform = ToWorldSpace(ToTransform(aabb), entityWorldTransform);
             transformedAABB.SetCenter(worldTransform.GetPosition());
             transformedAABB.SetExtent(aabb.GetExtent() * worldTransform.GetScale());
             return transformedAABB;
@@ -36,7 +36,7 @@ namespace CLX
     Transform GetShapeWorldTransform(const ECS& ecs, EntityID entityID, const Shape& shape)
     {
         const Transform shapeTransform = std::visit([](const auto& s) { return ToTransform(s); }, shape);
-        return shapeTransform.ToWorld(GetEntityWorldTransform(ecs, entityID));
+        return ToWorldSpace(shapeTransform, GetEntityWorldTransform(ecs, entityID));
     }
 
     void UpdateTriggerStates(std::span<const TriggerData> previousFrameTriggers, std::vector<TriggerData>& newTriggers)

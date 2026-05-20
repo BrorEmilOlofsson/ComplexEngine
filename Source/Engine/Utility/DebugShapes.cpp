@@ -3,6 +3,7 @@
 #include "Engine/Math/Shapes/Sphere.hpp"
 #include "Engine/Math/Shapes/Ray3.hpp"
 #include "Engine/Graphics/RenderList.hpp"
+#include "Engine/Math/RotationMath.hpp"
 
 namespace CLX
 {

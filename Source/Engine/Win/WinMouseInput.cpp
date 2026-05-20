@@ -2,6 +2,8 @@
 
 #ifdef _WIN32
 
+#define NOMINMAX
+
 #include "WinMouseInput.hpp"
 #include <Windows.h>
 #include <windowsx.h>

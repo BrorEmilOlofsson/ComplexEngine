@@ -1,12 +1,13 @@
 #pragma once
-#include "Engine/Graphics/DX11/RenderTarget/DX11RenderTarget.hpp"
-#include "Engine/Math/Vector2.hpp"
 
 
 #ifdef _WIN32
 
 #include <wrl/client.h>
 #include <d3d11.h>
+
+#include "Engine/Graphics/DX11/RenderTarget/DX11RenderTarget.hpp"
+#include "Engine/Math/Dimension2.hpp"
 
 namespace CLX
 {

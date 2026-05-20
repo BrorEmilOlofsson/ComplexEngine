@@ -1,12 +1,16 @@
 #pragma once
 #ifdef _WIN32
 
+#define NOMINMAX
+
 #include <filesystem>
 
 #include <wrl/client.h>
 #include <d3d11.h>
+#include <dxgi.h>
+#include <Windows.h>
 
-#include "Engine/Math/Vector2.hpp"
+#include "Engine/Math/Dimension2.hpp"
 
 
 namespace CLX
