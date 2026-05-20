@@ -8,6 +8,24 @@
 namespace CLX
 {
 
+    template<typename T, typename U>
+    [[nodiscard]] constexpr U GetRow(const T& position, const U& width)
+    {
+        return position / width;
+    }
+
+    template<typename T, typename U>
+    [[nodiscard]] constexpr U GetColumn(const T& position, const U& width)
+    {
+        return position % width;
+    }
+
+    template<std::integral T, std::unsigned_integral U>
+    [[nodiscard]] constexpr T GetIndex(const T& row, const T& column, const U& width)
+    {
+        return row * width + column;
+    }
+
     template<std::integral T>
     [[nodiscard]] constexpr T GetRightOffset()
     {
@@ -136,7 +154,7 @@ namespace CLX
 
     template<std::integral T, std::unsigned_integral U>
     [[nodiscard]] constexpr std::optional<T> GetPositionDownRight(const T& position, const U& width, const U& height)
-    {   
+    {
         const std::optional<T> newPosition = GetPositionDown(position, width, height);
         if (!newPosition)
         {
