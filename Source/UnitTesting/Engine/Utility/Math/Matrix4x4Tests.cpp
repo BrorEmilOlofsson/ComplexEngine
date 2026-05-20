@@ -168,7 +168,7 @@ TEST_CASE("Matrix4x4 Multiplication with Vector", "[Matrix4x4]")
 
 		constexpr Vector3f vector(1.f, 2.f, 3.f);
 
-		constexpr Vector3f result = matrix * vector;
+		constexpr Vector3f result = vector * matrix;
 		REQUIRE(result == vector);
 	}
 

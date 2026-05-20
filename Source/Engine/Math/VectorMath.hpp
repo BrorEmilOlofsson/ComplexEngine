@@ -593,15 +593,4 @@ namespace CLX
         ASSERT(resolution.GetWidth() != 0 && "Resolution height cannot be zero when calculating aspect ratio.");
 		return static_cast<float>(resolution.GetWidth()) / static_cast<float>(resolution.GetHeight());
 	}
-
-	template<typename T>
-    [[nodiscard]] constexpr Transform3<T> Lerp(const Transform3<T>& from, const Transform3<T>& to, const T& t)
-    {
-        return Transform3<T>
-            (
-                Lerp(from.GetPosition(), to.GetPosition(), t),
-                Slerp(from.GetRotation(), to.GetRotation(), t),
-                Lerp(from.GetScale(), to.GetScale(), t)
-            );
-    }
 }

@@ -6,6 +6,16 @@
 
 using namespace CLX;
 
+static void RequireNearlyEqual(const RotationMatrix3f& a, const RotationMatrix3f& b)
+{
+    constexpr float epsilon = 0.0001f;
+
+    for (unsigned int index = 0; index < 9; ++index)
+    {
+        REQUIRE(a[index] == Catch::Approx(b[index]).margin(epsilon));
+    }
+}
+
 TEST_CASE("Quaternion - Default constructor is identity")
 {
     Quaternionf q;
@@ -49,6 +59,25 @@ TEST_CASE("QuaternionToMatrix")
 
 	constexpr RotationMatrix3f expectedMatrix = RotationMatrix3f::Identity();
 	REQUIRE(m == expectedMatrix);
+}
+
+TEST_CASE("Quaternion - Rotation matrix round trip preserves direction")
+{
+    const RotationMatrix3f rotation = RotationMatrix3f::FromXY(UnitVector3f::Forward(), UnitVector3f::Up());
+    const RotationMatrix3f roundTrip = ToRotationMatrix(ToQuaternion(rotation));
+
+    RequireNearlyEqual(roundTrip, rotation);
+}
+
+TEST_CASE("Quaternion - Transform lerp reaches target rotation")
+{
+    const Transform from = Transform::FromPositionRotationScale(Point3f(0, 5, -10), RotationMatrix3f::Identity(), Vector3f(1, 1, 1));
+    const RotationMatrix3f targetRotation = RotationMatrix3f::FromXY(UnitVector3f::Forward(), UnitVector3f::Up());
+    const Transform to = Transform::FromPositionRotationScale(Point3f(0, 5, -10), targetRotation, Vector3f(1, 1, 1));
+
+    const Transform result = Lerp(from, to, 1.0f);
+
+    RequireNearlyEqual(result.GetRotation(), targetRotation);
 }
 
 //TEST_CASE("MatrixToQuaternion - 90 degrees around X")

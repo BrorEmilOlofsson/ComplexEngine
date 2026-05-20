@@ -162,6 +162,19 @@ namespace CLX
     {
         return a.GetMatrix() == b.GetMatrix();
     }
+
+	template<typename T>
+	[[nodiscard]] constexpr Transform3<T> Lerp(const Transform3<T>& from, const Transform3<T>& to, const T& t)
+	{
+		Quaternion<T> fromRotation = ToQuaternion(from.GetRotation());
+		Quaternion<T> toRotation = ToQuaternion(to.GetRotation());
+        return Transform3<T>::FromPositionRotationScale
+			(
+				Lerp(from.GetPosition(), to.GetPosition(), t),
+				ToRotationMatrix(Slerp(fromRotation, toRotation, t)),
+				Lerp(from.GetScale(), to.GetScale(), t)
+			);
+	}
 }
 
 template<std::floating_point T>

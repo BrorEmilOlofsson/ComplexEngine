@@ -111,16 +111,16 @@ namespace CLX
         {
             T s = Sqrt(trace + 1) * 2;
             q.w = T(0.25) * s;
-            q.x = (m(2, 1) - m(1, 2)) / s;
-            q.y = (m(0, 2) - m(2, 0)) / s;
-            q.z = (m(1, 0) - m(0, 1)) / s;
+            q.x = (m(1, 2) - m(2, 1)) / s;
+            q.y = (m(2, 0) - m(0, 2)) / s;
+            q.z = (m(0, 1) - m(1, 0)) / s;
         }
         else
         {
             if (m(0, 0) > m(1, 1) && m(0, 0) > m(2, 2))
             {
                 T s = Sqrt(T(1) + m(0, 0) - m(1, 1) - m(2, 2)) * 2;
-                q.w = (m(2, 1) - m(1, 2)) / s;
+                q.w = (m(1, 2) - m(2, 1)) / s;
                 q.x = T(0.25) * s;
                 q.y = (m(0, 1) + m(1, 0)) / s;
                 q.z = (m(0, 2) + m(2, 0)) / s;
@@ -128,7 +128,7 @@ namespace CLX
             else if (m(1, 1) > m(2, 2))
             {
                 T s = Sqrt(T(1) + m(1, 1) - m(0, 0) - m(2, 2)) * 2;
-                q.w = (m(0, 2) - m(2, 0)) / s;
+                q.w = (m(2, 0) - m(0, 2)) / s;
                 q.x = (m(0, 1) + m(1, 0)) / s;
                 q.y = T(0.25) * s;
                 q.z = (m(1, 2) + m(2, 1)) / s;
@@ -136,7 +136,7 @@ namespace CLX
             else
             {
                 T s = Sqrt(T(1) + m(2, 2) - m(0, 0) - m(1, 1)) * 2;
-                q.w = (m(1, 0) - m(0, 1)) / s;
+                q.w = (m(0, 1) - m(1, 0)) / s;
                 q.x = (m(0, 2) + m(2, 0)) / s;
                 q.y = (m(1, 2) + m(2, 1)) / s;
                 q.z = T(0.25) * s;
@@ -154,48 +154,6 @@ namespace CLX
 
         return ToQuaternion(matrix.GetRotationMatrix());
     }
-
-    template<typename T>
-    constexpr Quaternion<T> ToQuaternion2(const Matrix4x4<T>& matrix)
-    {
-        const T trace = matrix(1, 1) + matrix(2, 2) + matrix(3, 3);
-        Quaternion<T> quaternion;
-        if (trace > T(0))
-        {
-            const T s = Sqrt(trace + T(1)) * T(2);
-            quaternion.w = s * T(0.25);
-            quaternion.x = (matrix(3, 2) - matrix(2, 3)) / s;
-            quaternion.y = (matrix(1, 3) - matrix(3, 1)) / s;
-            quaternion.z = (matrix(2, 1) - matrix(1, 2)) / s;
-        }
-        else if ((matrix(1, 1) > matrix(2, 2)) && (matrix(1, 1) > matrix(3, 3)))
-        {
-            const T s = Sqrt(T(1) + matrix(1, 1) - matrix(2, 2) - matrix(3, 3)) * T(2);
-            quaternion.w = (matrix(3, 2) - matrix(2, 3)) / s;
-            quaternion.x = s * T(0.25);
-            quaternion.y = (matrix(1, 2) + matrix(2, 1)) / s;
-            quaternion.z = (matrix(1, 3) + matrix(3, 1)) / s;
-        }
-        else if (matrix(2, 2) > matrix(3, 3))
-        {
-            const T s = Sqrt(T(1) + matrix(2, 2) - matrix(1, 1) - matrix(3, 3)) * T(2);
-            quaternion.w = (matrix(1, 3) - matrix(3, 1)) / s;
-            quaternion.x = (matrix(1, 2) + matrix(2, 1)) / s;
-            quaternion.y = s * T(0.25);
-            quaternion.z = (matrix(2, 3) + matrix(3, 2)) / s;
-        }
-        else
-        {
-            const T s = Sqrt(T(1) + matrix(3, 3) - matrix(1, 1) - matrix(2, 2)) * T(2);
-            quaternion.w = (matrix(2, 1) - matrix(1, 2)) / s;
-            quaternion.x = (matrix(1, 3) + matrix(3, 1)) / s;
-            quaternion.y = (matrix(2, 3) + matrix(3, 2)) / s;
-            quaternion.z = s * T(0.25);
-        }
-
-        return quaternion;
-    }
-
 
     template<typename T>
     [[nodiscard]] constexpr Matrix4x4<T> ToWorldSpace(const Matrix4x4<T>& local, const Matrix4x4<T>& world)
@@ -543,7 +501,7 @@ namespace CLX
 
         const T dotThreshold = static_cast<T>(0.9995);
 
-        if (cosTheta > T(1) - dotThreshold)
+        if (cosTheta > dotThreshold)
         {
             return Lerp(from, qz, delta);
         }

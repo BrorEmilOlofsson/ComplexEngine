@@ -761,16 +761,10 @@ namespace CLX
 	}
 
 	template<typename T>
-	[[nodiscard]] constexpr Vector3<T> operator*(const Matrix4x4<T>& matrix, const Vector3<T>& vector) noexcept
-	{
-		const Vector4<T> v = Vector4<T>(vector.x, vector.y, vector.z, 1) * matrix;
-		return Vector3<T>(v.x, v.y, v.z);
-	}
-
-	template<typename T>
 	[[nodiscard]] constexpr Vector3<T> operator*(const Vector3<T>& vector, const Matrix4x4<T>& matrix) noexcept
 	{
-		return matrix * vector;
+        const Vector4<T> v = Vector4<T>(vector.x, vector.y, vector.z, 1) * matrix;
+		return Vector3<T>(v.x, v.y, v.z);
 	}
 
 	template<typename T>
