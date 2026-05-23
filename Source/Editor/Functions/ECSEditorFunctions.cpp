@@ -98,7 +98,7 @@ namespace CLX
         ecs.DestroyEntity(entityID);
     }
 
-    static std::map<EntityID, EntityID> DuplicateEntityHierarchy(ECS& ecs, const EntityID entityID, const IndexVariant childIndex, const DataTypeRegistry& dataTypeRegistry)
+    std::map<EntityID, EntityID> DuplicateEntityHierarchy(ECS& ecs, const EntityID entityID, const IndexVariant childIndex, const DataTypeRegistry& dataTypeRegistry)
     {
         const EntityID createdEntityID = ecs.DuplicateEntity(entityID);
         std::map<EntityID, EntityID> oldToNewEntityIDMap;
@@ -126,6 +126,45 @@ namespace CLX
         {
             AddBasedOnChildIndexVariant(ecs.GetComponent<TransformHierarchyComponent>(parentID)->children, createdEntityID, childIndex);
         }
+
+        return oldToNewEntityIDMap;
+    }
+
+
+    static std::map<EntityID, EntityID> PasteEntityHierarchy(ECS& targetECS, const ECS& sourceECS, const EntityID entityID, const EntityID targetParentID, 
+        const IndexVariant childIndex, const DataTypeRegistry& dataTypeRegistry)
+    {
+        const EntityID createdEntityID = sourceECS.CopyEntity(entityID, targetECS);
+        std::map<EntityID, EntityID> oldToNewEntityIDMap;
+        oldToNewEntityIDMap[entityID] = createdEntityID;
+        std::vector<EntityID> children = GetEntityDescendants(sourceECS, entityID);
+
+        for (auto child : children)
+        {
+            const EntityID createdChildEntityID = sourceECS.CopyEntity(child, targetECS);
+            oldToNewEntityIDMap[child] = createdChildEntityID;
+        }
+
+        // Remap parent-child relationships in the duplicated entities
+        RemapComponentEntityIDs(targetECS, createdEntityID, oldToNewEntityIDMap, dataTypeRegistry);
+
+        for (auto child : children)
+        {
+            const EntityID createdChildEntityID = oldToNewEntityIDMap.at(child);
+            RemapComponentEntityIDs(targetECS, createdChildEntityID, oldToNewEntityIDMap, dataTypeRegistry);
+        }
+
+        if (targetParentID != InvalidEntityID)
+        {
+            SetParentEntity(targetECS, targetParentID, createdEntityID, childIndex);
+
+        }
+     /*   const EntityID parentID = GetParentEntity(targetECS, entityID);
+        ASSERT(parentID == GetParentEntity(targetECS, createdEntityID));
+        if (parentID != InvalidEntityID)
+        {
+            AddBasedOnChildIndexVariant(targetECS.GetComponent<TransformHierarchyComponent>(parentID)->children, createdEntityID, childIndex);
+        }*/
 
         return oldToNewEntityIDMap;
     }
@@ -181,12 +220,10 @@ namespace CLX
         }
     }
 
-
-    EntityID DuplicateEntityHierarchy(ECS& ecs, const EntityID entityID, std::vector<EntityID>& rootEntities, const IndexVariant indexVariant, const DataTypeRegistry& dataTypeRegistry, EditorCommandTracker& commandTracker)
+    EntityID PasteEntityHierarchy(ECS& ecs, const ECS& sourceECS, const EntityID entityID, const EntityID targetParentID, std::vector<EntityID>& rootEntities, const IndexVariant childIndex, const DataTypeRegistry& dataTypeRegistry, EditorCommandTracker& commandTracker)
     {
-        std::map<EntityID, EntityID> oldToNewEntityIDMap = DuplicateEntityHierarchy(ecs, entityID, indexVariant, dataTypeRegistry);
+        std::map<EntityID, EntityID> oldToNewEntityIDMap = PasteEntityHierarchy(ecs, sourceECS, entityID, targetParentID, childIndex, dataTypeRegistry);
         const EntityID newEntityID = oldToNewEntityIDMap.at(entityID);
-
 
         struct DuplicateEntityHierarchyData final
         {
@@ -205,8 +242,8 @@ namespace CLX
             .duplicatedEntityID = newEntityID,
             .ecs = ecs,
             .rootEntities = rootEntities,
-            .parentID = GetParentEntity(ecs, entityID),
-            .indexVariant = indexVariant
+            .parentID = targetParentID,
+            .indexVariant = childIndex
         };
 
         auto doCommand = [](const DuplicateEntityHierarchyData& data)
@@ -234,11 +271,23 @@ namespace CLX
         return newEntityID;
     }
 
+
+    EntityID DuplicateEntityHierarchy(ECS& ecs, const EntityID entityID, std::vector<EntityID>& rootEntities, const IndexVariant indexVariant, const DataTypeRegistry& dataTypeRegistry, EditorCommandTracker& commandTracker)
+    {
+        return PasteEntityHierarchy(
+            ecs,
+            ecs, 
+            entityID, 
+            GetParentEntity(ecs, entityID), 
+            rootEntities, 
+            indexVariant, 
+            dataTypeRegistry, 
+            commandTracker
+        );
+    }
+
     static EntityID CreateRootEntity(ECS& ecs, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker)
     {
-        ecs;
-        rootEntities;
-        commandTracker;
         const EntityID createdEntityID = ecs.CreateEntity();
 
         struct CreateEntityData final
@@ -560,36 +609,6 @@ namespace CLX
                 AddComponentToEntity(ecs, entityID, dataTypeID, componentName, commandTracker);
             };
     }
-
-    //void RemoveComponent(ECS& ecs, const EntityID entityID, const DataTypeID& dataTypeID, ECS& ecsBuffer, EditorCommandTracker& commandTracker)
-    //{
-    //    const EntityID copyEntityID = ecs.CopyEntity(entityID, ecsBuffer);
-    //    ecs.RemoveComponent(entityID, dataTypeID.typeIndex);
-
-
-    //    struct RemoveComponentData final
-    //    {
-    //        std::reference_wrapper<ECS> ecs;
-    //        EntityID entityID;
-    //        std::reference_wrapper<ECS> ecsBuffer;
-    //        EntityID copyEntityID;
-    //    };
-
-    //    RemoveComponentData data
-    //    {
-    //        .ecs = ecs,
-    //        .entityID = entityID,
-    //        .ecsBuffer = ecsBuffer,
-    //        .copyEntityID = copyEntityID
-    //    };
-
-    //    auto command = [](const RemoveComponentData& data)
-    //        {
-    //            SwapEntities(data.ecs.get(), data.ecsBuffer.get(), data.entityID, data.copyEntityID);
-    //        };
-
-    //    commandTracker.RegisterCommand(EditorCommand(data, command, command, "Remove Component"));
-    //}
 
     static void RemoveComponent(ECS& ecs, const EntityID entityID, const DataTypeID dataTypeID, const DataTypeRegistry& dataTypeRegistry, const Blackboard& blackboard, EditorCommandTracker& commandTracker)
     {
@@ -1054,7 +1073,7 @@ namespace CLX
         return InvalidEntityID;
     }
 
-    [[nodiscard]] static std::vector<EditorAction> ShowEntityChildren(ECS& ecs, const EntityID entityID, std::set<EntityID>& selectedEntityIDs, ECS& ecsBuffer,
+    [[nodiscard]] static std::vector<EditorAction> ShowEntityChildren(ECS& ecs, const EntityID entityID, std::set<EntityID>& selectedEntityIDs,
         std::vector<EntityID>& rootEntities, const std::span<const EntityID> parentEntities, const std::string& imGuiTag, const std::set<EntityID>& uneditableEntities,
         const DataTypeRegistry& dataTypeRegistry, const std::function<bool(EntityID)>& filter)
     {
@@ -1121,7 +1140,7 @@ namespace CLX
                 {
                     continue;
                 }
-                InsertRange(editorActions, ShowEntityChildren(ecs, childEntityID, selectedEntityIDs, ecsBuffer, rootEntities, parentEntities, imGuiTag, uneditableEntities, dataTypeRegistry, filter));
+                InsertRange(editorActions, ShowEntityChildren(ecs, childEntityID, selectedEntityIDs, rootEntities, parentEntities, imGuiTag, uneditableEntities, dataTypeRegistry, filter));
             }
 
             if (!children.empty())
@@ -1136,7 +1155,7 @@ namespace CLX
     }
 
 
-    void ShowEntityHierarchy(ECSHandle ecsHandle, ECS& ecsBuffer, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker,
+    void ShowEntityHierarchy(ECSHandle ecsHandle, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker,
         const std::string& imGuiTag, std::set<EntityID>& selectedEntityIDs, const std::set<EntityID>& uneditableEntities,
         std::string& entitySearchBuffer, EntityCompositionAssetHandle compositionHandle,
         EntityCompositionInstantiationManager& compositionInstantiations,
@@ -1196,7 +1215,6 @@ namespace CLX
                     ecs,
                     rootEntityID,
                     selectedEntityIDs,
-                    ecsBuffer,
                     rootEntities,
                     parentEntites,
                     imGuiTag,
@@ -1278,7 +1296,7 @@ namespace CLX
         }
     }
 
-    void ShowEntityHierarchyWithAddButtons(ECSHandle ecsHandle, ECS& ecsBuffer, std::vector<EntityID>& rootEntities,
+    void ShowEntityHierarchyWithAddButtons(ECSHandle ecsHandle, std::vector<EntityID>& rootEntities,
         EditorCommandTracker& commandTracker, const std::string& imGuiTag, std::set<EntityID>& selectedEntityIDs, const EntityID defaultParent,
         const std::set<EntityID>& uneditableEntities, std::string& entitySearchBuffer, EntityCompositionAssetHandle compositionHandle,
         EntityCompositionInstantiationManager& compositionInstantiations, const DataTypeRegistry& dataTypeRegistry, AssetManager& assetManager)
@@ -1290,7 +1308,6 @@ namespace CLX
         ImGui::Separator();
         ShowEntityHierarchy(
             ecsHandle,
-            ecsBuffer,
             rootEntities,
             commandTracker,
             imGuiTag,
@@ -1559,7 +1576,7 @@ namespace CLX
                 data.dataTypeRegistry.LoadDataJSON(data.componentType, componentPtr, data.oldData, data.blackboard);
             };
 
-        commandTracker.ExecuteCommand(EditorCommand(data, doCommand, undoCommand, "Paste Component Data"));
+        commandTracker.ExecuteCommand(EditorCommand(data, doCommand, undoCommand, "Set Component Data"));
     }
 
 
@@ -1573,7 +1590,7 @@ namespace CLX
     }
 
     [[nodiscard]] static std::vector<EditorAction> ShowComponentData(ECS& ecs, const EntityID entityID, const DataTypeID componentTypeID,
-        void* const componentPtr, bool& anyActiveItem, bool& changedValue, JsonAny& copiedComponent,
+        void* const componentPtr, bool& isComponentActive, JsonAny& copiedComponent,
         EntityCompositionAssetHandle entityCompositionAsset, EntityCompositionInstantiationManager& entityInstantiations,
         const DataTypeRegistry& dataTypeRegistry, const Blackboard& blackboard)
     {
@@ -1614,12 +1631,12 @@ namespace CLX
             PROFILER_BEGIN("View Component Data");
 
             const ViewAndEditResult viewAndEditResult = dataTypeRegistry.ViewAndEditData(componentTypeID, componentPtr, newBlackboard);
-            anyActiveItem |= viewAndEditResult.isActive;
             PROFILER_END();
+
+            isComponentActive = viewAndEditResult.isActive;
 
             if (viewAndEditResult.isEdited)
             {
-                changedValue = true;
                 HandleEntityCompositionModification(
                     entityCompositionAsset,
                     entityInstantiations,
@@ -1803,20 +1820,16 @@ namespace CLX
         const EntityID selectedEntityID = data.entityID;
         bool& anyItemActiveLastFrame = data.componentBufferData.anyItemActiveLastFrame;
         JsonAny& storedComponent = data.componentBufferData.storedComponent;
-        ECS& ecsBuffer = data.ecsBuffer;
         //EntityID& copyEntityID = data.copyEntityID;
         JsonAny& copiedComponent = data.copiedComponent;
         EntityCompositionAssetHandle entityCompositionAsset = data.entityCompositionAsset;
         EntityCompositionInstantiationManager& entityInstantiations = data.entityInstantiations;
         const Blackboard& blackboard = data.blackboard;
 
-        //if (!anyItemActiveLastFrame)
-        //{
-        //    copyEntityID = ecs.CopyEntity(selectedEntityID, ecsBuffer);
-        //}
-        ecsBuffer;
         bool anyActiveItem = false;
         std::vector<EditorAction> editorActions;
+
+        DataTypeID changedDataTypeID = InvalidDataTypeID;
 
         static bool showAllComponents = false;
         for (auto [type, componentPtr] : ecs.ViewEntity(selectedEntityID))
@@ -1836,15 +1849,14 @@ namespace CLX
 
             // Store the old value of the component in case we need to create a change value action later. 
             nlohmann::json oldValueJson = blackboard.Get<Key_DataTypeRegistry>().SaveDataJSON(GetDataTypeID(type), componentPtr);
-            bool changedValue = false;
+            bool isComponentActive = false;
 
             auto showComponentDataActions = ShowComponentData(
                 ecs,
                 selectedEntityID,
                 GetDataTypeID(type),
                 componentPtr,
-                anyActiveItem,
-                changedValue,
+                isComponentActive,
                 copiedComponent,
                 entityCompositionAsset,
                 entityInstantiations,
@@ -1859,9 +1871,15 @@ namespace CLX
                 ImGui::EndDisabled();
             }
 
-            if (anyActiveItem && !anyItemActiveLastFrame)
+            if (isComponentActive)
             {
-                storedComponent.dataTypeID = GetDataTypeID(type);
+                anyActiveItem = true;
+                changedDataTypeID = GetDataTypeID(type);
+            }
+
+            if (isComponentActive && !anyItemActiveLastFrame)
+            {
+                storedComponent.dataTypeID = changedDataTypeID;
                 storedComponent.json = std::move(oldValueJson);
             }
         }
@@ -1880,18 +1898,10 @@ namespace CLX
                 blackboard.Get<Key_DataTypeRegistry>(),
                 blackboard
                 );
-            //auto action = CreateChangeComponentValueAction(ecs, ecsBuffer, selectedEntityID, );
-
             editorActions.push_back(std::move(action));
 
             storedComponent = {};
-            //copyEntityID = InvalidEntityID;
         }
-
-        /*   if (!anyActiveItem && !anyItemActiveLastFrame)
-           {
-               ecsBuffer.DestroyEntity(copyEntityID);
-           }*/
 
         anyItemActiveLastFrame = anyActiveItem;
 
@@ -1991,7 +2001,6 @@ namespace CLX
         PROFILER_FUNCTION(profiler::colors::Pink200);
         ECS& ecs = data.ecs;
         const EntityID entityID = data.entityID;
-        ECS& ecsBuffer = data.ecsBuffer;
         EntityID& copyEntityID = data.copyEntityID;
         std::string& componentSearchString = data.componentSearchString;
         uint32_t& selectedComponentPopupIndex = data.selectedComponentPopupIndex;
@@ -2010,7 +2019,6 @@ namespace CLX
                 .ecs = ecs,
                 .entityID = entityID,
                 .componentBufferData = componentBufferData,
-                .ecsBuffer = ecsBuffer,
                 .copyEntityID = copyEntityID,
                 .copiedComponent = copiedComponent,
                 .entityCompositionAsset = entityCompositionAsset,

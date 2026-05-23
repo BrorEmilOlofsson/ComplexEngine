@@ -22,13 +22,15 @@ static ECSRegistry CreateRegistry()
 TEST_CASE("ECS - Create Entity", "[ECS]")
 {
     {
-        ECS ecs(CreateRegistry());
+        EntitySerializationIDGenerator entityIDGenerator;
+        ECS ecs(CreateRegistry(), entityIDGenerator);
         const EntityID entityID = ecs.CreateEntity();
         REQUIRE(entityID.id == 0);
     }
 
     {
-        ECS ecs(CreateRegistry());
+        EntitySerializationIDGenerator entityIDGenerator;
+        ECS ecs(CreateRegistry(), entityIDGenerator);
         const EntityID entityID1 = ecs.CreateEntity();
         const EntityID entityID2 = ecs.CreateEntity();
         REQUIRE(entityID1.id == 0);
@@ -39,14 +41,16 @@ TEST_CASE("ECS - Create Entity", "[ECS]")
 TEST_CASE("ECS - Destroy Entity", "[ECS]")
 {
     {
-        ECS ecs(CreateRegistry());
+        EntitySerializationIDGenerator entityIDGenerator;
+        ECS ecs(CreateRegistry(), entityIDGenerator);
         const EntityID entityID = ecs.CreateEntity();
         ecs.DestroyEntity(entityID);
         REQUIRE(entityID.id == 0);
     }
 
     {
-        ECS ecs(CreateRegistry());
+        EntitySerializationIDGenerator entityIDGenerator;
+        ECS ecs(CreateRegistry(), entityIDGenerator);
         const EntityID entityID1 = ecs.CreateEntity();
         const EntityID entityID2 = ecs.CreateEntity();
 
@@ -59,7 +63,8 @@ TEST_CASE("ECS - Destroy Entity", "[ECS]")
     }
 
     {
-        ECS ecs(CreateRegistry());
+        EntitySerializationIDGenerator entityIDGenerator;
+        ECS ecs(CreateRegistry(), entityIDGenerator);
         const EntityID entityID1 = ecs.CreateEntity();
         const EntityID entityID2 = ecs.CreateEntity();
 
@@ -76,12 +81,14 @@ TEST_CASE("ECS - Destroy Entity", "[ECS]")
 TEST_CASE("ECS - Create Entity Generation ID", "[ECS]")
 {
     {
-        ECS ecs(CreateRegistry());
+        EntitySerializationIDGenerator entityIDGenerator;
+        ECS ecs(CreateRegistry(), entityIDGenerator);
         const EntityID entityID = ecs.CreateEntity();
         REQUIRE(entityID.generation == 0);
     }
     {
-        ECS ecs(CreateRegistry());
+        EntitySerializationIDGenerator entityIDGenerator;
+        ECS ecs(CreateRegistry(), entityIDGenerator);
         const EntityID entityID1 = ecs.CreateEntity();
         const EntityID entityID2 = ecs.CreateEntity();
         ecs.DestroyEntity(entityID1);
@@ -122,7 +129,8 @@ TEST_CASE("ECS - Create Entity Generation ID", "[ECS]")
 TEST_CASE("ECS - GetComponent with wrong generation ID", "[ECS]")
 {
     {
-        ECS ecs(CreateRegistry());
+        EntitySerializationIDGenerator entityIDGenerator;
+        ECS ecs(CreateRegistry(), entityIDGenerator);
         const EntityID entityID = ecs.CreateEntity();
         ecs.AddComponent<DummyComponent>(entityID, DummyComponent{});
 

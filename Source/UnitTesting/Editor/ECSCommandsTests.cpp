@@ -35,7 +35,8 @@ DataTypeRegistry CreateDataTypeRegistry()
 
 TEST_CASE("Create Entities")
 {
-    ECS ecs(CreateECSRegistry());
+    EntitySerializationIDGenerator idGenerator;
+    ECS ecs(CreateECSRegistry(), idGenerator);
     EditorCommandTracker commandTracker;
     std::vector<EntityID> rootEntities;
 
@@ -55,7 +56,8 @@ TEST_CASE("Create Entities")
 
 TEST_CASE("Destroy Entity")
 {
-    ECS ecs(CreateECSRegistry());
+    EntitySerializationIDGenerator idGenerator;
+    ECS ecs(CreateECSRegistry(), idGenerator);
     EditorCommandTracker commandTracker;
     std::vector<EntityID> rootEntities;
 
@@ -80,7 +82,8 @@ TEST_CASE("Destroy Entity")
 
 TEST_CASE("Add Child Entity")
 {
-    ECS ecs(CreateECSRegistry());
+    EntitySerializationIDGenerator idGenerator;
+    ECS ecs(CreateECSRegistry(), idGenerator);
     EditorCommandTracker commandTracker;
     std::vector<EntityID> rootEntities;
     for (size_t i = 0; i < 10; i++)
@@ -163,7 +166,8 @@ TEST_CASE("Instantiate Entity Composition")
 
         ECSManager ecsManager;
 
-        EntityCompositionAsset compositionAsset(EntityComposition(ecsManager, ecsManager.CreateECS(CreateECSRegistry())), std::filesystem::path("path/to/asset"));
+        EntitySerializationIDGenerator entityIDGenerator;
+        EntityCompositionAsset compositionAsset(EntityComposition(ecsManager, ecsManager.CreateECS(CreateECSRegistry(), entityIDGenerator)), std::filesystem::path("path/to/asset"));
 
         ECSOwningHandle targetECS(ecsManager, ecsManager.CreateECS(CreateECSRegistry()));
 
@@ -244,9 +248,10 @@ TEST_CASE("Instantiate Entity Composition")
     {
 
         ECSManager ecsManager;
+        EntitySerializationIDGenerator entityIDGenerator;
 
-        EntityCompositionAsset compositionAsset1(EntityComposition(ecsManager, ecsManager.CreateECS(CreateECSRegistry())), std::filesystem::path("path/to/asset"));
-        EntityCompositionAsset compositionAsset2(EntityComposition(ecsManager, ecsManager.CreateECS(CreateECSRegistry())), std::filesystem::path("path/to/asset"));
+        EntityCompositionAsset compositionAsset1(EntityComposition(ecsManager, ecsManager.CreateECS(CreateECSRegistry(), entityIDGenerator)), std::filesystem::path("path/to/asset"));
+        EntityCompositionAsset compositionAsset2(EntityComposition(ecsManager, ecsManager.CreateECS(CreateECSRegistry(), entityIDGenerator)), std::filesystem::path("path/to/asset"));
 
         const EntityID child1 = compositionAsset1->GetECS().CreateEntity();
         const EntityID child2 = compositionAsset1->GetECS().CreateEntity();

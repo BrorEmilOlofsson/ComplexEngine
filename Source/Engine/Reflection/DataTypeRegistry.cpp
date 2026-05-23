@@ -60,11 +60,6 @@ namespace CLX
 
                 ViewAndEditResult result = ViewAndEditData(member.dataTypeID, memberDataPtr, newBlackboard, &member);
 
-                if (member.name == "camera")
-                {
-                    std::println("IsActive: {}", result.isActive);
-                }
-
                 viewAndEditResult.isActive |= result.isActive;
                 if (result.isEdited)
                 {

@@ -20,7 +20,7 @@ namespace CLX
         return handle.GetRelativePath().stem().string();
     }
 
-    static void ShowInspector(std::set<EntityID>& selectedEntityIDs, ECS& ecsBuffer, EditorCommandTracker& commandTracker,
+    static void ShowInspector(std::set<EntityID>& selectedEntityIDs, EditorCommandTracker& commandTracker,
         EntityCompositionAssetHandle entityCompositionAsset, EntityCompositionInstantiationManager& entityInstantiations,
         ComponentBufferData& componentBufferData, EntityID& copyEntityID, uint32_t& selectedComponentPopupIndex,
         std::string& componentSearchBuffer, JsonAny& copiedComponent, const InputState& input, Blackboard& newBlackboard)
@@ -48,7 +48,6 @@ namespace CLX
                     entityCompositionAsset->GetECS(),
                     selectedEntityID,
                     componentBufferData,
-                    ecsBuffer,
                     copyEntityID,
                     selectedComponentPopupIndex,
                     componentSearchBuffer,
@@ -182,7 +181,6 @@ namespace CLX
 
     void EntityCompositionPopUp::Render(const Blackboard& blackboard)
     {
-        ECS& ecsBuffer = blackboard.Get<Key_ECSBuffer>();
         EditorCommandTracker& commandTracker = blackboard.Get<Key_CommandTracker>();
         const WindowView windowView = blackboard.Get<Key_WindowView>();
         //OperatingSystem& os = blackboard.Get<Key_OperatingSystem>();
@@ -227,7 +225,6 @@ namespace CLX
                 }
                 ShowEntityHierarchyWithAddButtons(
                     mEntityCompositionAsset->GetECSHandle(),
-                    ecsBuffer,
                     mRootEntities,
                     commandTracker,
                     std::string("##") + GetEntityCompositionName(mEntityCompositionAsset) + "EntityComposition",
@@ -247,7 +244,6 @@ namespace CLX
 
         ShowInspector(
             mSelectedEntityIDs,
-            ecsBuffer,
             commandTracker,
             mEntityCompositionAsset,
             compositionInstantiations,

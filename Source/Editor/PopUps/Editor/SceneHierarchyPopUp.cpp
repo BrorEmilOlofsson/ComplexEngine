@@ -60,17 +60,22 @@ namespace CLX
             ClearEntitySelection(selectedEntityIDs, commandTracker);
             commandTracker.EndComposite();
         }
-        /*else if (input.IsKeyHeld(eInputKey::Ctrl) && input.IsKeyPressed(eInputKey::C))
+        else if (input.IsKeyHeld(eInputKey::Ctrl) && input.IsKeyPressed(eInputKey::C) && selectedEntityIDs.size() == 1)
         {
+            // Fix this to support multiple selected entities and copying entity hierarchies
+            const EntityID selectedEntityID = *selectedEntityIDs.begin();
             copiedEntityID = ecs.CopyEntity(selectedEntityID, ecsBuffer);
-        }*/
+        }
         else if (input.IsKeyHeld(eInputKey::Ctrl) && input.IsKeyPressed(eInputKey::V))
         {
             if (copiedEntityID != InvalidEntityID)
             {
-                const EntityID createdEntityID = ecsBuffer.CopyEntity(copiedEntityID, ecs);
+                commandTracker.BeginComposite("Paste Entity + Select Entity");
+
+                EntityID createdEntityID = PasteEntityHierarchy(ecs, ecsBuffer, copiedEntityID, InvalidEntityID, rootEntities, LastIndex{}, dataTypeRegistry, commandTracker);
 
                 SetEntitySelection(createdEntityID, selectedEntityIDs, commandTracker);
+                commandTracker.EndComposite();
             }
         }
         else if (input.IsKeyHeld(eInputKey::Ctrl) && input.IsKeyPressed(eInputKey::D))
@@ -99,8 +104,8 @@ namespace CLX
         SceneManager& sceneManager = blackboard.Get<Key_SceneManager>();
         DataTypeRegistry& dataTypeRegistry = blackboard.Get<Key_DataTypeRegistry>();
         ECSHandle ecsHandle = sceneManager.GetActiveScene()->GetECSHandle();
-        ECS& ecsBuffer = blackboard.Get<Key_ECSBuffer>();
         const InputState& input = blackboard.Get<Key_InputState>();
+        ECS& ecsBuffer = blackboard.Get<Key_ECSBuffer>();
         AssetManager& assetManager = blackboard.Get<Key_AssetManager>();
         EntityCompositionInstantiationManager& compositionInstantiations = blackboard.Get<Key_EntityCompositionInstantiationManager>();
 
@@ -110,7 +115,6 @@ namespace CLX
         {
             ShowEntityHierarchyWithAddButtons(
                 ecsHandle,
-                ecsBuffer,
                 mRootEntities,
                 commandTracker,
                 mImGuiTag,
@@ -127,9 +131,9 @@ namespace CLX
 
         CheckCopyInputs(
             input, 
-            *ecsHandle.Get(), 
+            *ecsHandle.Get(),
             mSelectedEntityIDs, 
-            ecsBuffer, 
+            ecsBuffer,
             mCopiedEntityID, 
             mRootEntities,
             dataTypeRegistry,

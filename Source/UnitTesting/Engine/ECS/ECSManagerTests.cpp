@@ -9,9 +9,11 @@ TEST_CASE("ECSHandle destroys ecs in destructor", "[ECSManager]")
     CLX::ECSRegistry ecsRegistry;
     CLX::ECSManager ecsManager;
 
+    EntitySerializationIDGenerator entityIDGenerator;
+
     {
-        ECSOwningHandle ecs1 = CreateECS(ecsManager, ecsRegistry);
-        ECSOwningHandle ecs2 = CreateECS(ecsManager, ecsRegistry);
+        ECSOwningHandle ecs1 = CreateECS(ecsManager, ecsRegistry, entityIDGenerator);
+        ECSOwningHandle ecs2 = CreateECS(ecsManager, ecsRegistry, entityIDGenerator);
         REQUIRE(&ecs1 != &ecs2);
         REQUIRE(ecsManager.GetECSCount() == 2);
     }
@@ -22,11 +24,12 @@ TEST_CASE("ECSHandle destroys ecs in destructor", "[ECSManager]")
 
 TEST_CASE("ECSHandle copy constructor creates a new ECS with the same data", "[ECSManager]")
 {
-    CLX::ECSRegistry ecsRegistry;
+    ECSRegistry ecsRegistry;
     ecsRegistry.RegisterComponentType<int>();
-    CLX::ECSManager ecsManager;
-    ECSOwningHandle ecs1 = CreateECS(ecsManager, ecsRegistry);
-    const CLX::EntityID entityID = ecs1.Get().CreateEntity();
+    ECSManager ecsManager;
+    EntitySerializationIDGenerator entityIDGenerator;
+    ECSOwningHandle ecs1 = CreateECS(ecsManager, ecsRegistry, entityIDGenerator);
+    const EntityID entityID = ecs1.Get().CreateEntity();
     ecs1.Get().AddComponent<int>(entityID, 42);
     ECSOwningHandle ecs2 = ecs1;
     REQUIRE(ecsManager.GetECSCount() == 2);
@@ -37,13 +40,15 @@ TEST_CASE("ECSHandle copy constructor creates a new ECS with the same data", "[E
 
 TEST_CASE("ECSHandle copy assignment operator creates a new ECS with the same data", "[ECSManager]")
 {
-    CLX::ECSRegistry ecsRegistry;
+    ECSRegistry ecsRegistry;
     ecsRegistry.RegisterComponentType<int>();
-    CLX::ECSManager ecsManager;
-    ECSOwningHandle ecs1 = CreateECS(ecsManager, ecsRegistry);
-    const CLX::EntityID entityID = ecs1.Get().CreateEntity();
+    ECSManager ecsManager;
+    EntitySerializationIDGenerator entityIDGenerator;
+
+    ECSOwningHandle ecs1 = CreateECS(ecsManager, ecsRegistry, entityIDGenerator);
+    const EntityID entityID = ecs1.Get().CreateEntity();
     ecs1.Get().AddComponent<int>(entityID, 42);
-    ECSOwningHandle ecs2 = CreateECS(ecsManager, ecsRegistry);
+    ECSOwningHandle ecs2 = CreateECS(ecsManager, ecsRegistry, entityIDGenerator);
     REQUIRE(ecsManager.GetECSCount() == 2);
     ecs2 = ecs1;
     REQUIRE(ecsManager.GetECSCount() == 3);
@@ -53,11 +58,13 @@ TEST_CASE("ECSHandle copy assignment operator creates a new ECS with the same da
 
 TEST_CASE("ECSHandle move constructor transfers ownership", "[ECSManager]")
 {
-    CLX::ECSRegistry ecsRegistry;
+    ECSRegistry ecsRegistry;
     ecsRegistry.RegisterComponentType<int>();
-    CLX::ECSManager ecsManager;
-    ECSOwningHandle ecs1 = CreateECS(ecsManager, ecsRegistry);
-    const CLX::EntityID entityID = ecs1.Get().CreateEntity();
+    ECSManager ecsManager;
+    EntitySerializationIDGenerator entityIDGenerator;
+
+    ECSOwningHandle ecs1 = CreateECS(ecsManager, ecsRegistry, entityIDGenerator);
+    const EntityID entityID = ecs1.Get().CreateEntity();
     int* componentPtr = &ecs1.Get().AddComponent<int>(entityID, 42);
     ECSOwningHandle ecs2 = std::move(ecs1);
     REQUIRE(ecsManager.GetECSCount() == 1);
@@ -69,13 +76,14 @@ TEST_CASE("ECSHandle move constructor transfers ownership", "[ECSManager]")
 
 TEST_CASE("ECSHandle move assignment operator transfers ownership", "[ECSManager]")
 {
-    CLX::ECSRegistry ecsRegistry;
+    ECSRegistry ecsRegistry;
     ecsRegistry.RegisterComponentType<int>();
-    CLX::ECSManager ecsManager;
-    ECSOwningHandle ecs1 = CreateECS(ecsManager, ecsRegistry);
-    const CLX::EntityID entityID = ecs1.Get().CreateEntity();
+    ECSManager ecsManager;
+    EntitySerializationIDGenerator entityIDGenerator;
+    ECSOwningHandle ecs1 = CreateECS(ecsManager, ecsRegistry, entityIDGenerator);
+    const EntityID entityID = ecs1.Get().CreateEntity();
     int* componentPtr = &ecs1.Get().AddComponent<int>(entityID, 42);
-    ECSOwningHandle ecs2 = CreateECS(ecsManager, ecsRegistry);
+    ECSOwningHandle ecs2 = CreateECS(ecsManager, ecsRegistry, entityIDGenerator);
     REQUIRE(ecsManager.GetECSCount() == 2);
     ecs2 = std::move(ecs1);
     REQUIRE(ecsManager.GetECSCount() == 1);

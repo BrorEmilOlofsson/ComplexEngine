@@ -11,7 +11,7 @@
 namespace CLX
 {
 
-    static void ShowInspector(SceneManager& sceneManager, Camera& camera, const InputState& input, ECS& ecsBuffer, EditorCommandTracker& commandTracker,
+    static void ShowInspector(SceneManager& sceneManager, Camera& camera, const InputState& input, EditorCommandTracker& commandTracker,
         const Blackboard& blackboard, const std::string& imguiName, bool& isWindowActive, const std::set<EntityID>& selectedEntityIDs, ComponentBufferData& componentBufferData, EntityID& copyEntityID,
         uint32_t& selectedComponentPopupIndex, std::string& componentSearchString, JsonAny& copiedComponent, EntityCompositionInstantiationManager& entityCompositionInstantiations,
         std::function<void(EntityID)>& onEntitySelected)
@@ -42,7 +42,6 @@ namespace CLX
                     ecs,
                     selectedEntityID,
                     componentBufferData,
-                    ecsBuffer,
                     copyEntityID,
                     selectedComponentPopupIndex,
                     componentSearchString,
@@ -77,7 +76,6 @@ namespace CLX
         PROFILER_FUNCTION(profiler::colors::Wheat);
         EditorCommandTracker& commandTracker = blackboard.Get<Key_CommandTracker>();
         SceneManager& sceneManager = blackboard.Get<Key_SceneManager>();
-        ECS& ecsBuffer = blackboard.Get<Key_ECSBuffer>();
         const InputState& input = blackboard.Get<Key_InputState>();
         EntityCompositionInstantiationManager& entityCompositionInstantiations = blackboard.Get<Key_EntityCompositionInstantiationManager>();
         JsonAny& copiedComponent = blackboard.Get<Key_CurrentCopiedComponent>();
@@ -86,7 +84,6 @@ namespace CLX
             sceneManager,
             *mSceneCamera,
             input,
-            ecsBuffer,
             commandTracker,
             blackboard,
             mImGuiName,

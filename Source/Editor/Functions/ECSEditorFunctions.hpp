@@ -35,6 +35,7 @@ namespace CLX
 	void DestroyEntityHierarchy(ECS& ecs, const EntityID entityID, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker);
     void DestroyEntityHierarchies(ECS& ecs, const std::set<EntityID>& entityIDs, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker);
 
+	EntityID PasteEntityHierarchy(ECS& ecs, const ECS& sourceECS, const EntityID entityID, const EntityID targetParentID, std::vector<EntityID>& rootEntities, IndexVariant childIndex, const class DataTypeRegistry& dataTypeRegistry, EditorCommandTracker& commandTracker);
     EntityID DuplicateEntityHierarchy(ECS& ecs, const EntityID entityID, std::vector<EntityID>& rootEntities, IndexVariant childIndex, const class DataTypeRegistry& dataTypeRegistry, EditorCommandTracker& commandTracker);
 
 	void SetEntitySelection(const std::set<EntityID>& entityID, std::set<EntityID>& selectedEntityIDs, EditorCommandTracker& commandTracker);
@@ -44,12 +45,14 @@ namespace CLX
 	void ReorderEntity(ECS& ecs, const EntityID entityID, std::vector<EntityID>& rootEntities, const std::size_t newIndex, EditorCommandTracker& commandTracker);
 	void SetParentEntity(ECS& ecs, const EntityID parentID, const EntityID childID, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker, IndexVariant childIndex);
 
+	void UpdateRootEntities(const ECS& ecs, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker);
+
 	void ShowEntityAddButtons(ECS& ecs, EntityID& selectedEntityID, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker, const std::string& imGuiTag, EntityID defaultParentID);
 
-	void ShowEntityHierarchy(ECS& ecs, ECS& ecsBuffer, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker, const std::string& imGuiTag,
+	void ShowEntityHierarchy(ECS& ecs, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker, const std::string& imGuiTag,
 		EntityID& selectedEntityID, const std::set<EntityID>& uneditableEntities, std::string& entitySearchBuffer);
 
-	void ShowEntityHierarchyWithAddButtons(ECSHandle ecsHandle, ECS& ecsBuffer, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker,
+	void ShowEntityHierarchyWithAddButtons(ECSHandle ecsHandle, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker,
 		const std::string& imGuiTag, std::set<EntityID>& selectedEntityID, EntityID defaultParentID, const std::set<EntityID>& uneditableEntities, 
 		std::string& entitySearchBuffer, EntityCompositionAssetHandle compositionHandle, EntityCompositionInstantiationManager& compositionInstantiations, const class DataTypeRegistry& dataTypeRegistry, AssetManager& assetManager);
 	
@@ -60,7 +63,6 @@ namespace CLX
 		ECS& ecs;
 		EntityID entityID;
 		ComponentBufferData& componentBufferData;
-		ECS& ecsBuffer;
 		EntityID& copyEntityID;
 		JsonAny& copiedComponent;
 		EntityCompositionAssetHandle entityCompositionAsset;
@@ -78,7 +80,6 @@ namespace CLX
 		ECS& ecs;
 		EntityID entityID;
 		ComponentBufferData& componentBufferData;
-		ECS& ecsBuffer;
 		EntityID& copyEntityID;
         uint32_t& selectedComponentPopupIndex;
         std::string& componentSearchString;
@@ -90,8 +91,8 @@ namespace CLX
 
 	[[nodiscard]] std::vector<EditorAction> ShowEntityInspector(const ShowEntityInspectorData& data);
 	// Returns root entity of instantiated entity composition
-	EntityID InstantiateEntityComposition(ECSHandle targetECSHandle, EntityCompositionAssetHandle compositionAsset, EntityCompositionAssetHandle parentComposition, EntityID parentID,
-		EntityCompositionInstantiationManager& entityInstantiations, const DataTypeRegistry& dataTypeRegistry,
+	EntityID InstantiateEntityComposition(ECSHandle targetECSHandle, EntityCompositionAssetHandle compositionAsset, EntityCompositionAssetHandle parentComposition, 
+		EntityID parentID, EntityCompositionInstantiationManager& entityInstantiations, const DataTypeRegistry& dataTypeRegistry,
 		std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker);
 
 	void InstantiateEntityCompositionAndSelectRoot(EntityCompositionAssetHandle target, EntityCompositionAssetHandle toInstantiate, EntityID parentID,

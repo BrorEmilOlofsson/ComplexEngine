@@ -37,7 +37,9 @@ TEST_CASE("Benchmarking 2")
 	registry.RegisterComponentType<FakeComponent<11>>();
 	registry.RegisterComponentType<FakeComponent<12>>();
 	registry.RegisterComponentType<FakeComponent<13>>();
-	ECS ecs(registry);
+
+    EntitySerializationIDGenerator entityIDGenerator;
+	ECS ecs(registry, entityIDGenerator);
 
 	for (std::size_t i = 0; i < 1000; i++)
 	{
