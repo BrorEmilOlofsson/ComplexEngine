@@ -129,16 +129,3 @@ namespace CLX
 		return Dimension2<DimensionType>(GetWidth(aabb), GetHeight(aabb));
 	}
 }
-
-template<typename T>
-struct std::formatter<CLX::AABB2<T>> : std::formatter<std::string>
-{
-	auto format(const CLX::AABB2<T>& rect, auto& ctx) const
-	{
-		return std::format_to(
-			ctx.out(),
-			"AABB2(Min: {}, Max: {})",
-			rect.GetMin(), rect.GetMax()
-		);
-	}
-};

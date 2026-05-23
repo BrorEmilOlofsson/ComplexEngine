@@ -12,12 +12,12 @@ namespace CLX
 	ECSOwningHandle CreateECS(std::weak_ptr<Blackboard> blackboard)
 	{
         std::shared_ptr<Blackboard> sharedBlackboard = blackboard.lock();
-        return CreateECS(sharedBlackboard->Get<Key_ECSManager>(), sharedBlackboard->Get<Key_ECSRegistry>());
+        return CreateECS(sharedBlackboard->Get<Key_ECSManager>(), sharedBlackboard->Get<Key_ECSRegistry>(), sharedBlackboard->Get<Key_EntityIDGenerator>());
 	}
 
 	Scene::Scene(std::weak_ptr<Blackboard> blackboard)
-		: mECSHandle(CreateECS(blackboard))
-		, mBackupECSHandle(CreateECS(blackboard))
+		: mECS(CreateECS(blackboard))
+		, mBackupECS(std::nullopt)
 		, mBlackboard(blackboard)
 	{
 		mBlackboard.lock()->Insert<Key_IsPlaying>(false);
@@ -25,13 +25,13 @@ namespace CLX
 
 	void Scene::BeginPlay()
 	{
-		mBackupECSHandle = mECSHandle;
+		mBackupECS = mECS;
 		Blackboard& blackboard = *mBlackboard.lock();
 		blackboard.Insert<Key_SceneRenderState>(mRenderState);
 		blackboard.Insert<Key_CurrentRenderState>(mRenderState);
 		blackboard.Insert<Key_Navmesh>(mNavmesh);
 		blackboard.Insert<Key_IsPlaying>(true);
-		mECSHandle.Get().BeginPlay(blackboard);
+		mECS.Get().BeginPlay(blackboard);
 	}
 
 	void Scene::EndPlay()
@@ -40,9 +40,10 @@ namespace CLX
 		blackboard.Insert<Key_SceneRenderState>(mRenderState);
 		blackboard.Insert<Key_CurrentRenderState>(mRenderState);
 		blackboard.Insert<Key_Navmesh>(mNavmesh);
-		mECSHandle.Get().EndPlay(blackboard);
+		mECS.Get().EndPlay(blackboard);
 		blackboard.Insert<Key_IsPlaying>(false);
-		mECSHandle = mBackupECSHandle;
+		mECS = std::move(mBackupECS.value());
+		mBackupECS = std::nullopt;
 	}
 
 	template<typename T>
@@ -80,8 +81,8 @@ namespace CLX
 		blackboard.Insert<Key_SceneRenderState>(mRenderState);
 		blackboard.Insert<Key_CurrentRenderState>(mRenderState);
 		blackboard.Insert<Key_Navmesh>(mNavmesh);
-		mECSHandle.Get().EarlyUpdate(deltaTime, blackboard);
-		mECSHandle.Get().Update(deltaTime, blackboard);
+		mECS.Get().EarlyUpdate(deltaTime, blackboard);
+		mECS.Get().Update(deltaTime, blackboard);
 	}
 
 	void Scene::EditorUpdate()
@@ -90,7 +91,7 @@ namespace CLX
 		blackboard.Insert<Key_SceneRenderState>(mRenderState);
 		blackboard.Insert<Key_CurrentRenderState>(mRenderState);
 		blackboard.Insert<Key_Navmesh>(mNavmesh);
-		mECSHandle.Get().EditorUpdate(blackboard);
+		mECS.Get().EditorUpdate(blackboard);
 	}
 
 	void Scene::Render()
@@ -99,6 +100,6 @@ namespace CLX
 		blackboard.Insert<Key_SceneRenderState>(mRenderState);
 		blackboard.Insert<Key_CurrentRenderState>(mRenderState);
 		blackboard.Insert<Key_Navmesh>(mNavmesh);
-		mECSHandle.Get().Render(blackboard);
+		mECS.Get().Render(blackboard);
 	}
 }

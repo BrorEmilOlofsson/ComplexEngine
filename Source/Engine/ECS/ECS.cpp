@@ -3,13 +3,10 @@
 
 namespace CLX
 {
-    /*ECS::ECS()
-    {
-        myEntitiesByMask[ComponentMask()];
-    }*/
 
-    ECS::ECS(const ECSRegistry& ecsRegistry)
+    ECS::ECS(const ECSRegistry& ecsRegistry, EntitySerializationIDGenerator& entityIDGenerator)
         : mRegistry(ecsRegistry)
+        , mEntityIDGenerator(entityIDGenerator) 
     {
         mEntitiesByMask[ComponentMask()];
         mIterationList.reserve(1000);
@@ -27,6 +24,11 @@ namespace CLX
 
     EntityID ECS::CreateEntity()
     {
+        return CreateEntity(mEntityIDGenerator.get().Generate());
+    }
+
+    EntityID ECS::CreateEntity(const EntitySerializationID serializationID)
+    {
         EntityID entityID;
         if (!mFreeEntityIDs.empty())
         {
@@ -39,12 +41,15 @@ namespace CLX
             EntityData& entityData = mEntityData[entityID.id];
             entityData.mask = ComponentMask();
             entityData.isActive = true;
+            entityData.serializationID = serializationID;
             mFreeEntityIDs.pop();
         }
         else
         {
             entityID = EntityID{ static_cast<uint32_t>(mEntityData.size()) };
             mEntityData.emplace_back();
+            EntityData& entityData = mEntityData.back();
+            entityData.serializationID = serializationID;
             for (auto& componentPool : mComponentPools)
             {
                 componentPool.ResizeComponentIndices(size(mEntityData));
@@ -154,6 +159,11 @@ namespace CLX
     const ECSRegistry& ECS::GetRegistry() const
     {
         return mRegistry;
+    }
+
+    EntitySerializationIDGenerator& ECS::GetEntityIDGenerator()
+    {
+        return mEntityIDGenerator;
     }
 
     void ECS::BeginPlay(const Blackboard& blackboard)

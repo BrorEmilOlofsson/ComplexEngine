@@ -20,6 +20,7 @@
 #include "Engine/ECS/ECSManager.hpp"
 #include "Editor/EntityCompositionInstantiationManager.hpp"
 #include "Editor/Command/Commands/SetEntityTransformCommand.hpp"
+#include "Engine/Utility/Memory/DynamicMemoryArena.hpp"
 
 namespace CLX
 {
@@ -79,13 +80,13 @@ namespace CLX
         }
     }
 
-    static void SwapEntities(ECS& ecs1, ECS& ecs2, EntityID entityID1, EntityID entityID2)
-    {
-        const EntityID tempCopy = ecs1.CopyEntity(entityID1, ecs2);
-        ecs1.ReplaceEntity(entityID1, ecs2, entityID2);
-        ecs2.ReplaceEntity(entityID2, ecs2, tempCopy);
-        ecs2.DestroyEntity(tempCopy);
-    }
+    //static void SwapEntities(ECS& ecs1, ECS& ecs2, EntityID entityID1, EntityID entityID2)
+    //{
+    //    const EntityID tempCopy = ecs1.CopyEntity(entityID1, ecs2);
+    //    ecs1.ReplaceEntity(entityID1, ecs2, entityID2);
+    //    ecs2.ReplaceEntity(entityID2, ecs2, tempCopy);
+    //    ecs2.DestroyEntity(tempCopy);
+    //}
 
     void DestroyEntityHierarchy(ECS& ecs, const EntityID entityID)
     {
@@ -460,6 +461,10 @@ namespace CLX
 
     void SetEntitySelection(const std::set<EntityID>& entityIDs, std::set<EntityID>& selectedEntityIDs, EditorCommandTracker& commandTracker)
     {
+        if (entityIDs == selectedEntityIDs)
+        {
+            return;
+        }
         SetDataPtrCommand<std::set<EntityID>> command;
         command.mNewValue = entityIDs;
         command.mOldValue = selectedEntityIDs;
@@ -556,34 +561,74 @@ namespace CLX
             };
     }
 
-    void RemoveComponent(ECS& ecs, const EntityID entityID, const DataTypeID& dataTypeID, ECS& ecsBuffer, EditorCommandTracker& commandTracker)
+    //void RemoveComponent(ECS& ecs, const EntityID entityID, const DataTypeID& dataTypeID, ECS& ecsBuffer, EditorCommandTracker& commandTracker)
+    //{
+    //    const EntityID copyEntityID = ecs.CopyEntity(entityID, ecsBuffer);
+    //    ecs.RemoveComponent(entityID, dataTypeID.typeIndex);
+
+
+    //    struct RemoveComponentData final
+    //    {
+    //        std::reference_wrapper<ECS> ecs;
+    //        EntityID entityID;
+    //        std::reference_wrapper<ECS> ecsBuffer;
+    //        EntityID copyEntityID;
+    //    };
+
+    //    RemoveComponentData data
+    //    {
+    //        .ecs = ecs,
+    //        .entityID = entityID,
+    //        .ecsBuffer = ecsBuffer,
+    //        .copyEntityID = copyEntityID
+    //    };
+
+    //    auto command = [](const RemoveComponentData& data)
+    //        {
+    //            SwapEntities(data.ecs.get(), data.ecsBuffer.get(), data.entityID, data.copyEntityID);
+    //        };
+
+    //    commandTracker.RegisterCommand(EditorCommand(data, command, command, "Remove Component"));
+    //}
+
+    static void RemoveComponent(ECS& ecs, const EntityID entityID, const DataTypeID dataTypeID, const DataTypeRegistry& dataTypeRegistry, const Blackboard& blackboard, EditorCommandTracker& commandTracker)
     {
-        const EntityID copyEntityID = ecs.CopyEntity(entityID, ecsBuffer);
-        ecs.RemoveComponent(entityID, dataTypeID.typeIndex);
-
-
         struct RemoveComponentData final
         {
             std::reference_wrapper<ECS> ecs;
             EntityID entityID;
-            std::reference_wrapper<ECS> ecsBuffer;
-            EntityID copyEntityID;
+            DataTypeID componentTypeID = InvalidDataTypeID;
+            nlohmann::json oldComponentData;
+            std::reference_wrapper<const DataTypeRegistry> dataTypeRegistry;
+            Blackboard blackboard;
         };
+
+        nlohmann::json oldComponentData = dataTypeRegistry.SaveDataJSON(dataTypeID, ecs.GetComponent(entityID, dataTypeID.typeIndex));
 
         RemoveComponentData data
         {
             .ecs = ecs,
             .entityID = entityID,
-            .ecsBuffer = ecsBuffer,
-            .copyEntityID = copyEntityID
+            .componentTypeID = dataTypeID,
+            .oldComponentData = std::move(oldComponentData),
+            .dataTypeRegistry = dataTypeRegistry,
+            .blackboard = blackboard
         };
 
-        auto command = [](const RemoveComponentData& data)
+
+        auto doCommand = [](const RemoveComponentData& data)
             {
-                SwapEntities(data.ecs.get(), data.ecsBuffer.get(), data.entityID, data.copyEntityID);
+                data.ecs.get().RemoveComponent(data.entityID, data.componentTypeID.typeIndex);
             };
 
-        commandTracker.RegisterCommand(EditorCommand(data, command, command, "Remove Component"));
+        auto undoCommand = [](const RemoveComponentData& data)
+            {
+                void* componentPtr = data.ecs.get().AddComponent(data.entityID, data.componentTypeID.typeIndex);
+
+                data.dataTypeRegistry.get().LoadDataJSON(data.componentTypeID, componentPtr, data.oldComponentData, data.blackboard);
+            };
+
+        commandTracker.ExecuteCommand(EditorCommand(data, doCommand, undoCommand, "Remove Component"));
     }
 
     void ShowEntityAddButtons(ECS& ecs, std::set<EntityID>& selectedEntityIDs, std::vector<EntityID>& rootEntities,
@@ -984,6 +1029,15 @@ namespace CLX
             };
     }
 
+    [[nodiscard]] EditorAction CreateAppendEntitySelectionAction(const EntityID entityID, std::set<EntityID>& selectedEntityIDs)
+    {
+        return [entityID, &selectedEntityIDs](EditorCommandTracker& commandTracker)
+            {
+                AppendEntitySelection(entityID, selectedEntityIDs, commandTracker);
+            };
+    }
+
+
     template<typename T>
     EntityID FindFirstParentEntityWithComponent(const ECS& ecs, const EntityID childEntityID, const bool includeChild = true)
     {
@@ -1013,18 +1067,36 @@ namespace CLX
         InsertRange(editorActions, ShowEntityDropSpaceTarget(ecs, entityID, false, rootEntities, selectedEntityIDs));
         ImGui::PushID(entityID.id);
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 3 });
-        const bool isOpen = ImGui::TreeNodeEx((GetEntityName(ecs, entityID) + " (" + std::to_string(entityID.id) + ")").c_str(), GetHierarchyTreeNodeFlags(isSelected, isLeaf, shouldBeDefaultOpen));
+        const bool isInstantiatedEntityComposition = ecs.HasComponent<EntityCompositionInstantiationComponent>(entityID);
+        if (isInstantiatedEntityComposition)
+        {
+            ImGui::PushStyleColor(ImGuiCol_Text, ImColor(0.5f, 0.5f, 1.0f).Value);
+        }
+        const ImGuiTreeNodeFlags treeNodeFlags = GetHierarchyTreeNodeFlags(isSelected, isLeaf, shouldBeDefaultOpen);
+        const bool isOpen = ImGui::TreeNodeEx((GetEntityName(ecs, entityID) + " (" + std::to_string(entityID.id) + ")").c_str(), treeNodeFlags);
+        if (isInstantiatedEntityComposition)
+        {
+            ImGui::PopStyleColor();
+        }
         ImGui::PopStyleVar();
         ImGui::PopID();
 
         const bool isLeftClicked = ImGui::IsItemHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Left);
         const bool isRightClicked = ImGui::IsItemHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Right);
-        if (isRightClicked)
+
+        const bool isAppendKeyDown = (ImGui::IsKeyDown(ImGuiMod_Ctrl) || ImGui::IsKeyDown(ImGuiMod_Shift));
+        const bool shouldAddToSelection = !isSelected && isAppendKeyDown && isLeftClicked;
+        const bool shouldSetEntitySelection = (isLeftClicked && !ImGui::IsItemToggledOpen() && !isAppendKeyDown) || (isRightClicked && !isSelected);
+        if (shouldSetEntitySelection)
         {
             editorActions.push_back(CreateSetEntitySelectionAction(entityID, selectedEntityIDs));
         }
+        else if (shouldAddToSelection)
+        {
+            editorActions.push_back(CreateAppendEntitySelectionAction(entityID, selectedEntityIDs));
+        }
 
-        if (selectedEntityIDs.contains(entityID))
+        if (selectedEntityIDs.contains(entityID) || isRightClicked)
         {
             //ImGui::SetItemDefaultFocus();
 
@@ -1038,11 +1110,6 @@ namespace CLX
         }
 
         InsertRange(editorActions, ShowEntityPayload(ecs, entityID, rootEntities, selectedEntityIDs));
-
-        if (isLeftClicked && !ImGui::IsItemToggledOpen())
-        {
-            editorActions.push_back(CreateSetEntitySelectionAction(entityID, selectedEntityIDs));
-        }
 
         if (isOpen)
         {
@@ -1237,11 +1304,11 @@ namespace CLX
         );
     }
 
-    [[nodiscard]] static EditorAction CreateRemoveComponentAction(ECS& ecs, const EntityID entityID, const DataTypeID& dataTypeID, ECS& ecsBuffer)
+    [[nodiscard]] static EditorAction CreateRemoveComponentAction(ECS& ecs, const EntityID entityID, const DataTypeID dataTypeID, const DataTypeRegistry& dataTypeRegistry, const Blackboard& blackboard)
     {
-        return [&ecs, entityID, dataTypeID, &ecsBuffer](EditorCommandTracker& commandTracker)
+        return [&ecs, entityID, dataTypeID, &dataTypeRegistry, blackboard](EditorCommandTracker& commandTracker)
             {
-                RemoveComponent(ecs, entityID, dataTypeID, ecsBuffer, commandTracker);
+                RemoveComponent(ecs, entityID, dataTypeID, dataTypeRegistry, blackboard, commandTracker);
             };
     }
 
@@ -1416,26 +1483,114 @@ namespace CLX
         }
     }
 
-    [[nodiscard]] static std::optional<EditorAction> ShowComponentData(ECS& ecs, const EntityID entityID, const std::type_index componentType,
-        void* const componentPtr, bool& anyActiveItem, ECS& ecsBuffer, JsonAny& copiedComponent,
-        EntityCompositionAssetHandle entityCompositionAsset, EntityCompositionInstantiationManager& entityInstantiations, const DataTypeRegistry& dataTypeRegistry, const Blackboard& blackboard)
+    static bool AreJsonEqual(const DataTypeRegistry& dataTypeRegistry, const DataTypeID componentTypeID,
+        const nlohmann::json& jsonValue1, const nlohmann::json& jsonValue2, const Blackboard& blackboard)
+    {
+        DynamicMemoryArena arena(512);
+
+        auto inplaceConstructFunc = dataTypeRegistry.GetInplaceConstructFunction(componentTypeID);
+        auto destructFunc = dataTypeRegistry.GetDestroyFunction(componentTypeID);
+        auto copyFunc = dataTypeRegistry.GetCopyFunction(componentTypeID);
+
+        DynamicMemoryArenaHandle handle1 = arena.AllocateUnsafe(
+            dataTypeRegistry.GetDataTypeSize(componentTypeID),
+            inplaceConstructFunc,
+            destructFunc,
+            copyFunc,
+            componentTypeID.typeIndex
+        );
+        DynamicMemoryArenaHandle handle2 = arena.AllocateUnsafe(
+            dataTypeRegistry.GetDataTypeSize(componentTypeID),
+            inplaceConstructFunc, 
+            destructFunc,
+            copyFunc,
+            componentTypeID.typeIndex
+        );
+
+        dataTypeRegistry.LoadDataJSON(componentTypeID, arena.MemoryAt(handle1), jsonValue1, blackboard);
+        dataTypeRegistry.LoadDataJSON(componentTypeID, arena.MemoryAt(handle2), jsonValue2, blackboard);
+
+        return dataTypeRegistry.EqualsData(componentTypeID, arena.MemoryAt(handle1), arena.MemoryAt(handle2));
+    }
+
+    static void SetComponentData(ECS& ecs, const EntityID entityID, const DataTypeID componentType, const nlohmann::json& newValueJson, const nlohmann::json& oldValueJson,
+        const DataTypeRegistry& dataTypeRegistry, const Blackboard& blackboard, EditorCommandTracker& commandTracker)
+    {
+        ASSERT(!newValueJson.is_null());
+        ASSERT(!oldValueJson.is_null());
+
+        if (AreJsonEqual(dataTypeRegistry, componentType, newValueJson, oldValueJson, blackboard))
+        {
+            return;
+        }
+
+        struct PasteComponentDataCommandData
+        {
+            ECS& ecs;
+            EntityID entityID;
+            DataTypeID componentType;
+            nlohmann::json newData;
+            nlohmann::json oldData;
+            const DataTypeRegistry& dataTypeRegistry;
+            Blackboard blackboard;
+        };
+
+        PasteComponentDataCommandData data
+        {
+            .ecs = ecs,
+            .entityID = entityID,
+            .componentType = componentType,
+            .newData = newValueJson,
+            .oldData = oldValueJson,
+            .dataTypeRegistry = dataTypeRegistry,
+            .blackboard = blackboard
+        };
+
+        auto doCommand = [](const PasteComponentDataCommandData& data)
+            {
+                void* componentPtr = data.ecs.GetComponent(data.entityID, data.componentType.typeIndex);
+                data.dataTypeRegistry.LoadDataJSON(data.componentType, componentPtr, data.newData, data.blackboard);
+            };
+
+
+        auto undoCommand = [](const PasteComponentDataCommandData& data)
+            {
+                void* componentPtr = data.ecs.GetComponent(data.entityID, data.componentType.typeIndex);
+                data.dataTypeRegistry.LoadDataJSON(data.componentType, componentPtr, data.oldData, data.blackboard);
+            };
+
+        commandTracker.ExecuteCommand(EditorCommand(data, doCommand, undoCommand, "Paste Component Data"));
+    }
+
+
+    [[nodiscard]] static EditorAction CreateSetComponentDataAction(ECS& ecs, const EntityID entityID, const DataTypeID componentType, const nlohmann::json& newValueJson, const nlohmann::json& oldValueJson,
+        const DataTypeRegistry& dataTypeRegistry, const Blackboard& blackboard)
+    {
+        return [&ecs, entityID, componentType, newValueJson, oldValueJson, &dataTypeRegistry, blackboard](EditorCommandTracker& commandTracker)
+            {
+                SetComponentData(ecs, entityID, componentType, newValueJson, oldValueJson, dataTypeRegistry, blackboard, commandTracker);
+            };
+    }
+
+    [[nodiscard]] static std::vector<EditorAction> ShowComponentData(ECS& ecs, const EntityID entityID, const DataTypeID componentTypeID,
+        void* const componentPtr, bool& anyActiveItem, bool& changedValue, JsonAny& copiedComponent,
+        EntityCompositionAssetHandle entityCompositionAsset, EntityCompositionInstantiationManager& entityInstantiations,
+        const DataTypeRegistry& dataTypeRegistry, const Blackboard& blackboard)
     {
         PROFILER_FUNCTION(profiler::colors::Lime400);
 
         ASSERT(componentPtr != nullptr);
         ImGui::AlignTextToFramePadding();
 
-        const DataTypeID componentDataTypeID = GetDataTypeID(componentType);
-
-        const DataType* dataType = dataTypeRegistry.Find(componentDataTypeID);
+        const DataType* dataType = dataTypeRegistry.Find(componentTypeID);
         if (dataType == nullptr)
         {
-            return std::nullopt;
+            return {};
         }
 
         Blackboard newBlackboard = blackboard;
         PropertyPath propertyPath;
-        propertyPath.dataTypeID = componentDataTypeID;
+        propertyPath.dataTypeID = componentTypeID;
         newBlackboard.Insert<Key_CurrentPropertyPath>(propertyPath);
 
         const std::string& componentName = dataType->prettyName + "##Component";
@@ -1458,19 +1613,20 @@ namespace CLX
         {
             PROFILER_BEGIN("View Component Data");
 
-            const ViewAndEditResult viewAndEditResult = dataTypeRegistry.ViewAndEditData(componentDataTypeID, componentPtr, newBlackboard);
+            const ViewAndEditResult viewAndEditResult = dataTypeRegistry.ViewAndEditData(componentTypeID, componentPtr, newBlackboard);
             anyActiveItem |= viewAndEditResult.isActive;
             PROFILER_END();
 
             if (viewAndEditResult.isEdited)
             {
+                changedValue = true;
                 HandleEntityCompositionModification(
                     entityCompositionAsset,
                     entityInstantiations,
                     entityID,
                     viewAndEditResult.dataPtr,
                     viewAndEditResult.dataTypeID,
-                    componentDataTypeID,
+                    componentTypeID,
                     viewAndEditResult.propertyPath,
                     viewAndEditResult.vectorEditOperation,
                     dataTypeRegistry
@@ -1484,26 +1640,27 @@ namespace CLX
             }
         }
 
-        std::optional<EditorAction> removeComponentAction;
+        std::vector<EditorAction> actions;
         if (ImGui::BeginPopup("Component Options"))
         {
-            ImGui::BeginDisabled(HasAnyFlag(ecs.GetRegistry().GetComponentType(componentDataTypeID.typeIndex).traits, eECSComponentTrait::Default | eECSComponentTrait::NoManualAdd));
+            ImGui::BeginDisabled(HasAnyFlag(ecs.GetRegistry().GetComponentType(componentTypeID.typeIndex).traits, eECSComponentTrait::Default | eECSComponentTrait::NoManualAdd));
             if (ImGui::MenuItem("Remove"))
             {
-                removeComponentAction = CreateRemoveComponentAction(ecs, entityID, componentDataTypeID, ecsBuffer);
+                actions.push_back(CreateRemoveComponentAction(ecs, entityID, componentTypeID, dataTypeRegistry, blackboard));
             }
             ImGui::EndDisabled();
 
             if (ImGui::MenuItem("Copy"))
             {
-                copiedComponent.dataTypeID = componentDataTypeID;
-                copiedComponent.json = dataTypeRegistry.SaveDataJSON(componentDataTypeID, componentPtr);
+                copiedComponent.dataTypeID = componentTypeID;
+                copiedComponent.json = dataTypeRegistry.SaveDataJSON(componentTypeID, componentPtr);
             }
 
-            ImGui::BeginDisabled(copiedComponent.json.is_null() || copiedComponent.dataTypeID != componentDataTypeID);
+            ImGui::BeginDisabled(copiedComponent.json.is_null() || copiedComponent.dataTypeID != componentTypeID);
             if (ImGui::MenuItem("Paste"))
             {
-                dataTypeRegistry.LoadDataJSON(componentDataTypeID, componentPtr, copiedComponent.json, newBlackboard);
+                const nlohmann::json oldValueJson = dataTypeRegistry.SaveDataJSON(componentTypeID, componentPtr);
+                actions.push_back(CreateSetComponentDataAction(ecs, entityID, componentTypeID, copiedComponent.json, oldValueJson, dataTypeRegistry, blackboard));
             }
             ImGui::EndDisabled();
 
@@ -1517,7 +1674,7 @@ namespace CLX
 
         ImGui::Separator();
 
-        return removeComponentAction;
+        return actions;
     }
 
     void SetEntityName(ECS& ecs, const EntityID entityID, const std::string& newName, EditorCommandTracker& commandTracker)
@@ -1597,7 +1754,7 @@ namespace CLX
     }
 
 
-    void ChangeComponentValue(ECS& ecs, ECS& ecsBuffer, const EntityID entityID, const EntityID copyEntityID, EditorCommandTracker& commandTracker)
+    /*void ChangeComponentValue(ECS& ecs, ECS& ecsBuffer, const EntityID entityID, const EntityID copyEntityID, EditorCommandTracker& commandTracker)
     {
 
         struct ChangeComponentValueData final
@@ -1630,11 +1787,11 @@ namespace CLX
             {
                 ChangeComponentValue(ecs, ecsBuffer, entityID, copyEntityID, commandTracker);
             };
-    }
+    }*/
 
     [[nodiscard]] bool ShouldHideComponent(const std::type_index type)
     {
-        return (type == typeid(NameComponent) 
+        return (type == typeid(NameComponent)
             || type == typeid(TransformHierarchyComponent))
             || type == typeid(EntityCompositionInstantiationComponent);
     }
@@ -1644,19 +1801,20 @@ namespace CLX
         PROFILER_FUNCTION(profiler::colors::Brown400);
         ECS& ecs = data.ecs;
         const EntityID selectedEntityID = data.entityID;
-        bool& anyItemActiveLastFrame = data.anyItemActiveLastFrame;
+        bool& anyItemActiveLastFrame = data.componentBufferData.anyItemActiveLastFrame;
+        JsonAny& storedComponent = data.componentBufferData.storedComponent;
         ECS& ecsBuffer = data.ecsBuffer;
-        EntityID& copyEntityID = data.copyEntityID;
+        //EntityID& copyEntityID = data.copyEntityID;
         JsonAny& copiedComponent = data.copiedComponent;
         EntityCompositionAssetHandle entityCompositionAsset = data.entityCompositionAsset;
         EntityCompositionInstantiationManager& entityInstantiations = data.entityInstantiations;
         const Blackboard& blackboard = data.blackboard;
 
-        if (!anyItemActiveLastFrame)
-        {
-            copyEntityID = ecs.CopyEntity(selectedEntityID, ecsBuffer);
-        }
-
+        //if (!anyItemActiveLastFrame)
+        //{
+        //    copyEntityID = ecs.CopyEntity(selectedEntityID, ecsBuffer);
+        //}
+        ecsBuffer;
         bool anyActiveItem = false;
         std::vector<EditorAction> editorActions;
 
@@ -1675,44 +1833,65 @@ namespace CLX
                     continue;
                 }
             }
-            auto editorAction = ShowComponentData(
+
+            // Store the old value of the component in case we need to create a change value action later. 
+            nlohmann::json oldValueJson = blackboard.Get<Key_DataTypeRegistry>().SaveDataJSON(GetDataTypeID(type), componentPtr);
+            bool changedValue = false;
+
+            auto showComponentDataActions = ShowComponentData(
                 ecs,
                 selectedEntityID,
-                type,
+                GetDataTypeID(type),
                 componentPtr,
                 anyActiveItem,
-                ecsBuffer,
+                changedValue,
                 copiedComponent,
                 entityCompositionAsset,
                 entityInstantiations,
                 blackboard.Get<Key_DataTypeRegistry>(),
                 blackboard
             );
-            if (editorAction)
-            {
-                editorActions.push_back(std::move(editorAction.value()));
-            }
+
+            InsertRange(editorActions, std::move(showComponentDataActions));
+
             if (isHiddenComponent && showAllComponents)
             {
                 ImGui::EndDisabled();
+            }
+
+            if (anyActiveItem && !anyItemActiveLastFrame)
+            {
+                storedComponent.dataTypeID = GetDataTypeID(type);
+                storedComponent.json = std::move(oldValueJson);
             }
         }
 
         if (!anyActiveItem && anyItemActiveLastFrame)
         {
-            auto action = CreateChangeComponentValueAction(ecs, ecsBuffer, selectedEntityID, copyEntityID);
-            if (action)
-            {
-                editorActions.push_back(std::move(action));
-            }
+            DataTypeID changedComponentTypeID = storedComponent.dataTypeID;
+            ASSERT(changedComponentTypeID != InvalidDataTypeID);
+            nlohmann::json newValue = blackboard.Get<Key_DataTypeRegistry>().SaveDataJSON(changedComponentTypeID, ecs.GetComponent(selectedEntityID, changedComponentTypeID.typeIndex));
+            auto action = CreateSetComponentDataAction(
+                ecs,
+                selectedEntityID,
+                changedComponentTypeID,
+                std::move(newValue),
+                storedComponent.json,
+                blackboard.Get<Key_DataTypeRegistry>(),
+                blackboard
+                );
+            //auto action = CreateChangeComponentValueAction(ecs, ecsBuffer, selectedEntityID, );
 
-            copyEntityID = InvalidEntityID;
+            editorActions.push_back(std::move(action));
+
+            storedComponent = {};
+            //copyEntityID = InvalidEntityID;
         }
 
-        if (!anyActiveItem && !anyItemActiveLastFrame)
-        {
-            ecsBuffer.DestroyEntity(copyEntityID);
-        }
+        /*   if (!anyActiveItem && !anyItemActiveLastFrame)
+           {
+               ecsBuffer.DestroyEntity(copyEntityID);
+           }*/
 
         anyItemActiveLastFrame = anyActiveItem;
 
@@ -1812,11 +1991,11 @@ namespace CLX
         PROFILER_FUNCTION(profiler::colors::Pink200);
         ECS& ecs = data.ecs;
         const EntityID entityID = data.entityID;
-        bool& anyItemActiveLastFrame = data.anyItemActiveLastFrame;
         ECS& ecsBuffer = data.ecsBuffer;
         EntityID& copyEntityID = data.copyEntityID;
         std::string& componentSearchString = data.componentSearchString;
         uint32_t& selectedComponentPopupIndex = data.selectedComponentPopupIndex;
+        ComponentBufferData& componentBufferData = data.componentBufferData;
         JsonAny& copiedComponent = data.copiedComponent;
         EntityCompositionAssetHandle entityCompositionAsset = data.entityCompositionAsset;
         const Blackboard& blackboard = data.blackboard;
@@ -1830,7 +2009,7 @@ namespace CLX
             {
                 .ecs = ecs,
                 .entityID = entityID,
-                .anyItemActiveLastFrame = anyItemActiveLastFrame,
+                .componentBufferData = componentBufferData,
                 .ecsBuffer = ecsBuffer,
                 .copyEntityID = copyEntityID,
                 .copiedComponent = copiedComponent,

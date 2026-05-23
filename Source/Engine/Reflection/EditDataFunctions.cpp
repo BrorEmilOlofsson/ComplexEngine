@@ -512,7 +512,7 @@ namespace CLX
         }
         else
         {
-            if (ecs.IsEntityValid(entityID))
+            if (ecs.IsEntityValid(entityID) && ecs.IsEntityActive(entityID))
             {
                 const NameComponent* nameComponent = ecs.GetComponent<NameComponent>(entityID);
                 ASSERT_NEW(nameComponent, "Entity does not have a NameComponent");
@@ -616,24 +616,24 @@ namespace CLX
             camera.SetHorizontalFOV(ToRadians(horizontalFoV));
             camera.SetAspectRatio(aspectRatio);
             viewAndEditResult.isEdited = true;
-            viewAndEditResult.isActive = ImGui::IsItemActive();
         }
+        viewAndEditResult.isActive |= ImGui::IsItemActive();
 
         if (ImGui::DragFloat("NearPlane", &nearPlane, 0.1f, 0.f, 10.f))
         {
             camera.SetNearPlane(nearPlane);
             camera.SetAspectRatio(aspectRatio);
             viewAndEditResult.isEdited = true;
-            viewAndEditResult.isActive = ImGui::IsItemActive();
         }
+        viewAndEditResult.isActive |= ImGui::IsItemActive();
 
-        if (ImGui::DragFloat("FarPlane", &farPlane, 0.1f, 0.5f, 30000.f))
+        if (ImGui::DragFloat("FarPlane", &farPlane, 1.0f, 0.5f, 30000.f))
         {
             camera.SetFarPlane(farPlane);
             camera.SetAspectRatio(aspectRatio);
             viewAndEditResult.isEdited = true;
-            viewAndEditResult.isActive = ImGui::IsItemActive();
         }
+        viewAndEditResult.isActive |= ImGui::IsItemActive();
 
         return viewAndEditResult;
     }

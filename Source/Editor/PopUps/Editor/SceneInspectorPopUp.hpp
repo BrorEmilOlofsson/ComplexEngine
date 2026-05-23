@@ -5,6 +5,7 @@
 #include "Engine/ECS/EntityID.hpp"
 #include "Engine/Utility/Blackboard.hpp"
 #include "Engine/Utility/Camera.hpp"
+#include "Editor/Utility/ComponentBufferData.hpp"
 
 #include "Engine/Reflection/JsonAny.hpp"
 
@@ -24,7 +25,7 @@ namespace CLX
 
 		SceneHierarchyPopUp* mHierarchyPopUp = nullptr;
 
-		bool mAnyItemActiveLastFrame = false;
+		ComponentBufferData mComponentBufferData;
 		EntityID mCopyEntityID;
 		class Camera* mSceneCamera = nullptr;
 
@@ -32,7 +33,5 @@ namespace CLX
 
         uint32_t mSelectedComponentPopupIndex = 0;
         std::string mComponentSearchBuffer;
-
-		JsonAny mCopiedComponent;
 	};
 }

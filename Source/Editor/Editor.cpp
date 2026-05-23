@@ -109,7 +109,7 @@ namespace CLX
     }
 
     Editor::Editor(Engine* engine)
-        : mECSBuffer(engine->GetECSRegistry())
+        : mECSBuffer(engine->GetECSRegistry(), engine->GetEntityIDGenerator())
         , mEngine(engine)
     {
     }
@@ -207,6 +207,7 @@ namespace CLX
         editorBlackboard.Insert<Key_ShowUnitVectorInScene>(mEditorSceneSettings.showUnitVectorInScene);
         editorBlackboard.Insert<Key_NodeScriptingWindow>(mNodeScriptingWindow);
         editorBlackboard.Insert<Key_EntityCompositionInstantiationManager>(mEntityCompositionInstantiationManager);
+        editorBlackboard.Insert<Key_CurrentCopiedComponent>(mCopiedComponent);
 
         for (const std::shared_ptr<PopUp> popUp : mPopUpWindows)
         {
@@ -234,6 +235,7 @@ namespace CLX
         editorBlackboard.Insert<Key_DataTypeRegistry>(mEngine->GetDataTypeRegistry());
         editorBlackboard.Insert<Key_ECSRegistry>(mEngine->GetECSRegistry());
         editorBlackboard.Insert<Key_ECSManager>(mEngine->GetECSManager());
+        editorBlackboard.Insert<Key_EntityIDGenerator>(mEngine->GetEntityIDGenerator());
         editorBlackboard.Insert<Key_ImGuiStyleManager>(GetImGuiStyleManager());
         editorBlackboard.Insert<Key_GraphicsSettings>(mEngine->GetGraphicsSettings());
         editorBlackboard.Insert<Key_InputState>(mEngine->GetInputState());
@@ -245,6 +247,7 @@ namespace CLX
         editorBlackboard.Insert<Key_NodeScriptingWindow>(mNodeScriptingWindow);
         editorBlackboard.Insert<Key_EditorWindowManager>(mWindowManager);
         editorBlackboard.Insert<Key_EntityCompositionInstantiationManager>(mEntityCompositionInstantiationManager);
+        editorBlackboard.Insert<Key_CurrentCopiedComponent>(mCopiedComponent);
 
         for (auto& tab : mMainMenuTabs)
         {

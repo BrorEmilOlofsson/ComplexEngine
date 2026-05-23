@@ -181,6 +181,17 @@ namespace CLX
 		return ::ToJSON(entityID.id);
 	}
 
+	nlohmann::json ToJSON(const EntityID& entityID, const Blackboard& blackboard)
+	{
+        ECS& ecs = blackboard.Get<Key_CurrentECS>();
+		const bool normalSave = ecs.IsEntityActive(entityID) && ecs.IsEntityValid(entityID);
+        if (!normalSave)
+        {
+            return ::ToJSON(InvalidEntityID.id);
+        }
+		return ::ToJSON(entityID.id);
+	}
+
 	nlohmann::json ToJSON(const PointLight& pointLight)
 	{
 		nlohmann::json json;

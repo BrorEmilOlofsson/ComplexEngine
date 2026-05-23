@@ -220,7 +220,7 @@ namespace CLXTracker
 		const nlohmann::json json = nlohmann::json::parse(file);
 		file.close();
 
-		const nlohmann::json memoryTrackerSettings = json["Debug_Settings"]["MemoryTracker"];
+		const nlohmann::json memoryTrackerSettings = json["MemoryTracker"];
 
 		SimpleMemoryTrackerWrapper::myShouldActive = memoryTrackerSettings["Active"];
 

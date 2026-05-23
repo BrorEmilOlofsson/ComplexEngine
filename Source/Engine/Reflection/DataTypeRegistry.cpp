@@ -56,13 +56,19 @@ namespace CLX
                 PropertyPath propertyPath = newBlackboard.Get<Key_CurrentPropertyPath>();
                 propertyPath.elements.push_back(member.name);
                 newBlackboard.Insert<Key_CurrentPropertyPath>(propertyPath);
-                //std::println("Viewing member: {}", member.name);
-                //std::println("Property Path: {}", propertyPath);
-                ViewAndEditResult result = ViewAndEditData(member.dataTypeID, memberDataPtr, newBlackboard, &member); 
+
+
+                ViewAndEditResult result = ViewAndEditData(member.dataTypeID, memberDataPtr, newBlackboard, &member);
+
+                if (member.name == "camera")
+                {
+                    std::println("IsActive: {}", result.isActive);
+                }
+
+                viewAndEditResult.isActive |= result.isActive;
                 if (result.isEdited)
                 {
                     viewAndEditResult.isEdited = result.isEdited;
-                    viewAndEditResult.isActive = result.isActive;
                     viewAndEditResult.dataTypeID = member.dataTypeID;
                     viewAndEditResult.dataPtr = dataPtr + std::get<ByteOffset>(member.memberType);
                     viewAndEditResult.propertyPath = propertyPath;
@@ -192,12 +198,17 @@ namespace CLX
 
     bool DataTypeRegistry::EqualsData(DataTypeID dataTypeID, const void* dataPtr1, const void* dataPtr2) const
     {
-        if (EqualsFunction equalsFunction = mDataTypes.at(dataTypeID).equals)
+        const DataType* dataType = Find(dataTypeID);
+        if (dataType == nullptr)
+        {
+            throw std::exception("Data Type is not registered");
+        }
+        if (EqualsFunction equalsFunction = dataType->equals)
         {
             return equalsFunction(dataPtr1, dataPtr2);
         }
 
-        for (auto& member : mDataTypes.at(dataTypeID).memberVariables)
+        for (auto& member : dataType->memberVariables)
         {
             ASSERT(Find(member.dataTypeID) != nullptr);
             const void* memberDataPtr1 = dataPtr1 + std::get<ByteOffset>(member.memberType);

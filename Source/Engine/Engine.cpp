@@ -15,6 +15,35 @@
 namespace CLX
 {
 
+    struct ProjectSettings
+    {
+        Bounds<EntitySerializationID> usedEntityIDBounds;
+    };
+
+    ProjectSettings LoadProjectSettings()
+    {
+        const std::filesystem::path filename = std::filesystem::absolute(SIMPLE_SETTINGS_PROJECT);
+
+        std::ifstream file(filename);
+        if (!file.is_open())
+        {
+            assert(false && "Failed To Open File");
+            return {};
+        }
+
+        const nlohmann::json json = nlohmann::json::parse(file);
+        file.close();
+        
+        const uint64_t min = json["Used EntityID Bounds"]["Min"];
+        const uint64_t max = json["Used EntityID Bounds"]["Max"];
+        
+        ProjectSettings settings
+        {
+            .usedEntityIDBounds = Bounds<EntitySerializationID>::FromMinAndMax(EntitySerializationID{ min }, EntitySerializationID{ max })
+        };
+        return settings;
+    }
+
     Engine::Engine(OperatingSystem&& operatingSystem)
         : mOperatingSystem(std::move(operatingSystem))
         , mAssetManager(std::make_shared<AssetManager>())
@@ -44,9 +73,10 @@ namespace CLX
         std::shared_ptr<Blackboard> blackboard = mBlackboard;
         ECSRegistry* ecsRegistry = &mECSRegistry;
         ECSManager* ecsManager = &mECSManager;
-        auto entityCompositionLoader = [blackboard, ecsRegistry, ecsManager](const std::filesystem::path& path)
+        EntitySerializationIDGenerator* entityIDGenerator = &mEntityIDGenerator;
+        auto entityCompositionLoader = [blackboard, ecsRegistry, ecsManager, entityIDGenerator](const std::filesystem::path& path)
             {
-                EntityComposition entityComposition(*ecsManager, ecsManager->CreateECS(*ecsRegistry));
+                EntityComposition entityComposition(*ecsManager, ecsManager->CreateECS(*ecsRegistry, *entityIDGenerator));
                 LoadEntityComposition(path, entityComposition, *blackboard);
                 return EntityCompositionAsset(std::move(entityComposition), path);
             };
@@ -69,7 +99,7 @@ namespace CLX
         const nlohmann::json json = nlohmann::json::parse(file);
         file.close();
 
-        vSync = json["Game_Settings"]["VSync"];
+        vSync = json["VSync"];
     }
 
     void Engine::Init()
@@ -82,6 +112,8 @@ namespace CLX
         mBlackboard->Insert<Key_DataTypeRegistry>(mDataTypeRegistry);
         mBlackboard->Insert<Key_InputState>(mInputState);
         mBlackboard->Insert<Key_ECSManager>(mECSManager);
+        mBlackboard->Insert<Key_EntityIDGenerator>(mEntityIDGenerator);
+
 
         mAssetManager->GetAssetLoader().SetSceneLoader([this](const std::filesystem::path& path)
             {
@@ -91,9 +123,12 @@ namespace CLX
                 return SceneAsset(std::move(scene), path);
             });
 
+        ProjectSettings projectSettings = LoadProjectSettings();
+        mEntityIDGenerator.SetUsedIDBounds(projectSettings.usedEntityIDBounds);
+
         mAssetManager->LoadAssets();
         mOperatingSystem.Init();
-        mMainWindow = mOperatingSystem.MakeWindow(Dimension2u(1600, 900), L"SimpleEngine");
+        mMainWindow = mOperatingSystem.MakeWindow(Dimension2u(1600, 900), L"ComplexEngine");
 
         //mAudioManager.Init();
         mFrameTimer.Start();
@@ -118,10 +153,9 @@ namespace CLX
         assert(file.is_open() && "Failed To Open File");
 
         const nlohmann::json jsonData = nlohmann::json::parse(file);
-        const nlohmann::json gameSettings = jsonData["Game_Settings"];
         file.close();
 
-        const std::string defaultSceneRelativePathStr = gameSettings["Start_Scene_Path"];
+        const std::string defaultSceneRelativePathStr = jsonData["Start_Scene_Path"];
         const std::filesystem::path sceneRelativePath = std::filesystem::path(defaultSceneRelativePathStr);
         const std::filesystem::path sceneFilePath = GetAbsoluteAssetPath(sceneRelativePath);
         std::ifstream sceneFile(sceneFilePath);
@@ -175,6 +209,8 @@ namespace CLX
         {
             return false;
         }
+
+        //std::println("Used entityID bounds: {}", mEntityIDGenerator.GetUsedIDBounds());
 
         mInputState = mOperatingSystem.GetInputState();
 

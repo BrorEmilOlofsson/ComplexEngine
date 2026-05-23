@@ -44,10 +44,10 @@ namespace CLX
 
 	private:
 
-		ECSOwningHandle mECSHandle;
+		ECSOwningHandle mECS;
 		Navmesh mNavmesh;
 		std::filesystem::path mNavmeshPath;
-		ECSOwningHandle mBackupECSHandle;
+		std::optional<ECSOwningHandle> mBackupECS;
 		RenderState mRenderState;
 		std::weak_ptr<Blackboard> mBlackboard;
 		Ray3f mMouseRay;
@@ -55,17 +55,17 @@ namespace CLX
 
 	inline ECS& Scene::GetECS()
 	{
-		return mECSHandle.Get();
+		return mECS.Get();
 	}
 
 	inline const ECS& Scene::GetECS() const
 	{
-		return mECSHandle.Get();
+		return mECS.Get();
 	}
 
 	constexpr ECSHandle Scene::GetECSHandle()
 	{
-		return ToHandle(mECSHandle);
+		return ToHandle(mECS);
 	}
 
 	[[nodiscard]] constexpr RenderState& Scene::GetRenderState()

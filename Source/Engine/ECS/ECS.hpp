@@ -13,6 +13,7 @@
 #include "EntityID.hpp"
 #include "ComponentPool.hpp"
 #include "ECSSystem.hpp"
+#include "EntitySerializationIDGenerator.hpp"
 
 
 namespace CLX
@@ -660,7 +661,8 @@ namespace CLX
 
         struct EntityData
         {
-            ComponentMask mask;
+            ComponentMask mask = {};
+            EntitySerializationID serializationID = InvalidID<EntitySerializationID>();
             uint32_t generation = 0;
             bool isActive = true;
         };
@@ -668,25 +670,31 @@ namespace CLX
     public:
 
         ECS() = delete;
-        explicit ECS(const ECSRegistry& ecsRegistry);
+        explicit ECS(const ECSRegistry& ecsRegistry, EntitySerializationIDGenerator& entityIDGenerator);
 
         EntityID CreateEntity();
-        void DestroyEntity(const EntityID entityID);
+        EntityID CreateEntity(EntitySerializationID serializationID);
+        void DestroyEntity(EntityID entityID);
 
-        EntityID CopyEntity(const EntityID entityID, ECS& targetECS) const;
-        EntityID DuplicateEntity(const EntityID entityID);
-        void ReplaceEntity(const EntityID replaceEntityID, const ECS& sourceECS, const EntityID sourceEntityID);
+        EntityID CopyEntity(EntityID entityID, ECS& targetECS) const;
+        EntityID DuplicateEntity(EntityID entityID);
+        void ReplaceEntity(EntityID replaceEntityID, const ECS& sourceECS, EntityID sourceEntityID);
 
-        void ActivateEntity(const EntityID entityID);
-        void DeactivateEntity(const EntityID entityID);
+        void ActivateEntity(EntityID entityID);
+        void DeactivateEntity(EntityID entityID);
 
-        [[nodiscard]] constexpr bool IsEntityValid(const EntityID entityID) const;
+        [[nodiscard]] constexpr bool IsEntityValid(EntityID entityID) const;
+        [[nodiscard]] constexpr bool IsEntityActive(EntityID entityID) const;
+
+        [[nodiscard]] constexpr EntitySerializationID GetSerializationID(EntityID entityID) const;
 
         template<typename T>
-        T& AddComponent(const EntityID entityID);
+        T& AddComponent(EntityID entityID);
 
         template<typename T>
         T& AddComponent(const EntityID entityID, const T& defaultValue);
+
+        void* AddComponent(const EntityID entityID, std::type_index typeIndex);
 
         template<typename T>
         T& InsertComponent(const EntityID entityID);
@@ -740,6 +748,7 @@ namespace CLX
         void Render(const Blackboard& blackboard) const;
 
         [[nodiscard]] const ECSRegistry& GetRegistry() const;
+        [[nodiscard]] EntitySerializationIDGenerator& GetEntityIDGenerator();
 
     private:
 
@@ -798,11 +807,22 @@ namespace CLX
         std::queue<uint32_t> mFreeEntityIDs;
         ECSRegistry mRegistry;
         std::vector<EntityID> mIterationList;
+        std::reference_wrapper<EntitySerializationIDGenerator> mEntityIDGenerator;
     };
 
     constexpr bool ECS::IsEntityValid(const EntityID entityID) const
     {
         return entityID.id < size(mEntityData) && mEntityData[entityID.id].generation == entityID.generation;
+    }
+
+    constexpr bool ECS::IsEntityActive(const EntityID entityID) const
+    {
+        return mEntityData[entityID.id].isActive;
+    }
+
+    constexpr EntitySerializationID ECS::GetSerializationID(const EntityID entityID) const
+    {
+        return mEntityData[entityID.id].serializationID;
     }
 
     template<typename T>
@@ -826,6 +846,15 @@ namespace CLX
         UpdateEntityMask<T>(entityID, true);
         return component;
     }
+
+    inline void* ECS::AddComponent(const EntityID entityID, const std::type_index typeIndex)
+    {
+        const std::size_t componentTypeIndex = mRegistry.GetComponentTypeIndex(typeIndex);
+        void* component = mRegistry.GetComponentType(typeIndex).addComponentFunction(*this, entityID, nullptr);
+        UpdateEntityMask(entityID, true, componentTypeIndex);
+        return component;
+    }
+
 
     template<typename T>
     T& ECS::InsertComponent(const EntityID entityID)

@@ -22,7 +22,7 @@ namespace CLX
 
     static void ShowInspector(std::set<EntityID>& selectedEntityIDs, ECS& ecsBuffer, EditorCommandTracker& commandTracker,
         EntityCompositionAssetHandle entityCompositionAsset, EntityCompositionInstantiationManager& entityInstantiations,
-        bool& anyItemActiveLastFrame, EntityID& copyEntityID, uint32_t& selectedComponentPopupIndex,
+        ComponentBufferData& componentBufferData, EntityID& copyEntityID, uint32_t& selectedComponentPopupIndex,
         std::string& componentSearchBuffer, JsonAny& copiedComponent, const InputState& input, Blackboard& newBlackboard)
     {
         if (ImGui::Begin((GetEntityCompositionName(entityCompositionAsset) + " Inspector").c_str()))
@@ -47,7 +47,7 @@ namespace CLX
                 {
                     entityCompositionAsset->GetECS(),
                     selectedEntityID,
-                    anyItemActiveLastFrame,
+                    componentBufferData,
                     ecsBuffer,
                     copyEntityID,
                     selectedComponentPopupIndex,
@@ -90,6 +90,7 @@ namespace CLX
     {
 
         mIsOpen = ImGui::Begin(GetEntityCompositionName(mEntityCompositionAsset).c_str());
+        ImGuiUtility::CheckForWindowFocus();
         mIsWindowFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
         const AABB2i renderRect = GetImGuiRenderRect();
         ImGui::End();
@@ -157,7 +158,7 @@ namespace CLX
             }
 
 
-            if (input.IsKeyPressed(eInputKey::LMB))
+            if (input.IsKeyReleased(eInputKey::LMB))
             {
                 const Point2i mouseScreenPosition = os.GetCursorScreenPosition();
 
@@ -190,6 +191,7 @@ namespace CLX
         const InputState& input = blackboard.Get<Key_InputState>();
         AssetManager& assetManager = blackboard.Get<Key_AssetManager>();
         EntityCompositionInstantiationManager& compositionInstantiations = blackboard.Get<Key_EntityCompositionInstantiationManager>();
+        JsonAny& copiedComponent = blackboard.Get<Key_CurrentCopiedComponent>();
 
         const bool hasValidEntityComposition = mEntityCompositionAsset.IsValid();
 
@@ -249,11 +251,11 @@ namespace CLX
             commandTracker,
             mEntityCompositionAsset,
             compositionInstantiations,
-            mAnyItemActiveLastFrame,
+            mComponentBufferData,
             mCopyEntityID,
             mSelectedComponentPopupIndex,
             mComponentSearchBuffer,
-            mCopiedComponent,
+            copiedComponent,
             input,
             newBlackboard
         );

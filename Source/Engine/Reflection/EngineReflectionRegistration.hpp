@@ -81,5 +81,5 @@ namespace CLX
 	REGISTER_DATATYPE(SceneAssetHandle);
 	REGISTER_DATATYPE(EntityCompositionAssetHandle);
 
-    REGISTER_MEMBER_2(CustomVariableData("Near Plane", &Camera::GetNearPlane, &Camera::SetNearPlane), EditorSpeed{0.001f});
+    //REGISTER_MEMBER_2(CustomVariableData("Near Plane", &Camera::GetNearPlane, &Camera::SetNearPlane), EditorSpeed{0.001f});
 }

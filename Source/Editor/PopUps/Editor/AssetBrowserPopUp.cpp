@@ -111,9 +111,9 @@ namespace CLX
         assetManager.Rename(path, newName);
     }
 
-    EntityComposition CreateEntityComposition(ECSManager& ecsManager, const ECSRegistry& ecsRegistry, std::string name)
+    EntityComposition CreateEntityComposition(ECSManager& ecsManager, const ECSRegistry& ecsRegistry, EntitySerializationIDGenerator& entityIDGenerator, std::string name)
     {
-        EntityComposition entityComposition(ecsManager, ecsManager.CreateECS(ecsRegistry));
+        EntityComposition entityComposition(ecsManager, ecsManager.CreateECS(ecsRegistry, entityIDGenerator));
         NameComponent* nameComponent = entityComposition.GetECS().GetComponent<NameComponent>(entityComposition.GetRootEntity());
         ASSERT(nameComponent);
         nameComponent->name = std::move(name);
@@ -121,7 +121,7 @@ namespace CLX
     }
 
     static void ShowAssetCreationPopUp(const std::filesystem::path& directoryPath, bool& canOpenPopUp, AssetManager& assetManager,
-        const DataTypeRegistry& dataTypeRegistry, const ECSRegistry& ecsRegistry, ECSManager& ecsManager)
+        const DataTypeRegistry& dataTypeRegistry, const ECSRegistry& ecsRegistry, ECSManager& ecsManager, EntitySerializationIDGenerator& entityIDGenerator)
     {
         static constexpr const char* CreateAssetMenuPopupName = "CreateAssetMenu";
         static constexpr const char* CreateEntityCompositionAssetName = "CreateEntityCompositionAsset";
@@ -185,7 +185,7 @@ namespace CLX
             if (ImGui::Button("Create"))
             {
                 const std::filesystem::path path = directoryPath / (ToWString(name) + std::wstring(AssetExtensions::EntityComposition));
-                EntityCompositionAsset asset(CreateEntityComposition(ecsManager, ecsRegistry, name), path);
+                EntityCompositionAsset asset(CreateEntityComposition(ecsManager, ecsRegistry, entityIDGenerator, name), path);
                 auto assetHandle = assetManager.AddEntityComposition(asset);
                 SaveEntityCompositionAsset(assetHandle, dataTypeRegistry);
 
@@ -242,6 +242,7 @@ namespace CLX
         DataTypeRegistry& dataTypeRegistry;
         const ECSRegistry& ecsRegistry;
         ECSManager& ecsManager;
+        EntitySerializationIDGenerator& entityIDGenerator;
         NodeScriptingWindow& nodeScriptingWindow;
         MenuTabWindow& nodeScriptParentTab;
         MenuItemPopUp& nodeScriptButton;
@@ -387,7 +388,7 @@ namespace CLX
 
         RenamePopup(RenamePopupID, data.selectedFilePath, data.renameBuffer, data.assetManager);
 
-        ShowAssetCreationPopUp(directory, data.canOpenPopup, data.assetManager, data.dataTypeRegistry, data.ecsRegistry, data.ecsManager);
+        ShowAssetCreationPopUp(directory, data.canOpenPopup, data.assetManager, data.dataTypeRegistry, data.ecsRegistry, data.ecsManager, data.entityIDGenerator);
     }
 
 
@@ -488,6 +489,7 @@ namespace CLX
         DataTypeRegistry& dataTypeRegistry = blackboard.Get<Key_DataTypeRegistry>();
         const ECSRegistry& ecsRegistry = blackboard.Get<Key_ECSRegistry>();
         ECSManager& ecsManager = blackboard.Get<Key_ECSManager>();
+        EntitySerializationIDGenerator& entityIDGenerator = blackboard.Get<Key_EntityIDGenerator>();
         EditorWindowManager& windowManager = blackboard.Get<Key_EditorWindowManager>();
         NodeScriptingWindow& nodeScriptingWindow = blackboard.Get<Key_NodeScriptingWindow>();
         OperatingSystem& os = blackboard.Get<Key_OperatingSystem>();
@@ -500,6 +502,7 @@ namespace CLX
             .dataTypeRegistry = dataTypeRegistry,
             .ecsRegistry = ecsRegistry,
             .ecsManager = ecsManager,
+            .entityIDGenerator = entityIDGenerator,
             .nodeScriptingWindow = nodeScriptingWindow,
             .nodeScriptParentTab = *mNodeScriptParentTab,
             .nodeScriptButton = *mNodeScriptButton,

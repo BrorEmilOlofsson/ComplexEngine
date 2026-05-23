@@ -14,6 +14,7 @@
 #include "Engine/Reflection/DataTypeRegistry.hpp"
 #include "Engine/ECS/ECSRegistry.hpp"
 #include "Engine/Input/InputManager.hpp"
+#include "Engine/ECS/EntitySerializationIDGenerator.hpp"
 
 namespace CLX
 {
@@ -51,6 +52,7 @@ namespace CLX
         [[nodiscard]] const GraphicsFoundation& GetGraphicsFoundation() const;
         [[nodiscard]] ECSRegistry& GetECSRegistry() { return mECSRegistry; }
         [[nodiscard]] ECSManager& GetECSManager() { return mECSManager; }
+        [[nodiscard]] EntitySerializationIDGenerator& GetEntityIDGenerator() { return mEntityIDGenerator; }
         [[nodiscard]] const ECSRegistry& GetECSRegistry() const { return mECSRegistry; }
 		void SetShouldExit(bool shouldExit = true);
 		void SetCurrentDropPath(const std::filesystem::path& path);
@@ -64,6 +66,7 @@ namespace CLX
 
 		DataTypeRegistry mDataTypeRegistry;
 		OperatingSystem mOperatingSystem;
+        EntitySerializationIDGenerator mEntityIDGenerator;
 		ECSRegistry mECSRegistry;
 		ECSManager mECSManager;
 		[[no_unique_address]] Console mConsole;

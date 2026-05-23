@@ -299,4 +299,15 @@ namespace CLX
 	{
 		SetAspectRatio(ToAspectRatio(resolution));
     }
+
+	[[nodiscard]] constexpr bool operator==(const Camera& lhs, const Camera& rhs) noexcept
+	{
+        static_assert(sizeof(Camera) == 160); // This is to ensure that we are not accidentally missing any member variables in the equality comparison. 
+		return lhs.GetTransform() == rhs.GetTransform()
+			&& lhs.GetProjectionMatrix() == rhs.GetProjectionMatrix()
+			&& lhs.GetNearPlane() == rhs.GetNearPlane()
+			&& lhs.GetFarPlane() == rhs.GetFarPlane()
+			&& lhs.GetVerticalFOV() == rhs.GetVerticalFOV()
+			&& lhs.GetAspectRatio() == rhs.GetAspectRatio();
+	}
 }

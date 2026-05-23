@@ -23,8 +23,7 @@ namespace CLX
             Navmesh& navmesh = sceneManager.GetActiveScene()->GetNavmesh();
 
             ImGui::Text("Drag Navmesh Here");
-            auto objAsset = ObjectTarget<AssetPath_OBJ>();
-            if (objAsset)
+            if (auto objAsset = ObjectTarget<AssetPath_OBJ>())
             {
                 const std::filesystem::path navmeshPath = std::filesystem::path(objAsset->Value().view());
                 navmesh = Navmesh(NavmeshLoader::LoadMesh(navmeshPath));
@@ -162,6 +161,26 @@ namespace CLX
         }
     }
 
+    static void UpdateEntitySceneClickSelection(const InputState& input, const OperatingSystem& os, RenderState& renderState, std::set<EntityID>& selectedEntityIDs, EditorCommandTracker& commandTracker)
+    {
+        if (input.IsKeyReleased(eInputKey::LMB))
+        {
+            const Point2i mouseScreenPos = os.GetCursorScreenPosition();
+            if (IsInsideRenderRect(mouseScreenPos, renderState.GetRenderRect().value()))
+            {
+                const Point2i mappedPos = MapToRenderRect(mouseScreenPos, renderState.GetRenderRect().value());
+
+                const uint32_t id = renderState.GetRenderContext()->GetObjectIDAt(mappedPos);
+
+                const EntityID entityID{ id };
+                if (entityID != InvalidEntityID)
+                {
+                    SetEntitySelection(entityID, selectedEntityIDs, commandTracker);
+                }
+            }
+        }
+    }
+
     SceneWindowPopUp::SceneWindowPopUp()
         : mHierarchyPopUp("Hierarchy")
         , mInspectorPopUp("Inspector", &mHierarchyPopUp, &mCamera)
@@ -173,12 +192,17 @@ namespace CLX
     void SceneWindowPopUp::UpdateInternal(const Blackboard& blackboard)
     {
         const bool isOpen = ImGui::Begin(WindowName, nullptr, ImGuiWindowFlags_NoScrollbar);
+        
+        ImGuiUtility::CheckForWindowFocus();
+
         const bool isFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
         AABB2i renderRect = GetImGuiRenderRect();
         if (renderRect.GetExtent().x == 0 || renderRect.GetExtent().y == 0)
         {
             renderRect = AABB2i::FromDefaultAndExtent(Vector2u(100, 100));
         }
+
+
         ImGui::End();
 
         if (blackboard.Get<Key_IsPlaying>())
@@ -212,7 +236,7 @@ namespace CLX
                 const PrimitiveGrid3 grid
                 {
                     .minPos = Point3f::Zero(),
-                    .gridSize = Dimension3u(500, 0, 500),
+                    .gridSize = Dimension3u(100, 0, 100),
                     .cellSize = Dimension3f(10, 0, 10),
                     .offset = Vector3f(250.f, 0.f, 250.f),
                 };
@@ -223,22 +247,7 @@ namespace CLX
             sceneRenderState.SetRenderRect(renderRect);
             mCamera.SetResolution(GetDimension(renderRect));
 
-            if (input.IsKeyPressed(eInputKey::LMB))
-            {
-                const Point2i mouseScreenPos = os.GetCursorScreenPosition();
-                if (IsInsideRenderRect(mouseScreenPos, sceneRenderState.GetRenderRect().value()))
-                {
-                    const Point2i mappedPos = MapToRenderRect(mouseScreenPos, sceneRenderState.GetRenderRect().value());
-
-                    const uint32_t id = sceneRenderState.GetRenderContext()->GetObjectIDAt(mappedPos);
-
-                    const EntityID entityID{ id };
-                    if (entityID != InvalidEntityID)
-                    {
-                        SetEntitySelection(entityID, mHierarchyPopUp.GetSelectedEntityIDs(), commandTracker);
-                    }
-                }
-            }
+            UpdateEntitySceneClickSelection(input, os, sceneRenderState, mHierarchyPopUp.GetSelectedEntityIDs(), commandTracker);
 
             if (input.IsKeyPressed(eInputKey::F) && isFocused)
             {

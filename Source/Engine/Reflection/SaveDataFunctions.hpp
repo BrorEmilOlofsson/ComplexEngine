@@ -199,7 +199,7 @@ namespace CLX
 	template<typename T> requires std::is_enum_v<T>
 	[[nodiscard]] nlohmann::json ToJSON(const T& value)
 	{
-		return ::ToJSON(static_cast<int>(value));
+		return ::ToJSON(std::to_underlying(value));
 	}
 
 	template<typename T>

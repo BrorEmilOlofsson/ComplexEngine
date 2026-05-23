@@ -1,7 +1,8 @@
 #pragma once
 #include <type_traits>
-#include <functional>
 #include <concepts>
+#include <format>
+#include <string>
 #include "Engine/Utility/Assert.hpp"
 #include "Engine/Utility/Rebind.hpp"
 
@@ -236,3 +237,16 @@ namespace CLX
 		return a.GetMin() == b.GetMin() && a.GetMax() == b.GetMax();
 	}
 }
+
+template<typename T, typename BoundsChecker>
+struct std::formatter<CLX::Bounds<T, BoundsChecker>> : std::formatter<std::string>
+{
+	auto format(const CLX::Bounds<T, BoundsChecker>& bounds, auto& ctx) const
+	{
+		return std::format_to(
+			ctx.out(),
+			"AABB2(Min: {}, Max: {})",
+			bounds.GetMin(), bounds.GetMax()
+		);
+	}
+};

@@ -1,9 +1,7 @@
 {
-  "Debug_Settings": {
-    "DebugMode": true,
-    "MemoryTracker": {
-      "Active": false,
-      "Advanced":  false
-    }
+  "DebugMode": true,
+  "MemoryTracker": {
+    "Active": false,
+    "Advanced": false
   }
 }

@@ -8,15 +8,13 @@ namespace CLX
 	{
 		Simple,
 		Dark,
-		Light,
-		Count
+		Light
 	};
 
 	enum class eImGuiEditorMode
 	{
 		Default,
-		Playing,
-		Count
+		Playing
 	};
 
 	class ImGuiStyleManager final

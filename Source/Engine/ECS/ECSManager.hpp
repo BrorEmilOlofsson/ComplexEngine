@@ -4,11 +4,14 @@
 #include <limits>
 
 #include "Engine/ECS/ECS.hpp"
+#include "Engine/Utility/IDWrapper.hpp"
 
 namespace CLX
 {
 
-    using ECSID = uint32_t;
+    using ECSID = IDWrapper<uint32_t>;
+
+    constexpr ECSID InvalidECSID = InvalidID<ECSID>();
 
     class ECSManager
     {
@@ -43,17 +46,17 @@ namespace CLX
             }
         }
 
-        [[nodiscard]] ECSID CreateECS(const ECSRegistry& registry)
+        [[nodiscard]] ECSID CreateECS(const ECSRegistry& registry, EntitySerializationIDGenerator& entityIDGenerator)
         {
-            const ECSID ecsID = mECSIDCounter++;
+            const ECSID ecsID = ECSID{ mECSIDCounter.id++ };
             ASSERT(!mECSMap.contains(ecsID));
-            mECSMap.emplace(ecsID, ECS(registry));
+            mECSMap.emplace(ecsID, ECS(registry, entityIDGenerator));
             return ecsID;
         }
 
         [[nodiscard]] ECSID CopyECS(const ECSID& other)
         {
-            const ECSID ecsID = mECSIDCounter++;
+            const ECSID ecsID = ECSID{ mECSIDCounter.id++ };
             ECS* otherECS = GetECS(other);
             ASSERT(otherECS != nullptr);
             ASSERT(!mECSMap.contains(ecsID));
@@ -120,11 +123,11 @@ namespace CLX
 
         ~ECSOwningHandle()
         {
-            if (mECSID != std::numeric_limits<ECSID>::max())
+            if (mECSID != InvalidECSID)
             {
                 mECSManager->mECSMap.erase(mECSID);
             }
-            mECSID = std::numeric_limits<ECSID>::max();
+            mECSID = InvalidECSID;
             mECSManager = nullptr;
         }
 
@@ -169,8 +172,8 @@ namespace CLX
     };
 
 
-    inline ECSOwningHandle CreateECS(ECSManager& ecsManager, const ECSRegistry& registry)
+    inline ECSOwningHandle CreateECS(ECSManager& ecsManager, const ECSRegistry& registry, EntitySerializationIDGenerator& entityIDGenerator)
     {
-        return ECSOwningHandle(ecsManager, ecsManager.CreateECS(registry));
+        return ECSOwningHandle(ecsManager, ecsManager.CreateECS(registry, entityIDGenerator));
     }
 }

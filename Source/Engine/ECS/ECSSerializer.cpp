@@ -189,7 +189,7 @@ namespace CLX
 			return;
 		}
 
-		entityComposition.GetECS() = ECS(entityComposition.GetECS().GetRegistry());
+		entityComposition.GetECS() = ECS(entityComposition.GetECS().GetRegistry(), entityComposition.GetECS().GetEntityIDGenerator());
 
 		std::ifstream file(path);
 

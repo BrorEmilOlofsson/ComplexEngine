@@ -81,8 +81,6 @@ namespace CLX
 
 namespace CLX
 {
-
-
 	namespace ImGuiUtility
 	{
 		inline void SameLineDummy(float widthOffset, float heightOffset)
@@ -111,6 +109,14 @@ namespace CLX
 		inline void DrawRect(const Point2i& screenPos, const Color color)
 		{
 			::ImGui::GetForegroundDrawList()->AddRectFilled(ToImVec2(screenPos), ToImVec2(screenPos + Vector2i{ 2, 2 }), ::ImGui::ColorConvertFloat4ToU32(ToImVec4(color)));
+		}
+
+		inline void CheckForWindowFocus()
+		{
+			if (ImGui::IsWindowHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right))
+			{
+				ImGui::SetWindowFocus();
+			}
 		}
 	}
 }

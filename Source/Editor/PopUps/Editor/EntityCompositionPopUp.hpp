@@ -8,7 +8,7 @@
 #include "Engine/Utility/Camera.hpp"
 #include "Engine/Graphics/RenderState.hpp"
 #include "Engine/Asset/AssetTypes/EntityCompositionAsset.hpp"
-#include "Engine/Reflection/JsonAny.hpp"
+#include "Editor/Utility/ComponentBufferData.hpp"
 
 #include "Editor/Utility/TransformEntityData.hpp"
 
@@ -35,7 +35,7 @@ namespace CLX
 
 		EntityCompositionAssetHandle mEntityCompositionAsset;
 		std::set<EntityID> mSelectedEntityIDs;
-		bool mAnyItemActiveLastFrame = false;
+		ComponentBufferData mComponentBufferData;
 		EntityID mCopyEntityID;
 		std::vector<EntityID> mRootEntities;
 		Camera mCamera;
@@ -45,7 +45,6 @@ namespace CLX
         std::string mEntitySearchBuffer;
         uint32_t mSelectedComponentPopupIndex = 0;
 		std::string mComponentSearchBuffer;
-        JsonAny mCopiedComponent;
         int mGuizmoID = 0;
 		bool mIsWindowFocused = false;
 		// Refactor

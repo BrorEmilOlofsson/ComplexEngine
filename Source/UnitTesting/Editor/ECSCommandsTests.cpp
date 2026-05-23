@@ -193,9 +193,10 @@ TEST_CASE("Instantiate Entity Composition")
 
         ECSManager ecsManager;
 
-        EntityCompositionAsset compositionAsset(EntityComposition(ecsManager, ecsManager.CreateECS(CreateECSRegistry())), std::filesystem::path("path/to/asset"));
+        EntitySerializationIDGenerator entityIDGenerator;
+        EntityCompositionAsset compositionAsset(EntityComposition(ecsManager, ecsManager.CreateECS(CreateECSRegistry(), entityIDGenerator)), std::filesystem::path("path/to/asset"));
 
-        ECSOwningHandle targetECS(ecsManager, ecsManager.CreateECS(CreateECSRegistry()));
+        ECSOwningHandle targetECS(ecsManager, ecsManager.CreateECS(CreateECSRegistry(), entityIDGenerator));
 
         const EntityID parentID = targetECS.Get().CreateEntity();
         const EntityID child1 = compositionAsset->GetECS().CreateEntity();

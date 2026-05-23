@@ -12,11 +12,11 @@ namespace CLX
 {
 
     static void ShowInspector(SceneManager& sceneManager, Camera& camera, const InputState& input, ECS& ecsBuffer, EditorCommandTracker& commandTracker,
-        const Blackboard& blackboard, const std::string& imguiName, bool& isActive, const std::set<EntityID>& selectedEntityIDs, bool& anyItemActiveLastFrame, EntityID& copyEntityID,
+        const Blackboard& blackboard, const std::string& imguiName, bool& isWindowActive, const std::set<EntityID>& selectedEntityIDs, ComponentBufferData& componentBufferData, EntityID& copyEntityID,
         uint32_t& selectedComponentPopupIndex, std::string& componentSearchString, JsonAny& copiedComponent, EntityCompositionInstantiationManager& entityCompositionInstantiations,
         std::function<void(EntityID)>& onEntitySelected)
     {
-        if (ImGui::Begin(imguiName.c_str(), &isActive))
+        if (ImGui::Begin(imguiName.c_str(), &isWindowActive))
         {
             const EntityID selectedEntityID = selectedEntityIDs.size() == 1 ? *selectedEntityIDs.begin() : InvalidEntityID;
             if (selectedEntityID == InvalidEntityID)
@@ -41,7 +41,7 @@ namespace CLX
                 {
                     ecs,
                     selectedEntityID,
-                    anyItemActiveLastFrame,
+                    componentBufferData,
                     ecsBuffer,
                     copyEntityID,
                     selectedComponentPopupIndex,
@@ -80,6 +80,7 @@ namespace CLX
         ECS& ecsBuffer = blackboard.Get<Key_ECSBuffer>();
         const InputState& input = blackboard.Get<Key_InputState>();
         EntityCompositionInstantiationManager& entityCompositionInstantiations = blackboard.Get<Key_EntityCompositionInstantiationManager>();
+        JsonAny& copiedComponent = blackboard.Get<Key_CurrentCopiedComponent>();
 
         ShowInspector(
             sceneManager,
@@ -91,11 +92,11 @@ namespace CLX
             mImGuiName,
             mIsActive,
             mHierarchyPopUp->GetSelectedEntityIDs(),
-            mAnyItemActiveLastFrame,
+            mComponentBufferData,
             mCopyEntityID,
             mSelectedComponentPopupIndex,
             mComponentSearchBuffer,
-            mCopiedComponent,
+            copiedComponent,
             entityCompositionInstantiations,
             mEntitySelectedCallback
         );

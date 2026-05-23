@@ -57,9 +57,9 @@ workspace "FootballGame" -- Workspace, is not same as Project. Anything configur
 
 		'SIMPLE_SETTINGS_IMGUI="' .."Settings/imgui.ini" .. '"',
 		'SIMPLE_SETTINGS_GAME="' .. "Settings/game_settings.json" .. '"',
-		'SIMPLE_SETTINGS_EDITOR="' .. "Settings/editor_settings.json" .. '"',
 		'SIMPLE_SETTINGS_DEBUG="' .. "Settings/debug_settings.json" .. '"',
 		'SIMPLE_SETTINGS_ENGINE="' .. "Settings/engine_settings.json" .. '"',
+		'SIMPLE_SETTINGS_PROJECT="' .. "Settings/project_settings.json" .. '"',
 		
 		'SIMPLE_DIR_MINIDUMP="' .."../Temp/Minidumps/".. '"',
 		'SIMPLE_FILENAME_STACKTRACES="' .."../Temp/StackTraces/stack_traces.txt".. '"',

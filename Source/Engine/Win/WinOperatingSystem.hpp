@@ -5,7 +5,10 @@
 
 #include <string>
 #include <memory>
+#include <unordered_map>
+#include <vector>
 
+#include "Engine/Win/WinWindowClass.hpp"
 #include "Engine/Win/WinWindow.hpp"
 #include "Engine/OperatingSystem/WindowHandle.hpp"
 #include "Engine/Graphics/GraphicsFoundation.hpp"

@@ -12,6 +12,7 @@
 #include "Engine/Math/TransformMode.hpp"
 #include "Engine/Math/TransformOperation.hpp"
 #include "Editor/Utility/TransformEntityData.hpp"
+#include "Editor/Utility/ComponentBufferData.hpp"
 #include "Engine/Math/Shapes/AABB2.hpp"
 
 namespace CLX
@@ -58,7 +59,7 @@ namespace CLX
 	{
 		ECS& ecs;
 		EntityID entityID;
-		bool& anyItemActiveLastFrame;
+		ComponentBufferData& componentBufferData;
 		ECS& ecsBuffer;
 		EntityID& copyEntityID;
 		JsonAny& copiedComponent;
@@ -76,7 +77,7 @@ namespace CLX
 	{
 		ECS& ecs;
 		EntityID entityID;
-		bool& anyItemActiveLastFrame;
+		ComponentBufferData& componentBufferData;
 		ECS& ecsBuffer;
 		EntityID& copyEntityID;
         uint32_t& selectedComponentPopupIndex;

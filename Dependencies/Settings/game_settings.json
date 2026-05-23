@@ -1,1 +1,12 @@
-{"Game_Settings":{"Resolution":{"x":1280,"y":720},"Start_Scene_Path":"Scenes/Level_1.clxscene","VSync":false,"Window_Size":{"x":1280,"y":720}}}
+{
+  "Resolution": {
+    "x": 1280,
+    "y": 720
+  },
+  "Start_Scene_Path": "Scenes/Level_1.clxscene",
+  "VSync": false,
+  "Window_Size": {
+    "x": 1280,
+    "y": 720
+  }
+}

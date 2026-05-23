@@ -148,7 +148,8 @@ TEST_CASE("ECS - GetComponent with wrong generation ID", "[ECS]")
 TEST_CASE("ECS - Entity Iteration After Destroying Entities", "[ECS]")
 {
     {
-        ECS ecs(CreateRegistry());
+        EntitySerializationIDGenerator entityIDGenerator;
+        ECS ecs(CreateRegistry(), entityIDGenerator);
 
         std::size_t entityCount = 5;
         for (std::size_t i = 0; i < entityCount; i++)
@@ -173,7 +174,8 @@ TEST_CASE("ECS - Entity Iteration After Destroying Entities", "[ECS]")
     }
 
     {
-        ECS ecs(CreateRegistry());
+        EntitySerializationIDGenerator entityIDGenerator;
+        ECS ecs(CreateRegistry(), entityIDGenerator);
 
         std::size_t entityCount = 5;
         for (std::size_t i = 0; i < entityCount; i++)
