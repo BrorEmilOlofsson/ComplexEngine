@@ -5,6 +5,7 @@
 #include <cstring>
 #include <utility>
 #include <concepts>
+#include <any>
 
 #include "Engine/Utility/FunctionPtrWrapper.hpp"
 
@@ -19,6 +20,8 @@ namespace CLX
     using MoveFunction = FunctionPtrWrapper<void(void*, void*), struct MoveFTag>;
     using SwapFunction = FunctionPtrWrapper<void(void*, void*), struct SwapFTag>;
     using EqualsFunction = FunctionPtrWrapper<bool(const void*, const void*), struct EqualsFTag>;
+    using ToAnyFunction = FunctionPtrWrapper<std::any(const void*), struct ToAnyFTag>;
+    using FromAnyFunction = FunctionPtrWrapper<void(void*, const std::any&), struct FromAnyFTag>;
 
     template<typename T>
     [[nodiscard]] constexpr InplaceConstructFunction CreateInplaceConstructFunction()
@@ -128,4 +131,27 @@ namespace CLX
                 return value1 == value2;
             });
     }
+
+    template<typename T>
+    [[nodiscard]] constexpr ToAnyFunction CreateToAnyFunction()
+    {
+        return ToAnyFunction(
+            [](const void* dataPtr) -> std::any
+            {
+                const T& value = *reinterpret_cast<const T*>(dataPtr);
+                return std::any(value);
+            });
+    }
+
+    template<typename T>
+    [[nodiscard]] constexpr FromAnyFunction CreateFromAnyFunction()
+    {
+        return FromAnyFunction(
+            [](void* dataPtr, const std::any& any) -> void
+            {
+                T& value = *reinterpret_cast<T*>(dataPtr);
+                value = std::any_cast<T>(any);
+            });
+    }
+
 }

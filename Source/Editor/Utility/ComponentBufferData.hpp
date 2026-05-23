@@ -1,11 +1,11 @@
 #pragma once
-#include "Engine/Reflection/JsonAny.hpp"
+#include <any>
 
 namespace CLX
 {
     struct ComponentBufferData
     {
         bool anyItemActiveLastFrame = false;
-        JsonAny storedComponent;
+        std::any storedComponent;
     };
 }

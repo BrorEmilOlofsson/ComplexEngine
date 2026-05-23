@@ -13,7 +13,7 @@ namespace CLX
 
     static void ShowInspector(SceneManager& sceneManager, Camera& camera, const InputState& input, EditorCommandTracker& commandTracker,
         const Blackboard& blackboard, const std::string& imguiName, bool& isWindowActive, const std::set<EntityID>& selectedEntityIDs, ComponentBufferData& componentBufferData, EntityID& copyEntityID,
-        uint32_t& selectedComponentPopupIndex, std::string& componentSearchString, JsonAny& copiedComponent, EntityCompositionInstantiationManager& entityCompositionInstantiations,
+        uint32_t& selectedComponentPopupIndex, std::string& componentSearchString, std::any& copiedComponent, EntityCompositionInstantiationManager& entityCompositionInstantiations,
         std::function<void(EntityID)>& onEntitySelected)
     {
         if (ImGui::Begin(imguiName.c_str(), &isWindowActive))
@@ -78,7 +78,7 @@ namespace CLX
         SceneManager& sceneManager = blackboard.Get<Key_SceneManager>();
         const InputState& input = blackboard.Get<Key_InputState>();
         EntityCompositionInstantiationManager& entityCompositionInstantiations = blackboard.Get<Key_EntityCompositionInstantiationManager>();
-        JsonAny& copiedComponent = blackboard.Get<Key_CurrentCopiedComponent>();
+        std::any& copiedComponent = blackboard.Get<Key_CurrentCopiedComponent>();
 
         ShowInspector(
             sceneManager,

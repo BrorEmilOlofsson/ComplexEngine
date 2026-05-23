@@ -15,7 +15,6 @@
 #include "Editor/PopUps/Editor/AssetBrowserPopUp.hpp"
 #include "Editor/EntityCompositionInstantiationManager.hpp"
 #include "Editor/EditorWindows/EditorWindowManager.hpp"
-#include "Engine/Reflection/JsonAny.hpp"
 
 namespace CLX
 {
@@ -48,7 +47,7 @@ namespace CLX
         bool mIsCameraSettingsPopUpActive = false;
         bool mIsGraphicsSettingsPopUpActive = false;
         GraphicsSettingsData mGraphicsSettingsData = {};
-		JsonAny mCopiedComponent;
+		std::any mCopiedComponent;
         EditorWindowManager mWindowManager;
 		NodeScriptingWindow mNodeScriptingWindow;
 		SceneWindowPopUp mSceneWindow;

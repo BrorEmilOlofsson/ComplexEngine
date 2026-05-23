@@ -75,6 +75,9 @@ namespace CLX
         void MoveData(DataTypeID dataTypeID, void* destinationPtr, void* sourcePtr) const;
         bool EqualsData(DataTypeID dataTypeID, const void* dataPtr1, const void* dataPtr2) const;
 
+        [[nodiscard]] std::any ToAny(DataTypeID dataTypeID, const void* dataPtr) const;
+        void FromAny(DataTypeID dataTypeID, void* dataPtr, const std::any& any) const;
+
         [[nodiscard]] size_t GetDataTypeSize(DataTypeID dataTypeID) const;
         [[nodiscard]] InplaceConstructFunction GetInplaceConstructFunction(DataTypeID dataTypeID) const;
         [[nodiscard]] DestroyFunction GetDestroyFunction(DataTypeID dataTypeID) const;
@@ -189,6 +192,8 @@ namespace CLX
             .move = CreateMoveFunction<T>(),
             .swap = CreateSwapFunction<T>(),
             .equals = equalsFunction,
+            .toAny = CreateToAnyFunction<T>(),
+            .fromAny = CreateFromAnyFunction<T>(),
             .size = sizeof(T),
             .alignment = alignof(T),
             .type = std::type_index(typeInfo),

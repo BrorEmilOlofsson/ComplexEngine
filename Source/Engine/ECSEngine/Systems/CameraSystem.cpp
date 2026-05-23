@@ -42,36 +42,31 @@ namespace CLX
 			});
 	}
 
-	static void PushCameraLines(const ECS& ecs, RenderList& renderList)
+	void RenderCameraFrustrum(const Camera& camera, RenderList& renderList)
 	{
-        std::vector<const CameraComponent*> cameraComponents;
+		const UnitVector3f forward = camera.GetForward();
 
+		Frustrumf frustrum;
+		frustrum.mFarPlaneV = camera.GetFarPlane();
+		frustrum.mNearPlaneV = camera.GetNearPlane();
+		frustrum.mTransform = camera.GetTransform();
+		frustrum.mVerticalAngle = camera.GetVerticalFOV();
+		frustrum.mHorizontalAngle = camera.GetHorizontalFOV();
+		RenderFrustrum(frustrum, Colors::Lime, renderList);
+
+		DrawSphere sphere;
+		sphere.sphere = Spheref::FromCenterAndRadius(camera.GetPosition(), Radiusf(0.1f));
+		sphere.color = Colors::Gray;
+
+		renderList.AddSphere(sphere, false);
+	}
+
+	static void RenderCameras(const ECS& ecs, RenderList& renderList)
+	{
         ecs.ForEach([&](const CameraComponent& cameraComp)
 			{
-                cameraComponents.push_back(&cameraComp);
+				RenderCameraFrustrum(cameraComp.camera, renderList);
 			});
-
-		if (!cameraComponents.empty())
-		{
-			auto& cameraComponent = *cameraComponents.front();
-
-			const UnitVector3f forward = cameraComponent.camera.GetForward();
-			
-			const Camera& camera = cameraComponent.camera;
-			Frustrumf frustrum;
-			frustrum.mFarPlaneV = camera.GetFarPlane();
-			frustrum.mNearPlaneV = camera.GetNearPlane();
-			frustrum.mTransform = camera.GetTransform();
-			frustrum.mVerticalAngle = camera.GetVerticalFOV();
-			frustrum.mHorizontalAngle = camera.GetHorizontalFOV();
-			RenderFrustrum(frustrum, Colors::Lime, renderList);
-
-			DrawSphere sphere;
-			sphere.sphere = Spheref::FromCenterAndRadius(camera.GetPosition(), Radiusf(0.1f));
-			sphere.color = Colors::Gray;
-
-			renderList.AddSphere(sphere, false);
-		}
 	}
 
 	static void HandleFreeFly(ECS& ecs, const float deltaTime, const InputState& input)
@@ -110,6 +105,6 @@ namespace CLX
 		{
 			return;
 		}
-		PushCameraLines(ecs, blackboard.Get<Key_CurrentRenderState>().GetRenderList());
+		RenderCameras(ecs, blackboard.Get<Key_CurrentRenderState>().GetRenderList());
 	}
 }

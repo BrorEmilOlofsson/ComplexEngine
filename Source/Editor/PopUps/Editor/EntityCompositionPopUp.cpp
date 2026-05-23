@@ -23,7 +23,7 @@ namespace CLX
     static void ShowInspector(std::set<EntityID>& selectedEntityIDs, EditorCommandTracker& commandTracker,
         EntityCompositionAssetHandle entityCompositionAsset, EntityCompositionInstantiationManager& entityInstantiations,
         ComponentBufferData& componentBufferData, EntityID& copyEntityID, uint32_t& selectedComponentPopupIndex,
-        std::string& componentSearchBuffer, JsonAny& copiedComponent, const InputState& input, Blackboard& newBlackboard)
+        std::string& componentSearchBuffer, std::any& copiedComponent, const InputState& input, Blackboard& newBlackboard)
     {
         if (ImGui::Begin((GetEntityCompositionName(entityCompositionAsset) + " Inspector").c_str()))
         {
@@ -189,7 +189,7 @@ namespace CLX
         const InputState& input = blackboard.Get<Key_InputState>();
         AssetManager& assetManager = blackboard.Get<Key_AssetManager>();
         EntityCompositionInstantiationManager& compositionInstantiations = blackboard.Get<Key_EntityCompositionInstantiationManager>();
-        JsonAny& copiedComponent = blackboard.Get<Key_CurrentCopiedComponent>();
+        std::any& copiedComponent = blackboard.Get<Key_CurrentCopiedComponent>();
 
         const bool hasValidEntityComposition = mEntityCompositionAsset.IsValid();
 

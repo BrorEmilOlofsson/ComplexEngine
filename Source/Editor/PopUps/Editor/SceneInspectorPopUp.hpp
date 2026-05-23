@@ -7,8 +7,6 @@
 #include "Engine/Utility/Camera.hpp"
 #include "Editor/Utility/ComponentBufferData.hpp"
 
-#include "Engine/Reflection/JsonAny.hpp"
-
 namespace CLX
 {
 	class SceneHierarchyPopUp;

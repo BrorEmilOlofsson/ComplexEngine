@@ -16,5 +16,5 @@ namespace CLX
 	using Key_EditorSceneSettings = BlackboardKey<struct EditorSceneSettings&, "EditorSceneSettings">;
     using Key_NodeScriptingWindow = BlackboardKey<class NodeScriptingWindow&, "NodeScriptingWindow">;
     using Key_EntityCompositionInstantiationManager = BlackboardKey<class EntityCompositionInstantiationManager&, "EntityCompositionInstantiationManager">;
-    using Key_CurrentCopiedComponent = BlackboardKey<struct JsonAny&, "CurrentCopiedComponent">;
+    using Key_CurrentCopiedComponent = BlackboardKey<std::any&, "CurrentCopiedComponent">;
 }

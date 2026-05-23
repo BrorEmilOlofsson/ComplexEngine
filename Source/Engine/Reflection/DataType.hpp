@@ -1,8 +1,9 @@
 #pragma once
 #include <string>
 #include <vector>
-#include <type_traits>
 #include <limits>
+#include <typeindex>
+#include <any>
 
 #include <External/nlohmann/json.hpp>
 
@@ -24,7 +25,7 @@ namespace CLX
 
         ViewAndEditResult(*viewAndEdit)(void* dataPtr, const Blackboard& blackboard, const DataTypeMemberVariable* member) = nullptr;
         nlohmann::json(*toJSON)(const void* dataPtr, const class DataTypeRegistry& dataTypeRegistry) = nullptr;
-        void (*fromJSON)(void* dataPtr, const nlohmann::json& json, const Blackboard& blackboard) = nullptr;
+        void(*fromJSON)(void* dataPtr, const nlohmann::json& json, const Blackboard& blackboard) = nullptr;
 
         InplaceConstructFunction inplaceConstruct;
         DestroyFunction destroy;
@@ -32,6 +33,8 @@ namespace CLX
         MoveFunction move;
         SwapFunction swap;
         EqualsFunction equals;
+        ToAnyFunction toAny;
+        FromAnyFunction fromAny;
 
         std::size_t size = std::numeric_limits<std::size_t>::max();
         std::size_t alignment = std::numeric_limits<std::size_t>::max();

@@ -1500,8 +1500,8 @@ namespace CLX
         }
     }
 
-    static bool AreJsonEqual(const DataTypeRegistry& dataTypeRegistry, const DataTypeID componentTypeID,
-        const nlohmann::json& jsonValue1, const nlohmann::json& jsonValue2, const Blackboard& blackboard)
+    static bool AreAnyValuesEqual(const DataTypeRegistry& dataTypeRegistry, const DataTypeID componentTypeID,
+        const std::any& value1, const std::any& value2)
     {
         DynamicMemoryArena arena(512);
 
@@ -1518,25 +1518,27 @@ namespace CLX
         );
         DynamicMemoryArenaHandle handle2 = arena.AllocateUnsafe(
             dataTypeRegistry.GetDataTypeSize(componentTypeID),
-            inplaceConstructFunc, 
+            inplaceConstructFunc,
             destructFunc,
             copyFunc,
             componentTypeID.typeIndex
         );
 
-        dataTypeRegistry.LoadDataJSON(componentTypeID, arena.MemoryAt(handle1), jsonValue1, blackboard);
-        dataTypeRegistry.LoadDataJSON(componentTypeID, arena.MemoryAt(handle2), jsonValue2, blackboard);
+        dataTypeRegistry.FromAny(componentTypeID, arena.MemoryAt(handle1), value1);
+        dataTypeRegistry.FromAny(componentTypeID, arena.MemoryAt(handle2), value2);
+
+
 
         return dataTypeRegistry.EqualsData(componentTypeID, arena.MemoryAt(handle1), arena.MemoryAt(handle2));
     }
 
-    static void SetComponentData(ECS& ecs, const EntityID entityID, const DataTypeID componentType, const nlohmann::json& newValueJson, const nlohmann::json& oldValueJson,
-        const DataTypeRegistry& dataTypeRegistry, const Blackboard& blackboard, EditorCommandTracker& commandTracker)
+    static void SetComponentData(ECS& ecs, const EntityID entityID, const DataTypeID componentType, const std::any& newValue, const std::any& oldValue,
+        const DataTypeRegistry& dataTypeRegistry, EditorCommandTracker& commandTracker)
     {
-        ASSERT(!newValueJson.is_null());
-        ASSERT(!oldValueJson.is_null());
+        ASSERT(newValue.has_value());
+        ASSERT(oldValue.has_value());
 
-        if (AreJsonEqual(dataTypeRegistry, componentType, newValueJson, oldValueJson, blackboard))
+        if (AreAnyValuesEqual(dataTypeRegistry, componentType, newValue, oldValue))
         {
             return;
         }
@@ -1546,8 +1548,8 @@ namespace CLX
             ECS& ecs;
             EntityID entityID;
             DataTypeID componentType;
-            nlohmann::json newData;
-            nlohmann::json oldData;
+            std::any newData;
+            std::any oldData;
             const DataTypeRegistry& dataTypeRegistry;
             Blackboard blackboard;
         };
@@ -1557,40 +1559,39 @@ namespace CLX
             .ecs = ecs,
             .entityID = entityID,
             .componentType = componentType,
-            .newData = newValueJson,
-            .oldData = oldValueJson,
-            .dataTypeRegistry = dataTypeRegistry,
-            .blackboard = blackboard
+            .newData = newValue,
+            .oldData = oldValue,
+            .dataTypeRegistry = dataTypeRegistry
         };
 
         auto doCommand = [](const PasteComponentDataCommandData& data)
             {
                 void* componentPtr = data.ecs.GetComponent(data.entityID, data.componentType.typeIndex);
-                data.dataTypeRegistry.LoadDataJSON(data.componentType, componentPtr, data.newData, data.blackboard);
+                data.dataTypeRegistry.FromAny(data.componentType, componentPtr, data.newData);
             };
 
 
         auto undoCommand = [](const PasteComponentDataCommandData& data)
             {
                 void* componentPtr = data.ecs.GetComponent(data.entityID, data.componentType.typeIndex);
-                data.dataTypeRegistry.LoadDataJSON(data.componentType, componentPtr, data.oldData, data.blackboard);
+                data.dataTypeRegistry.FromAny(data.componentType, componentPtr, data.oldData);
             };
 
         commandTracker.ExecuteCommand(EditorCommand(data, doCommand, undoCommand, "Set Component Data"));
     }
 
 
-    [[nodiscard]] static EditorAction CreateSetComponentDataAction(ECS& ecs, const EntityID entityID, const DataTypeID componentType, const nlohmann::json& newValueJson, const nlohmann::json& oldValueJson,
-        const DataTypeRegistry& dataTypeRegistry, const Blackboard& blackboard)
+    [[nodiscard]] static EditorAction CreateSetComponentDataAction(ECS& ecs, const EntityID entityID, const DataTypeID componentType, const std::any& newValue, const std::any& oldValue,
+        const DataTypeRegistry& dataTypeRegistry)
     {
-        return [&ecs, entityID, componentType, newValueJson, oldValueJson, &dataTypeRegistry, blackboard](EditorCommandTracker& commandTracker)
+        return [&ecs, entityID, componentType, newValue, oldValue, &dataTypeRegistry](EditorCommandTracker& commandTracker)
             {
-                SetComponentData(ecs, entityID, componentType, newValueJson, oldValueJson, dataTypeRegistry, blackboard, commandTracker);
+                SetComponentData(ecs, entityID, componentType, newValue, oldValue, dataTypeRegistry, commandTracker);
             };
     }
 
     [[nodiscard]] static std::vector<EditorAction> ShowComponentData(ECS& ecs, const EntityID entityID, const DataTypeID componentTypeID,
-        void* const componentPtr, bool& isComponentActive, JsonAny& copiedComponent,
+        void* const componentPtr, bool& isComponentActive, std::any& copiedComponent,
         EntityCompositionAssetHandle entityCompositionAsset, EntityCompositionInstantiationManager& entityInstantiations,
         const DataTypeRegistry& dataTypeRegistry, const Blackboard& blackboard)
     {
@@ -1669,15 +1670,14 @@ namespace CLX
 
             if (ImGui::MenuItem("Copy"))
             {
-                copiedComponent.dataTypeID = componentTypeID;
-                copiedComponent.json = dataTypeRegistry.SaveDataJSON(componentTypeID, componentPtr);
+                copiedComponent = dataTypeRegistry.ToAny(componentTypeID, componentPtr);
             }
 
-            ImGui::BeginDisabled(copiedComponent.json.is_null() || copiedComponent.dataTypeID != componentTypeID);
+            ImGui::BeginDisabled(!copiedComponent.has_value());
             if (ImGui::MenuItem("Paste"))
             {
-                const nlohmann::json oldValueJson = dataTypeRegistry.SaveDataJSON(componentTypeID, componentPtr);
-                actions.push_back(CreateSetComponentDataAction(ecs, entityID, componentTypeID, copiedComponent.json, oldValueJson, dataTypeRegistry, blackboard));
+                const std::any oldValue = dataTypeRegistry.ToAny(componentTypeID, componentPtr);
+                actions.push_back(CreateSetComponentDataAction(ecs, entityID, componentTypeID, copiedComponent, oldValue, dataTypeRegistry));
             }
             ImGui::EndDisabled();
 
@@ -1819,9 +1819,9 @@ namespace CLX
         ECS& ecs = data.ecs;
         const EntityID selectedEntityID = data.entityID;
         bool& anyItemActiveLastFrame = data.componentBufferData.anyItemActiveLastFrame;
-        JsonAny& storedComponent = data.componentBufferData.storedComponent;
+        std::any& storedComponent = data.componentBufferData.storedComponent;
         //EntityID& copyEntityID = data.copyEntityID;
-        JsonAny& copiedComponent = data.copiedComponent;
+        std::any& copiedComponent = data.copiedComponent;
         EntityCompositionAssetHandle entityCompositionAsset = data.entityCompositionAsset;
         EntityCompositionInstantiationManager& entityInstantiations = data.entityInstantiations;
         const Blackboard& blackboard = data.blackboard;
@@ -1848,7 +1848,7 @@ namespace CLX
             }
 
             // Store the old value of the component in case we need to create a change value action later. 
-            nlohmann::json oldValueJson = blackboard.Get<Key_DataTypeRegistry>().SaveDataJSON(GetDataTypeID(type), componentPtr);
+            std::any oldValue = blackboard.Get<Key_DataTypeRegistry>().ToAny(GetDataTypeID(type), componentPtr);
             bool isComponentActive = false;
 
             auto showComponentDataActions = ShowComponentData(
@@ -1879,24 +1879,23 @@ namespace CLX
 
             if (isComponentActive && !anyItemActiveLastFrame)
             {
-                storedComponent.dataTypeID = changedDataTypeID;
-                storedComponent.json = std::move(oldValueJson);
+                storedComponent = std::move(oldValue);
             }
         }
 
         if (!anyActiveItem && anyItemActiveLastFrame)
         {
-            DataTypeID changedComponentTypeID = storedComponent.dataTypeID;
+            ASSERT(storedComponent.has_value());
+            DataTypeID changedComponentTypeID = GetDataTypeID(storedComponent.type());
             ASSERT(changedComponentTypeID != InvalidDataTypeID);
-            nlohmann::json newValue = blackboard.Get<Key_DataTypeRegistry>().SaveDataJSON(changedComponentTypeID, ecs.GetComponent(selectedEntityID, changedComponentTypeID.typeIndex));
+            std::any newValue = blackboard.Get<Key_DataTypeRegistry>().ToAny(changedComponentTypeID, ecs.GetComponent(selectedEntityID, changedComponentTypeID.typeIndex));
             auto action = CreateSetComponentDataAction(
                 ecs,
                 selectedEntityID,
                 changedComponentTypeID,
                 std::move(newValue),
-                storedComponent.json,
-                blackboard.Get<Key_DataTypeRegistry>(),
-                blackboard
+                storedComponent,
+                blackboard.Get<Key_DataTypeRegistry>()
                 );
             editorActions.push_back(std::move(action));
 
@@ -2005,7 +2004,7 @@ namespace CLX
         std::string& componentSearchString = data.componentSearchString;
         uint32_t& selectedComponentPopupIndex = data.selectedComponentPopupIndex;
         ComponentBufferData& componentBufferData = data.componentBufferData;
-        JsonAny& copiedComponent = data.copiedComponent;
+        std::any& copiedComponent = data.copiedComponent;
         EntityCompositionAssetHandle entityCompositionAsset = data.entityCompositionAsset;
         const Blackboard& blackboard = data.blackboard;
         if (entityID == InvalidEntityID)

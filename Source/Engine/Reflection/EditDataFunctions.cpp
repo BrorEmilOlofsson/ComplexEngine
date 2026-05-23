@@ -614,7 +614,6 @@ namespace CLX
         if (ImGui::DragFloat("HorizontalFoV", &horizontalFoV.Value(), 0.1f, 0.f, 179.f))
         {
             camera.SetHorizontalFOV(ToRadians(horizontalFoV));
-            camera.SetAspectRatio(aspectRatio);
             viewAndEditResult.isEdited = true;
         }
         viewAndEditResult.isActive |= ImGui::IsItemActive();
@@ -622,7 +621,6 @@ namespace CLX
         if (ImGui::DragFloat("NearPlane", &nearPlane, 0.1f, 0.f, 10.f))
         {
             camera.SetNearPlane(nearPlane);
-            camera.SetAspectRatio(aspectRatio);
             viewAndEditResult.isEdited = true;
         }
         viewAndEditResult.isActive |= ImGui::IsItemActive();
@@ -630,7 +628,6 @@ namespace CLX
         if (ImGui::DragFloat("FarPlane", &farPlane, 1.0f, 0.5f, 30000.f))
         {
             camera.SetFarPlane(farPlane);
-            camera.SetAspectRatio(aspectRatio);
             viewAndEditResult.isEdited = true;
         }
         viewAndEditResult.isActive |= ImGui::IsItemActive();

@@ -217,6 +217,16 @@ namespace CLX
         return true;
     }
 
+    std::any DataTypeRegistry::ToAny(DataTypeID dataTypeID, const void* dataPtr) const
+    {
+        return Find(dataTypeID)->toAny(dataPtr);
+    }
+
+    void DataTypeRegistry::FromAny(DataTypeID dataTypeID, void* dataPtr, const std::any& any) const
+    {
+        Find(dataTypeID)->fromAny(dataPtr, any);
+    }
+
     size_t DataTypeRegistry::GetDataTypeSize(DataTypeID dataTypeID) const
     {
         return mDataTypes.at(dataTypeID).size;

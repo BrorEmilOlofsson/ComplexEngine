@@ -8,7 +8,6 @@
 #include "Engine/Asset/AssetTypes/EntityCompositionAsset.hpp"
 #include "Engine/ECSEngine/Utility/ECSUtilityFunctions.hpp"
 #include "Engine/ECS/ECSHandle.hpp"
-#include "Engine/Reflection/JsonAny.hpp"
 #include "Engine/Math/TransformMode.hpp"
 #include "Engine/Math/TransformOperation.hpp"
 #include "Editor/Utility/TransformEntityData.hpp"
@@ -64,7 +63,7 @@ namespace CLX
 		EntityID entityID;
 		ComponentBufferData& componentBufferData;
 		EntityID& copyEntityID;
-		JsonAny& copiedComponent;
+		std::any& copiedComponent;
 		EntityCompositionAssetHandle entityCompositionAsset;
 		EntityCompositionInstantiationManager& entityInstantiations;
         const Blackboard& blackboard;
@@ -83,7 +82,7 @@ namespace CLX
 		EntityID& copyEntityID;
         uint32_t& selectedComponentPopupIndex;
         std::string& componentSearchString;
-        JsonAny& copiedComponent;
+        std::any& copiedComponent;
         EntityCompositionAssetHandle entityCompositionAsset;
         EntityCompositionInstantiationManager& entityInstantiations;
         const Blackboard& blackboard;
