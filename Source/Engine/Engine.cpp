@@ -248,7 +248,7 @@ namespace CLX
         PROFILER_FUNCTION(profiler::colors::Indigo800);
         RenderContext* renderContext = nullptr;
 #ifndef _EDITOR
-        renderContext = mSceneManager.GetCurrentScene().GetRenderState().GetRenderContext();
+        renderContext = mSceneManager.GetActiveScene()->GetRenderState().GetRenderContext();
 #endif
         mOperatingSystem.EndFrame(renderContext);
         if (!mGraphicsSettings->vSync)
@@ -265,7 +265,7 @@ namespace CLX
         mSceneManager.GetActiveScene()->GetRenderState().SetAmbientLight(AmbientLight{});
         mBlackboard->Insert<Key_DeltaTime>(deltaTimeCapped);
         mSceneManager.Update(deltaTimeCapped);
-        //mAudioManager.Update();
+        mAudioManager.Update();
     }
 
     void Engine::Render()
@@ -275,7 +275,7 @@ namespace CLX
         mSceneManager.GetActiveScene()->Render();
 
 #ifndef _EDITOR
-        mSceneManager.GetActiveScene()->GetRenderState().SetRenderRect(AABB2i::CreateFromDefaultAndExtent(Vector2i(mOperatingSystem.GetWindow(mMainWindow).GetClientSize())));
+        mSceneManager.GetActiveScene()->GetRenderState().SetRenderRect(AABB2i::FromDefaultAndExtent(ToVector2(mOperatingSystem.GetWindow(mMainWindow).GetClientSize())));
 #endif
         mOperatingSystem.GetGraphicsFoundation().Render(mSceneManager.GetActiveScene()->GetRenderState());
     }

@@ -8,7 +8,7 @@ namespace CLX
     AudioManager::AudioManager()
     {
         FMOD::Studio::System::create(&mFMODStudioSystem);
-        auto result = mFMODStudioSystem->initialize(512, FMOD_STUDIO_INIT_NORMAL, FMOD_INIT_NORMAL, nullptr);
+        [[maybe_unused]] auto result = mFMODStudioSystem->initialize(512, FMOD_STUDIO_INIT_NORMAL, FMOD_INIT_NORMAL, nullptr);
         ASSERT(result == FMOD_OK);
     }
 
@@ -19,10 +19,7 @@ namespace CLX
 
     void AudioManager::Update()
     {
-        auto result = mFMODStudioSystem->update();
-        if (result != FMOD_OK)
-        {
-            ASSERT(false);
-        }
+        [[maybe_unused]] auto result = mFMODStudioSystem->update();
+        ASSERT(result == FMOD_OK);
     }
 }
