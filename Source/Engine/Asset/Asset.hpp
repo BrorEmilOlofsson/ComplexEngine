@@ -18,6 +18,8 @@ namespace CLX
 	{
 	public:
 
+		using AssetType = T;
+
 		constexpr Asset() = default;
 
 		constexpr explicit Asset(T asset, std::filesystem::path relativePath)

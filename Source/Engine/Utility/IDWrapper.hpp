@@ -4,7 +4,7 @@
 
 namespace CLX
 {
-	template<typename IDType>
+	template<typename IDType, typename Tag>
 	struct IDWrapper
 	{
 		using value_type = IDType;
@@ -36,8 +36,8 @@ namespace CLX
 		IDType id = std::numeric_limits<IDType>::max();
 	};
 
-	template<typename IDType>
-	[[nodiscard]] inline bool operator<(IDWrapper<IDType> a, IDWrapper<IDType> b)
+	template<typename IDType, typename Tag>
+	[[nodiscard]] inline bool operator<(IDWrapper<IDType, Tag> a, IDWrapper<IDType, Tag> b)
 	{
 		return a.id < b.id;
 	}
@@ -56,32 +56,32 @@ namespace CLX
 }
 
 
-template<typename T>
-class std::numeric_limits<CLX::IDWrapper<T>>
+template<typename T, typename Tag>
+class std::numeric_limits<CLX::IDWrapper<T, Tag>>
 {
 public:
 
 	static constexpr bool is_specialized = true;
 
-	static constexpr CLX::IDWrapper<T> min() noexcept
+	static constexpr CLX::IDWrapper<T, Tag> min() noexcept
 	{
-		return CLX::IDWrapper<T>{ std::numeric_limits<T>::min() };
+		return CLX::IDWrapper<T, Tag>{ std::numeric_limits<T>::min() };
 	}
 
-	static constexpr CLX::IDWrapper<T> max() noexcept
+	static constexpr CLX::IDWrapper<T, Tag> max() noexcept
 	{
-		return CLX::IDWrapper<T>{ std::numeric_limits<T>::max() };
+		return CLX::IDWrapper<T, Tag>{ std::numeric_limits<T>::max() };
 	}
 };
 
 namespace std
 {
-	template<typename IDWrapperType>
-	struct hash<CLX::IDWrapper<IDWrapperType>>
+	template<typename IDWrapperType, typename Tag>
+	struct hash<CLX::IDWrapper<IDWrapperType, Tag>>
 	{
-		[[nodiscard]] std::size_t operator()(const CLX::IDWrapper<IDWrapperType>& idWrapper) const noexcept
+		[[nodiscard]] std::size_t operator()(const CLX::IDWrapper<IDWrapperType, Tag>& idWrapper) const noexcept
 		{
-			return std::hash<typename CLX::IDWrapper<IDWrapperType>::value_type>{}(idWrapper.id);
+			return std::hash<typename CLX::IDWrapper<IDWrapperType, Tag>::value_type>{}(idWrapper.id);
 		}
 	};
 }

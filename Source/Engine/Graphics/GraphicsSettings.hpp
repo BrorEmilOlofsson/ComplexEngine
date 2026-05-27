@@ -7,7 +7,7 @@ namespace CLX
 	{
 	public:
 		Color clearColor = Colors::DukeBlue;
-		unsigned int fPSCap = 0;
+		uint32_t fPSCap = 0;
 		bool vSync = false;
 
 		bool mIsUsingPBR = true;

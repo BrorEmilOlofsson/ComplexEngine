@@ -1125,9 +1125,10 @@ namespace CLX
         return ViewAndEditValue(animationAsset, blackboard.Get<Key_AssetManager>());
     }
 
-    template<typename T>
+    template<IsAssetHandle T>
     static ViewAndEditResult ViewAndEditAsset(T& assetHandle, const std::string* variableName, AssetManager& assetManager)
     {
+        using AssetType = typename T::AssetType;
         ViewAndEditResult viewAndEditResult;
         const std::filesystem::path filePath = assetHandle ? assetHandle.GetRelativePath() : std::filesystem::path();
 
@@ -1143,23 +1144,50 @@ namespace CLX
         ImGui::InputText("", filePath.string().data(), filePath.string().size());
         ImGui::EndDisabled();
 
+        ImGui::SameLine();
+        if (ImGui::Button("Pick"))
+        {
+            ImGui::OpenPopup("SelectAssetPopup");
+        }
+
+        if (ImGui::BeginPopup("SelectAssetPopup"))
+        {
+            const auto& assets = assetManager.GetAssets<AssetType>();
+
+            if (ImGui::Selectable("None", assetHandle == T::Empty()))
+            {
+                assetHandle = T{};
+                viewAndEditResult.isEdited = true;
+                viewAndEditResult.isActive = true;
+            }
+
+            for (auto& [path, asset] : assets)
+            {
+                const bool isSelected = assetHandle && assetHandle.GetRelativePath() == path;
+                if (ImGui::Selectable(path.string().c_str(), isSelected))
+                {
+                    assetHandle = T(asset);
+                    viewAndEditResult.isEdited = true;
+                    viewAndEditResult.isActive = true;
+                }
+            }
+            ImGui::EndPopup();
+        }
+
         if (const ImGuiPayload* currentPayload = ImGui::GetDragDropPayload())
         {
             const std::filesystem::path path = std::filesystem::path(reinterpret_cast<const char*>(currentPayload->Data));
             const std::filesystem::path extension = path.extension();
 
-            if (std::wstring_view(extension.c_str()) == AssetExtensions::Scene)
+            if (ImGui::BeginDragDropTarget())
             {
-                if (ImGui::BeginDragDropTarget())
+                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Asset"))
                 {
-                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Asset"))
-                    {
-                        assetHandle = assetManager.GetAsset<T>(path);
-                        viewAndEditResult.isEdited = true;
-                        viewAndEditResult.isActive = true;
-                    }
-                    ImGui::EndDragDropTarget();
+                    assetHandle = assetManager.GetAsset<AssetType>(path);
+                    viewAndEditResult.isEdited = true;
+                    viewAndEditResult.isActive = true;
                 }
+                ImGui::EndDragDropTarget();
             }
         }
 
@@ -1219,6 +1247,16 @@ namespace CLX
     ViewAndEditResult ViewAndEditValue(EntityCompositionAssetHandle& entityCompositionAsset, const Blackboard& blackboard)
     {
         return ViewAndEditValue(entityCompositionAsset, blackboard.Get<Key_AssetManager>());
+    }
+
+    ViewAndEditResult ViewAndEditValue(AudioAssetHandle& audioAsset, AssetManager& assetManager)
+    {
+        return ViewAndEditAsset(audioAsset, nullptr, assetManager);
+    }
+
+    ViewAndEditResult ViewAndEditValue(AudioAssetHandle& audioAsset, const Blackboard& blackboard)
+    {
+        return ViewAndEditValue(audioAsset, blackboard.Get<Key_AssetManager>());
     }
 
     /*ViewAndEditResult ViewAndEditValue(Fly::ClassInstanceProxy& aClassInstance, [[maybe_unused]] const std::string&)

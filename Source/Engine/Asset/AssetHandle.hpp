@@ -7,10 +7,13 @@
 namespace CLX
 {
 
+
 	template<typename T>
 	class AssetHandle final
 	{
 	public:
+
+        using AssetType = T;
 
 		constexpr AssetHandle() = default;
 
@@ -62,9 +65,9 @@ namespace CLX
 	template<typename T>
 	[[nodiscard]] constexpr bool operator==(const AssetHandle<T>& a, const AssetHandle<T>& b) noexcept
 	{
-		if (!a.IsValid() || !b.IsValid())
+		if (!a.IsValid() && !b.IsValid())
 		{
-			return false;
+			return true;
 		}
 
 		return &a.Get() == &b.Get();
@@ -75,5 +78,14 @@ namespace CLX
 	{
         return &a.Get() < &b.Get();
 	}
+
+	template<typename T>
+	struct IsAssetHandleHelper : std::false_type {};
+
+	template<typename T>
+	struct IsAssetHandleHelper<AssetHandle<T>> : std::true_type {};
+
+	template<typename T>
+	concept IsAssetHandle = IsAssetHandleHelper<T>::value;
 
 }

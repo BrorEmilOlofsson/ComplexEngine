@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <optional>
+#include <memory>
 #include "Engine/Graphics/RenderList.hpp"
 #include "Engine/Utility/Camera.hpp"
 #include "Engine/Graphics/SkyBox/Skybox.hpp"

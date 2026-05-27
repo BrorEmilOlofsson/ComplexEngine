@@ -237,7 +237,7 @@ namespace CLX
             return;
         }
 
-        const std::filesystem::path absolutePath = std::filesystem::absolute(SIMPLE_DIR_ASSETS / filePath);
+        const std::filesystem::path absolutePath = std::filesystem::absolute(GetAbsoluteAssetPath() / filePath);
         if (std::filesystem::exists(absolutePath))
         {
             texture = assetManager.GetTexture(absolutePath);

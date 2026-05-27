@@ -94,44 +94,102 @@ namespace CLX
             return ValidatedGet<SceneAssetHandle, true>(path, mSceneAssets);
         }
 
+        [[nodiscard]] AudioAssetHandle GetAudio(const std::filesystem::path& path)
+        {
+            return ValidatedGet<AudioAssetHandle, true>(path, mAudioAssets);
+        }
+
         template<typename T>
         [[nodiscard]] auto GetAsset(const std::filesystem::path& path)
         {
-            if constexpr (std::same_as<T, TextureAssetHandle>)
+            if constexpr (std::same_as<T, Texture>)
             {
                 return GetTexture(path);
             }
-            else if constexpr (std::same_as<T, MeshAssetHandle>)
+            else if constexpr (std::same_as<T, Mesh>)
             {
                 return GetMesh(path);
             }
-            else if constexpr (std::same_as<T, ModelAssetHandle>)
+            else if constexpr (std::same_as<T, Model>)
             {
                 return GetModel(path);
             }
-            else if constexpr (std::same_as<T, AnimatedModelAssetHandle>)
+            else if constexpr (std::same_as<T, AnimatedModel>)
             {
                 return GetAnimatedModel(path);
             }
-            else if constexpr (std::same_as<T, AnimationAssetHandle>)
+            else if constexpr (std::same_as<T, Animation>)
             {
                 return GetAnimation(path);
             }
-            else if constexpr (std::same_as<T, PixelShaderAssetHandle>)
+            else if constexpr (std::same_as<T, PixelShader>)
             {
                 return GetPixelShader(path);
             }
-            else if constexpr (std::same_as<T, VertexShaderAssetHandle>)
+            else if constexpr (std::same_as<T, VertexShader>)
             {
                 return GetVertexShader(path);
             }
-            else if constexpr (std::same_as<T, SceneAssetHandle>)
+            else if constexpr (std::same_as<T, Scene>)
             {
                 return GetScene(path);
             }
-            else if constexpr (std::same_as<T, EntityCompositionAssetHandle>)
+            else if constexpr (std::same_as<T, EntityComposition>)
             {
                 return GetEntityComposition(path);
+            }
+            else if constexpr (std::same_as<T, Audio>)
+            {
+                return GetAudio(path);
+            }
+            else
+            {
+                static_assert(false, "Unsupported asset type");
+            }
+        }
+
+        template<typename T>
+        [[nodiscard]] decltype(auto) GetAssets()
+        {
+            if constexpr (std::same_as<T, Texture>)
+            {
+                return mTextureAssets;
+            }
+            else if constexpr (std::same_as<T, Mesh>)
+            {
+                return mMeshAssets;
+            }
+            else if constexpr (std::same_as<T, Model>)
+            {
+                return mModelAssets;
+            }
+            else if constexpr (std::same_as<T, AnimatedModel>)
+            {
+                return mAnimatedModelAssets;
+            }
+            else if constexpr (std::same_as<T, Animation>)
+            {
+                return mAnimationAssets;
+            }
+            else if constexpr (std::same_as<T, PixelShader>)
+            {
+                return mPixelShaderAssets;
+            }
+            else if constexpr (std::same_as<T, VertexShader>)
+            {
+                return mVertexShaderAssets;
+            }
+            else if constexpr (std::same_as<T, Scene>)
+            {
+                return mSceneAssets;
+            }
+            else if constexpr (std::same_as<T, EntityComposition>)
+            {
+                return mEntityCompositionAssets;
+            }
+            else if constexpr (std::same_as<T, Audio>)
+            {
+                return mAudioAssets;
             }
             else
             {
@@ -225,6 +283,15 @@ namespace CLX
             const std::filesystem::path path = asset.GetRelativePath();
             mEntityCompositionAssets[std::filesystem::absolute(path)] = std::move(asset);
             return GetEntityComposition(path);
+        }
+
+        void AddAudio(const std::filesystem::path& path, AudioAsset asset)
+        {
+            if (!asset)
+            {
+                throw std::invalid_argument("Asset is invalid");
+            }
+            mAudioAssets[std::filesystem::absolute(path)] = std::move(asset);
         }
 
         SceneAssetHandle CreateScene(const std::filesystem::path& path)
@@ -351,6 +418,7 @@ namespace CLX
         std::unordered_map<std::filesystem::path, VertexShaderAsset> mVertexShaderAssets;
         std::unordered_map<std::filesystem::path, SceneAsset> mSceneAssets;
         std::unordered_map<std::filesystem::path, EntityCompositionAsset> mEntityCompositionAssets;
+        std::unordered_map<std::filesystem::path, AudioAsset> mAudioAssets;
 
         std::function<void(AssetManager&)> mDefaultLoader;
 

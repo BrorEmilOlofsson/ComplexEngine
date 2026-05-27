@@ -8,3 +8,4 @@
 #include "Engine/Asset/AssetTypes/VertexShaderAsset.hpp"
 #include "Engine/Asset/AssetTypes/SceneAsset.hpp"
 #include "Engine/Asset/AssetTypes/EntityCompositionAsset.hpp"
+#include "Engine/Asset/AssetTypes/AudioAsset.hpp"

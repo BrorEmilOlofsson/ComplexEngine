@@ -257,6 +257,7 @@ namespace CLX
 	ViewAndEditResult ViewAndEditValue(AnimationAssetHandle& animationAsset, const Blackboard& blackboard);
     ViewAndEditResult ViewAndEditValue(SceneAssetHandle& sceneAsset, const Blackboard& blackboard, const DataTypeMemberVariable* memberData);
     ViewAndEditResult ViewAndEditValue(EntityCompositionAssetHandle& entityCompositionAsset, const Blackboard& blackboard);
+    ViewAndEditResult ViewAndEditValue(AudioAssetHandle& audioAsset, const Blackboard& blackboard);
 
 	ViewAndEditResult ViewAndEditValue(std::array<TextureAssetHandle, 3>& textureAssets, const Blackboard& blackboard);
 

@@ -178,15 +178,30 @@ namespace CLX
 	[[nodiscard]] nlohmann::json ToJSON(const Camera& camera);
     [[nodiscard]] nlohmann::json ToJSON(const Shape& shape, const DataTypeRegistry& dataTypeRegistry);
 
-	[[nodiscard]] nlohmann::json ToJSON(const MeshAssetHandle& meshAsset);
-	[[nodiscard]] nlohmann::json ToJSON(const ModelAssetHandle& modelAsset);
-	[[nodiscard]] nlohmann::json ToJSON(const AnimatedModelAssetHandle& animatedModelAsset);
-	[[nodiscard]] nlohmann::json ToJSON(const PixelShaderAssetHandle& shaderAsset);
-	[[nodiscard]] nlohmann::json ToJSON(const VertexShaderAssetHandle& shaderAsset);
-	[[nodiscard]] nlohmann::json ToJSON(const TextureAssetHandle& textureAsset);
-	[[nodiscard]] nlohmann::json ToJSON(const AnimationAssetHandle& animationAsset);
-	[[nodiscard]] nlohmann::json ToJSON(const SceneAssetHandle& sceneAsset);
-    [[nodiscard]] nlohmann::json ToJSON(const EntityCompositionAssetHandle& entityCompositionAsset);
+	template<IsAssetHandle T>
+    [[nodiscard]] nlohmann::json ToJSON(const T& assetHandle)
+    {
+		nlohmann::json json;
+		std::filesystem::path path;
+
+		if (assetHandle)
+		{
+			path = assetHandle.GetRelativePath();
+		}
+
+		json = path;
+		return json;
+    }
+
+	//[[nodiscard]] nlohmann::json ToJSON(const MeshAssetHandle& meshAsset);
+	//[[nodiscard]] nlohmann::json ToJSON(const ModelAssetHandle& modelAsset);
+	//[[nodiscard]] nlohmann::json ToJSON(const AnimatedModelAssetHandle& animatedModelAsset);
+	//[[nodiscard]] nlohmann::json ToJSON(const PixelShaderAssetHandle& shaderAsset);
+	//[[nodiscard]] nlohmann::json ToJSON(const VertexShaderAssetHandle& shaderAsset);
+	//[[nodiscard]] nlohmann::json ToJSON(const TextureAssetHandle& textureAsset);
+	//[[nodiscard]] nlohmann::json ToJSON(const AnimationAssetHandle& animationAsset);
+	//[[nodiscard]] nlohmann::json ToJSON(const SceneAssetHandle& sceneAsset);
+ //   [[nodiscard]] nlohmann::json ToJSON(const EntityCompositionAssetHandle& entityCompositionAsset);
 
 	[[nodiscard]] nlohmann::json CustomToJSON(const std::array<TextureAssetHandle, 3>& textureAssets);
 

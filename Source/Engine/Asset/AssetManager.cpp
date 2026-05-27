@@ -245,6 +245,15 @@ namespace CLX
 				assetManager.AddScene(path, std::move(asset));
             };
 
+        loaderMap[L".mp3"] = [](const std::filesystem::path& path, AssetManager& assetManager)
+            {
+                AudioAsset asset = assetManager.GetAssetLoader().LoadAudio(path);
+                if (asset)
+                {
+                    assetManager.AddAudio(path, asset);
+                }
+            };
+
 		return loaderMap;
 	}
 

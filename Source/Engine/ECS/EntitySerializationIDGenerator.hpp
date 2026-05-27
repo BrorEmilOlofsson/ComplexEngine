@@ -7,7 +7,7 @@
 namespace CLX
 {
 
-    using EntitySerializationID = IDWrapper<uint64_t>;
+    using EntitySerializationID = IDWrapper<uint64_t, struct EntitySerializationIDTag>;
 
     class EntitySerializationIDGenerator
     {

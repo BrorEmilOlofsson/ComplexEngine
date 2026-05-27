@@ -9,7 +9,9 @@
 #include "Engine/ECS/EntityComposition.hpp"
 #include "Engine/ECS/ECSSerializer.hpp"
 #include "Engine/Scene/SceneLoader.hpp"
+#include "Engine/Reflection/Reflection.hpp"
 #include <External/nlohmann/json.hpp>
+#include <External/imgui/imgui.h>
 #include <fstream>
 
 namespace CLX
@@ -33,10 +35,10 @@ namespace CLX
 
         const nlohmann::json json = nlohmann::json::parse(file);
         file.close();
-        
+
         const uint64_t min = json["Used EntityID Bounds"]["Min"];
         const uint64_t max = json["Used EntityID Bounds"]["Max"];
-        
+
         ProjectSettings settings
         {
             .usedEntityIDBounds = Bounds<EntitySerializationID>::FromMinAndMax(EntitySerializationID{ min }, EntitySerializationID{ max })
@@ -52,6 +54,7 @@ namespace CLX
         , mSceneManager(mAssetManager)
     {
         RegisterEngineComponents();
+        DummyRegister();
 
 
         mECSRegistry.RegisterSystem<RotatingMovementSystem>();
@@ -81,6 +84,14 @@ namespace CLX
                 return EntityCompositionAsset(std::move(entityComposition), path);
             };
         mAssetManager->GetAssetLoader().SetEntityCompositionLoader(entityCompositionLoader);
+        mAssetManager->GetAssetLoader().SetAudioLoader([this](const std::filesystem::path& path)
+            {
+                if (auto audio = mAudioManager.LoadAudio(path))
+                {
+                    return AudioAsset(std::move(*audio), path);
+                }
+                return AudioAsset::Empty();
+            });
 
         mBlackboard->Insert<Key_ECSRegistry>(mECSRegistry);
 
@@ -119,7 +130,7 @@ namespace CLX
             {
                 Scene scene(mBlackboard);
                 SceneLoader::LoadScene(scene, path, *mBlackboard);
-                
+
                 return SceneAsset(std::move(scene), path);
             });
 
@@ -187,6 +198,9 @@ namespace CLX
 #ifndef _EDITOR
         mSceneManager.BeginPlay();
 #endif
+
+        AudioAssetHandle audioHandle2 = mAssetManager->GetAudio(GetAbsoluteAssetPath() / "Audio" / "StardewValley.mp3");
+        mAudioManager.Play(audioHandle2, 1.0f, { 0, 0, 0});
     }
 
     void Engine::Shutdown()
@@ -210,8 +224,6 @@ namespace CLX
             return false;
         }
 
-        //std::println("Used entityID bounds: {}", mEntityIDGenerator.GetUsedIDBounds());
-
         mInputState = mOperatingSystem.GetInputState();
 
         mInputManager.Update(mInputState);
@@ -226,7 +238,7 @@ namespace CLX
         return !mShouldExit.load();
     }
 
-    static void SyncToFPSCap(const std::chrono::steady_clock::time_point& lastTimePoint, const unsigned int fpsCap)
+    static void SyncToFPSCap(const std::chrono::steady_clock::time_point& lastTimePoint, const uint32_t fpsCap)
     {
         PROFILER_FUNCTION(profiler::colors::LightGreenA100);
         if (fpsCap != 0)
@@ -266,6 +278,18 @@ namespace CLX
         mBlackboard->Insert<Key_DeltaTime>(deltaTimeCapped);
         mSceneManager.Update(deltaTimeCapped);
         mAudioManager.Update();
+
+
+        static Vector3f audioPosition = Vector3f::Zero();
+        static float audioVolume = 1.0f;
+
+        ImGui::Begin("Audio Test");
+        ImGui::DragFloat3("Audio Position", &audioPosition.x, 0.001f);
+        ImGui::DragFloat("Audio Volume", &audioVolume, 0.001f);
+        ImGui::End();
+
+        mAudioManager.SetChannelPosition(AudioChannelID{1}, audioPosition);
+        mAudioManager.SetChannelVolume(AudioChannelID{1}, audioVolume);
     }
 
     void Engine::Render()

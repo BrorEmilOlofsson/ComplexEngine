@@ -9,7 +9,7 @@
 namespace CLX
 {
 
-    using ECSID = IDWrapper<uint32_t>;
+    using ECSID = IDWrapper<uint32_t, struct ECSIDTag>;
 
     constexpr ECSID InvalidECSID = InvalidID<ECSID>();
 

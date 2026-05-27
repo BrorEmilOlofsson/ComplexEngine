@@ -15,6 +15,7 @@
 #include "Engine/Graphics/Light/PointLight.hpp"
 #include "Engine/Graphics/Light/DirectionalLight.hpp"
 #include "Engine/Math/Shapes/Shape.hpp"
+#include "Engine/Asset/AssetManager.hpp"
 #include <External/nlohmann/json.hpp>
 #include <string>
 #include <array>
@@ -162,15 +163,35 @@ namespace CLX
 	void FromJSON(DirectionalLight& directionalLight, const nlohmann::json& json);
 	void FromJSON(Camera& camera, const nlohmann::json& json);
 
-	void FromJSON(MeshAssetHandle& meshAsset, const nlohmann::json& json, const Blackboard& blackboard);
-	void FromJSON(ModelAssetHandle& modelAsset, const nlohmann::json& json, const Blackboard& blackboard);
-	void FromJSON(AnimatedModelAssetHandle& animatedModelAsset, const nlohmann::json& json, const Blackboard& blackboard);
-	void FromJSON(TextureAssetHandle& textureAsset, const nlohmann::json& json, const Blackboard& blackboard);
-	void FromJSON(AnimationAssetHandle& animationAsset, const nlohmann::json& json, const Blackboard& blackboard);
-	void FromJSON(PixelShaderAssetHandle& shaderAsset, const nlohmann::json& json, const Blackboard& blackboard);
-	void FromJSON(VertexShaderAssetHandle& shaderAsset, const nlohmann::json& json, const Blackboard& blackboard);
-	void FromJSON(SceneAssetHandle& sceneAsset, const nlohmann::json& json, const Blackboard& blackboard);
-    void FromJSON(EntityCompositionAssetHandle& entityCompositionAsset, const nlohmann::json& json, const Blackboard& blackboard);
+	template<IsAssetHandle T>
+	void FromJSON(T& assetHandle, const nlohmann::json& json, AssetManager& assetManager)
+	{
+		const std::filesystem::path path = json;
+
+		if (path.empty())
+		{
+			return;
+		}
+
+        using AssetType = typename T::AssetType;
+		assetHandle = assetManager.GetAsset<AssetType>(path);
+	}
+
+	template<IsAssetHandle T>
+	void FromJSON(T& assetHandle, const nlohmann::json& json, const Blackboard& blackboard)
+	{
+		FromJSON(assetHandle, json, blackboard.Get<Key_AssetManager>());
+	}
+
+	//void FromJSON(MeshAssetHandle& meshAsset, const nlohmann::json& json, const Blackboard& blackboard);
+	//void FromJSON(ModelAssetHandle& modelAsset, const nlohmann::json& json, const Blackboard& blackboard);
+	//void FromJSON(AnimatedModelAssetHandle& animatedModelAsset, const nlohmann::json& json, const Blackboard& blackboard);
+	//void FromJSON(TextureAssetHandle& textureAsset, const nlohmann::json& json, const Blackboard& blackboard);
+	//void FromJSON(AnimationAssetHandle& animationAsset, const nlohmann::json& json, const Blackboard& blackboard);
+	//void FromJSON(PixelShaderAssetHandle& shaderAsset, const nlohmann::json& json, const Blackboard& blackboard);
+	//void FromJSON(VertexShaderAssetHandle& shaderAsset, const nlohmann::json& json, const Blackboard& blackboard);
+	//void FromJSON(SceneAssetHandle& sceneAsset, const nlohmann::json& json, const Blackboard& blackboard);
+ //   void FromJSON(EntityCompositionAssetHandle& entityCompositionAsset, const nlohmann::json& json, const Blackboard& blackboard);
 
 	void CustomFromJSON(std::array<TextureAssetHandle, 3>& textureAssets, const nlohmann::json& json, const Blackboard& blackboard);
 
