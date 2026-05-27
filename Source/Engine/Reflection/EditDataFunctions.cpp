@@ -576,7 +576,7 @@ namespace CLX
         return viewAndEditResult;
     }
 
-    static ViewAndEditResult ViewAndEditCamera(Camera& camera, const Dimension2u resolution)
+    static ViewAndEditResult ViewAndEditCamera(Camera& camera)
     {
         ViewAndEditResult viewAndEditResult;
 
@@ -604,8 +604,6 @@ namespace CLX
             viewAndEditResult.isEdited = true;
             viewAndEditResult.isActive = ImGui::IsItemActive();
         }*/
-
-        const float aspectRatio = ToAspectRatio(resolution);
 
         Degreesf horizontalFoV = ToDegrees(camera.GetHorizontalFOV());
         float nearPlane = camera.GetNearPlane();
@@ -635,9 +633,9 @@ namespace CLX
         return viewAndEditResult;
     }
 
-    ViewAndEditResult ViewAndEditValue(Camera& camera, const Blackboard& blackboard)
+    ViewAndEditResult ViewAndEditValue(Camera& camera, const Blackboard&)
     {
-        return ViewAndEditCamera(camera, blackboard.Get<Key_WindowView>().GetClientSize());
+        return ViewAndEditCamera(camera);
     }
 
     template<typename T, typename... Args>

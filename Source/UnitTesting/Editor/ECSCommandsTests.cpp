@@ -169,7 +169,7 @@ TEST_CASE("Instantiate Entity Composition")
         EntitySerializationIDGenerator entityIDGenerator;
         EntityCompositionAsset compositionAsset(EntityComposition(ecsManager, ecsManager.CreateECS(CreateECSRegistry(), entityIDGenerator)), std::filesystem::path("path/to/asset"));
 
-        ECSOwningHandle targetECS(ecsManager, ecsManager.CreateECS(CreateECSRegistry()));
+        ECSOwningHandle targetECS(ecsManager, ecsManager.CreateECS(CreateECSRegistry(), entityIDGenerator));
 
         EditorCommandTracker commandTracker;
         const DataTypeRegistry dataTypeRegistry = CreateDataTypeRegistry();

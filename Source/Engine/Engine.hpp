@@ -7,6 +7,7 @@
 #include "Engine/Input/InputState.hpp"
 #include "Engine/ECS/ECSManager.hpp"
 #include "Engine/Scene/SceneManager.hpp"
+#include "Engine/Audio/AudioManager.hpp"
 #include "Engine/SimpleScript/SimpleNodeScript.hpp"
 #include "Engine/Asset/AssetManager.hpp"
 #include "Engine/Graphics/GraphicsSettings.hpp"
@@ -72,6 +73,8 @@ namespace CLX
 		[[no_unique_address]] Console mConsole;
 		std::shared_ptr<AssetManager> mAssetManager;
 		SceneManager mSceneManager;
+        AudioManager mAudioManager;
+		InputManager mInputManager;
 
 		SystemTimerf mFrameTimer;
 		SystemTimerd mTotalTimer;
@@ -86,7 +89,6 @@ namespace CLX
 		std::shared_ptr<Blackboard> mBlackboard;
 		std::shared_ptr<GraphicsSettings> mGraphicsSettings;
 
-		InputManager mInputManager;
 		
 	};
 }
