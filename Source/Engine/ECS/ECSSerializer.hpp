@@ -9,7 +9,7 @@ namespace CLX
 	class DataTypeRegistry;
 
 	void SaveECS(const ECS& ecs, nlohmann::ordered_json& sceneJson, const DataTypeRegistry& dataTypeRegistry);
-	bool LoadECS(ECS& ecs, const nlohmann::json& jsonData, std::filesystem::path path, const Blackboard& blackboard);
+	bool LoadECS(ECS& ecs, const nlohmann::json& jsonData, const std::filesystem::path& path, const Blackboard& blackboard);
 
 	void SaveEntityCompositionAsset(const EntityCompositionAssetHandle& asset, const DataTypeRegistry& dataTypeRegistry);
 	void LoadEntityComposition(const std::filesystem::path& path, EntityComposition& entityComposition, const Blackboard& blackboard);

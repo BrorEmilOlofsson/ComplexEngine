@@ -6,6 +6,8 @@
 #include "Engine/Utility/GraphicsBufferData.hpp"
 #include "Engine/Graphics/GraphicsFoundation.hpp"
 #include "Engine/Math/Dimension2.hpp"
+#include "Engine/OperatingSystem/WindowFrameBuffer.hpp"
+#include "Engine/Input/InputState.hpp"
 
 namespace CLX
 {

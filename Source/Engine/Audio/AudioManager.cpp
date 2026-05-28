@@ -40,7 +40,7 @@ namespace CLX
         ASSERT(result == FMOD_OK);
     }
 
-    AudioChannelID AudioManager::Play(AudioAssetHandle handle, const float volume, const Vector3f& position)
+    AudioChannelID AudioManager::Play(AudioAssetHandle handle, const float volume, const Point3f& position)
     {
         ASSERT(handle);
 
@@ -61,7 +61,7 @@ namespace CLX
             soundChannel->setVolume(volume);
             soundChannel->setPaused(false);
 
-            const AudioChannelID chId = AudioChannelID{ mNextChId++ };
+            const AudioChannelID chId = AudioChannelID{ mNextChannelID++ };
             mChannels[chId] = soundChannel;
             return chId;
         }
@@ -75,7 +75,7 @@ namespace CLX
         ASSERT(result == FMOD_OK);
     }
 
-    void AudioManager::SetChannelPosition(AudioChannelID channelId, const Vector3f& position)
+    void AudioManager::SetChannelPosition(AudioChannelID channelId, const Point3f& position)
     {
         auto channelIt = mChannels.find(channelId);
         if (channelIt == mChannels.end())
@@ -97,6 +97,17 @@ namespace CLX
         }
 
         [[maybe_unused]] auto result = channelIt->second->setVolume(volume);
+        ASSERT(result == FMOD_OK);
+    }
+
+    void AudioManager::SetChannelPaused(AudioChannelID channelId, bool paused)
+    {
+        auto channelIt = mChannels.find(channelId);
+        if (channelIt == mChannels.end())
+        {
+            return;
+        }
+        [[maybe_unused]] auto result = channelIt->second->setPaused(paused);
         ASSERT(result == FMOD_OK);
     }
 

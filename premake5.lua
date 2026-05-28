@@ -50,23 +50,28 @@ workspace "FootballGame" -- Workspace, is not same as Project. Anything configur
 		'SIMPLE_DIR_ROOT="' .."../" .. '"',
 
 		'SIMPLE_DIR_DEPENDENCIES="' .."../Dependencies/" .. '"',
-		'SIMPLE_DIR_DEPENDENCIES_FORCE="' .."../Dependencies/Settings/Always_Force_Copy/" .. '"',
-		'SIMPLE_DIR_DEPENDENCIES_SETTINGS="' .."../Dependencies/Settings/" .. '"',
-		'SIMPLE_DIR_SETTINGS="' .."Settings/" .. '"',
 		'SIMPLE_DIR_SHADERS="' .. "Shaders/" .. '"',
 
-		'SIMPLE_SETTINGS_IMGUI="' .."Settings/imgui.ini" .. '"',
-		'SIMPLE_SETTINGS_GAME="' .. "Settings/game_settings.json" .. '"',
-		'SIMPLE_SETTINGS_DEBUG="' .. "Settings/debug_settings.json" .. '"',
-		'SIMPLE_SETTINGS_ENGINE="' .. "Settings/engine_settings.json" .. '"',
-		'SIMPLE_SETTINGS_PROJECT="' .. "Settings/project_settings.json" .. '"',
+		'COMPLEX_DIR_SETTINGS="' .. "../Settings/" .. '"',
+
+
+		--'SIMPLE_DIR_DEPENDENCIES="' .."../Dependencies/" .. '"',
+		--'SIMPLE_DIR_DEPENDENCIES_FORCE="' .."../Dependencies/Settings/Always_Force_Copy/" .. '"',
+		--'SIMPLE_DIR_DEPENDENCIES_SETTINGS="' .."../Dependencies/Settings/" .. '"',
+		--'SIMPLE_DIR_SETTINGS="' .."Settings/" .. '"',
+		--'SIMPLE_DIR_SHADERS="' .. "Shaders/" .. '"',
+
+		--'SIMPLE_SETTINGS_IMGUI="' .."Settings/imgui.ini" .. '"',
+		--'SIMPLE_SETTINGS_GAME="' .. "Settings/game_settings.json" .. '"',
+		--'SIMPLE_SETTINGS_DEBUG="' .. "Settings/debug_settings.json" .. '"',
+		--'SIMPLE_SETTINGS_ENGINE="' .. "Settings/engine_settings.json" .. '"',
+		--'SIMPLE_SETTINGS_PROJECT="' .. "Settings/project_settings.json" .. '"',
+
 		
 		'SIMPLE_DIR_MINIDUMP="' .."../Temp/Minidumps/".. '"',
 		'SIMPLE_FILENAME_STACKTRACES="' .."../Temp/StackTraces/stack_traces.txt".. '"',
 		'SIMPLE_FILENAME_PROFILER="' .. "../Temp/Profilers/profiler_data.prof" .. '"',
-		'SIMPLE_FILENAME_NEWSCENE="NewScene.scene"',
-		'SIMPLE_FILENAME_DEBUGJSON="debug_settings.json"',
-		"IMGUI_DEFINE_MATH_OPERATORS"
+		"IMGUI_DEFINE_MATH_OPERATORS",
 	}
 
 	filter { "configurations:*Game" }
@@ -220,62 +225,6 @@ workspace "FootballGame" -- Workspace, is not same as Project. Anything configur
 		}
 
 	--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-	-- group "Engine"
-	-- 	project "Utility"
-	-- 		kind "StaticLib"
-	-- 		location (dirs.Local)
-	-- 		targetdir (dirs.SimpleLib)
-	-- 		targetname("%{prj.name}_%{cfg.buildcfg}") 
-	-- 		fatalwarnings { "All" }
-
-	-- 		pchheader "Utility/Precompiled/UtilityPch.hpp" -- Force all Source (.cpp) files in this project to include "Engine/Precomplier/stdafx.h"
-	-- 		pchsource "Source/Utility/Precompiled/UtilityPch.cpp" -- Telling this project to use precomplier header
-
-	-- 		files {
-	-- 			"Source/Utility/**.h",
-	-- 			"Source/Utility/**.hpp",
-	-- 			"Source/Utility/**.cpp",
-	-- 			"Source/Utility/**.ixx"
-	-- 		}
-
-	-- 		includedirs {
-	-- 			"Source/",
-	-- 			"Source/External/"
-	-- 		}
-
-	--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-	
-	-- group "Engine"
-	-- 	project "Graphics"
-	-- 		kind "StaticLib"
-	-- 		location (dirs.Local)
-	-- 		targetdir (dirs.SimpleLib)
-	-- 		targetname("%{prj.name}_%{cfg.buildcfg}") 
-	-- 		fatalwarnings { "All" }
-
-	-- 		pchheader "Graphics/Precompiled/GraphicsPch.hpp" -- Force all Source (.cpp) files in this project to include "Engine/Precomplier/stdafx.h"
-	-- 		pchsource "Source/Graphics/Precompiled/GraphicsPch.cpp" -- Telling this project to use precomplier header
-
-	-- 		files {
-	-- 			"Source/Graphics/**.h",
-	-- 			"Source/Graphics/**.hpp",
-	-- 			"Source/Graphics/**.cpp",
-	-- 			"Source/Graphics/**.hlsl",
-	-- 			"Source/Graphics/**.hlsli",
-	-- 			"Source/Graphics/**.ixx"
-	-- 		}
-
-	-- 		includedirs {
-	-- 			"Source/",
-	-- 			"Source/External/"
-	-- 		}
-
-	-- 		links {
-	-- 			"d3d11"
-	-- 		}
-
-	--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	
 	project "Engine"
 		kind "StaticLib" -- Build type ".lib"
@@ -425,9 +374,7 @@ workspace "FootballGame" -- Workspace, is not same as Project. Anything configur
 
 		links {
 			"External", 
-			--"Utility",
 			"NodeScript",
-			--"Graphics", 
 			"Engine",
 			"Shader",
 			"Game",
@@ -490,8 +437,6 @@ workspace "FootballGame" -- Workspace, is not same as Project. Anything configur
 			links {
 				"External",
 				"NodeScript",
-				--"Utility",
-				--"Graphics", 
 				"Engine",
 				"Editor"
 			}
@@ -552,9 +497,7 @@ workspace "FootballGame" -- Workspace, is not same as Project. Anything configur
 
 			links {
 				"External",
-				--"Utility",
 				"NodeScript",
-				--"Graphics", 
 				"Engine"
 			}
 

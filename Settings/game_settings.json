@@ -1,0 +1,14 @@
+{
+  "Resolution": {
+    "Width": 1280,
+    "Height": 720
+  },
+  "Start Scene Path": "Scenes/Level_1.clxscene",
+  "VSync": false,
+  "Window Size": {
+    "Width": 1600,
+    "Height": 900
+  },
+  "Full Screen": false,
+  "Windowed Full Screen": true
+}

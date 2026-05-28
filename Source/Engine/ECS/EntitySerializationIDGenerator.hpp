@@ -1,5 +1,5 @@
 #pragma once
-#include <set>
+#include <unordered_set>
 #include <format>
 #include "Engine/Utility/IDWrapper.hpp"
 #include "Engine/Utility/Bounds.hpp"
@@ -15,43 +15,59 @@ namespace CLX
 
         EntitySerializationIDGenerator() = default;
 
-
         [[nodiscard]] EntitySerializationID Generate()
         {
-            Bounds<EntitySerializationID>* bounds = nullptr;
-            if (mLowerBounds.GetExtent() == 0)
+            EntitySerializationID id;
+            if (mUsedBounds.GetMin() > 0)
             {
-                bounds = &mUpperBounds;
+                id = EntitySerializationID{ mUsedBounds.GetMin() - 1 };
+                mUsedBounds.SetMin(id);
+            }
+            else if (mUsedBounds.GetMax() < std::numeric_limits<uint64_t>::max())
+            {
+                id = EntitySerializationID{ mUsedBounds.GetMax() + 1 };
+                mUsedBounds.SetMax(id);
             }
             else
             {
-                bounds = &mLowerBounds;
+                ASSERT(false);
             }
-           
-            EntitySerializationID id = bounds->GetMin();
-            bounds->SetMin(++id);
+
             mUsedIDs.insert(id);
             return id;
         }
 
-        void SetUsedIDBounds(const Bounds<EntitySerializationID>& bounds)
+        void MarkIDAsUsed(const EntitySerializationID id)
         {
-            auto min = bounds.GetMin();
-            auto max = bounds.GetMax();
-            mLowerBounds.SetMax(min);
-            mUpperBounds.SetMin(max);
+            mUsedBounds.ExpandToContain(id);
+            auto [_, inserted] = mUsedIDs.insert(id);
+            ASSERT(inserted);
         }
 
-        [[nodiscard]] Bounds<EntitySerializationID> GetUsedIDBounds() const
+        [[nodiscard]] bool IsIDUsed(const EntitySerializationID id) const
         {
-            return Bounds<EntitySerializationID>::FromMinAndMax(mLowerBounds.GetMax(), mUpperBounds.GetMin());
+            return mUsedIDs.contains(id);
+        }
+
+        void SetUsedIDBounds(const Bounds<uint64_t>& bounds)
+        {
+            mUsedBounds = bounds;
+        }
+
+        [[nodiscard]] std::optional<Bounds<uint64_t>> GetUsedIDBounds() const
+        {
+            if (mUsedBounds.GetExtent() == 0)
+            {
+                return std::nullopt;
+            }
+
+            return mUsedBounds;
         }
 
     private:
 
-        std::set<EntitySerializationID> mUsedIDs;
-        Bounds<EntitySerializationID> mLowerBounds{ Bounds<EntitySerializationID>::FromMinAndMax(EntitySerializationID{ 0 }, std::numeric_limits<EntitySerializationID>::max()) };
-        Bounds<EntitySerializationID> mUpperBounds{ Bounds<EntitySerializationID>::FromMinAndMax(std::numeric_limits<EntitySerializationID>::max(), std::numeric_limits<EntitySerializationID>::max()) };
+        std::unordered_set<EntitySerializationID> mUsedIDs;
+        Bounds<uint64_t> mUsedBounds = Bounds<uint64_t>::FromMinAndMax(0, 0);
     };
 
 }

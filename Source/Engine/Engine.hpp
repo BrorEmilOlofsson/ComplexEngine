@@ -20,6 +20,16 @@
 namespace CLX
 {
 
+	struct GameSettings
+	{
+		Dimension2u windowSize;
+		Dimension2u resolution;
+		std::filesystem::path startScenePath;
+		bool vSync = false;
+        bool fullScreen = false;
+        bool windowedFullScreen = false;
+	};
+
 	class Engine final
 	{
 	public:
@@ -60,11 +70,6 @@ namespace CLX
 
 	private:
 
-		void LoadSettingsFromJson();
-		void CheckAndCopySettingsFiles();
-		
-	private:
-
 		DataTypeRegistry mDataTypeRegistry;
 		OperatingSystem mOperatingSystem;
         EntitySerializationIDGenerator mEntityIDGenerator;
@@ -80,6 +85,7 @@ namespace CLX
 		SystemTimerd mTotalTimer;
 		WindowHandle mMainWindow;
 		InputState mInputState;
+        GameSettings mLoadedGameSettings;
 
 		[[no_unique_address]] SimpleNodeScript mNodeScript;
 
@@ -88,7 +94,5 @@ namespace CLX
 		std::atomic_bool mShouldExit;
 		std::shared_ptr<Blackboard> mBlackboard;
 		std::shared_ptr<GraphicsSettings> mGraphicsSettings;
-
-		
 	};
 }

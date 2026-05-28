@@ -6,26 +6,25 @@
 #include <fmod/core/fmod.hpp>
 #include <fmod/studio/fmod_studio.hpp>
 
-#include "Engine/Math/Vector3.hpp"
-#include "Engine/Utility/IDWrapper.hpp"
+#include "Engine/Math/Point3.hpp"
 #include "Engine/Asset/AssetTypes/AudioAsset.hpp"
+#include "Engine/Audio/AudioChannelID.hpp"
 
 namespace CLX
 {
-    using AudioChannelID = IDWrapper<size_t, struct AudioChannelIDTag>;
-
     class AudioManager
     {
     public:
 
         AudioManager();
 
-        AudioChannelID Play(AudioAssetHandle handle, const float volume = 1.0f, const Vector3f& position = Vector3f::Zero());
+        AudioChannelID Play(AudioAssetHandle handle, float volume = 1.0f, const Point3f& position = Point3f::Zero());
 
         void Update();
 
-        void SetChannelPosition(AudioChannelID channelId, const Vector3f& position);
-        void SetChannelVolume(AudioChannelID channelId, const float volume);
+        void SetChannelPosition(AudioChannelID channelId, const Point3f& position);
+        void SetChannelVolume(AudioChannelID channelId, float volume);
+        void SetChannelPaused(AudioChannelID channelId, bool paused);
 
         std::optional<Audio> LoadAudio(const std::filesystem::path& path);
 
@@ -35,7 +34,6 @@ namespace CLX
         FMOD::System* mFMODSystem = nullptr;
         std::unordered_map<std::filesystem::path, FMOD::Sound*> mSounds;
         std::unordered_map<AudioChannelID, FMOD::Channel*> mChannels;
-        size_t mNextChId = 1;
-
+        uint32_t mNextChannelID = 0;
     };
 }

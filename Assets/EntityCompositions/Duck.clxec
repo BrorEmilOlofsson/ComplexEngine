@@ -1,1 +1,54 @@
-{"Entities":[{"Components":[{"Name":"NameComponent","Properties":{"name":"Duck"}},{"Name":"TransformComponent","Properties":{"transform":{"Position":{"x":0.0,"y":0.0,"z":0.0},"Rotation":{"x":0.0,"y":-0.0,"z":-0.0},"Scale":{"x":1.0,"y":1.0,"z":1.0}}}},{"Name":"TransformHierarchyComponent","Properties":{"children":[],"parent":4294967295}},{"Name":"DuckComponent","Properties":{"ducklingIDs":[],"speed":1.0}}],"ID":0}]}
+{
+  "Entities": [
+    {
+      "Components": [
+        {
+          "Name": "NameComponent",
+          "Properties": {
+            "name": "Duck"
+          }
+        },
+        {
+          "Name": "TransformComponent",
+          "Properties": {
+            "transform": {
+              "Position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Rotation": {
+                "x": 0.0,
+                "y": -0.0,
+                "z": -0.0
+              },
+              "Scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+              }
+            }
+          }
+        },
+        {
+          "Name": "TransformHierarchyComponent",
+          "Properties": {
+            "children": [
+            ],
+            "parent": 4294967295
+          }
+        },
+        {
+          "Name": "DuckComponent",
+          "Properties": {
+            "ducklingIDs": [
+            ],
+            "speed": 1.0
+          }
+        }
+      ],
+      "ID": 0,
+      "SID": 1000
+    }
+  ]
+}

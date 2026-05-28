@@ -71,8 +71,7 @@ namespace CLX
         MenuItemPopUp* settingsGraphicsButton = settingsTab.AddPopUp("Graphics");
         settingsTab.AddButton("Save layout")->SetCallback([]()
             {
-                std::filesystem::path path = SIMPLE_DIR_DEPENDENCIES_SETTINGS;
-                path /= "imgui.ini";
+                std::filesystem::path path = GetAbsoluteImGuiSettingsPath();
                 std::string strPath = std::filesystem::absolute(path).string();
                 ImGui::SaveIniSettingsToDisk(strPath.c_str());
             });
@@ -158,7 +157,7 @@ namespace CLX
         }
         if (input.IsKeyPressed(eInputKey::F6))
         {
-            windowView.SetSize(Dimension2u(720, 405), false);
+            windowView.SetSize(Dimension2u(720, 405));
         }
     }
 

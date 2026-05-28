@@ -6,11 +6,11 @@
 #include <memory>
 #include <string>
 #include "Engine/Math/Shapes/AABB2.hpp"
-#include "Engine/Win/WinInputProcessor.hpp"
 #include "WinWindowClass.hpp"
 #include "Engine/OperatingSystem/WindowFrameBuffer.hpp"
 #include "Engine/Graphics/GraphicsWindowView.hpp"
 #include "Engine/Math/Dimension2.hpp"
+#include "Engine/Utility/WindowSizeSettings.hpp"
 
 #include "Engine/Win/WinDefines.hpp"
 #include <Windows.h>
@@ -55,7 +55,7 @@ namespace CLX
 		void Show();
 		void Hide();
 
-		void SetSize(const Dimension2u& windowSize, const bool fullScreen);
+		void SetSize(const WindowSizeSettings& sizeSettings);
 		void SetRect(const AABB2i& rect, unsigned int flags);
 		void ToggleFullScreen();
 
@@ -117,9 +117,9 @@ namespace CLX
 		window.EndFrame(renderContext);
 	}*/
 
-	inline void Window_SetSize(Win_Window& window, Dimension2u size, const bool fullScreen)
+	inline void Window_SetSize(Win_Window& window, const WindowSizeSettings& sizeSettings)
 	{
-		window.SetSize(size, fullScreen);
+		window.SetSize(sizeSettings);
 	}
 
 	inline void Window_ToggleFullScreen(Win_Window& window)

@@ -1,5 +1,6 @@
 #include "Editor/Precompiled/EditorPch.hpp"
 #include "ImGuiStyleManager.hpp"
+#include "Engine/Utility/File/FileUtility.hpp"
 #include <IconFontDefines.h>
 
 namespace CLX
@@ -10,7 +11,7 @@ namespace CLX
 		std::filesystem::path iniPath = std::filesystem::absolute("Settings/imgui.ini");
 		if (iniPath.empty())
 		{
-			std::filesystem::path savedSource = std::filesystem::absolute(std::filesystem::path(SIMPLE_DIR_SETTINGS) / "imgui.ini");
+			std::filesystem::path savedSource = GetAbsoluteProjectSettingsPath() / "imgui.ini";
 			std::filesystem::copy(savedSource, iniPath);
 		}
 		const std::string iniPathStr = iniPath.string();

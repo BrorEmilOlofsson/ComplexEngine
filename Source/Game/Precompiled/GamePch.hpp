@@ -1,9 +1,5 @@
 #pragma once
 
-#ifdef _DEBUG
-#include "Engine/Debugger/MemoryTracker/MemoryTracker.h"
-#endif
-
 #include <cassert>
 #include <array>
 #include <vector>

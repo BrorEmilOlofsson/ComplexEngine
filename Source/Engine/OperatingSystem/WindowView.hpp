@@ -1,8 +1,8 @@
 #pragma once
-#include "WindowFrameBuffer.hpp"
+#include <type_traits>
 #include "Engine/Math/Shapes/AABB2.hpp"
-#include "Engine/Input/InputState.hpp"
-#include "Engine/Utility/SystemTimer.hpp"
+#include "Engine/Math/Dimension2.hpp"
+#include "Engine/Utility/WindowSizeSettings.hpp"
 
 namespace CLX
 {
@@ -15,7 +15,7 @@ namespace CLX
 			, hideFunc([](void* window) { return HideWindow(*static_cast<T*>(window)); })
 			, captureCursorFunc([](void* window) -> void { return Window_CaptureCursor(*static_cast<T*>(window)); })
 			, releaseCursorFunc([](void* window) -> void { return Window_ReleaseCursor(*static_cast<T*>(window)); })
-			, setSizeFunc([](void* window, Dimension2u size, const bool fullScreen) -> void { return Window_SetSize(*static_cast<T*>(window), size, fullScreen); })
+			, setSizeFunc([](void* window, const WindowSizeSettings& sizeSettings) -> void { return Window_SetSize(*static_cast<T*>(window), sizeSettings); })
 			, toggleFullScreen([](void* window) -> void { return Window_ToggleFullScreen(*static_cast<T*>(window)); })
 		{
 		}
@@ -24,7 +24,7 @@ namespace CLX
 		void (*hideFunc)(void*) = nullptr;
 		void (*captureCursorFunc)(void*) = nullptr;
 		void (*releaseCursorFunc)(void*) = nullptr;
-		void (*setSizeFunc)(void*, const Dimension2u, const bool) = nullptr;
+		void (*setSizeFunc)(void*, const WindowSizeSettings&) = nullptr;
 		void (*toggleFullScreen)(void*) = nullptr;
 	};
 
@@ -65,9 +65,9 @@ namespace CLX
 			mOperations.hideFunc(mWindow);
 		}
 
-		void SetSize(Dimension2u size, const bool fullScreen) const
+		void SetSize(const WindowSizeSettings& sizeSettings) const
 		{
-			mOperations.setSizeFunc(mWindow, size, fullScreen);
+			mOperations.setSizeFunc(mWindow, sizeSettings);
 		}
 
 		void ToggleFullScreen() const

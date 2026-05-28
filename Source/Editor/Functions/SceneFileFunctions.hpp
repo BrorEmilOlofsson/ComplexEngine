@@ -51,7 +51,7 @@ namespace CLX
         {
             return [sceneManager, assetManager]() -> void
                 {
-                    const std::filesystem::path absolutePath = std::filesystem::absolute(AppendCounterIfAlreadyExist(std::filesystem::path(SIMPLE_DIR_SCENES) / std::filesystem::path(SIMPLE_FILENAME_NEWSCENE)));
+                    const std::filesystem::path absolutePath = std::filesystem::absolute(AppendCounterIfAlreadyExist(std::filesystem::path(SIMPLE_DIR_SCENES) / "New Scene.clxscene"));
 
                     SceneAssetHandle sceneAsset = assetManager.lock()->CreateScene(absolutePath);
                     //sceneManager->CreateNewScene(absolutePath);
@@ -101,16 +101,16 @@ namespace CLX
                 {
                     const SceneAssetHandle activeSceneAsset = sceneManager->GetActiveScene();
                     std::filesystem::path relativePath = activeSceneAsset.GetRelativePath();
-                    std::optional<nlohmann::json> jsonData = FileUtility::GetDataAsJson(std::filesystem::absolute(SIMPLE_SETTINGS_GAME));
+                    std::optional<nlohmann::json> jsonData = FileUtility::GetDataAsJson(GetAbsoluteGameSettingsPath());
 
                     if (!jsonData.has_value())
                     {
                         return;
                     }
 
-                    jsonData.value()["Game_Settings"]["Start_Scene_RelativePath"] = relativePath;
+                    jsonData.value()["Start Scene Path"] = relativePath;
 
-                    std::ofstream writeFile(std::filesystem::absolute(SIMPLE_SETTINGS_GAME));
+                    std::ofstream writeFile(GetAbsoluteGameSettingsPath());
                     assert(writeFile.is_open() && "Failed to open the file");
 
                     writeFile << jsonData.value();

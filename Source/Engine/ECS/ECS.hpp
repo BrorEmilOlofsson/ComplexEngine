@@ -523,6 +523,11 @@ namespace CLX
                 return mEntityID;
             }
 
+            [[nodiscard]] EntitySerializationID GetSerializationID() const
+            {
+                return mECS->GetSerializationID(mEntityID);
+            }
+
         private:
 
             const ECS* mECS = nullptr;

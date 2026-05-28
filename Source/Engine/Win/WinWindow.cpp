@@ -208,14 +208,15 @@ namespace CLX
 	}
 
 
-	void Win_Window::SetSize(const Dimension2u& windowSize, const bool setFullScreen)
+	void Win_Window::SetSize(const WindowSizeSettings& sizeSettings)
 	{
-		if (setFullScreen)
+		if (std::holds_alternative<FullScreen>(sizeSettings))
 		{
 			mResizeBuffer.fullScreen = true;
 		}
-		else
+        else if (std::holds_alternative<Dimension2u>(sizeSettings))
 		{
+			const Dimension2u windowSize = std::get<Dimension2u>(sizeSettings);
 			mResizeBuffer.fullScreen = false;
 			const AABB2i currentClientRect = GetClientBounds();
 			const Vector2f scale = static_cast<Vector2f>(ToVector2(windowSize)) / static_cast<Vector2f>(currentClientRect.GetExtent());
@@ -223,6 +224,10 @@ namespace CLX
 			mResizeBuffer.windowedRect = GetAdjustedWindowRect(scaledClientAABB, GetStyle());
 			mResizeBuffer.windowedStyle = GetStyle();
 		}
+        else if (std::holds_alternative<WindowedFullScreen>(sizeSettings))
+        {
+
+        }
 		mHasCustomResized = true;
 	}
 

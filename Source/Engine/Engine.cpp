@@ -19,14 +19,14 @@ namespace CLX
 
     struct ProjectSettings
     {
-        Bounds<EntitySerializationID> usedEntityIDBounds;
+        Bounds<uint64_t> usedEntityIDBounds;
     };
 
     ProjectSettings LoadProjectSettings()
     {
-        const std::filesystem::path filename = std::filesystem::absolute(SIMPLE_SETTINGS_PROJECT);
+        const std::filesystem::path path = GetAbsoluteProjectSettingsPath();
 
-        std::ifstream file(filename);
+        std::ifstream file(path);
         if (!file.is_open())
         {
             assert(false && "Failed To Open File");
@@ -41,8 +41,48 @@ namespace CLX
 
         ProjectSettings settings
         {
-            .usedEntityIDBounds = Bounds<EntitySerializationID>::FromMinAndMax(EntitySerializationID{ min }, EntitySerializationID{ max })
+            .usedEntityIDBounds = Bounds<uint64_t>::FromMinAndMax(min, max)
         };
+        return settings;
+    }
+
+    void SaveProjectSettings(const ProjectSettings& settings)
+    {
+        const std::filesystem::path path = GetAbsoluteProjectSettingsPath();
+
+        std::ofstream file(path);
+        if (!file.is_open())
+        {
+            assert(false && "Failed To Open File");
+            return;
+        }
+
+        nlohmann::json json;
+        json["Used EntityID Bounds"]["Min"] = settings.usedEntityIDBounds.GetMin();
+        json["Used EntityID Bounds"]["Max"] = settings.usedEntityIDBounds.GetMax();
+        file << json;
+    }
+
+    GameSettings LoadGameSettings()
+    {
+        const std::filesystem::path path = GetAbsoluteGameSettingsPath();
+        std::ifstream file(path);
+        if (!file.is_open())
+        {
+            assert(false && "Failed To Open File");
+            return {};
+        }
+
+        const nlohmann::json json = nlohmann::json::parse(file);
+        file.close();
+
+        GameSettings settings;
+        settings.windowSize = Dimension2u(json["Window Size"]["Width"], json["Window Size"]["Height"]);
+        settings.resolution = Dimension2u(json["Resolution"]["Width"], json["Resolution"]["Height"]);
+        settings.startScenePath = std::filesystem::path(std::string(json["Start Scene Path"]));
+        settings.vSync = json["VSync"];
+        settings.fullScreen = json["Full Screen"];
+        settings.windowedFullScreen = json["Windowed Full Screen"];
         return settings;
     }
 
@@ -55,19 +95,9 @@ namespace CLX
     {
         RegisterEngineComponents();
         DummyRegister();
-
-
-        mECSRegistry.RegisterSystem<RotatingMovementSystem>();
-        mECSRegistry.RegisterSystem<RenderSystem>();
-        mECSRegistry.RegisterSystem<RenderLightSystem>();
-        mECSRegistry.RegisterSystem<CameraSystem>();
-        mECSRegistry.RegisterSystem<AnimationSystem>();
-        mECSRegistry.RegisterSystem<NavmeshSystem>();
-        mECSRegistry.RegisterSystem<DebugShapeSystem>();
-        mECSRegistry.RegisterSystem<TriggerSystem>();
+        RegisterEngineSystems(mECSRegistry);
 
         TypeRegistration::ExecuteRegistrations(mDataTypeRegistry, mECSRegistry);
-
 
         mDataTypeRegistry.Assert();
         mOperatingSystem.GetGraphicsFoundation().SetAssetManager(mAssetManager);
@@ -97,22 +127,6 @@ namespace CLX
 
     }
 
-    void LoadGraphicsSettings(bool& vSync)
-    {
-        const std::filesystem::path filename = std::filesystem::absolute(SIMPLE_SETTINGS_GAME);
-
-        std::ifstream file(filename);
-        if (!file.is_open())
-        {
-            return;
-        }
-
-        const nlohmann::json json = nlohmann::json::parse(file);
-        file.close();
-
-        vSync = json["VSync"];
-    }
-
     void Engine::Init()
     {
         mECSRegistry.SetBlackboard(mBlackboard);
@@ -124,6 +138,7 @@ namespace CLX
         mBlackboard->Insert<Key_InputState>(mInputState);
         mBlackboard->Insert<Key_ECSManager>(mECSManager);
         mBlackboard->Insert<Key_EntityIDGenerator>(mEntityIDGenerator);
+        mBlackboard->Insert<Key_AudioManager>(mAudioManager);
 
 
         mAssetManager->GetAssetLoader().SetSceneLoader([this](const std::filesystem::path& path)
@@ -137,51 +152,35 @@ namespace CLX
         ProjectSettings projectSettings = LoadProjectSettings();
         mEntityIDGenerator.SetUsedIDBounds(projectSettings.usedEntityIDBounds);
 
+        mLoadedGameSettings = LoadGameSettings();
+        mGraphicsSettings->vSync = mLoadedGameSettings.vSync;
+
         mAssetManager->LoadAssets();
         mOperatingSystem.Init();
-        mMainWindow = mOperatingSystem.MakeWindow(Dimension2u(1600, 900), L"ComplexEngine");
+        mMainWindow = mOperatingSystem.MakeWindow(mLoadedGameSettings.windowSize, L"ComplexEngine");
 
-        //mAudioManager.Init();
+        if (mLoadedGameSettings.fullScreen)
+        {
+            mOperatingSystem.GetWindow(mMainWindow).SetSize(FullScreen{});
+        }
+        else if (mLoadedGameSettings.windowedFullScreen)
+        {
+            //mOperatingSystem.GetWindow(mMainWindow).SetSize(WindowedFullScreen{});
+        }
+
         mFrameTimer.Start();
         mTotalTimer.Start();
 
         mNodeScript.Init();
 
-        CheckAndCopySettingsFiles();
-        LoadSettingsFromJson();
-        LoadGraphicsSettings(mGraphicsSettings->vSync);
         mOperatingSystem.LoadCursors(std::string(Directory::Assets) + std::string("Cursors"));
 
         mOperatingSystem.GetWindow(mMainWindow).Show();
     }
 
-
-    std::filesystem::path LoadSceneSettingsDefaultScene()
-    {
-        const std::filesystem::path filename = std::filesystem::absolute(SIMPLE_SETTINGS_GAME);
-
-        std::ifstream file(filename);
-        assert(file.is_open() && "Failed To Open File");
-
-        const nlohmann::json jsonData = nlohmann::json::parse(file);
-        file.close();
-
-        const std::string defaultSceneRelativePathStr = jsonData["Start_Scene_Path"];
-        const std::filesystem::path sceneRelativePath = std::filesystem::path(defaultSceneRelativePathStr);
-        const std::filesystem::path sceneFilePath = GetAbsoluteAssetPath(sceneRelativePath);
-        std::ifstream sceneFile(sceneFilePath);
-
-        if (!sceneFile.is_open())
-        {
-            ASSERT("Failed to open default scene file at path");
-        }
-
-        return sceneRelativePath;
-    }
-
     void Engine::LateInit()
     {
-        std::filesystem::path sceneFilePath = LoadSceneSettingsDefaultScene();
+        std::filesystem::path sceneFilePath = mLoadedGameSettings.startScenePath;
 
         SceneAssetHandle defaultScene = mAssetManager->GetScene(sceneFilePath);
         if (!defaultScene)
@@ -190,22 +189,19 @@ namespace CLX
         }
         mSceneManager.ChangeSceneDirectly(defaultScene);
 
-        //mSceneManager.Init(mBlackboard);
-
         RenderContext r = mOperatingSystem.GetGraphicsFoundation().CreateRenderContext(mOperatingSystem.GetWindow(mMainWindow).GetClientSize());
         mSceneManager.GetActiveScene()->GetRenderState().SetRenderContext(std::move(r));
 
 #ifndef _EDITOR
         mSceneManager.BeginPlay();
 #endif
-
-        AudioAssetHandle audioHandle2 = mAssetManager->GetAudio(GetAbsoluteAssetPath() / "Audio" / "StardewValley.mp3");
-        mAudioManager.Play(audioHandle2, 1.0f, { 0, 0, 0});
     }
 
     void Engine::Shutdown()
     {
         mOperatingSystem.Shutdown();
+
+        SaveProjectSettings(ProjectSettings{ mEntityIDGenerator.GetUsedIDBounds().value_or({}) });
     }
 
     bool Engine::BeginFrame()
@@ -279,17 +275,33 @@ namespace CLX
         mSceneManager.Update(deltaTimeCapped);
         mAudioManager.Update();
 
+        static AudioChannelID channelId = InvalidID<AudioChannelID>();
 
-        static Vector3f audioPosition = Vector3f::Zero();
+        if (channelId == InvalidID<AudioChannelID>())
+        {
+            AudioAssetHandle audioHandle = mAssetManager->GetAudio(GetAbsoluteAssetPath() / "Audio" / "StardewValley.mp3");
+            channelId = mAudioManager.Play(audioHandle, 1.0f, { 0, 0, 0 });
+        }
+
+        static Point3f audioPosition = Point3f::Zero();
         static float audioVolume = 1.0f;
-
+        static bool stop = false;
         ImGui::Begin("Audio Test");
-        ImGui::DragFloat3("Audio Position", &audioPosition.x, 0.001f);
-        ImGui::DragFloat("Audio Volume", &audioVolume, 0.001f);
-        ImGui::End();
+        if (ImGui::DragFloat3("Audio Position", &audioPosition.x, 0.001f))
+        {
+            mAudioManager.SetChannelPosition(channelId, audioPosition);
 
-        mAudioManager.SetChannelPosition(AudioChannelID{1}, audioPosition);
-        mAudioManager.SetChannelVolume(AudioChannelID{1}, audioVolume);
+        }
+        if (ImGui::DragFloat("Audio Volume", &audioVolume, 0.001f))
+        {
+            mAudioManager.SetChannelVolume(channelId, audioVolume);
+
+        }
+        if (ImGui::Checkbox("Stop Audio", &stop))
+        {
+            mAudioManager.SetChannelPaused(channelId, stop);
+        }
+        ImGui::End();
     }
 
     void Engine::Render()
@@ -337,89 +349,6 @@ namespace CLX
     void Engine::SetCurrentDropPath(const std::filesystem::path& path)
     {
         mCurrentDropPath = path;
-    }
-
-    void Engine::LoadSettingsFromJson()
-    {
-        const std::filesystem::path filename = std::filesystem::absolute(SIMPLE_SETTINGS_GAME);
-
-        std::ifstream file(filename);
-        assert(file.is_open() && "Failed To Open File");
-
-        const nlohmann::json json = nlohmann::json::parse(file);
-        file.close();
-
-        /*const nlohmann::json& windowSizeJson = json["Game_Settings"]["Window_Size"];
-        const nlohmann::json& resolutionJson = json["Game_Settings"]["Resolution"];
-
-        Dimension2u windowSize;
-        windowSize. = windowSizeJson["x"];
-        windowSize.y = windowSizeJson["y"];
-
-        Dimension2u resolution;
-        resolution.x = resolutionJson["x"];
-        resolution.y = resolutionJson["y"];*/
-    }
-
-    void Engine::CheckAndCopySettingsFiles()
-    {
-        const std::filesystem::path binSettings = std::filesystem::absolute(SIMPLE_DIR_SETTINGS);
-        const std::filesystem::path dependenciesSettings = std::filesystem::absolute(SIMPLE_DIR_DEPENDENCIES_SETTINGS);
-        const std::filesystem::path forceDependenciesSettings = std::filesystem::absolute(SIMPLE_DIR_DEPENDENCIES_FORCE);
-
-        std::vector<std::filesystem::path> binSettingsFileNames;
-        std::vector<std::filesystem::path> dependenciesSettingsFileNames;
-        std::vector<std::filesystem::path> forceDependenciesSettingsFileNames;
-
-        for (const auto& entry : std::filesystem::directory_iterator(binSettings))
-        {
-            if (std::filesystem::is_regular_file(entry.path()))
-            {
-                binSettingsFileNames.push_back(entry.path().filename());
-            }
-        }
-
-        for (const auto& entry : std::filesystem::directory_iterator(dependenciesSettings))
-        {
-            if (std::filesystem::is_regular_file(entry.path()))
-            {
-                dependenciesSettingsFileNames.push_back(entry.path().filename());
-            }
-        }
-
-        for (const auto& entry : std::filesystem::directory_iterator(forceDependenciesSettings))
-        {
-            if (std::filesystem::is_regular_file(entry.path()))
-            {
-                forceDependenciesSettingsFileNames.push_back(entry.path().filename());
-            }
-        }
-
-        std::vector<std::filesystem::path> missingFileNames;
-
-        std::sort(dependenciesSettingsFileNames.begin(), dependenciesSettingsFileNames.end());
-        std::sort(binSettingsFileNames.begin(), binSettingsFileNames.end());
-        std::set_difference(dependenciesSettingsFileNames.begin(), dependenciesSettingsFileNames.end(), binSettingsFileNames.begin(), binSettingsFileNames.end(), std::inserter(missingFileNames, missingFileNames.begin()));
-
-        for (const std::filesystem::path& name : missingFileNames)
-        {
-            const std::filesystem::path source = std::filesystem::absolute(SIMPLE_DIR_DEPENDENCIES_SETTINGS) / name;
-            const std::filesystem::path destination = std::filesystem::absolute(SIMPLE_DIR_SETTINGS) / name;
-            std::filesystem::copy_file(source, destination, std::filesystem::copy_options::overwrite_existing);
-
-            Console::Print("Copied: ", ConsoleTextColor::White, false);
-            Console::Print(name.string(), ConsoleTextColor::Green, true);
-        }
-
-        for (const std::filesystem::path& name : forceDependenciesSettingsFileNames)
-        {
-            const std::filesystem::path source = std::filesystem::absolute(SIMPLE_DIR_DEPENDENCIES_FORCE) / name;
-            const std::filesystem::path destination = std::filesystem::absolute(SIMPLE_DIR_SETTINGS) / name;
-            std::filesystem::copy_file(source, destination, std::filesystem::copy_options::overwrite_existing);
-
-            Console::Print("Force copied: ", ConsoleTextColor::White, false);
-            Console::Print(name.string(), ConsoleTextColor::Green, true);
-        }
     }
 
     float Engine::GetDeltaTime() const

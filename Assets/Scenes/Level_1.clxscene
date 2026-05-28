@@ -1,1 +1,370 @@
-{"Entities":[{"ID":0,"Components":[{"Name":"TransformComponent","Properties":{"transform":{"Position":{"x":0.0,"y":2.457719564437866,"z":-6.4802470207214355},"Rotation":{"x":0.0,"y":-0.0,"z":-0.0},"Scale":{"x":1.0,"y":1.0,"z":1.0}}}},{"Name":"NameComponent","Properties":{"name":"Camera"}},{"Name":"TransformHierarchyComponent","Properties":{"children":[],"parent":4294967295}},{"Name":"CameraComponent","Properties":{"camera":{"FarPlane":30000.0,"HorizontalFoV":1.5704795122146606,"NearPlane":0.10000000149011612,"Position":{"x":0.0,"y":2.457719564437866,"z":-6.4802470207214355}},"freeFly":false}}]},{"ID":1,"Components":[{"Name":"TransformComponent","Properties":{"transform":{"Position":{"x":5.6654558181762695,"y":0.0,"z":0.0},"Rotation":{"x":0.0,"y":-0.0,"z":-0.0},"Scale":{"x":1.0,"y":1.0,"z":1.0}}}},{"Name":"NameComponent","Properties":{"name":"Duck"}},{"Name":"TransformHierarchyComponent","Properties":{"children":[],"parent":4294967295}},{"Name":"ArrowComponent","Properties":{"color":{"a":1.0,"b":1.0,"g":0.0,"r":0.3823528289794922},"length":1.0,"thickness":0.6000000238418579}},{"Name":"DuckComponent","Properties":{"ducklingIDs":[],"speed":1.0}}]},{"ID":2,"Components":[{"Name":"TransformComponent","Properties":{"transform":{"Position":{"x":-3.1382036209106445,"y":0.0,"z":1.7016708850860596},"Rotation":{"x":0.0,"y":-0.0,"z":-0.0},"Scale":{"x":1.0,"y":1.0,"z":1.0}}}},{"Name":"NameComponent","Properties":{"name":"Duckling1"}},{"Name":"TransformHierarchyComponent","Properties":{"children":[],"parent":4294967295}},{"Name":"ArrowComponent","Properties":{"color":{"a":1.0,"b":0.0,"g":0.0,"r":1.0},"length":1.0,"thickness":0.6000000238418579}},{"Name":"DucklingComponent","Properties":{"speed":1.0}}]},{"ID":3,"Components":[{"Name":"TransformComponent","Properties":{"transform":{"Position":{"x":-1.8900984525680542,"y":0.0,"z":3.035987615585327},"Rotation":{"x":0.0,"y":-0.0,"z":-0.0},"Scale":{"x":1.0,"y":1.0,"z":1.0}}}},{"Name":"NameComponent","Properties":{"name":"Duckling2"}},{"Name":"TransformHierarchyComponent","Properties":{"children":[],"parent":4294967295}},{"Name":"ArrowComponent","Properties":{"color":{"a":1.0,"b":0.0,"g":1.0,"r":0.11764705181121826},"length":1.0,"thickness":0.6000000238418579}},{"Name":"DucklingComponent","Properties":{"speed":1.0}}]},{"ID":4,"Components":[{"Name":"TransformComponent","Properties":{"transform":{"Position":{"x":3.6752068996429443,"y":0.0,"z":0.0},"Rotation":{"x":0.0,"y":-0.0,"z":-0.0},"Scale":{"x":1.0,"y":1.0,"z":1.0}}}},{"Name":"NameComponent","Properties":{"name":"Duckling3"}},{"Name":"TransformHierarchyComponent","Properties":{"children":[],"parent":4294967295}},{"Name":"ArrowComponent","Properties":{"color":{"a":1.0,"b":1.0,"g":0.0,"r":0.970588207244873},"length":1.0,"thickness":0.6000000238418579}},{"Name":"DucklingComponent","Properties":{"speed":1.0}}]},{"ID":5,"Components":[{"Name":"TransformComponent","Properties":{"transform":{"Position":{"x":-0.7459642887115479,"y":0.0,"z":-4.498772621154785},"Rotation":{"x":0.0,"y":-0.0,"z":-0.0},"Scale":{"x":1.0,"y":1.0,"z":1.0}}}},{"Name":"NameComponent","Properties":{"name":"Duckling4"}},{"Name":"TransformHierarchyComponent","Properties":{"children":[],"parent":4294967295}},{"Name":"ArrowComponent","Properties":{"color":{"a":1.0,"b":0.0,"g":0.9705882668495178,"r":1.0},"length":1.0,"thickness":0.6000000238418579}},{"Name":"DucklingComponent","Properties":{"speed":1.0}}]}],"NavmeshPath":""}
+{
+  "Entities": [
+    {
+      "ID": 0,
+      "SID": 0,
+      "Components": [
+        {
+          "Name": "TransformComponent",
+          "Properties": {
+            "transform": {
+              "Position": {
+                "x": 0.0,
+                "y": 2.457719564437866,
+                "z": -6.4802470207214355
+              },
+              "Rotation": {
+                "x": 0.0,
+                "y": -0.0,
+                "z": -0.0
+              },
+              "Scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+              }
+            }
+          }
+        },
+        {
+          "Name": "NameComponent",
+          "Properties": {
+            "name": "Camera"
+          }
+        },
+        {
+          "Name": "TransformHierarchyComponent",
+          "Properties": {
+            "children": [
+            ],
+            "parent": 4294967295
+          }
+        },
+        {
+          "Name": "CameraComponent",
+          "Properties": {
+            "camera": {
+              "FarPlane": 30000.0,
+              "HorizontalFoV": 1.5704795122146606,
+              "NearPlane": 0.10000000149011612,
+              "Position": {
+                "x": 0.0,
+                "y": 2.457719564437866,
+                "z": -6.4802470207214355
+              }
+            },
+            "freeFly": false
+          }
+        }
+      ]
+    },
+    {
+      "ID": 1,
+      "SID": 1,
+      "Components": [
+        {
+          "Name": "TransformComponent",
+          "Properties": {
+            "transform": {
+              "Position": {
+                "x": 5.6654558181762695,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Rotation": {
+                "x": 0.0,
+                "y": -0.0,
+                "z": -0.0
+              },
+              "Scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+              }
+            }
+          }
+        },
+        {
+          "Name": "NameComponent",
+          "Properties": {
+            "name": "Duck"
+          }
+        },
+        {
+          "Name": "TransformHierarchyComponent",
+          "Properties": {
+            "children": [
+            ],
+            "parent": 4294967295
+          }
+        },
+        {
+          "Name": "ArrowComponent",
+          "Properties": {
+            "color": {
+              "a": 1.0,
+              "b": 1.0,
+              "g": 0.0,
+              "r": 0.3823528289794922
+            },
+            "length": 1.0,
+            "thickness": 0.6000000238418579
+          }
+        },
+        {
+          "Name": "DuckComponent",
+          "Properties": {
+            "ducklingIDs": [
+            ],
+            "speed": 1.0
+          }
+        }
+      ]
+    },
+    {
+      "ID": 2,
+      "SID": 2,
+      "Components": [
+        {
+          "Name": "TransformComponent",
+          "Properties": {
+            "transform": {
+              "Position": {
+                "x": -3.1382036209106445,
+                "y": 0.0,
+                "z": 1.7016708850860596
+              },
+              "Rotation": {
+                "x": 0.0,
+                "y": -0.0,
+                "z": -0.0
+              },
+              "Scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+              }
+            }
+          }
+        },
+        {
+          "Name": "NameComponent",
+          "Properties": {
+            "name": "Duckling1"
+          }
+        },
+        {
+          "Name": "TransformHierarchyComponent",
+          "Properties": {
+            "children": [
+            ],
+            "parent": 4294967295
+          }
+        },
+        {
+          "Name": "ArrowComponent",
+          "Properties": {
+            "color": {
+              "a": 1.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 1.0
+            },
+            "length": 1.0,
+            "thickness": 0.6000000238418579
+          }
+        },
+        {
+          "Name": "DucklingComponent",
+          "Properties": {
+            "speed": 1.0
+          }
+        }
+      ]
+    },
+    {
+      "ID": 3,
+      "SID": 3,
+      "Components": [
+        {
+          "Name": "TransformComponent",
+          "Properties": {
+            "transform": {
+              "Position": {
+                "x": -1.8900984525680542,
+                "y": 0.0,
+                "z": 3.035987615585327
+              },
+              "Rotation": {
+                "x": 0.0,
+                "y": -0.0,
+                "z": -0.0
+              },
+              "Scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+              }
+            }
+          }
+        },
+        {
+          "Name": "NameComponent",
+          "Properties": {
+            "name": "Duckling2"
+          }
+        },
+        {
+          "Name": "TransformHierarchyComponent",
+          "Properties": {
+            "children": [
+            ],
+            "parent": 4294967295
+          }
+        },
+        {
+          "Name": "ArrowComponent",
+          "Properties": {
+            "color": {
+              "a": 1.0,
+              "b": 0.0,
+              "g": 1.0,
+              "r": 0.11764705181121826
+            },
+            "length": 1.0,
+            "thickness": 0.6000000238418579
+          }
+        },
+        {
+          "Name": "DucklingComponent",
+          "Properties": {
+            "speed": 1.0
+          }
+        }
+      ]
+    },
+    {
+      "ID": 4,
+      "SID": 4,
+      "Components": [
+        {
+          "Name": "TransformComponent",
+          "Properties": {
+            "transform": {
+              "Position": {
+                "x": 3.6752068996429443,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Rotation": {
+                "x": 0.0,
+                "y": -0.0,
+                "z": -0.0
+              },
+              "Scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+              }
+            }
+          }
+        },
+        {
+          "Name": "NameComponent",
+          "Properties": {
+            "name": "Duckling3"
+          }
+        },
+        {
+          "Name": "TransformHierarchyComponent",
+          "Properties": {
+            "children": [
+            ],
+            "parent": 4294967295
+          }
+        },
+        {
+          "Name": "ArrowComponent",
+          "Properties": {
+            "color": {
+              "a": 1.0,
+              "b": 1.0,
+              "g": 0.0,
+              "r": 0.970588207244873
+            },
+            "length": 1.0,
+            "thickness": 0.6000000238418579
+          }
+        },
+        {
+          "Name": "DucklingComponent",
+          "Properties": {
+            "speed": 1.0
+          }
+        }
+      ]
+    },
+    {
+      "ID": 5,
+      "SID": 5,
+      "Components": [
+        {
+          "Name": "TransformComponent",
+          "Properties": {
+            "transform": {
+              "Position": {
+                "x": -0.7459642887115479,
+                "y": 0.0,
+                "z": -4.498772621154785
+              },
+              "Rotation": {
+                "x": 0.0,
+                "y": -0.0,
+                "z": -0.0
+              },
+              "Scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+              }
+            }
+          }
+        },
+        {
+          "Name": "NameComponent",
+          "Properties": {
+            "name": "Duckling4"
+          }
+        },
+        {
+          "Name": "TransformHierarchyComponent",
+          "Properties": {
+            "children": [
+            ],
+            "parent": 4294967295
+          }
+        },
+        {
+          "Name": "ArrowComponent",
+          "Properties": {
+            "color": {
+              "a": 1.0,
+              "b": 0.0,
+              "g": 0.9705882668495178,
+              "r": 1.0
+            },
+            "length": 1.0,
+            "thickness": 0.6000000238418579
+          }
+        },
+        {
+          "Name": "DucklingComponent",
+          "Properties": {
+            "speed": 1.0
+          }
+        }
+      ]
+    }
+  ],
+  "NavmeshPath": ""
+}

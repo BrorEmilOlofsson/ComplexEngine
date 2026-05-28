@@ -26,4 +26,24 @@ namespace CLX
 	{
 		return std::filesystem::absolute(SIMPLE_DIR_ASSETS);
 	}
+
+	inline std::filesystem::path GetAbsoluteSettingsPath()
+	{
+		return std::filesystem::absolute(std::filesystem::path(COMPLEX_DIR_SETTINGS));
+	}
+
+	inline std::filesystem::path GetAbsoluteProjectSettingsPath()
+	{
+		return std::filesystem::absolute(std::filesystem::path(COMPLEX_DIR_SETTINGS) / "project_settings.json");
+	}
+
+	inline std::filesystem::path GetAbsoluteGameSettingsPath()
+	{
+		return std::filesystem::absolute(std::filesystem::path(COMPLEX_DIR_SETTINGS) / "game_settings.json");
+	}
+
+	inline std::filesystem::path GetAbsoluteImGuiSettingsPath()
+	{
+		return std::filesystem::absolute(std::filesystem::path(COMPLEX_DIR_SETTINGS) / "imgui.ini");
+	}
 }

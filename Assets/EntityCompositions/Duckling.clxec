@@ -1,1 +1,65 @@
-{"Entities":[{"ID":0,"Components":[{"Name":"NameComponent","Properties":{"name":"Duckling"}},{"Name":"TransformComponent","Properties":{"transform":{"Position":{"x":0.0,"y":0.0,"z":0.0},"Rotation":{"x":0.0,"y":-0.0,"z":-0.0},"Scale":{"x":1.0,"y":1.0,"z":1.0}}}},{"Name":"TransformHierarchyComponent","Properties":{"children":[],"parent":4294967295}},{"Name":"ArrowComponent","Properties":{"color":{"a":1.0,"b":1.0,"g":0.8529412746429443,"r":0.0},"length":1.0,"thickness":0.6000000238418579}},{"Name":"DucklingComponent","Properties":{"speed":1.0}}]}]}
+{
+  "Entities": [
+    {
+      "ID": 0,
+      "SID": 3000,
+      "Components": [
+        {
+          "Name": "NameComponent",
+          "Properties": {
+            "name": "Duckling"
+          }
+        },
+        {
+          "Name": "TransformComponent",
+          "Properties": {
+            "transform": {
+              "Position": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "Rotation": {
+                "x": 0.0,
+                "y": -0.0,
+                "z": -0.0
+              },
+              "Scale": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+              }
+            }
+          }
+        },
+        {
+          "Name": "TransformHierarchyComponent",
+          "Properties": {
+            "children": [
+            ],
+            "parent": 4294967295
+          }
+        },
+        {
+          "Name": "ArrowComponent",
+          "Properties": {
+            "color": {
+              "a": 1.0,
+              "b": 1.0,
+              "g": 0.8529412746429443,
+              "r": 0.0
+            },
+            "length": 1.0,
+            "thickness": 0.6000000238418579
+          }
+        },
+        {
+          "Name": "DucklingComponent",
+          "Properties": {
+            "speed": 1.0
+          }
+        }
+      ]
+    }
+  ]
+}

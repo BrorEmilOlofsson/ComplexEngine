@@ -3,6 +3,7 @@
 #include <External/imgui/imgui_impl_win32.h>
 #include <External/imgui/imguizmo/ImGuizmo.h>
 #include <filesystem>
+#include "Engine/Utility/File/FileUtility.hpp"
 
 namespace CLX
 {
@@ -40,11 +41,11 @@ namespace CLX
 	{
 		IMGUI_CHECKVERSION();
 
-		ImGui::LoadIniSettingsFromDisk(std::filesystem::absolute(SIMPLE_SETTINGS_IMGUI).string().c_str());
+		ImGui::LoadIniSettingsFromDisk(GetAbsoluteImGuiSettingsPath().string().c_str());
 	}
 
 	void DX11ImGuiFoundation::Save()
 	{
-		ImGui::SaveIniSettingsToDisk(std::filesystem::absolute(SIMPLE_SETTINGS_IMGUI).string().c_str());
+		ImGui::SaveIniSettingsToDisk(GetAbsoluteImGuiSettingsPath().string().c_str());
 	}
 }

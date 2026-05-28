@@ -77,7 +77,7 @@ namespace CLX
 				if (ImGui::Selectable(WindowSizeToString(windowSizes[i]).c_str(), selectedIndex == i))
 				{
 					selectedWindowSizeIndex = i;
-					window.SetSize(windowSizes[i], false);
+					window.SetSize(windowSizes[i]);
 				}
 
 			}

@@ -99,6 +99,9 @@ namespace CLX
 		[[nodiscard]] constexpr T GetCenter() const noexcept;
 		[[nodiscard]] constexpr extent_t GetExtent() const noexcept;
 
+		[[nodiscard]] constexpr bool Contains(const T& value) const noexcept;
+        constexpr void ExpandToContain(const T& value) noexcept;
+
 	private:
 
 		constexpr void Assert();
@@ -197,6 +200,28 @@ namespace CLX
 	constexpr typename Bounds<T, BoundsChecker>::extent_t Bounds<T, BoundsChecker>::GetExtent() const noexcept
 	{
 		return static_cast<extent_t>(mMax - mMin);
+	}
+
+    template<typename T, typename BoundsChecker>
+    constexpr bool Bounds<T, BoundsChecker>::Contains(const T& value) const noexcept
+    {
+		return BoundsChecker{}(mMin, value) && BoundsChecker{}(value, mMax);
+    }
+
+	template<typename T, typename BoundsChecker>
+	constexpr void Bounds<T, BoundsChecker>::ExpandToContain(const T& value) noexcept
+	{
+		if (!Contains(value))
+		{
+			if (BoundsChecker{}(value, mMin))
+			{
+				mMin = value;
+			}
+			else
+			{
+				mMax = value;
+			}
+		}
 	}
 
 	template<typename T, typename BoundsChecker>
