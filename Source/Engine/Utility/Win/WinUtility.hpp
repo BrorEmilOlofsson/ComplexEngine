@@ -101,9 +101,9 @@ namespace CLX
 		return ToPoint(p);
 	}
 
-	[[nodiscard]] inline AABB2i GetMonitorRect()
+	[[nodiscard]] inline AABB2i GetMonitorRect(HWND hWND)
 	{
-		HMONITOR hMonitor = MonitorFromWindow(GetDesktopWindow(), MONITOR_DEFAULTTOPRIMARY);
+		HMONITOR hMonitor = MonitorFromWindow(hWND, MONITOR_DEFAULTTONEAREST);
 
 		MONITORINFOEX monitorInfo = { sizeof(MONITORINFOEX) };
 		GetMonitorInfo(hMonitor, &monitorInfo);
@@ -111,9 +111,14 @@ namespace CLX
 		return ToAABB<int>(monitorInfo.rcMonitor);
 	}
 
+	[[nodiscard]] inline AABB2i GetMonitorRect()
+	{
+		return GetMonitorRect(GetDesktopWindow());
+	}
+
 	inline void SetWindowFullscreen(HWND hWND)
 	{
-		AABB2i rect = GetMonitorRect();
+		AABB2i rect = GetMonitorRect(hWND);
 		DWORD style = GetWindowStyleCustom(hWND);
 		style &= ~WS_OVERLAPPEDWINDOW;
 		style |= WS_POPUP;

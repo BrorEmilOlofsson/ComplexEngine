@@ -151,15 +151,33 @@ namespace CLX
 		{
 			if (mResizeBuffer.fullScreen)
 			{
-				mResizeBuffer.windowedRect = GetBounds();
-				mResizeBuffer.windowedStyle = GetWindowStyleCustom(mHandle);
+				if (!mIsFullscreen)
+				{
+					mResizeBuffer.windowedRect = GetBounds();
+					mResizeBuffer.windowedStyle = GetWindowStyleCustom(mHandle);
+				}
 				SetWindowFullscreen(mHandle);
 				mIsFullscreen = true;
 			}
+			else if (mResizeBuffer.windowedFullScreen)
+			{
+				if (mIsFullscreen)
+				{
+					SetWindowStyle(mHandle, mResizeBuffer.windowedStyle);
+					SetWindowRect(mHandle, mResizeBuffer.windowedRect, SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
+					mIsFullscreen = false;
+				}
+
+				::ShowWindow(mHandle, SW_MAXIMIZE);
+			}
 			else
 			{
+				if (IsZoomed(mHandle))
+				{
+					::ShowWindow(mHandle, SW_RESTORE);
+				}
 				SetWindowStyle(mHandle, mResizeBuffer.windowedStyle);
-				SetWindowRect(mHandle, mResizeBuffer.windowedRect, SWP_NOZORDER | SWP_NOOWNERZORDER);
+				SetWindowRect(mHandle, mResizeBuffer.windowedRect, SWP_NOZORDER | SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
 				mIsFullscreen = false;
 			}
 
@@ -204,20 +222,27 @@ namespace CLX
 	void Win_Window::ToggleFullScreen()
 	{
 		mResizeBuffer.fullScreen = !mIsFullscreen;
+		mResizeBuffer.windowedFullScreen = false;
 		mHasCustomResized = true;
 	}
 
+    void Win_Window::SetTitle(const std::wstring& title)
+    {
+        SetWindowText(mHandle, title.c_str());
+    }
 
 	void Win_Window::SetSize(const WindowSizeSettings& sizeSettings)
 	{
 		if (std::holds_alternative<FullScreen>(sizeSettings))
 		{
 			mResizeBuffer.fullScreen = true;
+			mResizeBuffer.windowedFullScreen = false;
 		}
         else if (std::holds_alternative<Dimension2u>(sizeSettings))
 		{
 			const Dimension2u windowSize = std::get<Dimension2u>(sizeSettings);
 			mResizeBuffer.fullScreen = false;
+			mResizeBuffer.windowedFullScreen = false;
 			const AABB2i currentClientRect = GetClientBounds();
 			const Vector2f scale = static_cast<Vector2f>(ToVector2(windowSize)) / static_cast<Vector2f>(currentClientRect.GetExtent());
 			const AABB2i scaledClientAABB = ScaleAABB(currentClientRect, scale);
@@ -226,7 +251,8 @@ namespace CLX
 		}
         else if (std::holds_alternative<WindowedFullScreen>(sizeSettings))
         {
-
+			mResizeBuffer.fullScreen = false;
+			mResizeBuffer.windowedFullScreen = true;
         }
 		mHasCustomResized = true;
 	}

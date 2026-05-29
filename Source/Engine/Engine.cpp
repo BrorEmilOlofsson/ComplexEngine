@@ -83,6 +83,7 @@ namespace CLX
         settings.vSync = json["VSync"];
         settings.fullScreen = json["Full Screen"];
         settings.windowedFullScreen = json["Windowed Full Screen"];
+        settings.windowTitle = ToWString(std::string(json["Window Title"]));
         return settings;
     }
 
@@ -157,7 +158,7 @@ namespace CLX
 
         mAssetManager->LoadAssets();
         mOperatingSystem.Init();
-        mMainWindow = mOperatingSystem.MakeWindow(mLoadedGameSettings.windowSize, L"ComplexEngine");
+        mMainWindow = mOperatingSystem.MakeWindow(mLoadedGameSettings.windowSize, mLoadedGameSettings.windowTitle);
 
         if (mLoadedGameSettings.fullScreen)
         {
@@ -165,7 +166,7 @@ namespace CLX
         }
         else if (mLoadedGameSettings.windowedFullScreen)
         {
-            //mOperatingSystem.GetWindow(mMainWindow).SetSize(WindowedFullScreen{});
+            mOperatingSystem.GetWindow(mMainWindow).SetSize(WindowedFullScreen{});
         }
 
         mFrameTimer.Start();

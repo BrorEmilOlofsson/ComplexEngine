@@ -44,11 +44,6 @@ namespace CLX
 
 		[[nodiscard]] DWORD GetStyle() const noexcept;
 
-		/*[[nodiscard]] const WindowFrameBuffer& GetFrameBuffer() const noexcept
-		{
-			return mFrameBuffer;
-		}*/
-
 		void BeginFrame(const WindowFrameBuffer& frameBuffer);
 		void EndFrame(RenderContext* renderContext);
 
@@ -58,6 +53,7 @@ namespace CLX
 		void SetSize(const WindowSizeSettings& sizeSettings);
 		void SetRect(const AABB2i& rect, unsigned int flags);
 		void ToggleFullScreen();
+        void SetTitle(const std::wstring& title);
 
 		void CaptureCursor();
 		void ReleaseCursor();
@@ -88,8 +84,6 @@ namespace CLX
 		HWND mHandle{};
         std::unique_ptr<GraphicsWindowView> mGraphicsWindowView;
 
-		//WindowFrameBuffer mFrameBuffer;
-
 		bool mIsCursorCaptured = false;
 		Point2i mCapturedCursorPosition;
         Point2i mWindowMousePosition;
@@ -101,6 +95,7 @@ namespace CLX
 			AABB2i windowedRect;
 			DWORD windowedStyle{};
 			bool fullScreen = false;
+			bool windowedFullScreen = false;
 		};
 
 		ResizeBuffer mResizeBuffer;
@@ -126,6 +121,11 @@ namespace CLX
 	{
 		window.ToggleFullScreen();
 	}
+
+    inline void Window_SetTitle(Win_Window& window, const std::wstring& title)
+    {
+        window.SetTitle(title);
+    }
 
 	[[nodiscard]] inline void* GetWindowHandle(const Win_Window& window) noexcept
 	{

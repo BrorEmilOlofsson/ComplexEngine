@@ -16,7 +16,8 @@ namespace CLX
 			, captureCursorFunc([](void* window) -> void { return Window_CaptureCursor(*static_cast<T*>(window)); })
 			, releaseCursorFunc([](void* window) -> void { return Window_ReleaseCursor(*static_cast<T*>(window)); })
 			, setSizeFunc([](void* window, const WindowSizeSettings& sizeSettings) -> void { return Window_SetSize(*static_cast<T*>(window), sizeSettings); })
-			, toggleFullScreen([](void* window) -> void { return Window_ToggleFullScreen(*static_cast<T*>(window)); })
+			, toggleFullScreenFunc([](void* window) -> void { return Window_ToggleFullScreen(*static_cast<T*>(window)); })
+            , setTitleFunc([](void* window, const std::wstring& title) -> void { return Window_SetTitle(*static_cast<T*>(window), title); })
 		{
 		}
 
@@ -25,7 +26,8 @@ namespace CLX
 		void (*captureCursorFunc)(void*) = nullptr;
 		void (*releaseCursorFunc)(void*) = nullptr;
 		void (*setSizeFunc)(void*, const WindowSizeSettings&) = nullptr;
-		void (*toggleFullScreen)(void*) = nullptr;
+		void (*toggleFullScreenFunc)(void*) = nullptr;
+		void (*setTitleFunc)(void*, const std::wstring&) = nullptr;
 	};
 
 	struct WindowConstOperations final
@@ -72,7 +74,7 @@ namespace CLX
 
 		void ToggleFullScreen() const
 		{
-			mOperations.toggleFullScreen(mWindow);
+			mOperations.toggleFullScreenFunc(mWindow);
 		}
 
 		void CaptureCursor() const noexcept
@@ -84,6 +86,11 @@ namespace CLX
 		{
 			return mOperations.releaseCursorFunc(mWindow);
 		}
+
+        void SetTitle(const std::wstring& title) const
+        {
+            mOperations.setTitleFunc(mWindow, title);
+        }
 
 		[[nodiscard]] Dimension2u GetClientSize() const noexcept
 		{

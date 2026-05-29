@@ -10,5 +10,6 @@
     "Height": 900
   },
   "Full Screen": false,
-  "Windowed Full Screen": true
+  "Windowed Full Screen": true,
+  "Window Title": "Complex Engine"
 }

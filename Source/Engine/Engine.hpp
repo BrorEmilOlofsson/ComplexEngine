@@ -28,6 +28,7 @@ namespace CLX
 		bool vSync = false;
         bool fullScreen = false;
         bool windowedFullScreen = false;
+        std::wstring windowTitle = L"ComplexEngine";
 	};
 
 	class Engine final
