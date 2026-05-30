@@ -21,8 +21,8 @@ namespace CLX
 		float moveSpeed = 10.f;
 		float rotationSpeed = 20.f;
 		bool freeFly = false;
-		bool mouseIsTapped = false;
-		float mouseTapTimer = 0.f;
+		bool mouseIsHeld = false;
+		float mouseHeldTimer = 0.f;
 		CameraControls controls;
 	};
 

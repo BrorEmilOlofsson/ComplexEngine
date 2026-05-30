@@ -59,11 +59,11 @@ namespace CLX
 			}
 
 			settings.freeFly = false;
-			settings.mouseIsTapped = false;
+			settings.mouseIsHeld = false;
 			return;
 		}
 
-		if (input.IsKeyPressed(eInputKey::Tab) && !settings.mouseIsTapped)
+		if (input.IsKeyPressed(eInputKey::Tab) && !settings.mouseIsHeld)
 		{
 			settings.freeFly = !settings.freeFly;
 		}
@@ -72,21 +72,21 @@ namespace CLX
 
 		if (heldRMB)
 		{
-			settings.mouseTapTimer += deltaTime;
+			settings.mouseHeldTimer += deltaTime;
 
-			if (settings.mouseTapTimer > 0.12f)
+			if (settings.mouseHeldTimer > 0.12f)
 			{
-				settings.mouseTapTimer = 0.0f;
-				settings.mouseIsTapped = true;
+				settings.mouseHeldTimer = 0.0f;
+				settings.mouseIsHeld = true;
 			}
 		}
 		else
 		{
-			settings.mouseTapTimer = 0.0f;
-			settings.mouseIsTapped = false;
+			settings.mouseHeldTimer = 0.0f;
+			settings.mouseIsHeld = false;
 		}
 
-		if (settings.freeFly || settings.mouseIsTapped)
+		if (settings.freeFly || settings.mouseIsHeld)
 		{
 			if (os.IsCursorVisible())
 			{

@@ -120,7 +120,7 @@ namespace CLX
         }
     }
 
-    static void CheckForEntityCompositionDrops(ECSHandle ecsHandle, AssetManager& assetManager, EntityCompositionInstantiationManager& entityInstantiations, 
+    static void CheckForEntityCompositionDrops(ECSHandle ecsHandle, AssetManager& assetManager, EntityCompositionInstantiationManager& entityInstantiations,
         std::vector<EntityID>& rootEntities, std::set<EntityID>& selectedEntityIDs,
         const DataTypeRegistry& dataTypeRegistry, EditorCommandTracker& commandTracker)
     {
@@ -192,7 +192,7 @@ namespace CLX
     void SceneWindowPopUp::UpdateInternal(const Blackboard& blackboard)
     {
         const bool isOpen = ImGui::Begin(WindowName, nullptr, ImGuiWindowFlags_NoScrollbar);
-        
+
         ImGuiUtility::CheckForWindowFocus();
 
         const bool isFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
@@ -202,24 +202,45 @@ namespace CLX
             renderRect = AABB2i::FromDefaultAndExtent(Vector2u(100, 100));
         }
 
-
         ImGui::End();
+
+        SceneManager& sceneManager = blackboard.Get<Key_SceneManager>();
+        RenderState& sceneRenderState = sceneManager.GetActiveScene()->GetRenderState();
+        const WindowView windowView = blackboard.Get<Key_WindowView>();
+        FreeFlyCameraSettings& cameraSettings = blackboard.Get<Key_FreeFlyCameraSettings>();
+        const float deltaTime = blackboard.Get<Key_DeltaTime>();
+        const InputState& input = blackboard.Get<Key_InputState>();
+        OperatingSystem& os = blackboard.Get<Key_OperatingSystem>();
+
 
         if (blackboard.Get<Key_IsPlaying>())
         {
+            if (isOpen && isFocused)
+            {
+                if (input.IsKeyPressed(eInputKey::C) && isFocused)
+                {
+                    mUseEditorCameraWhenPlaying = !mUseEditorCameraWhenPlaying;
+                }
+            }
+
+            if (mUseEditorCameraWhenPlaying)
+            {
+                if (isOpen && isFocused)
+                {
+                    UpdateEditorCamera(mCamera, cameraSettings, deltaTime, windowView, input, os);
+                }
+                sceneRenderState.SetCamera(mCamera);
+            }
+
             return;
         }
+        else
+        {
+            mUseEditorCameraWhenPlaying = false;
+        }
 
-        const WindowView windowView = blackboard.Get<Key_WindowView>();
-        const InputState& input = blackboard.Get<Key_InputState>();
-        const float deltaTime = blackboard.Get<Key_DeltaTime>();
-        OperatingSystem& os = blackboard.Get<Key_OperatingSystem>();
         EditorCommandTracker& commandTracker = blackboard.Get<Key_CommandTracker>();
-        FreeFlyCameraSettings& cameraSettings = blackboard.Get<Key_FreeFlyCameraSettings>();
 
-        SceneManager& sceneManager = blackboard.Get<Key_SceneManager>();
-
-        RenderState& sceneRenderState = sceneManager.GetActiveScene()->GetRenderState();
         EditorSceneSettings& editorSceneSettings = blackboard.Get<Key_EditorSceneSettings>();
 
         UpdateTransformOperation(os.IsCursorVisible(), input, editorSceneSettings.transformOperation);
@@ -243,7 +264,6 @@ namespace CLX
                 RenderGrid3(grid, Colors::Gray, sceneRenderState.GetRenderList());
             }
 
-
             sceneRenderState.SetRenderRect(renderRect);
             mCamera.SetResolution(GetDimension(renderRect));
 
@@ -257,7 +277,6 @@ namespace CLX
                     TeleportCameraToEntity(sceneManager.GetActiveScene()->GetECS(), entityID, mCamera, false);
                 }
             }
-
         }
 
         sceneRenderState.SetCamera(mCamera);
@@ -272,18 +291,18 @@ namespace CLX
         Blackboard newBlackboard = blackboard;
         newBlackboard.Insert<Key_CurrentRenderState>(activeScene.GetRenderState());
         EditorCommandTracker& commandTracker = blackboard.Get<Key_CommandTracker>();
-        //const InputState& input = blackboard.Get<Key_InputState>();
-        //OperatingSystem& os = blackboard.Get<Key_OperatingSystem>();
         AssetManager& assetManager = blackboard.Get<Key_AssetManager>();
         EditorSceneSettings& editorSceneSettings = blackboard.Get<Key_EditorSceneSettings>();
         const DataTypeRegistry& dataTypeRegistry = blackboard.Get<Key_DataTypeRegistry>();
         EntityCompositionInstantiationManager& compositionInstantiations = blackboard.Get<Key_EntityCompositionInstantiationManager>();
 
         const WindowView windowView = blackboard.Get<Key_WindowView>();
-        void* sceneTextureID = activeScene.GetRenderState().GetRenderContext()->GetOutputSRV();
+        void* const sceneTextureID = activeScene.GetRenderState().GetRenderContext()->GetOutputSRV();
         RenderState& sceneRenderState = activeScene.GetRenderState();
         mHierarchyPopUp.Render(newBlackboard);
         mInspectorPopUp.Render(newBlackboard);
+
+        const bool isPlaying = blackboard.Get<Key_IsPlaying>();
 
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 3));
@@ -307,7 +326,7 @@ namespace CLX
                 commandTracker
             );
 
-            if (mHierarchyPopUp.GetSelectedEntityIDs().size() == 1)
+            if (mHierarchyPopUp.GetSelectedEntityIDs().size() == 1 && !isPlaying)
             {
                 ShowEntityImGuizmo(
                     activeScene.GetECS(),
@@ -321,8 +340,6 @@ namespace CLX
                     mGuizmoID,
                     isWindowFocused,
                     mTransformEntityData,
-                    //input,
-                    //os.IsCursorVisible(),
                     commandTracker
                 );
             }

@@ -198,9 +198,9 @@ namespace CLX
     }
 
     template<std::floating_point T>
-    [[nodiscard]] constexpr Transform3<T> ToLocalSpace(const Transform3<T>& local, const Transform3<T>& parent)
+    [[nodiscard]] constexpr Transform3<T> ToLocalSpace(const Transform3<T>& child, const Transform3<T>& parent)
     {
-        return Transform3<T>::FromMatrix(ToLocalSpace(local.GetMatrix(), parent.GetMatrix()));
+        return Transform3<T>::FromMatrix(ToLocalSpace(child.GetMatrix(), parent.GetMatrix()));
     }
 
     template<typename T>

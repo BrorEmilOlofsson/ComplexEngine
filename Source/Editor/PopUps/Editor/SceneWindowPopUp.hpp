@@ -24,6 +24,7 @@ namespace CLX
 		SceneHierarchyPopUp mHierarchyPopUp;
 		SceneInspectorPopUp mInspectorPopUp;
 		Camera mCamera;
+		bool mUseEditorCameraWhenPlaying = false;
 		// TODO: Refactor
 		int mGuizmoID = -1;
 

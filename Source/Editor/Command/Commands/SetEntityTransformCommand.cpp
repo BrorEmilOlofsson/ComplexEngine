@@ -1,16 +1,9 @@
 #include "Editor/Precompiled/EditorPch.hpp"
 #include "SetEntityTransformCommand.hpp"
-#include "Engine/ECSEngine/Components/TransformComponent.hpp"
-#include "Engine/ECS/ECS.hpp"
+#include "Engine/ECSEngine/Utility/ECSUtilityFunctions.hpp"
 
 namespace CLX
 {
-	void SetEntityTransform(ECS& ecs, EntityID entityID, const Transform& transform)
-	{
-		TransformComponent* transformComponent = ecs.GetComponent<TransformComponent>(entityID);
-
-		transformComponent->transform = transform;
-	}
 
 	void SetEntityTransformCommand::Execute() const
 	{

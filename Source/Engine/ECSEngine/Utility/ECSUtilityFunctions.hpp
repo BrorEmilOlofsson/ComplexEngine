@@ -178,27 +178,6 @@ namespace CLX
         return ecs.GetComponent<TransformHierarchyComponent>(entityID)->parent;
     }
 
-    template<typename T>
-    [[nodiscard]] bool HasAnyAncestorComponent(const ECS& ecs, const EntityID entityID)
-    {
-        if (ecs.HasComponent<T>(entityID))
-        {
-            return true;
-        }
-
-        EntityID parentID = GetParentEntity(ecs, entityID);
-        while (parentID != InvalidEntityID)
-        {
-            if (ecs.HasComponent<T>(entityID))
-            {
-                return true;
-            }
-            parentID = GetParentEntity(ecs, entityID);
-        }
-
-        return false;
-    }
-
     [[nodiscard]] inline std::vector<EntityID> GetEntityAncestors(const ECS& ecs, const EntityID entityID, bool includeSelf = false)
     {
         std::vector<EntityID> ancestors;
@@ -261,6 +240,27 @@ namespace CLX
         }
 
         return worldTransform;
+    }
+
+    inline void SetEntityTransform(ECS& ecs, const EntityID entityID, const Transform& transform)
+    {
+        TransformComponent* transformComponent = ecs.GetComponent<TransformComponent>(entityID);
+        ASSERT(transformComponent != nullptr);
+        transformComponent->transform = transform;
+    }
+
+    inline void SetEntityWorldTransform(ECS& ecs, const EntityID entityID, const Transform& transform)
+    {
+        const EntityID parentID = GetParentEntity(ecs, entityID);
+        if (parentID == InvalidEntityID)
+        {
+            SetEntityTransform(ecs, entityID, transform);
+            return;
+        }
+
+        const Transform parentWorldTransform = GetEntityWorldTransform(ecs, parentID);
+
+        SetEntityTransform(ecs, entityID, ToLocalSpace(transform, parentWorldTransform));
     }
 
     [[nodiscard]] inline const std::string& GetEntityName(const ECS& ecs, const EntityID entityID)

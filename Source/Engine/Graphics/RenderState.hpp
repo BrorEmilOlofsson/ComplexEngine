@@ -38,6 +38,8 @@ namespace CLX
 		constexpr void SetCamera(const Camera& camera) noexcept;
 		constexpr void SetRenderRect(const AABB2i& renderRect) noexcept;
 		constexpr void SetRenderContext(RenderContext&& renderContext);
+		constexpr void SetRenderList(const RenderList& renderList);
+
 
 		constexpr void Reset();
 
@@ -130,6 +132,11 @@ namespace CLX
 	constexpr void RenderState::SetRenderContext(RenderContext&& renderContext)
 	{
 		mRenderContext = std::make_unique<RenderContext>(std::move(renderContext));
+	}
+
+	constexpr void RenderState::SetRenderList(const RenderList& renderList)
+	{
+		mRenderList = renderList;
 	}
 
 	constexpr void RenderState::Reset()

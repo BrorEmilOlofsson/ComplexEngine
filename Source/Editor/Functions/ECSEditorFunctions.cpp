@@ -131,7 +131,7 @@ namespace CLX
     }
 
 
-    static std::map<EntityID, EntityID> PasteEntityHierarchy(ECS& targetECS, const ECS& sourceECS, const EntityID entityID, const EntityID targetParentID, 
+    static std::map<EntityID, EntityID> PasteEntityHierarchy(ECS& targetECS, const ECS& sourceECS, const EntityID entityID, const EntityID targetParentID,
         const IndexVariant childIndex, const DataTypeRegistry& dataTypeRegistry)
     {
         const EntityID createdEntityID = sourceECS.CopyEntity(entityID, targetECS);
@@ -159,12 +159,12 @@ namespace CLX
             SetParentEntity(targetECS, targetParentID, createdEntityID, childIndex);
 
         }
-     /*   const EntityID parentID = GetParentEntity(targetECS, entityID);
-        ASSERT(parentID == GetParentEntity(targetECS, createdEntityID));
-        if (parentID != InvalidEntityID)
-        {
-            AddBasedOnChildIndexVariant(targetECS.GetComponent<TransformHierarchyComponent>(parentID)->children, createdEntityID, childIndex);
-        }*/
+        /*   const EntityID parentID = GetParentEntity(targetECS, entityID);
+           ASSERT(parentID == GetParentEntity(targetECS, createdEntityID));
+           if (parentID != InvalidEntityID)
+           {
+               AddBasedOnChildIndexVariant(targetECS.GetComponent<TransformHierarchyComponent>(parentID)->children, createdEntityID, childIndex);
+           }*/
 
         return oldToNewEntityIDMap;
     }
@@ -276,12 +276,12 @@ namespace CLX
     {
         return PasteEntityHierarchy(
             ecs,
-            ecs, 
-            entityID, 
-            GetParentEntity(ecs, entityID), 
-            rootEntities, 
-            indexVariant, 
-            dataTypeRegistry, 
+            ecs,
+            entityID,
+            GetParentEntity(ecs, entityID),
+            rootEntities,
+            indexVariant,
+            dataTypeRegistry,
             commandTracker
         );
     }
@@ -882,12 +882,47 @@ namespace CLX
             };
     }
 
+    void SetEntityWorldTransform(ECS& ecs, const EntityID entityID, const Transform& newTransform, EditorCommandTracker& commandTracker)
+    {
+        struct SetEntityWorldTransformData final
+        {
+            std::reference_wrapper<ECS> ecs;
+            EntityID entityID;
+            Transform newTransform;
+            Transform oldTransform;
+        };
+
+        const Transform oldTransform = GetEntityWorldTransform(ecs, entityID);
+
+        SetEntityWorldTransformData data
+        {
+            .ecs = ecs,
+            .entityID = entityID,
+            .newTransform = newTransform,
+            .oldTransform = oldTransform
+        };
+
+        auto doCommand = [](const SetEntityWorldTransformData& data)
+            {
+                SetEntityWorldTransform(data.ecs, data.entityID, data.newTransform);
+            };
+
+        auto undoCommand = [](const SetEntityWorldTransformData& data)
+            {
+                SetEntityWorldTransform(data.ecs, data.entityID, data.oldTransform);
+            };
+
+        commandTracker.ExecuteCommand(EditorCommand(data, doCommand, undoCommand, "Set Entity World Transform"));
+    }
+
 
     [[nodiscard]] void OnEntityDroppedOnEntity(ECS& ecs, const EntityID parentID, const EntityID childID, std::vector<EntityID>& rootEntities, std::set<EntityID>& selectedEntityIDs, EditorCommandTracker& commandTracker)
     {
         commandTracker.BeginComposite("Set Parent Entity + Select Entity");
+        const Transform childWorldTransform = GetEntityWorldTransform(ecs, childID);
         SetParentEntity(ecs, parentID, childID, rootEntities, commandTracker);
         SetEntitySelection(childID, selectedEntityIDs, commandTracker);
+        SetEntityWorldTransform(ecs, childID, childWorldTransform, commandTracker);
         commandTracker.EndComposite();
     }
 
@@ -1075,7 +1110,7 @@ namespace CLX
 
     [[nodiscard]] static std::vector<EditorAction> ShowEntityChildren(ECS& ecs, const EntityID entityID, std::set<EntityID>& selectedEntityIDs,
         std::vector<EntityID>& rootEntities, const std::span<const EntityID> parentEntities, const std::string& imGuiTag, const std::set<EntityID>& uneditableEntities,
-        const DataTypeRegistry& dataTypeRegistry, const std::function<bool(EntityID)>& filter)
+        const DataTypeRegistry& dataTypeRegistry, const std::function<bool(EntityID)>& filter, bool& openedEntityOptionsPopup)
     {
         std::vector<EditorAction> editorActions;
         const bool isSelected = selectedEntityIDs.contains(entityID);
@@ -1102,7 +1137,6 @@ namespace CLX
 
         const bool isLeftClicked = ImGui::IsItemHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Left);
         const bool isRightClicked = ImGui::IsItemHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Right);
-
         const bool isAppendKeyDown = (ImGui::IsKeyDown(ImGuiMod_Ctrl) || ImGui::IsKeyDown(ImGuiMod_Shift));
         const bool shouldAddToSelection = !isSelected && isAppendKeyDown && isLeftClicked;
         const bool shouldSetEntitySelection = (isLeftClicked && !ImGui::IsItemToggledOpen() && !isAppendKeyDown) || (isRightClicked && !isSelected);
@@ -1123,6 +1157,7 @@ namespace CLX
             if (isRightClicked && !isUneditable)
             {
                 ImGui::OpenPopup(entityOptionsPopUpName.c_str());
+                openedEntityOptionsPopup = true;
             }
 
             InsertRange(editorActions, ShowEntityOptionsPopUp(entityOptionsPopUpName, ecs, entityID, selectedEntityIDs, rootEntities, dataTypeRegistry, imGuiTag));
@@ -1140,7 +1175,7 @@ namespace CLX
                 {
                     continue;
                 }
-                InsertRange(editorActions, ShowEntityChildren(ecs, childEntityID, selectedEntityIDs, rootEntities, parentEntities, imGuiTag, uneditableEntities, dataTypeRegistry, filter));
+                InsertRange(editorActions, ShowEntityChildren(ecs, childEntityID, selectedEntityIDs, rootEntities, parentEntities, imGuiTag, uneditableEntities, dataTypeRegistry, filter, openedEntityOptionsPopup));
             }
 
             if (!children.empty())
@@ -1205,6 +1240,8 @@ namespace CLX
                     }
                 }
             }
+
+            bool openedEntityOptionsPopup = false;
             for (const EntityID rootEntityID : rootEntities)
             {
                 if (!filter(rootEntityID))
@@ -1220,7 +1257,8 @@ namespace CLX
                     imGuiTag,
                     uneditableEntities,
                     dataTypeRegistry,
-                    filter
+                    filter,
+                    openedEntityOptionsPopup
                 ));
             }
 
@@ -1229,15 +1267,15 @@ namespace CLX
                 InsertRange(editorActions, ShowEntityDropSpaceTarget(ecs, rootEntities.back(), true, rootEntities, selectedEntityIDs));
             }
 
+            const ImVec2 min = ImGui::GetWindowContentRegionMin();
+            const ImVec2 max = ImGui::GetWindowContentRegionMax();
 
-            ImVec2 min = ImGui::GetWindowContentRegionMin();
-            ImVec2 max = ImGui::GetWindowContentRegionMax();
-
-            ImVec2 screenMin = ImGui::GetWindowPos() + min;
-            ImVec2 screenMax = ImGui::GetWindowPos() + max;
+            const ImVec2 screenMin = ImGui::GetWindowPos() + min;
+            const ImVec2 screenMax = ImGui::GetWindowPos() + max;
 
             ImGui::SetCursorScreenPos(screenMin);
             ImGui::InvisibleButton("##ListBoxDropRegion", screenMax - screenMin);
+            const bool openPopup = ImGui::IsItemHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Right) && !openedEntityOptionsPopup;
             if (auto entityCompositionPath = ObjectTarget<AssetPath_EntityComposition>())
             {
                 EntityCompositionAssetHandle handle = assetManager.GetEntityComposition(std::filesystem::path(entityCompositionPath.value().Value().mData));
@@ -1268,6 +1306,57 @@ namespace CLX
                         commandTracker
                     );
                 }
+            }
+
+            if (openPopup)
+            {
+                ImGui::OpenPopup("EntityHierarchyContextMenu");
+            }
+
+            bool shouldOpenAddEntityCompositionPopup = false;
+            if (ImGui::BeginPopup("EntityHierarchyContextMenu"))
+            {
+                if (ImGui::MenuItem(("Create Entity" + imGuiTag).c_str()))
+                {
+                    commandTracker.BeginComposite("Create Entity + Select Entity");
+                    const EntityID createdEntityID = CreateEntity(ecs, rootEntities, InvalidEntityID, commandTracker);
+                    SetEntitySelection(createdEntityID, selectedEntityIDs, commandTracker);
+                    commandTracker.EndComposite();
+                }
+
+                shouldOpenAddEntityCompositionPopup = ImGui::MenuItem("Add Entity Composition");
+
+
+
+                ImGui::EndPopup();
+
+            }
+
+            if (shouldOpenAddEntityCompositionPopup)
+            {
+                ImGui::OpenPopup("AddEntityCompositionPopup");
+            }
+
+            if (ImGui::BeginPopup("AddEntityCompositionPopup"))
+            {
+                for (const auto& [assetPath, assetHandle] : assetManager.GetAssets<EntityComposition>())
+                {
+                    if (ImGui::MenuItem(assetPath.string().c_str()))
+                    {
+                        InstantiateEntityCompositionAndSelectRoot(
+                            ecsHandle,
+                            EntityCompositionAssetHandle(assetHandle),
+                            InvalidEntityID,
+                            compositionInstantiations,
+                            rootEntities,
+                            selectedEntityIDs,
+                            dataTypeRegistry,
+                            commandTracker
+                        );
+                        break;
+                    }
+                }
+                ImGui::EndPopup();
             }
 
             ImGui::EndListBox();
@@ -1896,7 +1985,7 @@ namespace CLX
                 std::move(newValue),
                 storedComponent,
                 blackboard.Get<Key_DataTypeRegistry>()
-                );
+            );
             editorActions.push_back(std::move(action));
 
             storedComponent = {};
