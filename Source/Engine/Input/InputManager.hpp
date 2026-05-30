@@ -1,6 +1,10 @@
 #pragma once
+#include <memory>
+#include <type_traits>
+#include <vector>
+#include "InputKey.hpp"
 #include <unordered_map>
-#include <queue>
+#include <vector>
 #include "Engine/Input/InputState.hpp"
 
 namespace CLX
@@ -91,7 +95,7 @@ namespace CLX
 	{
 	public:
 
-		constexpr InputManager() = default;
+		InputManager() = default;
 
 
 

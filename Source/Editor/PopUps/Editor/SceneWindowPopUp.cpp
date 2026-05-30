@@ -66,6 +66,22 @@ namespace CLX
         ImGuizmo::ViewManipulate(view.GetDataPtr(), 16, cubePos, ImVec2(cubeSize, cubeSize), 0);
     }
 
+    void StartOrEndPlay(const bool startPlaying, Editor& editor, SceneManager& sceneManager)
+    {
+        if (startPlaying)
+        {
+            sceneManager.SetIsPlaying(true);
+            sceneManager.BeginPlay();
+            editor.OnSceneBeginPlay(sceneManager.GetActiveScene().Get());
+        }
+        else
+        {
+            editor.OnSceneEndPlay(sceneManager.GetActiveScene().Get());
+            sceneManager.EndPlay();
+            sceneManager.SetIsPlaying(false);
+        }
+    }
+
     static void RenderPlayButton(Editor& editor, SceneManager& sceneManager)
     {
         ImGuiStyleManager& imguiStyleManager = editor.GetImGuiStyleManager();
@@ -97,18 +113,7 @@ namespace CLX
             {
                 const bool startPlaying = !isPlaying;
 
-                if (startPlaying)
-                {
-                    sceneManager.SetIsPlaying(true);
-                    sceneManager.BeginPlay();
-                    editor.OnSceneBeginPlay(sceneManager.GetActiveScene().Get());
-                }
-                else
-                {
-                    sceneManager.SetIsPlaying(false);
-                    editor.OnSceneEndPlay(sceneManager.GetActiveScene().Get());
-                    sceneManager.EndPlay();
-                }
+                StartOrEndPlay(startPlaying, editor, sceneManager);
             }
 
             if (isPlaying)
@@ -183,10 +188,10 @@ namespace CLX
 
     SceneWindowPopUp::SceneWindowPopUp()
         : mHierarchyPopUp("Hierarchy")
-        , mInspectorPopUp("Inspector", &mHierarchyPopUp, &mCamera)
+        , mInspectorPopUp("Inspector", &mHierarchyPopUp, &mEditorCamera)
     {
-        mCamera.SetRotation(ToRotationMatrix(Rotatorf(Degreesf(25), Degreesf(0), Degreesf(0))));
-        mCamera.SetPosition(Point3f(1, 9, -12));
+        mEditorCamera.SetRotation(ToRotationMatrix(Rotatorf(Degreesf(25), Degreesf(0), Degreesf(0))));
+        mEditorCamera.SetPosition(Point3f(1, 9, -12));
     }
 
     void SceneWindowPopUp::UpdateInternal(const Blackboard& blackboard)
@@ -211,15 +216,34 @@ namespace CLX
         const float deltaTime = blackboard.Get<Key_DeltaTime>();
         const InputState& input = blackboard.Get<Key_InputState>();
         OperatingSystem& os = blackboard.Get<Key_OperatingSystem>();
+        Editor& editor = blackboard.Get<Key_Editor>();
 
+        const bool isPlaying = blackboard.Get<Key_IsPlaying>();
 
-        if (blackboard.Get<Key_IsPlaying>())
+        if (isPlaying)
         {
             if (isOpen && isFocused)
             {
-                if (input.IsKeyPressed(eInputKey::C) && isFocused)
+                if (input.IsKeyPressed(eInputKey::C))
                 {
+                    if (!mUseEditorCameraWhenPlaying)
+                    {
+                        if (sceneRenderState.GetCamera().has_value())
+                        {
+                            mInGameCamera = sceneRenderState.GetCamera().value();
+                        }
+                        else
+                        {
+                            mInGameCamera = mEditorCamera;
+                        }
+                    }
+
                     mUseEditorCameraWhenPlaying = !mUseEditorCameraWhenPlaying;
+                }
+
+                if (input.IsKeyPressed(eInputKey::Esc))
+                {
+                    StartOrEndPlay(false, editor, sceneManager);
                 }
             }
 
@@ -227,9 +251,9 @@ namespace CLX
             {
                 if (isOpen && isFocused)
                 {
-                    UpdateEditorCamera(mCamera, cameraSettings, deltaTime, windowView, input, os);
+                    UpdateEditorCamera(mInGameCamera, cameraSettings, deltaTime, windowView, input, os);
                 }
-                sceneRenderState.SetCamera(mCamera);
+                sceneRenderState.SetCamera(mInGameCamera);
             }
 
             return;
@@ -249,7 +273,7 @@ namespace CLX
         {
             if (isFocused)
             {
-                UpdateEditorCamera(mCamera, cameraSettings, deltaTime, windowView, input, os);
+                UpdateEditorCamera(mEditorCamera, cameraSettings, deltaTime, windowView, input, os);
             }
 
             if (editorSceneSettings.showGrid)
@@ -265,21 +289,21 @@ namespace CLX
             }
 
             sceneRenderState.SetRenderRect(renderRect);
-            mCamera.SetResolution(GetDimension(renderRect));
+            mEditorCamera.SetResolution(GetDimension(renderRect));
 
             UpdateEntitySceneClickSelection(input, os, sceneRenderState, mHierarchyPopUp.GetSelectedEntityIDs(), commandTracker);
 
-            if (input.IsKeyPressed(eInputKey::F) && isFocused)
+            if (input.IsKeyPressed(eInputKey::F) && isFocused && !isPlaying)
             {
                 if (mHierarchyPopUp.GetSelectedEntityIDs().size() == 1)
                 {
                     const EntityID entityID = *mHierarchyPopUp.GetSelectedEntityIDs().begin();
-                    TeleportCameraToEntity(sceneManager.GetActiveScene()->GetECS(), entityID, mCamera, false);
+                    TeleportCameraToEntity(sceneManager.GetActiveScene()->GetECS(), entityID, mEditorCamera, false);
                 }
             }
         }
 
-        sceneRenderState.SetCamera(mCamera);
+        sceneRenderState.SetCamera(mEditorCamera);
     }
 
     void SceneWindowPopUp::Render(const Blackboard& blackboard)
@@ -311,7 +335,7 @@ namespace CLX
         {
             const bool isWindowFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
 
-            RenderOrientationCube(mCamera);
+            RenderOrientationCube(mEditorCamera);
 
             const AABB2i renderRect = RenderImage(sceneTextureID);
             //assert(renderRect == sceneRenderState.GetRenderRect().value());
@@ -333,7 +357,7 @@ namespace CLX
                     *mHierarchyPopUp.GetSelectedEntityIDs().begin(),
                     editorSceneSettings.transformMode,
                     editorSceneSettings.transformOperation,
-                    mCamera,
+                    mEditorCamera,
                     sceneRenderState.GetRenderRect().value(),
                     editorSceneSettings.useSnap,
                     editorSceneSettings.snapValue,

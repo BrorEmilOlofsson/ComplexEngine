@@ -23,7 +23,8 @@ namespace CLX
 		TransformEntityData mTransformEntityData;
 		SceneHierarchyPopUp mHierarchyPopUp;
 		SceneInspectorPopUp mInspectorPopUp;
-		Camera mCamera;
+		Camera mEditorCamera;
+		Camera mInGameCamera;
 		bool mUseEditorCameraWhenPlaying = false;
 		// TODO: Refactor
 		int mGuizmoID = -1;

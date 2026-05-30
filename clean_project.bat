@@ -2,7 +2,6 @@
 
 
 del *.sln
-del /q Source\Launcher\Resources\*.aps
 
 rmdir /s /q .vs
 

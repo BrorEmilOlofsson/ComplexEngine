@@ -286,7 +286,8 @@ namespace CLX
 
         static Point3f audioPosition = Point3f::Zero();
         static float audioVolume = 1.0f;
-        static bool stop = false;
+        static bool stop = true;
+        mAudioManager.SetChannelPaused(channelId, stop);
         ImGui::Begin("Audio Test");
         if (ImGui::DragFloat3("Audio Position", &audioPosition.x, 0.001f))
         {
