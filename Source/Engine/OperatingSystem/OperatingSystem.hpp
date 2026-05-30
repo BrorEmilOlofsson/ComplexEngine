@@ -22,18 +22,14 @@ namespace CLX
 		{
 		}
 
-		void BeginFrame(const GraphicsBufferData& bufferData);
+		void BeginFrame();
 		void EndFrame(RenderContext* renderContext);
-
-		void Init();
-		void Shutdown();
 
 		[[nodiscard]] WindowView GetWindow(WindowHandle windowHandle);
 		[[nodiscard]] CWindowView GetWindow(WindowHandle windowHandle) const;
 		WindowHandle MakeWindow(Dimension2u size, std::wstring title);
 
-        [[nodiscard]] GraphicsFoundation& GetGraphicsFoundation();
-        [[nodiscard]] const GraphicsFoundation& GetGraphicsFoundation() const;
+        void SetGraphicsFoundation(GraphicsFoundation* graphicsFoundation) { mConcept->SetGraphicsFoundation(graphicsFoundation); }
         [[nodiscard]] const InputState& GetInputState() const;
 
 		void LoadCursors(const std::filesystem::path& path);
@@ -53,15 +49,12 @@ namespace CLX
 			OperatingSystemConcept() = default;
 			virtual ~OperatingSystemConcept() = default;
 
-			virtual void BeginFrame(const GraphicsBufferData& data) = 0;
+			virtual void BeginFrame() = 0;
 			virtual void EndFrame(RenderContext* renderContext) = 0;
-			virtual void Init() = 0;
-			virtual void Shutdown() = 0;
 			virtual WindowView GetWindow(WindowHandle windowHandle) = 0;
 			virtual CWindowView GetCWindow(WindowHandle windowHandle) const = 0;
 			virtual WindowHandle MakeWindow(Dimension2u size, std::wstring title) = 0;
-            virtual GraphicsFoundation& GetGraphicsFoundation() = 0;
-            virtual const GraphicsFoundation& GetGraphicsFoundation() const = 0;
+            virtual void SetGraphicsFoundation(GraphicsFoundation* graphicsFoundation) = 0;
             virtual const InputState& GetInputState() const = 0;
 			virtual void LoadCursors(const std::filesystem::path& path) = 0;
             virtual const WindowFrameBuffer& GetFrameBuffer() const = 0;
@@ -83,24 +76,14 @@ namespace CLX
 			{
 			}
 
-			void BeginFrame(const GraphicsBufferData& data) override
+			void BeginFrame() override
 			{
-				OSBeginFrame(mObject, data);
+				OSBeginFrame(mObject);
 			}
 
 			void EndFrame(RenderContext* renderContext) override
 			{
 				OSEndFrame(mObject, renderContext);
-			}
-
-			void Init() override
-			{
-				OSInit(mObject);
-			}
-
-			void Shutdown() override
-			{
-				OSShutdown(mObject);
 			}
 
 			WindowView GetWindow(WindowHandle windowHandle) override
@@ -120,15 +103,10 @@ namespace CLX
 				return OSCreateWindow(mObject, size, title);
 			}
 
-			GraphicsFoundation& GetGraphicsFoundation() override
+			void SetGraphicsFoundation(GraphicsFoundation* graphicsFoundation) override
 			{
-				return OSGetGraphicsFoundation(mObject);
+                OSSetGraphicsFoundation(mObject, graphicsFoundation);
 			}
-
-			const GraphicsFoundation& GetGraphicsFoundation() const override
-			{
-				return OSGetGraphicsFoundation(mObject);
-            }
 
 			const InputState& GetInputState() const override
 			{

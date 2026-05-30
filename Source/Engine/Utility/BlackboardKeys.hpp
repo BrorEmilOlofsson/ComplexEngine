@@ -23,6 +23,7 @@ namespace CLX
 	using Key_DataTypeRegistry = BlackboardKey<class DataTypeRegistry&, "DataTypeRegistry">;
 	using Key_InputState = BlackboardKey<const class InputState&, "InputState">;
 	using Key_OperatingSystem = BlackboardKey<class OperatingSystem&, "OperatingSystem">;
+	using Key_GraphicsFoundation = BlackboardKey<class GraphicsFoundation&, "GraphicsFoundation">;
 	using Key_AudioManager = BlackboardKey<class AudioManager&, "AudioManager">;
     using Key_ECSRegistry = BlackboardKey<class ECSRegistry&, "ECSRegistry">;
     using Key_ECSManager = BlackboardKey<class ECSManager&, "ECSManager">;

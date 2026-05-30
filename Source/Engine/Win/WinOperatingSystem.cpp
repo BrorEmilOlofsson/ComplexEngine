@@ -37,13 +37,11 @@ namespace CLX
     Win_OperatingSystem::Win_OperatingSystem(HINSTANCE instanceHandle, std::wstring className)
         : mInstanceHandle(instanceHandle)
         , mWindowClass(std::make_unique<Win_WindowClass>(instanceHandle, std::move(className), HandleMsgSetup))
-        , mGraphicsFoundation(DX11Foundation())
     {}
 
     Win_OperatingSystem::Win_OperatingSystem(Win_OperatingSystem&& other)
         : mInstanceHandle(std::move(other.mInstanceHandle))
         , mWindowClass(std::move(other.mWindowClass))
-        , mGraphicsFoundation(std::move(other.mGraphicsFoundation))
         , mWindows(std::move(other.mWindows))
         , mCursors(std::move(other.mCursors))
         , mIsCursorVisible(std::move(other.mIsCursorVisible))
@@ -52,16 +50,6 @@ namespace CLX
         {
             SetWindowLongPtr(window->GetHandle(), GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
         }
-    }
-
-    void Win_OperatingSystem::Init()
-    {
-        mGraphicsFoundation.Init();
-    }
-
-    void Win_OperatingSystem::Shutdown()
-    {
-        mGraphicsFoundation.Shutdown();
     }
 
     [[nodiscard]] bool ProcessMessages()
@@ -82,10 +70,9 @@ namespace CLX
         return hasQuit;
     }
 
-    void Win_OperatingSystem::BeginFrame(const GraphicsBufferData& data)
+    void Win_OperatingSystem::BeginFrame()
     {
         mFrameBuffer = {};
-        mGraphicsFoundation.BeginFrame(data);
         bool hasQuit = ProcessMessages();
         mFrameBuffer.hasQuit |= hasQuit;
 
@@ -98,11 +85,6 @@ namespace CLX
 
     void Win_OperatingSystem::EndFrame(RenderContext* renderContext)
     {
-        for (auto& window : mWindows)
-        {
-            window->GetGraphicsWindow().BindBackBuffer();
-        }
-        mGraphicsFoundation.EndFrame();
         for (auto& window : mWindows)
         {
             window->EndFrame(renderContext);
@@ -175,10 +157,9 @@ namespace CLX
                 *mWindowClass,
                 this
             );
-            GraphicsWindowView windowView = mGraphicsFoundation.MakeWindow(WindowView(*window));
+            GraphicsWindowView windowView = mGraphicsFoundation->MakeWindow(WindowView(*window));
             window->SetGraphicsWindowView(windowView);
             SetWindowLongPtr(window->GetHandle(), GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
-
 
             window->GetGraphicsWindow().Init();
 
@@ -209,16 +190,6 @@ namespace CLX
     const Win_Window& Win_OperatingSystem::GetWindow(const WindowID windowID) const
     {
         return *mWindows[windowID];
-    }
-
-    GraphicsFoundation& Win_OperatingSystem::GetGraphicsFoundation() noexcept
-    {
-        return mGraphicsFoundation;
-    }
-
-    const GraphicsFoundation& Win_OperatingSystem::GetGraphicsFoundation() const noexcept
-    {
-        return mGraphicsFoundation;
     }
 
     const InputState& Win_OperatingSystem::GetInputState() const noexcept
@@ -265,7 +236,6 @@ namespace CLX
     {
         return mIsCursorVisible;
     }
-
 }
 
 #endif

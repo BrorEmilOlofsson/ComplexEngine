@@ -55,7 +55,7 @@ namespace CLX
 
     static void OnAssetClicked(const std::filesystem::path& path, std::filesystem::path& currentDirectory,
         NodeScriptingWindow& nodeScriptingWindow, MenuTabWindow& nodeScriptParentTab, MenuItemPopUp& nodeScriptButton,
-        SceneManager& sceneManager, AssetManager& assetManager, EditorWindowManager& windowManager, OperatingSystem& os, WindowView mainWindowView, const ImTextureID textureID)
+        SceneManager& sceneManager, AssetManager& assetManager, EditorWindowManager& windowManager, GraphicsFoundation& graphics, WindowView mainWindowView, const ImTextureID textureID)
     {
         const std::wstring extension = path.extension().wstring();
         if (std::filesystem::is_directory(path))
@@ -80,7 +80,7 @@ namespace CLX
             EntityCompositionAssetHandle entityCompositionAsset = assetManager.GetEntityComposition(path);
             if (entityCompositionAsset.IsValid())
             {
-                windowManager.CreateWindow(entityCompositionAsset, os.GetGraphicsFoundation().CreateRenderContext(mainWindowView.GetClientSize()));
+                windowManager.CreateWindow(entityCompositionAsset, graphics.CreateRenderContext(mainWindowView.GetClientSize()));
             }
         }
     }
@@ -248,6 +248,7 @@ namespace CLX
         MenuItemPopUp& nodeScriptButton;
         EditorWindowManager& windowManager;
         OperatingSystem& os;
+        GraphicsFoundation& graphicsFoundation;
         WindowView mainWindowView;
         bool& canOpenPopup;
         std::string& filePopUpID;
@@ -336,7 +337,7 @@ namespace CLX
                         data.sceneManager,
                         data.assetManager,
                         data.windowManager,
-                        data.os,
+                        data.graphicsFoundation,
                         data.mainWindowView,
                         textureID
                     );
@@ -493,6 +494,7 @@ namespace CLX
         EditorWindowManager& windowManager = blackboard.Get<Key_EditorWindowManager>();
         NodeScriptingWindow& nodeScriptingWindow = blackboard.Get<Key_NodeScriptingWindow>();
         OperatingSystem& os = blackboard.Get<Key_OperatingSystem>();
+        GraphicsFoundation& graphicsFoundation = blackboard.Get<Key_GraphicsFoundation>();
         WindowView windowView = blackboard.Get<Key_WindowView>();
         
         const DrawFilesInFolderData data
@@ -508,6 +510,7 @@ namespace CLX
             .nodeScriptButton = *mNodeScriptButton,
             .windowManager = windowManager,
             .os = os,
+            .graphicsFoundation = graphicsFoundation,
             .mainWindowView = windowView,
             .canOpenPopup = mCanOpenPopup,
             .filePopUpID = mFilePopUpID,

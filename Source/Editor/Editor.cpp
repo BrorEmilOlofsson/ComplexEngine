@@ -242,6 +242,7 @@ namespace CLX
         editorBlackboard.Insert<Key_EditorSceneSettings>(mEditorSceneSettings);
         editorBlackboard.Insert<Key_ShowUnitVectorInScene>(mEditorSceneSettings.showUnitVectorInScene);
         editorBlackboard.Insert<Key_OperatingSystem>(mEngine->GetOperatingSystem());
+        editorBlackboard.Insert<Key_GraphicsFoundation>(mEngine->GetGraphicsFoundation());
         editorBlackboard.Insert<Key_FreeFlyCameraSettings>(mFreeFlyCameraSettings);
         editorBlackboard.Insert<Key_NodeScriptingWindow>(mNodeScriptingWindow);
         editorBlackboard.Insert<Key_EditorWindowManager>(mWindowManager);

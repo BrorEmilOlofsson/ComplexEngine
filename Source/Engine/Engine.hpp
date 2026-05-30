@@ -73,6 +73,7 @@ namespace CLX
 
 		DataTypeRegistry mDataTypeRegistry;
 		std::reference_wrapper<OperatingSystem> mOperatingSystem;
+		GraphicsFoundation mGraphicsFoundation;
         EntitySerializationIDGenerator mEntityIDGenerator;
 		ECSRegistry mECSRegistry;
 		ECSManager mECSManager;

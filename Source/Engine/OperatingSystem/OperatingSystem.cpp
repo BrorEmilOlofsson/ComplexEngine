@@ -4,24 +4,14 @@
 namespace CLX
 {
 
-	void OperatingSystem::BeginFrame(const GraphicsBufferData& bufferData)
+	void OperatingSystem::BeginFrame()
 	{
-		mConcept->BeginFrame(bufferData);
+		mConcept->BeginFrame();
 	}
 
 	void OperatingSystem::EndFrame(RenderContext* renderContext)
 	{
 		mConcept->EndFrame(renderContext);
-	}
-
-	void OperatingSystem::Init()
-	{
-		mConcept->Init();
-	}
-
-	void OperatingSystem::Shutdown()
-	{
-		mConcept->Shutdown();
 	}
 
 	WindowView OperatingSystem::GetWindow(WindowHandle windowHandle)
@@ -39,15 +29,15 @@ namespace CLX
 		return mConcept->MakeWindow(size, title);
 	}
 
-	GraphicsFoundation& OperatingSystem::GetGraphicsFoundation()
-	{
-		return mConcept->GetGraphicsFoundation();
-	}
+	//GraphicsFoundation& OperatingSystem::GetGraphicsFoundation()
+	//{
+	//	return mConcept->GetGraphicsFoundation();
+	//}
 
-	const GraphicsFoundation& OperatingSystem::GetGraphicsFoundation() const
-	{
-		return mConcept->GetGraphicsFoundation();
-    }
+	//const GraphicsFoundation& OperatingSystem::GetGraphicsFoundation() const
+	//{
+	//	return mConcept->GetGraphicsFoundation();
+ //   }
 
 	const InputState& OperatingSystem::GetInputState() const
 	{

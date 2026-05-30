@@ -132,6 +132,10 @@ namespace CLX
 
 	void DX11Foundation::EndFrame()
 	{
+		for (auto& window : mWindows)
+		{
+			window.second.BindBackBuffer();
+		}
 #ifdef _EDITOR
 		mImGui.EndFrame();
 #endif

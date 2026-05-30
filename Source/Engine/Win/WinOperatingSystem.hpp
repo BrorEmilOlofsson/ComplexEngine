@@ -7,6 +7,7 @@
 #include <memory>
 #include <unordered_map>
 #include <vector>
+#include <filesystem>
 
 #include "Engine/Win/WinWindowClass.hpp"
 #include "Engine/Win/WinWindow.hpp"
@@ -14,6 +15,7 @@
 #include "Engine/Graphics/GraphicsFoundation.hpp"
 #include "Engine/Utility/Win/WinUtility.hpp"
 #include "Engine/Win/WinInputProcessor.hpp"
+#include "Engine/Math/Dimension2.hpp"
 
 #include "Engine/Win/WinDefines.hpp"
 #include <Windows.h>
@@ -34,9 +36,7 @@ namespace CLX
 		Win_OperatingSystem& operator=(const Win_OperatingSystem&) = delete;
 		Win_OperatingSystem& operator=(Win_OperatingSystem&&) = delete;
 
-		void Init();
-		void Shutdown();
-		void BeginFrame(const GraphicsBufferData& bufferData);
+		void BeginFrame();
 		void EndFrame(RenderContext* renderContext);
 
 		LRESULT HandleMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -44,9 +44,7 @@ namespace CLX
 		WindowID MakeWindow(Dimension2u size, std::wstring title);
 		[[nodiscard]] Win_Window& GetWindow(const WindowID windowID);
 		[[nodiscard]] const Win_Window& GetWindow(const WindowID windowID) const;
-
-		[[nodiscard]] GraphicsFoundation& GetGraphicsFoundation() noexcept;
-		[[nodiscard]] const GraphicsFoundation& GetGraphicsFoundation() const noexcept;
+        void SetGraphicsFoundation(GraphicsFoundation* graphicsFoundation) { mGraphicsFoundation = graphicsFoundation; }
         [[nodiscard]] const InputState& GetInputState() const noexcept;
 
 		void LoadCursors(const std::filesystem::path& path);
@@ -55,39 +53,28 @@ namespace CLX
 		void HideCursor();
 
 		[[nodiscard]] bool IsCursorVisible() const;
+        [[nodiscard]] const WindowFrameBuffer& GetFrameBuffer() const { return mFrameBuffer; }
 
 	private:
 
 		HINSTANCE mInstanceHandle = HINSTANCE{};
 		std::unique_ptr<Win_WindowClass> mWindowClass;
         Win_InputProcessor mInputProcessor;
-		GraphicsFoundation mGraphicsFoundation;
+		GraphicsFoundation* mGraphicsFoundation = nullptr;
 		std::vector<std::unique_ptr<Win_Window>> mWindows;
-	public:
 		WindowFrameBuffer mFrameBuffer;
-	private:
 		std::unordered_map<std::filesystem::path, HCURSOR> mCursors;
 		bool mIsCursorVisible = true;
 	};
 
-	inline void OSBeginFrame(Win_OperatingSystem& os, const GraphicsBufferData& data)
+	inline void OSBeginFrame(Win_OperatingSystem& os)
 	{
-		os.BeginFrame(data);
+		os.BeginFrame();
 	}
 
 	inline void OSEndFrame(Win_OperatingSystem& os, RenderContext* renderContext)
 	{
 		os.EndFrame(renderContext);
-	}
-
-	inline void OSInit(Win_OperatingSystem& os)
-	{
-		os.Init();
-	}
-
-	inline void OSShutdown(Win_OperatingSystem& os)
-	{
-		os.Shutdown();
 	}
 
 	[[nodiscard]] inline Win_Window& GetOSWindow(Win_OperatingSystem& os, WindowHandle windowHandle)
@@ -105,14 +92,9 @@ namespace CLX
 		return WindowHandle{ os.MakeWindow(size, title) };
 	}
 
-	[[nodiscard]] inline GraphicsFoundation& OSGetGraphicsFoundation(Win_OperatingSystem& os)
-	{
-		return os.GetGraphicsFoundation();
-	}
-
-	[[nodiscard]] inline const GraphicsFoundation& OSGetGraphicsFoundation(const Win_OperatingSystem& os)
-	{
-		return os.GetGraphicsFoundation();
+    inline void OSSetGraphicsFoundation(Win_OperatingSystem& os, GraphicsFoundation* graphicsFoundation)
+    {
+        os.SetGraphicsFoundation(graphicsFoundation);
     }
 
 	[[nodiscard]] inline const InputState& OSGetInputState(const Win_OperatingSystem& os)
@@ -127,7 +109,7 @@ namespace CLX
 
 	inline const WindowFrameBuffer& OSGetFrameBuffer(const Win_OperatingSystem& os)
 	{
-		return os.mFrameBuffer;
+		return os.GetFrameBuffer();
     }
 
 	inline void OSSetCursor(Win_OperatingSystem& os, const std::filesystem::path& path)

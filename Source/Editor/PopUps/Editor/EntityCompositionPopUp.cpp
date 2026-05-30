@@ -208,7 +208,7 @@ namespace CLX
             if (hasValidEntityComposition)
             {
                 mEntityCompositionAsset->GetECS().Render(newBlackboard);
-                blackboard.Get<Key_OperatingSystem>().GetGraphicsFoundation().Render(mRenderState);
+                blackboard.Get<Key_GraphicsFoundation>().Render(mRenderState);
             }
         }
 

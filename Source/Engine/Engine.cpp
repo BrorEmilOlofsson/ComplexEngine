@@ -10,6 +10,7 @@
 #include "Engine/ECS/ECSSerializer.hpp"
 #include "Engine/Scene/SceneLoader.hpp"
 #include "Engine/Reflection/Reflection.hpp"
+#include "Engine/Graphics/GraphicsFoundationCreator.hpp"
 #include <External/nlohmann/json.hpp>
 #include <External/imgui/imgui.h>
 #include <fstream>
@@ -89,6 +90,7 @@ namespace CLX
 
     Engine::Engine(OperatingSystem& operatingSystem)
         : mOperatingSystem(operatingSystem)
+        , mGraphicsFoundation(CreateGraphicsFoundation(eGraphicsAPI::DX11))
         , mAssetManager(std::make_shared<AssetManager>())
         , mBlackboard(std::make_shared<Blackboard>())
         , mGraphicsSettings(std::make_shared<GraphicsSettings>())
@@ -101,8 +103,8 @@ namespace CLX
         TypeRegistration::ExecuteRegistrations(mDataTypeRegistry, mECSRegistry);
 
         mDataTypeRegistry.Assert();
-        mOperatingSystem.get().GetGraphicsFoundation().SetAssetManager(mAssetManager);
-        mOperatingSystem.get().GetGraphicsFoundation().SetGraphicsSettings(mGraphicsSettings);
+        mGraphicsFoundation.SetAssetManager(mAssetManager);
+        mGraphicsFoundation.SetGraphicsSettings(mGraphicsSettings);
 
         std::shared_ptr<Blackboard> blackboard = mBlackboard;
         ECSRegistry* ecsRegistry = &mECSRegistry;
@@ -141,7 +143,6 @@ namespace CLX
         mBlackboard->Insert<Key_EntityIDGenerator>(mEntityIDGenerator);
         mBlackboard->Insert<Key_AudioManager>(mAudioManager);
 
-
         mAssetManager->GetAssetLoader().SetSceneLoader([this](const std::filesystem::path& path)
             {
                 Scene scene(mBlackboard);
@@ -157,7 +158,8 @@ namespace CLX
         mGraphicsSettings->vSync = mLoadedGameSettings.vSync;
 
         mAssetManager->LoadAssets();
-        mOperatingSystem.get().Init();
+        mGraphicsFoundation.Init();
+        mOperatingSystem.get().SetGraphicsFoundation(&mGraphicsFoundation);
         mMainWindow = mOperatingSystem.get().MakeWindow(mLoadedGameSettings.windowSize, mLoadedGameSettings.windowTitle);
 
         if (mLoadedGameSettings.fullScreen)
@@ -190,7 +192,7 @@ namespace CLX
         }
         mSceneManager.ChangeSceneDirectly(defaultScene);
 
-        RenderContext r = mOperatingSystem.get().GetGraphicsFoundation().CreateRenderContext(mOperatingSystem.get().GetWindow(mMainWindow).GetClientSize());
+        RenderContext r = mGraphicsFoundation.CreateRenderContext(mOperatingSystem.get().GetWindow(mMainWindow).GetClientSize());
         mSceneManager.GetActiveScene()->GetRenderState().SetRenderContext(std::move(r));
 
 #ifndef _EDITOR
@@ -200,7 +202,7 @@ namespace CLX
 
     void Engine::Shutdown()
     {
-        mOperatingSystem.get().Shutdown();
+        mGraphicsFoundation.Shutdown();
 
         SaveProjectSettings(ProjectSettings{ mEntityIDGenerator.GetUsedIDBounds().value_or({}) });
     }
@@ -213,7 +215,8 @@ namespace CLX
         GraphicsBufferData bufferData;
         bufferData.frameTimer = mFrameTimer;
         bufferData.totalTimer = mTotalTimer;
-        mOperatingSystem.get().BeginFrame(bufferData);
+        mGraphicsFoundation.BeginFrame(bufferData);
+        mOperatingSystem.get().BeginFrame();
 
         const WindowFrameBuffer& windowFrameBuffer = mOperatingSystem.get().GetFrameBuffer();
         if (windowFrameBuffer.hasQuit)
@@ -259,6 +262,7 @@ namespace CLX
 #ifndef _EDITOR
         renderContext = mSceneManager.GetActiveScene()->GetRenderState().GetRenderContext();
 #endif
+        mGraphicsFoundation.EndFrame();
         mOperatingSystem.get().EndFrame(renderContext);
         if (!mGraphicsSettings->vSync)
         {
@@ -315,7 +319,7 @@ namespace CLX
 #ifndef _EDITOR
         mSceneManager.GetActiveScene()->GetRenderState().SetRenderRect(AABB2i::FromDefaultAndExtent(ToVector2(mOperatingSystem.get().GetWindow(mMainWindow).GetClientSize())));
 #endif
-        mOperatingSystem.get().GetGraphicsFoundation().Render(mSceneManager.GetActiveScene()->GetRenderState());
+        mGraphicsFoundation.Render(mSceneManager.GetActiveScene()->GetRenderState());
     }
 
     WindowView Engine::GetMainWindow()
@@ -335,12 +339,12 @@ namespace CLX
 
     GraphicsFoundation& Engine::GetGraphicsFoundation()
     {
-        return mOperatingSystem.get().GetGraphicsFoundation();
+        return mGraphicsFoundation;
     }
 
     const GraphicsFoundation& Engine::GetGraphicsFoundation() const
     {
-        return mOperatingSystem.get().GetGraphicsFoundation();
+        return mGraphicsFoundation;
     }
 
     void Engine::SetShouldExit(bool shouldExit)
