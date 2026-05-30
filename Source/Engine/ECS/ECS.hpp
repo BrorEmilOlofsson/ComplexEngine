@@ -677,6 +677,12 @@ namespace CLX
         ECS() = delete;
         explicit ECS(const ECSRegistry& ecsRegistry, EntitySerializationIDGenerator& entityIDGenerator);
 
+    private:
+
+        EntityID CreateEntityInternal(EntitySerializationID serializationID);
+    
+public:
+
         EntityID CreateEntity();
         EntityID CreateEntity(EntitySerializationID serializationID);
         void DestroyEntity(EntityID entityID);

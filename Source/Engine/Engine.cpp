@@ -87,8 +87,8 @@ namespace CLX
         return settings;
     }
 
-    Engine::Engine(OperatingSystem&& operatingSystem)
-        : mOperatingSystem(std::move(operatingSystem))
+    Engine::Engine(OperatingSystem& operatingSystem)
+        : mOperatingSystem(operatingSystem)
         , mAssetManager(std::make_shared<AssetManager>())
         , mBlackboard(std::make_shared<Blackboard>())
         , mGraphicsSettings(std::make_shared<GraphicsSettings>())
@@ -101,8 +101,8 @@ namespace CLX
         TypeRegistration::ExecuteRegistrations(mDataTypeRegistry, mECSRegistry);
 
         mDataTypeRegistry.Assert();
-        mOperatingSystem.GetGraphicsFoundation().SetAssetManager(mAssetManager);
-        mOperatingSystem.GetGraphicsFoundation().SetGraphicsSettings(mGraphicsSettings);
+        mOperatingSystem.get().GetGraphicsFoundation().SetAssetManager(mAssetManager);
+        mOperatingSystem.get().GetGraphicsFoundation().SetGraphicsSettings(mGraphicsSettings);
 
         std::shared_ptr<Blackboard> blackboard = mBlackboard;
         ECSRegistry* ecsRegistry = &mECSRegistry;
@@ -157,16 +157,16 @@ namespace CLX
         mGraphicsSettings->vSync = mLoadedGameSettings.vSync;
 
         mAssetManager->LoadAssets();
-        mOperatingSystem.Init();
-        mMainWindow = mOperatingSystem.MakeWindow(mLoadedGameSettings.windowSize, mLoadedGameSettings.windowTitle);
+        mOperatingSystem.get().Init();
+        mMainWindow = mOperatingSystem.get().MakeWindow(mLoadedGameSettings.windowSize, mLoadedGameSettings.windowTitle);
 
         if (mLoadedGameSettings.fullScreen)
         {
-            mOperatingSystem.GetWindow(mMainWindow).SetSize(FullScreen{});
+            mOperatingSystem.get().GetWindow(mMainWindow).SetSize(FullScreen{});
         }
         else if (mLoadedGameSettings.windowedFullScreen)
         {
-            mOperatingSystem.GetWindow(mMainWindow).SetSize(WindowedFullScreen{});
+            mOperatingSystem.get().GetWindow(mMainWindow).SetSize(WindowedFullScreen{});
         }
 
         mFrameTimer.Start();
@@ -174,9 +174,9 @@ namespace CLX
 
         mNodeScript.Init();
 
-        mOperatingSystem.LoadCursors(std::string(Directory::Assets) + std::string("Cursors"));
+        mOperatingSystem.get().LoadCursors(std::string(Directory::Assets) + std::string("Cursors"));
 
-        mOperatingSystem.GetWindow(mMainWindow).Show();
+        mOperatingSystem.get().GetWindow(mMainWindow).Show();
     }
 
     void Engine::LateInit()
@@ -190,7 +190,7 @@ namespace CLX
         }
         mSceneManager.ChangeSceneDirectly(defaultScene);
 
-        RenderContext r = mOperatingSystem.GetGraphicsFoundation().CreateRenderContext(mOperatingSystem.GetWindow(mMainWindow).GetClientSize());
+        RenderContext r = mOperatingSystem.get().GetGraphicsFoundation().CreateRenderContext(mOperatingSystem.get().GetWindow(mMainWindow).GetClientSize());
         mSceneManager.GetActiveScene()->GetRenderState().SetRenderContext(std::move(r));
 
 #ifndef _EDITOR
@@ -200,7 +200,7 @@ namespace CLX
 
     void Engine::Shutdown()
     {
-        mOperatingSystem.Shutdown();
+        mOperatingSystem.get().Shutdown();
 
         SaveProjectSettings(ProjectSettings{ mEntityIDGenerator.GetUsedIDBounds().value_or({}) });
     }
@@ -213,15 +213,15 @@ namespace CLX
         GraphicsBufferData bufferData;
         bufferData.frameTimer = mFrameTimer;
         bufferData.totalTimer = mTotalTimer;
-        mOperatingSystem.BeginFrame(bufferData);
+        mOperatingSystem.get().BeginFrame(bufferData);
 
-        const WindowFrameBuffer& windowFrameBuffer = mOperatingSystem.GetFrameBuffer();
+        const WindowFrameBuffer& windowFrameBuffer = mOperatingSystem.get().GetFrameBuffer();
         if (windowFrameBuffer.hasQuit)
         {
             return false;
         }
 
-        mInputState = mOperatingSystem.GetInputState();
+        mInputState = mOperatingSystem.get().GetInputState();
 
         mInputManager.Update(mInputState);
 
@@ -230,7 +230,7 @@ namespace CLX
             FileUtility::CopyFiles(windowFrameBuffer.droppedFiles, mCurrentDropPath);
         }
 
-        mSceneManager.GetActiveScene()->BeginFrame(mOperatingSystem.GetWindow(mMainWindow).GetClientSize(), mOperatingSystem.GetCursorScreenPosition());
+        mSceneManager.GetActiveScene()->BeginFrame(mOperatingSystem.get().GetWindow(mMainWindow).GetClientSize(), mOperatingSystem.get().GetCursorScreenPosition());
 
         return !mShouldExit.load();
     }
@@ -259,7 +259,7 @@ namespace CLX
 #ifndef _EDITOR
         renderContext = mSceneManager.GetActiveScene()->GetRenderState().GetRenderContext();
 #endif
-        mOperatingSystem.EndFrame(renderContext);
+        mOperatingSystem.get().EndFrame(renderContext);
         if (!mGraphicsSettings->vSync)
         {
             SyncToFPSCap(mFrameTimer.GetLastTimepoint(), mGraphicsSettings->fPSCap);
@@ -313,14 +313,14 @@ namespace CLX
         mSceneManager.GetActiveScene()->Render();
 
 #ifndef _EDITOR
-        mSceneManager.GetActiveScene()->GetRenderState().SetRenderRect(AABB2i::FromDefaultAndExtent(ToVector2(mOperatingSystem.GetWindow(mMainWindow).GetClientSize())));
+        mSceneManager.GetActiveScene()->GetRenderState().SetRenderRect(AABB2i::FromDefaultAndExtent(ToVector2(mOperatingSystem.get().GetWindow(mMainWindow).GetClientSize())));
 #endif
-        mOperatingSystem.GetGraphicsFoundation().Render(mSceneManager.GetActiveScene()->GetRenderState());
+        mOperatingSystem.get().GetGraphicsFoundation().Render(mSceneManager.GetActiveScene()->GetRenderState());
     }
 
     WindowView Engine::GetMainWindow()
     {
-        return mOperatingSystem.GetWindow(mMainWindow);
+        return mOperatingSystem.get().GetWindow(mMainWindow);
     }
 
     DataTypeRegistry& Engine::GetDataTypeRegistry()
@@ -335,12 +335,12 @@ namespace CLX
 
     GraphicsFoundation& Engine::GetGraphicsFoundation()
     {
-        return mOperatingSystem.GetGraphicsFoundation();
+        return mOperatingSystem.get().GetGraphicsFoundation();
     }
 
     const GraphicsFoundation& Engine::GetGraphicsFoundation() const
     {
-        return mOperatingSystem.GetGraphicsFoundation();
+        return mOperatingSystem.get().GetGraphicsFoundation();
     }
 
     void Engine::SetShouldExit(bool shouldExit)

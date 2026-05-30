@@ -35,7 +35,7 @@ namespace CLX
 	{
 	public:
 
-		explicit Engine(OperatingSystem&& operatingSystem);
+		explicit Engine(OperatingSystem& operatingSystem);
 
 		void Init();
 		void LateInit();
@@ -53,8 +53,8 @@ namespace CLX
 		[[nodiscard]] const InputState& GetInputState() const { return mInputState; }
 		[[nodiscard]] SceneManager& GetSceneManager() { return mSceneManager; }
 		[[nodiscard]] const SceneManager& GetSceneManager() const { return mSceneManager; }
-		[[nodiscard]] OperatingSystem& GetOperatingSystem() { return mOperatingSystem; }
-		[[nodiscard]] const OperatingSystem& GetOperatingSystem() const { return mOperatingSystem; }
+		[[nodiscard]] OperatingSystem& GetOperatingSystem() { return mOperatingSystem.get(); }
+		[[nodiscard]] const OperatingSystem& GetOperatingSystem() const { return mOperatingSystem.get(); }
 		[[nodiscard]] WindowView GetMainWindow();
 		[[nodiscard]] std::weak_ptr<AssetManager> GetAssetManager() { return mAssetManager; }
 		[[nodiscard]] GraphicsSettings& GetGraphicsSettings() { return *mGraphicsSettings; }
@@ -72,7 +72,7 @@ namespace CLX
 	private:
 
 		DataTypeRegistry mDataTypeRegistry;
-		OperatingSystem mOperatingSystem;
+		std::reference_wrapper<OperatingSystem> mOperatingSystem;
         EntitySerializationIDGenerator mEntityIDGenerator;
 		ECSRegistry mECSRegistry;
 		ECSManager mECSManager;

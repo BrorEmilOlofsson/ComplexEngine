@@ -503,6 +503,12 @@ namespace CLX
 
     static ViewAndEditResult ViewAndEditValue(EntityID& entityID, const ECS& ecs, const std::string& variableName)
     {
+        EntitySerializationID entitySerializationID = InvalidID<EntitySerializationID>();
+        
+        if (entityID != InvalidEntityID)
+        {
+            entitySerializationID = ecs.GetSerializationID(entityID);
+        }
         ImGui::Text(variableName.c_str());
         ImGui::SameLine();
         std::string btnStr;
@@ -523,6 +529,7 @@ namespace CLX
                 btnStr = "Invalid Entity (" + std::to_string(entityID.id) + ")";
             }
         }
+        ImGui::Button(("SID " + std::to_string(entitySerializationID.id)).c_str());
         ImGui::Button(btnStr.c_str());
         ViewAndEditResult viewAndEditResult;
 
@@ -533,6 +540,7 @@ namespace CLX
         if (auto result = ObjectTarget<EntityID>())
         {
             viewAndEditResult.isEdited = true;
+            viewAndEditResult.isActive = true;
             entityID = result.value();
         }
         return viewAndEditResult;

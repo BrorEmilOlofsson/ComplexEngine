@@ -5,5 +5,5 @@ namespace CLX
 	
 	class OperatingSystem;
 
-	void RunGame(OperatingSystem&& operatingSystem);
+	void RunGame(OperatingSystem& operatingSystem);
 }

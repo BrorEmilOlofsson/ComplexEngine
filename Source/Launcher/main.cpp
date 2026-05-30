@@ -3,7 +3,6 @@
 #include "Editor/EditorApplication.hpp"
 #include "Game/GameMain.hpp"
 #include "Engine/OperatingSystem/OperatingSystem.hpp"
-#include <memory>
 
 #ifdef BUILD_WITH_EASY_PROFILER
 #pragma message("BUILD_WITH_EASY_PROFILER is defined")
@@ -33,7 +32,7 @@ struct Profiler
 
 #ifdef _WIN32
 
-#include "Engine/Win/WinWindow.hpp"
+#include <Windows.h>
 #include "Engine/Win/WinOperatingSystem.hpp"
 
 namespace CLX
@@ -41,27 +40,27 @@ namespace CLX
 
 	static OperatingSystem CreateWindowsOperatingSystem(HINSTANCE hInstance)
 	{
-		return OperatingSystem(Win_OperatingSystem(hInstance, L"SimpleWindowClass"));
+		return OperatingSystem(Win_OperatingSystem(hInstance, L"WindowClass"));
 	}
 
-	static void Run(OperatingSystem&& operatingSystem);
+	static void Run(OperatingSystem& operatingSystem);
 }
 
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ LPWSTR, [[maybe_unused]] _In_ int nCmdShow)
 {
 	Profiler profiler("Main.cpp");
-	CLX::Run(CLX::CreateWindowsOperatingSystem(hInstance));
+    CLX::OperatingSystem operatingSystem = CLX::CreateWindowsOperatingSystem(hInstance);
+	CLX::Run(operatingSystem);
 
 	return 0;
-
 }
 
 #endif
 
 namespace CLX
 {
-	using RunFunction = void(*)(OperatingSystem&&);
+	using RunFunction = void(*)(OperatingSystem&);
 
 	static RunFunction GetRunFunction()
 	{
@@ -76,10 +75,10 @@ namespace CLX
 #endif
 	}
 
-	static void Run(OperatingSystem&& operatingSystem)
+	static void Run(OperatingSystem& operatingSystem)
 	{
 		RunFunction runFunction = GetRunFunction();
 
-		runFunction(std::move(operatingSystem));
+		runFunction(operatingSystem);
 	}
 }

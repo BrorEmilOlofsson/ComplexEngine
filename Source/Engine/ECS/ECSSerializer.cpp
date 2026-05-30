@@ -124,7 +124,6 @@ namespace CLX
         }
 
         const DataTypeRegistry& dataTypeRegistry = blackboard.Get<Key_DataTypeRegistry>();
-        EntitySerializationIDGenerator& serializationIDGenerator = blackboard.Get<Key_EntityIDGenerator>();
         bool shouldUpdateJSON = false;
 
         const nlohmann::json& entitiesJson = jsonData["Entities"];
@@ -135,10 +134,7 @@ namespace CLX
             const EntityID loadedEntityID = { entityData["ID"] };
             const EntitySerializationID loadedSerializationID = { entityData["SID"] };
 
-            serializationIDGenerator.MarkIDAsUsed(loadedSerializationID);
-
             const EntityID newEntityID = ecs.CreateEntity(loadedSerializationID);
-
 
             if (entityData.contains("Components") == false)
             {

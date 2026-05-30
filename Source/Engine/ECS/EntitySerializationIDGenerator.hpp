@@ -1,13 +1,11 @@
 #pragma once
 #include <unordered_set>
-#include <format>
-#include "Engine/Utility/IDWrapper.hpp"
+#include <optional>
 #include "Engine/Utility/Bounds.hpp"
+#include "EntitySerializationID.hpp"
 
 namespace CLX
 {
-
-    using EntitySerializationID = IDWrapper<uint64_t, struct EntitySerializationIDTag>;
 
     class EntitySerializationIDGenerator
     {
@@ -70,16 +68,4 @@ namespace CLX
         Bounds<uint64_t> mUsedBounds = Bounds<uint64_t>::FromMinAndMax(0, 0);
     };
 
-}
-
-namespace std
-{
-    template<>
-    struct formatter<CLX::EntitySerializationID> : std::formatter<CLX::EntitySerializationID::value_type>
-    {
-        auto format(const CLX::EntitySerializationID& id, auto& ctx) const
-        {
-            return std::formatter<CLX::EntitySerializationID::value_type>::format(id.id, ctx);
-        }
-    };
 }

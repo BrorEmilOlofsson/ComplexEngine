@@ -4,6 +4,6 @@ namespace CLX
 {
 	class OperatingSystem;
 
-	void RunEditor(OperatingSystem&& operatingSystem);
+	void RunEditor(OperatingSystem& operatingSystem);
 
 }

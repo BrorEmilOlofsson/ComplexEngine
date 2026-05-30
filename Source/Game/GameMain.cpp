@@ -6,10 +6,10 @@
 namespace CLX
 {
 
-	void RunGame(OperatingSystem&& operatingSystem)
+	void RunGame(OperatingSystem& operatingSystem)
 	{
 		PROFILER_FUNCTION(profiler::colors::Black);
-		Engine engine(std::move(operatingSystem));
+		Engine engine(operatingSystem);
 		engine.Init();
 
 		Game game;

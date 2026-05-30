@@ -22,12 +22,7 @@ namespace CLX
         }
     }
 
-    EntityID ECS::CreateEntity()
-    {
-        return CreateEntity(mEntityIDGenerator.get().Generate());
-    }
-
-    EntityID ECS::CreateEntity(const EntitySerializationID serializationID)
+    EntityID ECS::CreateEntityInternal(const EntitySerializationID serializationID)
     {
         EntityID entityID;
         if (!mFreeEntityIDs.empty())
@@ -59,6 +54,17 @@ namespace CLX
         mRegistry.InitializeEntity(*this, entityID);
 
         return entityID;
+    }
+
+    EntityID ECS::CreateEntity()
+    {
+        return CreateEntityInternal(mEntityIDGenerator.get().Generate());
+    }
+
+    EntityID ECS::CreateEntity(const EntitySerializationID serializationID)
+    {
+        mEntityIDGenerator.get().MarkIDAsUsed(serializationID);
+        return CreateEntityInternal(serializationID);
     }
 
     void ECS::DestroyEntity(const EntityID entityID)

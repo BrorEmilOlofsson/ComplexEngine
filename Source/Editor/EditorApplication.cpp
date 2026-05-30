@@ -7,10 +7,10 @@
 namespace CLX
 {
 
-	void RunEditor(OperatingSystem&& operatingSystem)
+	void RunEditor(OperatingSystem& operatingSystem)
 	{
 		PROFILER_FUNCTION(profiler::colors::Black)
-		Engine engine(std::move(operatingSystem));
+		Engine engine(operatingSystem);
 		engine.Init();
 
 		Editor editor(&engine);
