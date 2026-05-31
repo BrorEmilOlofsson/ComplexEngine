@@ -2337,15 +2337,8 @@ namespace CLX
         }
     }
 
-    void ShowEntityImGuizmo(ECS& ecs, const EntityID selectedEntityID, const eTransformMode transformMode, const eTransformOperation transformOperation, const Camera& camera,
-        const AABB2i renderRect, const bool useSnap, const float snapValue, const int guimzoID, const bool applyTransformation,
-        TransformEntityData& transformEntityData, EditorCommandTracker& commandTracker)
+    std::optional<Transform> ShowImGuizmo(const Camera& camera, Transform transform, const eTransformMode transformMode, const eTransformOperation transformOperation, const AABB2i renderRect, const int guizmoID, const bool useSnap, const float snapValue)
     {
-        if (selectedEntityID == InvalidEntityID)
-        {
-            return;
-        }
-
         ImGuizmo::AllowAxisFlip(false);
 
         ImGuizmo::SetOrthographic(false);
@@ -2353,27 +2346,75 @@ namespace CLX
         //const Point2f topLeft = Point2f(GetTopLeftCorner(renderRect));
         ImGuizmo::SetRect((float)renderRect.GetMin().x, (float)renderRect.GetMin().y, (float)renderRect.GetExtent().x, (float)renderRect.GetExtent().y);
 
-        TransformComponent* transformComponent = ecs.GetComponent<TransformComponent>(selectedEntityID);
-        ASSERT_NEW(transformComponent != nullptr, "Selected entity does not have a TransformComponent.");
-
-        Matrix4x4f entityMatrix = GetEntityWorldTransform(ecs, selectedEntityID).GetMatrix();
-        const Matrix4x4f view = camera.GetViewMatrix();
-        const Matrix4x4f proj = camera.GetProjectionMatrix();
-
+        const Matrix4x4f viewMatrix = camera.GetViewMatrix();
+        const Matrix4x4f projMatrix = camera.GetProjectionMatrix();
         const ImGuizmo::OPERATION guizmoOperation = ToImGuizmoOperation(transformOperation);
 
         const float snapV = useSnap ? snapValue : 0.f;
         const Vector3f gridSnapValues(snapV, snapV, snapV);
 
-        ImGuizmo::SetID(guimzoID);
+        Matrix4x4f matrix = transform.GetMatrix();
+
+        ImGuizmo::SetID(guizmoID);
         const bool isManipulatingEntityTransform = ImGuizmo::Manipulate(
-            view.GetDataPtr(),
-            proj.GetDataPtr(),
+            viewMatrix.GetDataPtr(),
+            projMatrix.GetDataPtr(),
             guizmoOperation,
             ToImGuizmoMode(transformMode),
-            entityMatrix.GetDataPtr(),
+            matrix.GetDataPtr(),
             nullptr,
             &gridSnapValues.x
+        );
+
+        return isManipulatingEntityTransform ? std::optional<Transform>(Transform::FromMatrix(matrix)) : std::nullopt;
+    }
+
+    void ShowEntityImGuizmo(ECS& ecs, const EntityID selectedEntityID, const eTransformMode transformMode, const eTransformOperation transformOperation, const Camera& camera,
+        const AABB2i renderRect, const bool useSnap, const float snapValue, const int guizmoID, const bool applyTransformation,
+        TransformEntityData& transformEntityData, EditorCommandTracker& commandTracker)
+    {
+        if (selectedEntityID == InvalidEntityID)
+        {
+            return;
+        }
+
+        //ImGuizmo::AllowAxisFlip(false);
+
+        //ImGuizmo::SetOrthographic(false);
+        //ImGuizmo::SetDrawlist(ImGui::GetWindowDrawList());
+        ////const Point2f topLeft = Point2f(GetTopLeftCorner(renderRect));
+        //ImGuizmo::SetRect((float)renderRect.GetMin().x, (float)renderRect.GetMin().y, (float)renderRect.GetExtent().x, (float)renderRect.GetExtent().y);
+
+
+        //Matrix4x4f entityMatrix = GetEntityWorldTransform(ecs, selectedEntityID).GetMatrix();
+        //const Matrix4x4f view = camera.GetViewMatrix();
+        //const Matrix4x4f proj = camera.GetProjectionMatrix();
+
+        //const ImGuizmo::OPERATION guizmoOperation = ToImGuizmoOperation(transformOperation);
+
+        //const float snapV = useSnap ? snapValue : 0.f;
+        //const Vector3f gridSnapValues(snapV, snapV, snapV);
+
+        //ImGuizmo::SetID(guizmoID);
+        //const bool isManipulatingEntityTransform = ImGuizmo::Manipulate(
+        //    view.GetDataPtr(),
+        //    proj.GetDataPtr(),
+        //    guizmoOperation,
+        //    ToImGuizmoMode(transformMode),
+        //    entityMatrix.GetDataPtr(),
+        //    nullptr,
+        //    &gridSnapValues.x
+        //);
+
+        auto result = ShowImGuizmo(
+            camera,
+            GetEntityWorldTransform(ecs, selectedEntityID),
+            transformMode,
+            transformOperation,
+            renderRect,
+            guizmoID,
+            useSnap,
+            snapValue
         );
 
         if (!applyTransformation)
@@ -2381,8 +2422,13 @@ namespace CLX
             return;
         }
 
+        const bool isManipulatingEntityTransform = result.has_value();
+
         const bool isDraggingPreviousFrame = transformEntityData.isDraggingEntity;
         const bool isDraggingCurrentFrame = ImGuizmo::IsUsing();
+
+        TransformComponent* transformComponent = ecs.GetComponent<TransformComponent>(selectedEntityID);
+        ASSERT_NEW(transformComponent != nullptr, "Selected entity does not have a TransformComponent.");
 
         if (isDraggingCurrentFrame && !isDraggingPreviousFrame)
         {
@@ -2393,7 +2439,8 @@ namespace CLX
 
         if (isManipulatingEntityTransform)
         {
-            const Transform localTransform = GetEntityLocalTransform(ecs, selectedEntityID, Transform::FromMatrix(entityMatrix));
+            const Transform newTransform = result.value();
+            const Transform localTransform = GetEntityLocalTransform(ecs, selectedEntityID, newTransform);
 
             if (HasAnyFlag(transformOperation, eTransformOperation::Translate))
             {

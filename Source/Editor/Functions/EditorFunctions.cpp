@@ -149,6 +149,7 @@ namespace CLX
 			ShowLocalWorldTransformSettings(editorSceneSettings.transformMode);
 			ShowGridSnapSettings(editorSceneSettings.useSnap, editorSceneSettings.snapValue);
 			ImGui::Checkbox("Show Grid", &editorSceneSettings.showGrid);
+			ImGui::Checkbox("Show Navmesh Editor", &editorSceneSettings.showNavmeshEditor);
 			ImGui::EndPopup();
 		}
 	}

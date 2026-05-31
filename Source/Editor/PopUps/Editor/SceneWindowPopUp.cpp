@@ -11,6 +11,7 @@
 #include "Editor/EditorSceneSettings.hpp"
 #include "Engine/Utility/DebugShapes.hpp"
 #include "Engine/Asset/AssetManager.hpp"
+#include "Editor/Functions/NavmeshEditor.hpp"
 #include <External/AwsomeFontIcons/IconFontDefines.h>
 
 namespace CLX
@@ -350,7 +351,8 @@ namespace CLX
                 commandTracker
             );
 
-            if (mHierarchyPopUp.GetSelectedEntityIDs().size() == 1 && !isPlaying)
+            const bool showNavmeshEditor = editorSceneSettings.showNavmeshEditor;
+            if (mHierarchyPopUp.GetSelectedEntityIDs().size() == 1 && !isPlaying && !showNavmeshEditor)
             {
                 ShowEntityImGuizmo(
                     activeScene.GetECS(),
@@ -366,6 +368,11 @@ namespace CLX
                     mTransformEntityData,
                     commandTracker
                 );
+            }
+
+            if (!isPlaying && showNavmeshEditor)
+            {
+                ShowNavmeshEditor(activeScene, mEditorCamera, sceneRenderState.GetRenderRect().value(), blackboard.Get<Key_InputState>());
             }
 
             ImGui::PopStyleVar();

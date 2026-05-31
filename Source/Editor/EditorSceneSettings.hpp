@@ -9,6 +9,7 @@ namespace CLX
 		bool useSnap = false;
 		float snapValue = 1.0f;
 		bool showGrid = false;
+        bool showNavmeshEditor = false;
 		eTransformMode transformMode = eTransformMode::Local;
         eTransformOperation transformOperation = eTransformOperation::Translate;
 		bool showUnitVectorInScene = false;

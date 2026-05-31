@@ -103,6 +103,7 @@ namespace CLX
 		EntityCompositionInstantiationManager& entityInstantiations, std::vector<EntityID>& rootEntities,
 		std::set<EntityID>& selectedEntityIDs, const DataTypeRegistry& dataTypeRegistry, EditorCommandTracker& commandTracker);
 
+	[[nodiscard]] std::optional<Transform> ShowImGuizmo(const Camera& camera, Transform transform, const eTransformMode transformMode, const eTransformOperation transformOperation, const AABB2i renderRect, const int guizmoID, const bool useSnap, const float snapValue);
 	void ShowEntityImGuizmo(ECS& ecs, EntityID selectedEntityID, eTransformMode transformMode, eTransformOperation transformOperation,
 		const Camera& camera, AABB2i renderRect, bool useSnap, float snapValue, int guizmoID, bool applyTransformation,
 		TransformEntityData& transformEntityData, EditorCommandTracker& commandTracker);

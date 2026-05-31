@@ -55,6 +55,8 @@ namespace CLX
 		[[nodiscard]] const Grid2<NavmeshNodeIndex>& GetNodeGrid() const { return mNodeGrid; }
 		[[nodiscard]] const Grid2<NavmeshVertexIndex>& GetVertexGrid() const { return mVertexGrid; }
 		[[nodiscard]] const Grid2<NavmeshWallIndex>& GetWallGrid() const { return mWallGrid; }
+        [[nodiscard]] NavmeshNode& GetNode(NavmeshNodeIndex index) { return mNodes[index]; }
+        [[nodiscard]] const NavmeshNode& GetNode(NavmeshNodeIndex index) const { return mNodes[index]; }
 
 	private:
 
