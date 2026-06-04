@@ -4,6 +4,7 @@
 #include "Engine/Math/Point3.hpp"
 #include "NavmeshDefines.hpp"
 #include "Engine/Math/Shapes/Plane.hpp"
+#include "Engine/Utility/IDWrapper.hpp"
 
 namespace CLX
 {
@@ -27,8 +28,8 @@ namespace CLX
 		Point2f mCenter;
 		Point3f mCenter3D;
 		Planef mPlane;
-		std::array<NavmeshNodeIndex, Vertices_In_Triangle> mConnections{};
-		std::array<NavmeshVertexIndex, Vertices_In_Triangle> mVertexIndices{};
+		std::array<NavmeshNodeIndex, Vertices_In_Triangle> mConnections{ InvalidID<NavmeshNodeIndex>() };
+		std::array<NavmeshVertexIndex, Vertices_In_Triangle> mVertexIndices{ InvalidID<NavmeshVertexIndex>() };
 		eNavmeshNodeState mState = eNavmeshNodeState::Walkable;
 	};
 

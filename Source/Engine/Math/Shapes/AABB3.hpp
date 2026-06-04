@@ -79,4 +79,22 @@ namespace CLX
 			Point3<T>(min.x, max.y, max.z)
 		};
 	}
+
+	template<typename T>
+	[[nodiscard]] constexpr T GetWidth(const AABB3<T>& aabb) noexcept
+	{
+		return aabb.GetMax().x - aabb.GetMin().x;
+	}
+
+	template<typename T>
+	[[nodiscard]] constexpr T GetHeight(const AABB3<T>& aabb) noexcept
+	{
+		return aabb.GetMax().y - aabb.GetMin().y;
+	}
+
+	template<typename T>
+	[[nodiscard]] constexpr T GetDepth(const AABB3<T>& aabb) noexcept
+	{
+		return aabb.GetMax().z - aabb.GetMin().z;
+	}
 }

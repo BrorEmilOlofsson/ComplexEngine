@@ -20,6 +20,14 @@ namespace CLX
 {
 	using NavmeshWallIndex = int;
 
+	[[nodiscard]] constexpr Triangle3f ToFace(const NavmeshNode& node, std::span<const Point3f> vertices)
+	{
+		const Point3f& vertex1 = vertices[node.mVertexIndices[0]];
+		const Point3f& vertex2 = vertices[node.mVertexIndices[1]];
+		const Point3f& vertex3 = vertices[node.mVertexIndices[2]];
+		return Triangle3f(vertex1, vertex2, vertex3);
+	}
+
 	class Navmesh final
 	{
 		friend class NavmeshAStar;
@@ -58,7 +66,7 @@ namespace CLX
         [[nodiscard]] NavmeshNode& GetNode(NavmeshNodeIndex index) { return mNodes[index]; }
         [[nodiscard]] const NavmeshNode& GetNode(NavmeshNodeIndex index) const { return mNodes[index]; }
 
-	private:
+	public:
 
 		std::optional<Point3f> FindClosestPointInNavmesh(const Point3f& position, const AABB2f& searchField) const;
 		
@@ -68,9 +76,14 @@ namespace CLX
 
 		NavmeshNodeIndex GetNodeIndexFromPosition(const Point3f& position) const;
 		bool IsInsideNode(const NavmeshNode& node, const Point2f& position) const;
-		bool IsVertexConnectedToNode(const NavmeshVertexIndex aVertexIndex, const NavmeshNodeIndex nodeIndex) const;
+		bool IsVertexConnectedToNode(const NavmeshVertexIndex vertexIndex, const NavmeshNodeIndex nodeIndex) const;
+		bool IsVertexConnectedToNode(const NavmeshVertexIndex vertexIndex, const NavmeshNode& node) const;
+        std::pair<NavmeshNodeIndex, NavmeshNodeIndex> GetConnectedNodes(NavmeshVertexIndex vertexIndex1, NavmeshVertexIndex vertexIndex2) const;
+        std::vector<NavmeshNodeIndex> GetConnectedNodes(NavmeshVertexIndex vertexIndex) const;
+        std::vector<NavmeshVertexIndex> GetConnectedVertices(NavmeshVertexIndex vertexIndex) const;
 		bool AreNodesConnected(const NavmeshNodeIndex node1, const NavmeshNodeIndex node2) const;
-		bool AreAllVerticesConnectedToNode(const NavmeshNodeIndex nodeIndex, const NavmeshVertexIndex vertexIndex1, const NavmeshVertexIndex vertexIndex2, const NavmeshVertexIndex aVertexIndex3) const;
+        bool AreVerticesConnected(const NavmeshVertexIndex vertexIndex1, const NavmeshVertexIndex vertexIndex2) const;
+		bool AreAllVerticesConnectedToNode(const NavmeshNodeIndex nodeIndex, const NavmeshVertexIndex vertexIndex1, const NavmeshVertexIndex vertexIndex2, const NavmeshVertexIndex vertexIndex3) const;
 		std::optional<NavmeshEdge> GetEdgeBetweenNodes(const NavmeshNodeIndex nodeIndex1, const NavmeshNodeIndex nodeIndex2) const;
 		std::optional<LineSegment2f> GetEdgeLineSegment2DFromNodes(const NavmeshNodeIndex nodeIndex1, const NavmeshNodeIndex nodeIndex2) const;
 		LineSegment2f GetLineSegment2DFromEdge(const NavmeshEdge& edge) const;

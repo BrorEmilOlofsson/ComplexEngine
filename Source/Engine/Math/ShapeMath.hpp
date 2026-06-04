@@ -23,6 +23,7 @@
 #include "Engine/Math/Dimension2.hpp"
 #include "Engine/Utility/Approximation.hpp"
 #include "Engine/Math/Transform3.hpp"
+#include <optional>
 
 namespace CLX
 {
@@ -40,6 +41,18 @@ namespace CLX
     }
 
     template<typename T>
+    [[nodiscard]] constexpr Line2<T> ToLine(const Ray2<T>& ray)
+    {
+        return Line2<T>::FromPointAndDirection(ray.GetOrigin(), ray.GetDirection());
+    }
+
+    template<typename T>
+    [[nodiscard]] constexpr Line3<T> ToLine(const Ray3<T>& ray)
+    {
+        return Line3<T>::FromPointAndDirection(ray.GetOrigin(), ray.GetDirection());
+    }
+
+    template<typename T>
     [[nodiscard]] constexpr LineSegment2<T> ToLineSegment(const Ray2<T>& ray, const T& distance)
     {
         return LineSegment2<T>::FromPoints(ray.GetOrigin(), ray.GetPointAtDistance(distance));
@@ -49,6 +62,24 @@ namespace CLX
     [[nodiscard]] constexpr LineSegment3<T> ToLineSegment(const Ray3<T>& ray, const T& distance)
     {
         return LineSegment3<T>::FromPoints(ray.GetOrigin(), ray.GetPointAtDistance(distance));
+    }
+
+    template<typename T>
+    [[nodiscard]] constexpr LineSegment3<T> ToLineSegment3XY(const LineSegment2<T>& lineSegment, const T& z)
+    {
+        return LineSegment3<T>::FromPoints(ToPoint3XY(lineSegment.StartPoint(), z), ToPoint3XY(lineSegment.EndPoint(), z));
+    }
+
+    template<typename T>
+    [[nodiscard]] constexpr LineSegment3<T> ToLineSegment3XZ(const LineSegment2<T>& lineSegment, const T& y)
+    {
+        return LineSegment3<T>::FromPoints(ToPoint3XZ(lineSegment.StartPoint(), y), ToPoint3XZ(lineSegment.EndPoint(), y));
+    }
+
+    template<typename T>
+    [[nodiscard]] constexpr LineSegment3<T> ToLineSegment3YZ(const LineSegment2<T>& lineSegment, const T& x)
+    {
+        return LineSegment3<T>::FromPoints(ToPoint3YZ(lineSegment.StartPoint(), x), ToPoint3YZ(lineSegment.EndPoint(), x));
     }
 
     template<typename T>
@@ -118,24 +149,6 @@ namespace CLX
     }
 
     template<typename T>
-    [[nodiscard]] constexpr T GetWidth(const AABB3<T>& aabb) noexcept
-    {
-        return aabb.GetMax().x - aabb.GetMin().x;
-    }
-
-    template<typename T>
-    [[nodiscard]] constexpr T GetHeight(const AABB3<T>& aabb) noexcept
-    {
-        return aabb.GetMax().y - aabb.GetMin().y;
-    }
-
-    template<typename T>
-    [[nodiscard]] constexpr T GetDepth(const AABB3<T>& aabb) noexcept
-    {
-        return aabb.GetMax().z - aabb.GetMin().z;
-    }
-
-    template<typename T>
     [[nodiscard]] constexpr std::optional<T> GetPlaneXPos(const Plane<T>& plane, const T& yPos, const T& zPos)
     {
         const Point3<T>& point = plane.GetPoint();
@@ -172,6 +185,89 @@ namespace CLX
     }
 
     template<typename T>
+    [[nodiscard]] constexpr std::optional<Point3<T>> GetPointAtX(const Line3<T>& line, const T& xPos)
+    {
+        if (line.GetDirection().X() == 0.f)
+        {
+            return std::nullopt;
+        }
+
+        const T t = (xPos - line.GetPoint().x) / line.GetDirection().X();
+        return line.GetPoint() + t * line.GetDirection();
+    }
+
+    template<typename T>
+    [[nodiscard]] constexpr std::optional<Point3<T>> GetPointAtY(const Line3<T>& line, const T& yPos)
+    {
+        if (line.GetDirection().Y() == 0.f)
+        {
+            return std::nullopt;
+        }
+
+        const T t = (yPos - line.GetPoint().y) / line.GetDirection().Y();
+        return line.GetPoint() + t * line.GetDirection();
+    }
+
+    template<typename T>
+    [[nodiscard]] constexpr std::optional<Point3<T>> GetPointAtZ(const Line3<T>& line, const T& zPos)
+    {
+        if (line.GetDirection().Z() == 0.f)
+        {
+            return std::nullopt;
+        }
+
+        const T t = (zPos - line.GetPoint().z) / line.GetDirection().Z();
+        return line.GetPoint() + t * line.GetDirection();
+    }
+
+    template<typename T>
+    [[nodiscard]] constexpr std::optional<Point3<T>> GetPointAtX(const Ray3<T>& line, const T& xPos)
+    {
+        if (line.GetDirection().X() == 0.f)
+        {
+            return std::nullopt;
+        }
+
+        const T t = (xPos - line.GetOrigin().x) / line.GetDirection().X();
+        if (t < 0)
+        {
+            return std::nullopt;
+        }
+        return line.GetOrigin() + t * line.GetDirection();
+    }
+
+    template<typename T>
+    [[nodiscard]] constexpr std::optional<Point3<T>> GetPointAtY(const Ray3<T>& line, const T& yPos)
+    {
+        if (line.GetDirection().Y() == 0.f)
+        {
+            return std::nullopt;
+        }
+
+        const T t = (yPos - line.GetOrigin().y) / line.GetDirection().Y();
+        if (t < 0)
+        {
+            return std::nullopt;
+        }
+        return line.GetOrigin() + t * line.GetDirection();
+    }
+
+    template<typename T>
+    [[nodiscard]] constexpr std::optional<Point3<T>> GetPointAtZ(const Ray3<T>& line, const T& zPos)
+    {
+        if (line.GetDirection().Z() == 0.f)
+        {
+            return std::nullopt;
+        }
+        const T t = (zPos - line.GetOrigin().z) / line.GetDirection().Z();
+        if (t < 0)
+        {
+            return std::nullopt;
+        }
+        return line.GetOrigin() + t * line.GetDirection();
+    }
+
+    template<typename T>
     [[nodiscard]] constexpr bool IsOnNormalSide(const Point3<T>& position, const Point3<T>& planePoint, const UnitVector3<T>& normal) noexcept
     {
         return Dot(position - planePoint, normal) > 0.0f;
@@ -181,6 +277,18 @@ namespace CLX
     [[nodiscard]] constexpr bool IsOnNormalSide(const Point3<T>& position, const Plane<T>& plane) noexcept
     {
         return IsOnNormalSide(position, plane.GetPoint(), plane.GetNormal());
+    }
+
+    template<typename T>
+    [[nodiscard]] constexpr bool IsOnNormalSide(const Point2<T>& position, const Point2<T>& linePoint, const UnitVector2<T>& normal) noexcept
+    {
+        return Dot(position - linePoint, normal) > 0.0f;
+    }
+
+    template<typename T>
+    [[nodiscard]] constexpr bool IsOnNormalSide(const Point2<T>& position, const LineSegment2<T>& line) noexcept
+    {
+        return IsOnNormalSide(position, line.StartPoint(), GetNormal(line));
     }
 
     template<typename T>
@@ -215,11 +323,11 @@ namespace CLX
         const Point2<T>& C = triangle.GetPoint2();
         const T D = 2 * (A.x * (B.y - C.y) + B.x * (C.y - A.y) + C.x * (A.y - B.y));
         const T Ux = ((Square(A.x) + Square(A.y)) * (B.y - C.y) +
-                      (Square(B.x) + Square(B.y)) * (C.y - A.y) +
-                      (Square(C.x) + Square(C.y)) * (A.y - B.y)) / D;
+            (Square(B.x) + Square(B.y)) * (C.y - A.y) +
+            (Square(C.x) + Square(C.y)) * (A.y - B.y)) / D;
         const T Uy = ((Square(A.x) + Square(A.y)) * (C.x - B.x) +
-                      (Square(B.x) + Square(B.y)) * (A.x - C.x) +
-                      (Square(C.x) + Square(C.y)) * (B.x - A.x)) / D;
+            (Square(B.x) + Square(B.y)) * (A.x - C.x) +
+            (Square(C.x) + Square(C.y)) * (B.x - A.x)) / D;
         const Point2<T> center(Ux, Uy);
         const T radius = Distance(center, A);
         return Circle<T>::FromCenterAndRadius(center, Radius<T>(radius));
@@ -379,6 +487,19 @@ namespace CLX
     }
 
     template<typename T>
+    [[nodiscard]] constexpr T GetDistance(const Ray3<T>& ray, const Point3<T>& point) noexcept
+    {
+        const Vector3<T> diff = point - ray.GetOrigin();
+        const T t = Dot(ray.GetDirection(), diff);
+        if (t < 0)
+        {
+            return  Distance(point, ray.GetOrigin());
+        }
+        const Point3<T> projectedPoint = ray.GetOrigin() + ray.GetDirection() * t;
+        return Distance(point, projectedPoint);
+    }
+
+    template<typename T>
     [[nodiscard]] constexpr Point3<T> GetProjectedPoint(const Plane<T>& plane, const Point3<T>& point) noexcept
     {
         const T t = Dot(plane.GetNormal(), point - plane.GetPoint());
@@ -459,7 +580,7 @@ namespace CLX
     template<typename T>
     [[nodiscard]] constexpr T GetVolume(const Sphere<T>& sphere) noexcept
     {
-        return static_cast<T>((4.0 / 3.0) * PI<T> * Cube(sphere.GetRadius().Value()));
+        return static_cast<T>((4.0 / 3.0) * PI<T> *Cube(sphere.GetRadius().Value()));
     }
 
     template<typename T>

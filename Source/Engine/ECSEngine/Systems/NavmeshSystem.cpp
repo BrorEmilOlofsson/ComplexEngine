@@ -7,7 +7,7 @@
 #include "Engine/Graphics/RenderState.hpp"
 #include "Engine/Scene/SceneManager.hpp"
 #include "Engine/Input/InputState.hpp"
-#include <External/fmt/core.h>
+#include <External/fmt/format.h>
 
 namespace CLX
 {
@@ -64,56 +64,6 @@ namespace CLX
 		}
 	}
 
-	void DebugFindPath(const Navmesh& navmesh, const InputState& input, RenderList& renderList, const Ray3f& mouseRay)
-	{
-		static Ray3f startRay;
-		static Ray3f endRay;
-		static std::optional<NavmeshPositionData> startHit;
-		static std::optional<NavmeshPositionData> endHit;
-		static std::vector<Point3f> path;
-		if (input.IsKeyPressed(eInputKey::LMB))
-		{
-			startRay = mouseRay;
-			startHit = navmesh.Raycast(startRay);
-			if (startHit && endHit)
-			{
-				path = navmesh.FindPath(startHit->m3DPosition, endHit->m3DPosition);
-			}
-		}
-		if (input.IsKeyPressed(eInputKey::RMB))
-		{
-			endRay = mouseRay;
-			endHit = navmesh.Raycast(endRay);
-
-			if (startHit && endHit)
-			{
-				path = navmesh.FindPath(startHit->m3DPosition, endHit->m3DPosition);
-			}
-		}
-		if (startHit)
-		{
-			RenderSphere(Spheref::FromCenterAndRadius(startHit->m3DPosition, Radiusf(0.1f)), Colors::SkyBlue, renderList);
-		}
-		if (endHit)
-		{
-			RenderSphere(Spheref::FromCenterAndRadius(endHit->m3DPosition, Radiusf(0.1f)), Colors::Navy, renderList);
-		}
-		if (!path.empty())
-		{
-			if (startHit)
-			{
-				RenderLineSegment(startHit->m3DPosition, path[0], Colors::FrenchRose, renderList);
-			}
-		}
-		if (path.size() >= 2)
-		{
-			for (std::size_t i = 0; i < path.size() - 1; ++i)
-			{
-				RenderLineSegment(path[i], path[i + 1], Colors::FrenchRose, renderList);
-			}
-		}
-	}
-
 	void NavmeshSystem::Render(const ECS&, [[maybe_unused]] const Blackboard& blackboard)
 	{
 #ifdef _EDITOR
@@ -124,7 +74,6 @@ namespace CLX
 			const SceneSettings& sceneSettings = blackboard.Get<Key_SceneManager>().GetSceneSettings();
 			const Ray3f mouseRay = blackboard.Get<Key_SceneManager>().GetActiveScene()->GetMouseRay();
 			RenderNavmesh(navmesh, renderState.GetRenderList(), sceneSettings.navmeshRenderSettings);
-			DebugFindPath(navmesh, blackboard.Get<Key_InputState>(), renderState.GetRenderList(), mouseRay);
 		}
 #endif
 	}

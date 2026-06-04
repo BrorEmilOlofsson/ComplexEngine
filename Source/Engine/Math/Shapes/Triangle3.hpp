@@ -20,6 +20,9 @@ namespace CLX
 		[[nodiscard]] constexpr const Point3<T>& GetPoint1() const noexcept;
 		[[nodiscard]] constexpr const Point3<T>& GetPoint2() const noexcept;
 
+        [[nodiscard]] constexpr Point3<T>& operator[](const std::size_t index) noexcept;
+        [[nodiscard]] constexpr const Point3<T>& operator[](const std::size_t index) const noexcept;
+
 	private:
 
 		Point3<T> mPoint0;
@@ -73,4 +76,40 @@ namespace CLX
 	{
 		return mPoint2;
 	}
+
+	template<typename T>
+    constexpr Point3<T>& Triangle3<T>::operator[](const std::size_t index) noexcept
+    {
+        assert(index < 3);
+        if (index == 0)
+        {
+            return mPoint0;
+        }
+        else if (index == 1)
+        {
+            return mPoint1;
+        }
+        else
+        {
+            return mPoint2;
+        }
+    }
+
+    template<typename T>
+    constexpr const Point3<T>& Triangle3<T>::operator[](const std::size_t index) const noexcept
+    {
+        assert(index < 3);
+        if (index == 0)
+        {
+            return mPoint0;
+        }
+        else if (index == 1)
+        {
+            return mPoint1;
+        }
+        else
+        {
+            return mPoint2;
+        }
+    }
 }
