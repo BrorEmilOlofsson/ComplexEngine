@@ -71,5 +71,8 @@ namespace CLX
 	};
 
 	template<typename ValueType>
-	using OutcomeTableUInt = OutcomeTable<ValueType, unsigned int>;
+	using OutcomeTableUInt32 = OutcomeTable<ValueType, uint32_t>;
+
+	template<typename ValueType>
+	using OutcomeTableUInt = OutcomeTableUInt32<ValueType>;
 }

@@ -1,5 +1,5 @@
-#include "Engine/Utility/Probability/Random.hpp"
 #include <External/Catch2/catch_amalgamated.hpp>
+#include "Engine/Utility/Random.hpp"
 
 using namespace CLX;
 
@@ -21,7 +21,7 @@ TEST_CASE("Get Random Number")
 TEST_CASE("GetRandomValueInOutcomeTable")
 {
 
-	OutcomeTableUInt<std::string_view> table;
+	OutcomeTableUInt32<std::string_view> table;
 
 	table.Insert("Emil", 500);
 	table.Insert("Emil 2", 500);
