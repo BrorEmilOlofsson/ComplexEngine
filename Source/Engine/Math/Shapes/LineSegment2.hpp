@@ -1,6 +1,6 @@
 #pragma once
 #include "Engine/Math/Point2.hpp"
-#include "Engine/Math/UnitVector2.hpp"
+#include "Engine/Math/VectorMath.hpp"
 
 namespace CLX
 {
@@ -75,4 +75,30 @@ namespace CLX
 	{
 		return a.StartPoint() == b.StartPoint() && a.EndPoint() == b.EndPoint();
 	}
+
+	template<typename T>
+	[[nodiscard]] constexpr T GetLength(const LineSegment2<T>& lineSegment)
+	{
+		return Distance(lineSegment.StartPoint(), lineSegment.EndPoint());
+	}
+
+	template<typename T, typename U>
+	[[nodiscard]] constexpr Point2<T> Lerp(const LineSegment2<T>& lineSegment, const U t) noexcept
+	{
+		return Lerp(lineSegment.StartPoint(), lineSegment.EndPoint(), t);
+	}
+
+	template<typename T>
+	[[nodiscard]] constexpr UnitVector2<T> GetDirection(const LineSegment2<T>& lineSegment) noexcept
+	{
+		return GetUnitVector(lineSegment.StartPoint(), lineSegment.EndPoint());
+	}
+
+	// Get a normal vector (perpendicular) to the line segment in 2D
+	template<typename T>
+	[[nodiscard]] constexpr UnitVector2<T> GetNormal(const LineSegment2<T>& lineSegment) noexcept
+	{
+		return GetPerpendicularVector(GetDirection(lineSegment));
+	}
+
 }

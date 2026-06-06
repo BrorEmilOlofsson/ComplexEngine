@@ -204,24 +204,31 @@ namespace CLX
         }
     }
 
-    void LoadEntityComposition(const std::filesystem::path& path, EntityComposition& entityComposition, const Blackboard& blackboard)
+    std::optional<EntityComposition> LoadEntityComposition(const std::filesystem::path& path, const ECSRegistry& ecsRegistry, 
+        EntitySerializationIDGenerator& idGenerator, ECSManager& ecsManager, const Blackboard& blackboard)
     {
         if (!std::filesystem::exists(path))
         {
-            return;
+            return std::nullopt;
         }
 
-        entityComposition.GetECS() = ECS(entityComposition.GetECS().GetRegistry(), entityComposition.GetECS().GetEntityIDGenerator());
 
         std::ifstream file(path);
 
         if (!file.is_open())
         {
-            return;
+            return std::nullopt;
         }
-
         nlohmann::json json = nlohmann::json::parse(file);
-        LoadECS(entityComposition.GetECS(), json, path, blackboard);
 
+        ECSID ecsID = ecsManager.CreateECS(ecsRegistry, idGenerator);
+        ECSOwningHandle ecsOwningHandle(ecsManager, ecsID);
+        LoadECS(ecsOwningHandle.Get(), json, path, blackboard);
+
+        EntityID rootEntity = EntityID{ 0, 0 };
+
+        EntityComposition entityComposition(ecsOwningHandle, rootEntity);
+        
+        return entityComposition;
     }
 }

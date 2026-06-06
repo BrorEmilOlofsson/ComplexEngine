@@ -1,6 +1,7 @@
 #pragma once
 #include "Engine/Asset/AssetTypes/EntityCompositionAsset.hpp"
 #include <External/nlohmann/json.hpp>
+#include <optional>
 
 namespace CLX
 {
@@ -12,6 +13,6 @@ namespace CLX
 	bool LoadECS(ECS& ecs, const nlohmann::json& jsonData, const std::filesystem::path& path, const Blackboard& blackboard);
 
 	void SaveEntityCompositionAsset(const EntityCompositionAssetHandle& asset, const DataTypeRegistry& dataTypeRegistry);
-	void LoadEntityComposition(const std::filesystem::path& path, EntityComposition& entityComposition, const Blackboard& blackboard);
+	std::optional<EntityComposition> LoadEntityComposition(const std::filesystem::path& path, const ECSRegistry& ecsRegistry, EntitySerializationIDGenerator& idGenerator, ECSManager& ecsManager, const Blackboard& blackboard);
 
 }

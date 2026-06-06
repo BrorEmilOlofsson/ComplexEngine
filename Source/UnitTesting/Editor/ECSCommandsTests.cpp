@@ -160,6 +160,14 @@ TEST_CASE("Add Child Entity")
     REQUIRE(ecs.GetComponent<TransformHierarchyComponent>(EntityID{ 2 })->children.size() == 0);
 }
 
+EntityComposition CreateTestComposition(ECSManager& ecsManager, EntitySerializationIDGenerator& entityIDGenerator)
+{
+    ECSID ecsID = ecsManager.CreateECS(CreateECSRegistry(), entityIDGenerator);
+    ECS& ecs = *ecsManager.GetECS(ecsID);
+    EntityID rootEntityID = ecs.CreateEntity();
+    return EntityComposition(ECSOwningHandle(ecsManager, ecsID), rootEntityID);
+}
+
 TEST_CASE("Instantiate Entity Composition")
 {
     {
@@ -167,7 +175,7 @@ TEST_CASE("Instantiate Entity Composition")
         ECSManager ecsManager;
 
         EntitySerializationIDGenerator entityIDGenerator;
-        EntityCompositionAsset compositionAsset(EntityComposition(ecsManager, ecsManager.CreateECS(CreateECSRegistry(), entityIDGenerator)), std::filesystem::path("path/to/asset"));
+        EntityCompositionAsset compositionAsset(CreateTestComposition(ecsManager, entityIDGenerator), std::filesystem::path("path/to/asset"));
 
         ECSOwningHandle targetECS(ecsManager, ecsManager.CreateECS(CreateECSRegistry(), entityIDGenerator));
 
@@ -198,7 +206,7 @@ TEST_CASE("Instantiate Entity Composition")
         ECSManager ecsManager;
 
         EntitySerializationIDGenerator entityIDGenerator;
-        EntityCompositionAsset compositionAsset(EntityComposition(ecsManager, ecsManager.CreateECS(CreateECSRegistry(), entityIDGenerator)), std::filesystem::path("path/to/asset"));
+        EntityCompositionAsset compositionAsset(CreateTestComposition(ecsManager, entityIDGenerator), std::filesystem::path("path/to/asset"));
 
         ECSOwningHandle targetECS(ecsManager, ecsManager.CreateECS(CreateECSRegistry(), entityIDGenerator));
 
@@ -250,8 +258,8 @@ TEST_CASE("Instantiate Entity Composition")
         ECSManager ecsManager;
         EntitySerializationIDGenerator entityIDGenerator;
 
-        EntityCompositionAsset compositionAsset1(EntityComposition(ecsManager, ecsManager.CreateECS(CreateECSRegistry(), entityIDGenerator)), std::filesystem::path("path/to/asset"));
-        EntityCompositionAsset compositionAsset2(EntityComposition(ecsManager, ecsManager.CreateECS(CreateECSRegistry(), entityIDGenerator)), std::filesystem::path("path/to/asset"));
+        EntityCompositionAsset compositionAsset1(CreateTestComposition(ecsManager, entityIDGenerator), std::filesystem::path("path/to/asset"));
+        EntityCompositionAsset compositionAsset2(CreateTestComposition(ecsManager, entityIDGenerator), std::filesystem::path("path/to/asset"));
 
         const EntityID child1 = compositionAsset1->GetECS().CreateEntity();
         const EntityID child2 = compositionAsset1->GetECS().CreateEntity();

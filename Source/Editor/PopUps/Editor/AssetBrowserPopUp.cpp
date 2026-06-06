@@ -113,7 +113,8 @@ namespace CLX
 
     EntityComposition CreateEntityComposition(ECSManager& ecsManager, const ECSRegistry& ecsRegistry, EntitySerializationIDGenerator& entityIDGenerator, std::string name)
     {
-        EntityComposition entityComposition(ecsManager, ecsManager.CreateECS(ecsRegistry, entityIDGenerator));
+        ECSID ecsID = ecsManager.CreateECS(ecsRegistry, entityIDGenerator);
+        EntityComposition entityComposition(ECSOwningHandle(ecsManager, ecsID));
         NameComponent* nameComponent = entityComposition.GetECS().GetComponent<NameComponent>(entityComposition.GetRootEntity());
         ASSERT(nameComponent);
         nameComponent->name = std::move(name);

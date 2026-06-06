@@ -9,7 +9,9 @@ namespace CLX
 	{
 	public:
 
-		explicit EntityComposition(ECSManager& ecsManager, ECSID ecsID);
+		static constexpr EntityID DefaultRootEntityID = EntityID{ 0, 0 };
+
+		explicit EntityComposition(ECSOwningHandle ecsOwningHandle, EntityID rootEntityID = DefaultRootEntityID);
 
 		[[nodiscard]] constexpr ECSHandle GetECSHandle() noexcept;
 		[[nodiscard]] ECS& GetECS() noexcept;

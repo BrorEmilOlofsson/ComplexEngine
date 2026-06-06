@@ -112,9 +112,12 @@ namespace CLX
         EntitySerializationIDGenerator* entityIDGenerator = &mEntityIDGenerator;
         auto entityCompositionLoader = [blackboard, ecsRegistry, ecsManager, entityIDGenerator](const std::filesystem::path& path)
             {
-                EntityComposition entityComposition(*ecsManager, ecsManager->CreateECS(*ecsRegistry, *entityIDGenerator));
-                LoadEntityComposition(path, entityComposition, *blackboard);
-                return EntityCompositionAsset(std::move(entityComposition), path);
+                std::optional<EntityComposition> entityComposition = LoadEntityComposition(path, *ecsRegistry, *entityIDGenerator, *ecsManager, *blackboard);
+                if (entityComposition)
+                {
+                    return EntityCompositionAsset(std::move(*entityComposition), path);
+                }
+                return EntityCompositionAsset::Empty();
             };
         mAssetManager->GetAssetLoader().SetEntityCompositionLoader(entityCompositionLoader);
         mAssetManager->GetAssetLoader().SetAudioLoader([this](const std::filesystem::path& path)

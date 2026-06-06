@@ -1,14 +1,17 @@
 #include "Engine/Precompiled/EnginePch.hpp"
 #include "EntityComposition.hpp"
 #include "ECSRegistry.hpp"
+#include "Engine/ECSEngine/Utility/ECSUtilityFunctions.hpp"
 
 namespace CLX
 {
 
-	EntityComposition::EntityComposition(ECSManager& ecsManager, ECSID ecsID)
-		: mECSHandle(ecsManager, ecsID)
-		, mRootEntityID(mECSHandle.Get().CreateEntity())
+	EntityComposition::EntityComposition(ECSOwningHandle ecsOwningHandle, EntityID rootEntityID)
+		: mECSHandle(std::move(ecsOwningHandle))
+		, mRootEntityID(rootEntityID)
 	{
+        ASSERT(mRootEntityID != InvalidEntityID);
+		ASSERT(GetParentEntity(mECSHandle.Get(), mRootEntityID) == InvalidEntityID);
 	}
 
 	EntityID EntityComposition::GetRootEntity() const noexcept

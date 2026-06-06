@@ -505,10 +505,7 @@ namespace CLX
     {
         EntitySerializationID entitySerializationID = InvalidID<EntitySerializationID>();
         
-        if (entityID != InvalidEntityID)
-        {
-            entitySerializationID = ecs.GetSerializationID(entityID);
-        }
+
         ImGui::Text(variableName.c_str());
         ImGui::SameLine();
         std::string btnStr;
@@ -523,6 +520,7 @@ namespace CLX
                 const NameComponent* nameComponent = ecs.GetComponent<NameComponent>(entityID);
                 ASSERT_NEW(nameComponent, "Entity does not have a NameComponent");
                 btnStr = nameComponent->name + " (" + std::to_string(entityID.id) + ")";
+                entitySerializationID = ecs.GetSerializationID(entityID);
             }
             else
             {
