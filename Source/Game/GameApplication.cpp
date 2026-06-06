@@ -1,5 +1,5 @@
 #include "Game/Precompiled/GamePch.hpp"
-#include "GameMain.hpp"
+#include "GameApplication.hpp"
 #include "Engine/Engine.hpp"
 #include "Game/Game.hpp"
 

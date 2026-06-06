@@ -282,35 +282,6 @@ namespace CLX
         mBlackboard->Insert<Key_DeltaTime>(deltaTimeCapped);
         mSceneManager.Update(deltaTimeCapped);
         mAudioManager.Update();
-
-        static AudioChannelID channelId = InvalidID<AudioChannelID>();
-
-        if (channelId == InvalidID<AudioChannelID>())
-        {
-            AudioAssetHandle audioHandle = mAssetManager->GetAudio(GetAbsoluteAssetPath() / "Audio" / "StardewValley.mp3");
-            channelId = mAudioManager.Play(audioHandle, 1.0f, { 0, 0, 0 });
-        }
-
-        static Point3f audioPosition = Point3f::Zero();
-        static float audioVolume = 1.0f;
-        static bool stop = true;
-        mAudioManager.SetChannelPaused(channelId, stop);
-        ImGui::Begin("Audio Test");
-        if (ImGui::DragFloat3("Audio Position", &audioPosition.x, 0.001f))
-        {
-            mAudioManager.SetChannelPosition(channelId, audioPosition);
-
-        }
-        if (ImGui::DragFloat("Audio Volume", &audioVolume, 0.001f))
-        {
-            mAudioManager.SetChannelVolume(channelId, audioVolume);
-
-        }
-        if (ImGui::Checkbox("Stop Audio", &stop))
-        {
-            mAudioManager.SetChannelPaused(channelId, stop);
-        }
-        ImGui::End();
     }
 
     void Engine::Render()

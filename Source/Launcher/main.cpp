@@ -1,7 +1,7 @@
 #include <External/profiler.h>
 #include "Engine/Utility/EasyProfilerOutput.hpp"
 #include "Editor/EditorApplication.hpp"
-#include "Game/GameMain.hpp"
+#include "Game/GameApplication.hpp"
 #include "Engine/OperatingSystem/OperatingSystem.hpp"
 
 #ifdef BUILD_WITH_EASY_PROFILER

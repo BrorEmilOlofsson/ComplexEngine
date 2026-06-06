@@ -28,7 +28,7 @@ namespace CLX
 		void ChangeSceneDirectly(SceneAssetHandle scene);
 
         [[nodiscard]] bool IsPlaying() const noexcept { return mIsPlaying; }
-        void SetIsPlaying(bool isPlaying) noexcept { mIsPlaying = isPlaying; }
+        //void SetIsPlaying(bool isPlaying) noexcept { mIsPlaying = isPlaying; }
 		void RegisterOnSceneLoadedFunction(std::function<void(Scene&)> function)
 		{
 			mOnSceneLoadedFunctions.push_back(std::move(function));

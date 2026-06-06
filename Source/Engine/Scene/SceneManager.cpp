@@ -32,6 +32,7 @@ namespace CLX
         {
             return;
         }
+        mIsPlaying = true;
         mActiveScene->BeginPlay();
     }
 
@@ -42,6 +43,7 @@ namespace CLX
             return;
         }
         mActiveScene->EndPlay();
+        mIsPlaying = false;
     }
 
     void SceneManager::Update(float deltaTime)

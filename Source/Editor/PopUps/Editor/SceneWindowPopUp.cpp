@@ -71,7 +71,6 @@ namespace CLX
     {
         if (startPlaying)
         {
-            sceneManager.SetIsPlaying(true);
             sceneManager.BeginPlay();
             editor.OnSceneBeginPlay(sceneManager.GetActiveScene().Get());
         }
@@ -79,7 +78,6 @@ namespace CLX
         {
             editor.OnSceneEndPlay(sceneManager.GetActiveScene().Get());
             sceneManager.EndPlay();
-            sceneManager.SetIsPlaying(false);
         }
     }
 
