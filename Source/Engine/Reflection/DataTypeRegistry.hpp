@@ -30,9 +30,9 @@ namespace CLX
     };
 
     template<typename T>
-    concept Savable = requires(const T & data, const DataTypeRegistry & dataTypeRegistry)
+    concept Savable = requires(const T & data, const Blackboard & blackboard)
     {
-        { ToJSON(data, dataTypeRegistry) } -> std::same_as<nlohmann::json>;
+        { ToJSON(data, blackboard) } -> std::same_as<nlohmann::json>;
     };
 
     template<typename T>
@@ -65,8 +65,8 @@ namespace CLX
         ViewAndEditResult ViewAndEditData(DataTypeID dataTypeID, void* dataPtr, const Blackboard& blackboard, const DataTypeMemberVariable* memberData = nullptr) const;
         void LoadDataJSON(const DataType& dataType, void* dataPtr, const nlohmann::json& json, const Blackboard& blackboard) const;
         void LoadDataJSON(DataTypeID dataTypeID, void* dataPtr, const nlohmann::json& json, const Blackboard& blackboard) const;
-        nlohmann::json SaveDataJSON(const DataType& dataType, const void* dataPtr) const;
-        nlohmann::json SaveDataJSON(DataTypeID dataTypeID, const void* dataPtr) const;
+        nlohmann::json SaveDataJSON(const DataType& dataType, const void* dataPtr, const Blackboard& blackboard) const;
+        nlohmann::json SaveDataJSON(DataTypeID dataTypeID, const void* dataPtr, const Blackboard& blackboard) const;
 
         void InplaceAllocateData(DataTypeID dataTypeID, void* destinationPtr, const void* defaultValuePtr = nullptr) const;
         void CopyData(DataTypeID dataTypeID, void* destinationPtr, const void* sourcePtr) const;
@@ -212,7 +212,7 @@ namespace CLX
 
         if constexpr (std::is_fundamental_v<T>)
         {
-            dataType.toJSON = [](const void* dataPtr, const DataTypeRegistry&) -> nlohmann::json
+            dataType.toJSON = [](const void* dataPtr, const Blackboard&) -> nlohmann::json
                 {
                     const T* pointer = reinterpret_cast<const T*>(dataPtr);
                     return ::ToJSON(*pointer);
@@ -220,10 +220,10 @@ namespace CLX
         }
         else if constexpr (Savable<T>)
         {
-            dataType.toJSON = [](const void* dataPtr, const DataTypeRegistry& dataTypeRegistry) -> nlohmann::json
+            dataType.toJSON = [](const void* dataPtr, const Blackboard& blackboard) -> nlohmann::json
                 {
                     const T* pointer = reinterpret_cast<const T*>(dataPtr);
-                    return ToJSON(*pointer, dataTypeRegistry);
+                    return ToJSON(*pointer, blackboard);
                 };
         }
 

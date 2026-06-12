@@ -14,9 +14,9 @@ namespace CLX
     {
     public:
 
-        static std::function<void()> Save(const SceneManager* sceneManager, const class DataTypeRegistry* dataTypeRegistry)
+        static std::function<void()> Save(const SceneManager* sceneManager, std::weak_ptr<Blackboard> blackboard)
         {
-            return [sceneManager, dataTypeRegistry]() -> void
+            return [sceneManager, blackboard]() -> void
                 {
                     auto sceneAsset = sceneManager->GetActiveScene();
                     if (!sceneAsset)
@@ -26,7 +26,7 @@ namespace CLX
                     }
 
                     const Scene& activeScene = sceneAsset.Get();
-                    SceneLoader::SaveScene(activeScene, sceneAsset.GetRelativePath(), *dataTypeRegistry);
+                    SceneLoader::SaveScene(activeScene, sceneAsset.GetRelativePath(), *blackboard.lock());
 
 
                     Console::Print("Scene ", ConsoleTextColor::White, false);

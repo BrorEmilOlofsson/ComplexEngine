@@ -1,5 +1,6 @@
 #pragma once
 #include <filesystem>
+#include "Engine/Utility/Blackboard.hpp"
 
 namespace CLX
 {
@@ -9,7 +10,7 @@ namespace CLX
 	class SceneLoader
 	{
 	public:
-		static void SaveScene(const Scene& scene, const std::filesystem::path& path, const class DataTypeRegistry& dataTypeRegistry);
+		static void SaveScene(const Scene& scene, const std::filesystem::path& path, const Blackboard& blackboard);
 		static void LoadScene(Scene& scene, const std::filesystem::path& path, const Blackboard& blackboard);
 		static void CreateNewSceneFile(const std::filesystem::path& path);
 	};

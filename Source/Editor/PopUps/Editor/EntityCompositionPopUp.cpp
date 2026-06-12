@@ -212,8 +212,6 @@ namespace CLX
             }
         }
 
-
-
         if (ImGui::Begin((GetEntityCompositionName(mEntityCompositionAsset) + " Hierarchy").c_str()))
         {
 
@@ -221,7 +219,7 @@ namespace CLX
             {
                 if (ImGui::Button("Save"))
                 {
-                    SaveEntityCompositionAsset(mEntityCompositionAsset, blackboard.Get<Key_DataTypeRegistry>());
+                    SaveEntityCompositionAsset(mEntityCompositionAsset, blackboard);
                 }
                 ShowEntityHierarchyWithAddButtons(
                     mEntityCompositionAsset->GetECSHandle(),

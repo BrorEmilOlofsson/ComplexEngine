@@ -9,8 +9,9 @@
 namespace CLX
 {
 
-    static void SaveComponents(ECS::ConstEntityView entityView, nlohmann::ordered_json& entityJson, const DataTypeRegistry& dataTypeRegistry)
+    static void SaveComponents(ECS::ConstEntityView entityView, nlohmann::ordered_json& entityJson, const Blackboard& blackboard)
     {
+        const DataTypeRegistry& dataTypeRegistry = blackboard.Get<Key_DataTypeRegistry>();
         std::size_t componentCount = 0;
 
         for (auto [typeInfo, componentPtr] : entityView)
@@ -20,24 +21,31 @@ namespace CLX
             nlohmann::ordered_json& componentJson = entityJson["Components"][componentCount];
 
             componentJson["Name"] = componentDataType->name;
-            componentJson["Properties"] = dataTypeRegistry.SaveDataJSON(*componentDataType, componentPtr);
+            componentJson["Properties"] = dataTypeRegistry.SaveDataJSON(*componentDataType, componentPtr, blackboard);
 
             ++componentCount;
         }
     }
 
-    void SaveECS(const ECS& ecs, nlohmann::ordered_json& json, const DataTypeRegistry& dataTypeRegistry)
+    void SaveECS(const ECS& ecs, nlohmann::ordered_json& json, const Blackboard& blackboard)
     {
+        
+
+        auto& entityIDsJSON = json["EntityIDs"];
+        for (auto entityView : ecs.ViewEntities())
+        {
+            entityIDsJSON.emplace_back(entityView.GetSerializationID().id);
+        }
+
         auto& entitiesJSON = json["Entities"];
 
         std::size_t i = 0;
         for (auto entityView : ecs.ViewEntities())
         {
             nlohmann::ordered_json& entityJson = entitiesJSON[i];
-            entityJson["ID"] = entityView.GetEntityID().id;
             entityJson["SID"] = entityView.GetSerializationID().id;
 
-            SaveComponents(entityView, entityJson, dataTypeRegistry);
+            SaveComponents(entityView, entityJson, blackboard);
             i++;
         }
     }
@@ -118,32 +126,37 @@ namespace CLX
     bool LoadECS(ECS& ecs, const nlohmann::json& jsonData, const std::filesystem::path& path, const Blackboard& blackboard)
     {
         PROFILER_FUNCTION(profiler::colors::Brick);
-        if (!jsonData.contains("Entities") || jsonData.is_null())
-        {
-            return false;
-        }
 
         const DataTypeRegistry& dataTypeRegistry = blackboard.Get<Key_DataTypeRegistry>();
         bool shouldUpdateJSON = false;
 
+        std::unordered_map<EntitySerializationID, EntityID> serializationIDToEntityIDMap;
+
+        for (uint64_t sid : jsonData["EntityIDs"])
+        {
+            EntitySerializationID loadedSerializationID{ sid };
+            EntityID entityID = ecs.CreateEntity(loadedSerializationID);
+            serializationIDToEntityIDMap.emplace(loadedSerializationID, entityID);
+        }
+
+        Blackboard newBlackboard = blackboard;
+        newBlackboard.Insert<Key_EntitySerializationMap>(serializationIDToEntityIDMap);
+
         const nlohmann::json& entitiesJson = jsonData["Entities"];
+
 
         for (size_t i = 0; i < entitiesJson.size(); ++i)
         {
             const nlohmann::json& entityData = entitiesJson[i];
-            const EntityID loadedEntityID = { entityData["ID"] };
             const EntitySerializationID loadedSerializationID = { entityData["SID"] };
 
-            const EntityID newEntityID = ecs.CreateEntity(loadedSerializationID);
+            const EntityID mappedEntityID = serializationIDToEntityIDMap.at(loadedSerializationID);
 
-            if (entityData.contains("Components") == false)
-            {
-                continue;
-            }
+            const auto& componentsJson = entityData["Components"];
 
-            for (size_t j = 0; j < entityData["Components"].size(); ++j)
+            for (size_t j = 0; j < componentsJson.size(); ++j)
             {
-                const nlohmann::json& componentDataJSON = entityData["Components"][j];
+                const nlohmann::json& componentDataJSON = componentsJson[j];
 
                 const std::string componentName = componentDataJSON["Name"];
                 const DataTypeID dataTypeID = dataTypeRegistry.Find(componentName);
@@ -155,12 +168,7 @@ namespace CLX
 
                 const ECSRegistry& registry = ecs.GetRegistry();
                 const std::vector<DataTypeMemberVariable>& componentProperties = dataTypeRegistry.Find(dataTypeID)->memberVariables;
-                void* componentPointer = registry.GetComponentType(dataTypeID.typeIndex).addComponentFunction(ecs, newEntityID, nullptr);
-
-                if (!componentDataJSON.contains("Properties"))
-                {
-                    continue;
-                }
+                void* componentPointer = registry.GetComponentType(dataTypeID.typeIndex).addComponentFunction(ecs, mappedEntityID, nullptr);
 
                 nlohmann::json membersJSON = componentDataJSON["Properties"];
 
@@ -169,14 +177,14 @@ namespace CLX
                     shouldUpdateJSON = true;
                 }
 
-                dataTypeRegistry.LoadDataJSON(dataTypeID, componentPointer, membersJSON, blackboard);
+                dataTypeRegistry.LoadDataJSON(dataTypeID, componentPointer, membersJSON, newBlackboard);
             }
         }
 
         return shouldUpdateJSON;
     }
 
-    static void SaveEntityComposition(const std::filesystem::path& path, const EntityComposition& entityComposition, const DataTypeRegistry& dataTypeRegistry)
+    static void SaveEntityComposition(const std::filesystem::path& path, const EntityComposition& entityComposition, const Blackboard& blackboard)
     {
         nlohmann::ordered_json json;
 
@@ -190,21 +198,21 @@ namespace CLX
             return;
         }
         const ECS& ecs = entityComposition.GetECS();
-        SaveECS(ecs, json, dataTypeRegistry);
+        SaveECS(ecs, json, blackboard);
 
         writeFile << json;
 
     }
 
-    void SaveEntityCompositionAsset(const EntityCompositionAssetHandle& asset, const DataTypeRegistry& dataTypeRegistry)
+    void SaveEntityCompositionAsset(const EntityCompositionAssetHandle& asset, const Blackboard& blackboard)
     {
         if (asset)
         {
-            SaveEntityComposition(asset.GetRelativePath(), asset.Get(), dataTypeRegistry);
+            SaveEntityComposition(asset.GetRelativePath(), asset.Get(), blackboard);
         }
     }
 
-    std::optional<EntityComposition> LoadEntityComposition(const std::filesystem::path& path, const ECSRegistry& ecsRegistry, 
+    std::optional<EntityComposition> LoadEntityComposition(const std::filesystem::path& path, const ECSRegistry& ecsRegistry,
         EntitySerializationIDGenerator& idGenerator, ECSManager& ecsManager, const Blackboard& blackboard)
     {
         if (!std::filesystem::exists(path))
@@ -228,7 +236,7 @@ namespace CLX
         EntityID rootEntity = EntityID{ 0, 0 };
 
         EntityComposition entityComposition(ecsOwningHandle, rootEntity);
-        
+
         return entityComposition;
     }
 }

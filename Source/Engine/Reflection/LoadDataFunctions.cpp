@@ -24,21 +24,46 @@ void FromJSON(bool& value, const nlohmann::json& json)
 
 void FromJSON(char& value, const nlohmann::json& json)
 {
-    int v = static_cast<int>(value);
-    FromJSON(v, json);
+    int8_t temp = json;
+    value = static_cast<char>(temp);
 }
 
-void FromJSON(int& value, const nlohmann::json& json)
+void FromJSON(int8_t& value, const nlohmann::json& json)
 {
     value = json;
 }
 
-void FromJSON(unsigned int& value, const nlohmann::json& json)
+void FromJSON(uint8_t& value, const nlohmann::json& json)
+{
+    value = json;
+}
+
+void FromJSON(int32_t& value, const nlohmann::json& json)
+{
+    value = json;
+}
+
+void FromJSON(uint32_t& value, const nlohmann::json& json)
+{
+    value = json;
+}
+
+void FromJSON(int64_t& value, const nlohmann::json& json)
+{
+    value = json;
+}
+
+void FromJSON(uint64_t& value, const nlohmann::json& json)
 {
     value = json;
 }
 
 void FromJSON(float& value, const nlohmann::json& json)
+{
+    value = json;
+}
+
+void FromJSON(double& value, const nlohmann::json& json)
 {
     value = json;
 }
@@ -93,9 +118,19 @@ namespace CLX
         color.b = json.at("b");
     }
 
-    void FromJSON(EntityID& entityID, const nlohmann::json& json)
+    void FromJSON(EntityID& entityID, const nlohmann::json& json, const Blackboard& blackboard)
     {
-        ::FromJSON(entityID.id, json);
+        if (json.is_null())
+        {
+            entityID = InvalidEntityID;
+            return;
+        }
+
+        const auto& entityMap = blackboard.Get<Key_EntitySerializationMap>();
+        
+        EntitySerializationID entitySerializationID;
+        ::FromJSON(entitySerializationID.id, json);
+        entityID = entityMap.at(entitySerializationID);
     }
 
     void FromJSON(PointLight& pointLight, const nlohmann::json& json)

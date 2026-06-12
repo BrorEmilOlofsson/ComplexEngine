@@ -66,6 +66,8 @@ namespace CLX
         [[nodiscard]] ECSManager& GetECSManager() { return mECSManager; }
         [[nodiscard]] EntitySerializationIDGenerator& GetEntityIDGenerator() { return mEntityIDGenerator; }
         [[nodiscard]] const ECSRegistry& GetECSRegistry() const { return mECSRegistry; }
+        [[nodiscard]] std::weak_ptr<Blackboard> GetBlackboard() { return mBlackboard; }
+        [[nodiscard]] std::weak_ptr<const Blackboard> GetBlackboard() const { return mBlackboard; }
 		void SetShouldExit(bool shouldExit = true);
 		void SetCurrentDropPath(const std::filesystem::path& path);
 

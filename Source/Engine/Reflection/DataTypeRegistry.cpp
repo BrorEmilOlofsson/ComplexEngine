@@ -131,11 +131,11 @@ namespace CLX
         LoadDataJSON(*dataType, dataPtr, json, blackboard);
     }
 
-    nlohmann::json DataTypeRegistry::SaveDataJSON(const DataType& dataType, const void* dataPtr) const
+    nlohmann::json DataTypeRegistry::SaveDataJSON(const DataType& dataType, const void* dataPtr, const Blackboard& blackboard) const
     {
         if (dataType.toJSON != nullptr)
         {
-            return dataType.toJSON(dataPtr, *this);
+            return dataType.toJSON(dataPtr, blackboard);
         }
 
         nlohmann::json json;
@@ -149,13 +149,13 @@ namespace CLX
             }
 
             const void* const memberPtr = dataPtr + std::get<ByteOffset>(member.memberType);
-            json[member.name] = SaveDataJSON(*memberDataType, memberPtr);
+            json[member.name] = SaveDataJSON(*memberDataType, memberPtr, blackboard);
         }
 
         return json;
     }
 
-    nlohmann::json DataTypeRegistry::SaveDataJSON(const DataTypeID dataTypeID, const void* dataPtr) const
+    nlohmann::json DataTypeRegistry::SaveDataJSON(const DataTypeID dataTypeID, const void* dataPtr, const Blackboard& blackboard) const
     {
         const DataType* dataType = Find(dataTypeID);
         if (dataType == nullptr)
@@ -163,7 +163,7 @@ namespace CLX
             return {};
         }
 
-        return SaveDataJSON(*dataType, dataPtr);
+        return SaveDataJSON(*dataType, dataPtr, blackboard);
     }
 
     void DataTypeRegistry::InplaceAllocateData(DataTypeID dataTypeID, void* dataPtr, const void* defaultValuePtr) const

@@ -169,37 +169,6 @@ namespace CLX
         return oldToNewEntityIDMap;
     }
 
-    void AddEntityToRootEntities(const EntityID entityID, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker)
-    {
-        if (std::ranges::find(rootEntities, entityID) != end(rootEntities))
-        {
-            return;
-        }
-        struct AddEntityToRootEntitiesData final
-        {
-            EntityID entityID;
-            std::reference_wrapper<std::vector<EntityID>> rootEntities;
-        };
-
-        AddEntityToRootEntitiesData data
-        {
-            .entityID = entityID,
-            .rootEntities = rootEntities
-        };
-
-        auto doCommand = [](const AddEntityToRootEntitiesData& data)
-            {
-                data.rootEntities.get().push_back(data.entityID);
-            };
-
-        auto undoCommand = [](const AddEntityToRootEntitiesData& data)
-            {
-                data.rootEntities.get().pop_back();
-            };
-
-        commandTracker.ExecuteCommand(EditorCommand(data, doCommand, undoCommand, "Add Entity To Root Entities"));
-    }
-
     void ActivateEntityHierarchy(ECS& ecs, const EntityID entityID)
     {
         ecs.ActivateEntity(entityID);
@@ -234,7 +203,6 @@ namespace CLX
             EntityID parentID;
             IndexVariant indexVariant;
         };
-
 
         DuplicateEntityHierarchyData data
         {
@@ -622,7 +590,7 @@ namespace CLX
             Blackboard blackboard;
         };
 
-        nlohmann::json oldComponentData = dataTypeRegistry.SaveDataJSON(dataTypeID, ecs.GetComponent(entityID, dataTypeID.typeIndex));
+        nlohmann::json oldComponentData = dataTypeRegistry.SaveDataJSON(dataTypeID, ecs.GetComponent(entityID, dataTypeID.typeIndex), blackboard);
 
         RemoveComponentData data
         {

@@ -1,7 +1,9 @@
 {
+  "EntityIDs": [
+    3000
+  ],
   "Entities": [
     {
-      "ID": 0,
       "SID": 3000,
       "Components": [
         {
@@ -37,7 +39,7 @@
           "Properties": {
             "children": [
             ],
-            "parent": 4294967295
+            "parent": null
           }
         },
         {

@@ -19,11 +19,6 @@
 #include "Engine/Graphics/Light/DirectionalLight.hpp"
 #include "Engine/Math/Shapes/Shape.hpp"
 
-namespace CLX
-{
-    class DataTypeRegistry;
-}
-
 [[nodiscard]] nlohmann::json ToJSON(const bool& value);
 [[nodiscard]] nlohmann::json ToJSON(const char& value);
 [[nodiscard]] nlohmann::json ToJSON(const int& value);
@@ -37,7 +32,7 @@ namespace std
 
 namespace CLX
 {
-	[[nodiscard]] nlohmann::json SaveDataPtr(const DataTypeID dataTypeID, const void* dataPtr, const DataTypeRegistry& dataTypeRegistry);
+	[[nodiscard]] nlohmann::json SaveDataPtr(const DataTypeID dataTypeID, const void* dataPtr, const Blackboard& blackboard);
 
 	[[nodiscard]] nlohmann::json ToJSON(const Transform& transform);
 
@@ -171,12 +166,12 @@ namespace CLX
 		return ::ToJSON(degrees.Value());
 	}
 
-	[[nodiscard]] nlohmann::json ToJSON(const EntityID& entityID);
+	[[nodiscard]] nlohmann::json ToJSON(const EntityID& entityID, const Blackboard& blackboard);
 
 	[[nodiscard]] nlohmann::json ToJSON(const PointLight& pointlight);
 	[[nodiscard]] nlohmann::json ToJSON(const DirectionalLight& directionalLight);
 	[[nodiscard]] nlohmann::json ToJSON(const Camera& camera);
-    [[nodiscard]] nlohmann::json ToJSON(const Shape& shape, const DataTypeRegistry& dataTypeRegistry);
+    [[nodiscard]] nlohmann::json ToJSON(const Shape& shape, const Blackboard& blackboard);
 
 	template<IsAssetHandle T>
     [[nodiscard]] nlohmann::json ToJSON(const T& assetHandle)
@@ -224,7 +219,7 @@ namespace CLX
 	};
 
     template<NormalSavable T>
-	[[nodiscard]] nlohmann::json ToJSON(const T& value, const DataTypeRegistry&)
+	[[nodiscard]] nlohmann::json ToJSON(const T& value, const Blackboard&)
 	{
         return ToJSON(value);
 	}
@@ -233,12 +228,12 @@ namespace CLX
 namespace std
 {
 	template<typename T>
-	[[nodiscard]] nlohmann::json ToJSON(const std::vector<T>& vector, const CLX::DataTypeRegistry& dataTypeRegistry)
+	[[nodiscard]] nlohmann::json ToJSON(const std::vector<T>& vector, const CLX::Blackboard& blackboard)
 	{
 		nlohmann::json arrayJson = nlohmann::json::array();
 		for (const T& data : vector)
 		{
-			nlohmann::json element = CLX::SaveDataPtr(CLX::GetDataTypeID<T>(), &data, dataTypeRegistry);
+			nlohmann::json element = CLX::SaveDataPtr(CLX::GetDataTypeID<T>(), &data, blackboard);
 
 			arrayJson.push_back(std::move(element));
 		}

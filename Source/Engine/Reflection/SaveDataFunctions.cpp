@@ -14,9 +14,10 @@
 
 namespace CLX
 {
-	nlohmann::json SaveDataPtr(const DataTypeID dataTypeID, const void* dataPtr, const DataTypeRegistry& dataTypeRegistry)
+	nlohmann::json SaveDataPtr(const DataTypeID dataTypeID, const void* dataPtr, const Blackboard& blackboard)
 	{
-		return dataTypeRegistry.SaveDataJSON(dataTypeID, dataPtr);
+        const DataTypeRegistry& dataTypeRegistry = blackboard.Get<Key_DataTypeRegistry>();
+		return dataTypeRegistry.SaveDataJSON(dataTypeID, dataPtr, blackboard);
 	}
 }
 
@@ -40,9 +41,24 @@ nlohmann::json ToJSON(const unsigned int& value)
 	return nlohmann::json(value);
 }
 
+nlohmann::json ToJSON(const int64_t& value)
+{
+	return nlohmann::json(value);
+}
+
+nlohmann::json ToJSON(const uint64_t& value)
+{
+	return nlohmann::json(value);
+}
+
 nlohmann::json ToJSON(const float& value)
 {
 	return nlohmann::json(value);
+}
+
+nlohmann::json ToJSON(const std::nullptr_t& value)
+{
+    return nlohmann::json(value);
 }
 
 namespace std
@@ -183,13 +199,14 @@ namespace CLX
 
 	nlohmann::json ToJSON(const EntityID& entityID, const Blackboard& blackboard)
 	{
-        ECS& ecs = blackboard.Get<Key_CurrentECS>();
+        const ECS& ecs = blackboard.Get<Key_CurrentECS>();
+		auto serializationID = ecs.GetSerializationID(entityID);
 		const bool normalSave = ecs.IsEntityActive(entityID) && ecs.IsEntityValid(entityID);
         if (!normalSave)
         {
-            return ::ToJSON(InvalidEntityID.id);
+            return ::ToJSON(nullptr);
         }
-		return ::ToJSON(entityID.id);
+		return ::ToJSON(serializationID.id);
 	}
 
 	nlohmann::json ToJSON(const PointLight& pointLight)
@@ -225,12 +242,13 @@ namespace CLX
 		return json;
 	}
 
-	nlohmann::json ToJSON(const Shape& shape, const DataTypeRegistry& dataTypeRegistry)
+	nlohmann::json ToJSON(const Shape& shape, const Blackboard& blackboard)
 	{
 		auto variantInfo = GetVariantInfo(shape);
 		nlohmann::json json;
+        const DataTypeRegistry& dataTypeRegistry = blackboard.Get<Key_DataTypeRegistry>();
         json["ShapeType"] = dataTypeRegistry.Find(variantInfo.first)->name;
-        json["ShapeData"] = dataTypeRegistry.SaveDataJSON(variantInfo.first, variantInfo.second);
+        json["ShapeData"] = dataTypeRegistry.SaveDataJSON(variantInfo.first, variantInfo.second, blackboard);
 		return json;
 	}
 

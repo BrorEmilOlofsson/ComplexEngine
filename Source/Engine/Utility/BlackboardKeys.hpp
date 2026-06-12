@@ -1,8 +1,10 @@
 #pragma once
 #include <string>
+#include <unordered_map>
 #include <functional>
 #include "Engine/Utility/Blackboard.hpp"
 #include "Engine/Math/Transform3.hpp"
+#include "Engine/ECS/EntitySerializationID.hpp"
 
 namespace CLX
 {
@@ -32,4 +34,5 @@ namespace CLX
     using Key_CurrentECS = BlackboardKey<class ECS&, "CurrentECS">;
     using Key_CurrentPropertyPath = BlackboardKey<struct PropertyPath&, "CurrentPropertyPath">;
     using Key_ActivePropertyPath = BlackboardKey<struct PropertyPath&, "ActivePropertyPath">;
+    using Key_EntitySerializationMap = BlackboardKey<const std::unordered_map<EntitySerializationID, EntityID>&, "EntitySerializationMap">;
 }

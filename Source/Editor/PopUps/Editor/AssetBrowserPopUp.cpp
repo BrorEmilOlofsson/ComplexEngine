@@ -122,7 +122,7 @@ namespace CLX
     }
 
     static void ShowAssetCreationPopUp(const std::filesystem::path& directoryPath, bool& canOpenPopUp, AssetManager& assetManager,
-        const DataTypeRegistry& dataTypeRegistry, const ECSRegistry& ecsRegistry, ECSManager& ecsManager, EntitySerializationIDGenerator& entityIDGenerator)
+        const Blackboard& blackboard, const ECSRegistry& ecsRegistry, ECSManager& ecsManager, EntitySerializationIDGenerator& entityIDGenerator)
     {
         static constexpr const char* CreateAssetMenuPopupName = "CreateAssetMenu";
         static constexpr const char* CreateEntityCompositionAssetName = "CreateEntityCompositionAsset";
@@ -188,7 +188,7 @@ namespace CLX
                 const std::filesystem::path path = directoryPath / (ToWString(name) + std::wstring(AssetExtensions::EntityComposition));
                 EntityCompositionAsset asset(CreateEntityComposition(ecsManager, ecsRegistry, entityIDGenerator, name), path);
                 auto assetHandle = assetManager.AddEntityComposition(asset);
-                SaveEntityCompositionAsset(assetHandle, dataTypeRegistry);
+                SaveEntityCompositionAsset(assetHandle, blackboard);
 
                 ImGui::CloseCurrentPopup();
             }
@@ -243,6 +243,7 @@ namespace CLX
         DataTypeRegistry& dataTypeRegistry;
         const ECSRegistry& ecsRegistry;
         ECSManager& ecsManager;
+        const Blackboard& blackboard;
         EntitySerializationIDGenerator& entityIDGenerator;
         NodeScriptingWindow& nodeScriptingWindow;
         MenuTabWindow& nodeScriptParentTab;
@@ -390,7 +391,7 @@ namespace CLX
 
         RenamePopup(RenamePopupID, data.selectedFilePath, data.renameBuffer, data.assetManager);
 
-        ShowAssetCreationPopUp(directory, data.canOpenPopup, data.assetManager, data.dataTypeRegistry, data.ecsRegistry, data.ecsManager, data.entityIDGenerator);
+        ShowAssetCreationPopUp(directory, data.canOpenPopup, data.assetManager, data.blackboard, data.ecsRegistry, data.ecsManager, data.entityIDGenerator);
     }
 
 
@@ -505,6 +506,7 @@ namespace CLX
             .dataTypeRegistry = dataTypeRegistry,
             .ecsRegistry = ecsRegistry,
             .ecsManager = ecsManager,
+            .blackboard = blackboard,
             .entityIDGenerator = entityIDGenerator,
             .nodeScriptingWindow = nodeScriptingWindow,
             .nodeScriptParentTab = *mNodeScriptParentTab,

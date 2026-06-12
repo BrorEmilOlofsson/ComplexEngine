@@ -24,7 +24,7 @@ namespace CLX
         std::vector<DataTypeMemberVariable> memberVariables;
 
         ViewAndEditResult(*viewAndEdit)(void* dataPtr, const Blackboard& blackboard, const DataTypeMemberVariable* member) = nullptr;
-        nlohmann::json(*toJSON)(const void* dataPtr, const class DataTypeRegistry& dataTypeRegistry) = nullptr;
+        nlohmann::json(*toJSON)(const void* dataPtr, const Blackboard& blackboard) = nullptr;
         void(*fromJSON)(void* dataPtr, const nlohmann::json& json, const Blackboard& blackboard) = nullptr;
 
         InplaceConstructFunction inplaceConstruct;

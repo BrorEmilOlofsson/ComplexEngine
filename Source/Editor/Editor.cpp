@@ -85,7 +85,7 @@ namespace CLX
             sceneLoadSelectable->SetStrings(sceneNames);
         }
 
-        sceneSaveButton->SetCallback(SceneFileFunctions::Save(&engine.GetSceneManager(), &engine.GetDataTypeRegistry()));
+        sceneSaveButton->SetCallback(SceneFileFunctions::Save(&engine.GetSceneManager(), engine.GetBlackboard()));
         sceneLoadSelectable->SetCallback(SceneFileFunctions::Load(&engine.GetSceneManager(), engine.GetAssetManager()));
         sceneCreateNewButton->SetCallback(SceneFileFunctions::CreateNew(&engine.GetSceneManager(), engine.GetAssetManager()));
         sceneCreateCopyButton->SetCallback(SceneFileFunctions::CreateCopy(&engine.GetSceneManager(), engine.GetAssetManager()));

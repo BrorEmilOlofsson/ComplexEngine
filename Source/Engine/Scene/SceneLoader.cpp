@@ -12,11 +12,11 @@
 namespace CLX
 {
 
-	void SceneLoader::SaveScene(const Scene& scene, const std::filesystem::path& filePath, const DataTypeRegistry& dataTypeRegistry)
+	void SceneLoader::SaveScene(const Scene& scene, const std::filesystem::path& filePath, const Blackboard& blackboard)
 	{
 		PROFILER_FUNCTION(profiler::colors::TealA400);
 		nlohmann::ordered_json sceneJson;
-		SaveECS(scene.GetECS(), sceneJson, dataTypeRegistry);
+		SaveECS(scene.GetECS(), sceneJson, blackboard);
 		sceneJson["NavmeshPath"] = std::filesystem::relative(scene.GetNavmeshPath(), std::filesystem::path(SIMPLE_DIR_ASSETS));
 
 		std::ofstream writeFile(std::filesystem::path(SIMPLE_DIR_ASSETS) / std::filesystem::absolute(filePath));
@@ -54,7 +54,7 @@ namespace CLX
 
 			if (shouldSave)
 			{
-				SaveScene(scene, filePath, blackboard.Get<Key_DataTypeRegistry>());
+				SaveScene(scene, filePath, blackboard);
 				Console::Print(ConvertFilePathToPrettyName(filePath), ConsoleTextColor::Red, false);
 				Console::Print(" has been updated due to changes in the source code", ConsoleTextColor::White, true);
 			}

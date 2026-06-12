@@ -27,9 +27,14 @@ namespace CLX
 
 void FromJSON(bool& value, const nlohmann::json& json);
 void FromJSON(char& value, const nlohmann::json& json);
-void FromJSON(int& value, const nlohmann::json& json);
-void FromJSON(unsigned int& value, const nlohmann::json& json);
+void FromJSON(int8_t& value, const nlohmann::json& json);
+void FromJSON(uint8_t& value, const nlohmann::json& json);
+void FromJSON(int32_t& value, const nlohmann::json& json);
+void FromJSON(uint32_t& value, const nlohmann::json& json);
+void FromJSON(int64_t& value, const nlohmann::json& json);
+void FromJSON(uint64_t& value, const nlohmann::json& json);
 void FromJSON(float& value, const nlohmann::json& json);
+void FromJSON(double& value, const nlohmann::json& json);
 
 namespace std
 {
@@ -157,7 +162,7 @@ namespace CLX
 
 	void FromJSON(Shape& shape, const nlohmann::json& json, const Blackboard& blackboard);
 
-	void FromJSON(EntityID& entityID, const nlohmann::json& json);
+	void FromJSON(EntityID& entityID, const nlohmann::json& json, const Blackboard& blackboard);
 
 	void FromJSON(PointLight& pointLight, const nlohmann::json& json);
 	void FromJSON(DirectionalLight& directionalLight, const nlohmann::json& json);
