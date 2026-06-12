@@ -208,7 +208,9 @@ namespace CLX
     {
         if (asset)
         {
-            SaveEntityComposition(asset.GetRelativePath(), asset.Get(), blackboard);
+            Blackboard newBlackboard = blackboard;
+            newBlackboard.Insert<Key_CurrentECS>(asset.Get().GetECS());
+            SaveEntityComposition(asset.GetRelativePath(), asset.Get(), newBlackboard);
         }
     }
 
