@@ -18,7 +18,6 @@
 
 namespace CLX
 {
-	using NavmeshWallIndex = int;
 
 	[[nodiscard]] constexpr Triangle3f ToFace(const NavmeshNode& node, std::span<const Point3f> vertices)
 	{
@@ -32,7 +31,6 @@ namespace CLX
 	{
 		friend class NavmeshAStar;
 		friend class Pathfinder;
-		friend class NavmeshCreator;
 	public:
 
 		Navmesh();
@@ -99,6 +97,8 @@ namespace CLX
 		Grid2<NavmeshWallIndex> mWallGrid;
 
 		AABB2f mDimensions;
+
+	public:
 
 		static constexpr float Wall_Offset = 0.0f;
 		static constexpr float Closest_Point_AABB_Size = 10.f;

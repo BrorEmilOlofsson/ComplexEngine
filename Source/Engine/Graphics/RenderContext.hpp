@@ -36,7 +36,7 @@ namespace CLX
 		RenderContext& operator=(RenderContext&&) = default;
 
 		template<typename T>
-		[[nodiscard]] T* GetUnderlying()
+		[[nodiscard]] T* Cast()
 		{
 			if (Model<T>* p = dynamic_cast<Model<T>*>(mConcept.get()))
 			{
@@ -46,13 +46,25 @@ namespace CLX
 		}
 
 		template<typename T>
-		[[nodiscard]] const T* GetUnderlying() const
+		[[nodiscard]] const T* Cast() const
 		{
 			if (const Model<T>* p = dynamic_cast<const Model<T>*>(mConcept.get()))
 			{
 				return &p->GetUnderlying();
 			}
 			return nullptr;
+		}
+
+		template<typename T>
+		[[nodiscard]] T& CastUnsafe()
+		{
+            return static_cast<Model<T>*>(mConcept.get())->GetUnderlying();
+		}
+
+		template<typename T>
+		[[nodiscard]] const T& CastUnsafe() const
+		{
+            return static_cast<const Model<T>*>(mConcept.get())->GetUnderlying();
 		}
 
 		[[nodiscard]] std::vector<void*> GetGBufferSRVs() const

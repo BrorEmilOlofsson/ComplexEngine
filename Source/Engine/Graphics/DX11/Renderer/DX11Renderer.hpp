@@ -11,7 +11,6 @@
 #include "Engine/Graphics/DX11/Renderer/DX11MeshRenderer.hpp"
 #include "Engine/Graphics/DX11/Text/DX11TextRenderer.hpp"
 #include "Engine/Graphics/ConstantBufferData.hpp"
-#include "Engine/Graphics/SkyBox/SkyBox.hpp"
 #include "Engine/Graphics/RenderState.hpp"
 
 #include <wrl/client.h>

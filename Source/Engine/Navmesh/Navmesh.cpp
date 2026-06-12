@@ -2,18 +2,23 @@
 #include "Navmesh.hpp"
 #include "NavmeshCreator.hpp"
 #include "Engine/Math/UnitVector2.hpp"
-#include "Engine/Math/Shapes/Triangle2.hpp"
 #include "Engine/Math/ShapeMath.hpp"
 #include "Engine/Utility/Intersection.hpp"
 
-#include <assert.h>
+#include <cassert>
 #include <limits>
 
 namespace CLX
 {
     Navmesh::Navmesh()
     {
-        NavmeshCreator::CreateNavmesh(*this);
+        auto result = NavmeshCreator::CreateNavmesh(mNavmeshData);
+        mNodes = std::move(result.nodes);
+        mWalls = std::move(result.walls);
+        mNodeGrid = std::move(result.nodeGrid);
+        mWallGrid = std::move(result.wallGrid);
+        mVertexGrid = std::move(result.vertexGrid);
+        mDimensions = result.dimensions;
     }
 
     Navmesh::Navmesh(const NavmeshData& navmeshData)
@@ -23,7 +28,13 @@ namespace CLX
         {
             assert(false);
         }
-        NavmeshCreator::CreateNavmesh(*this);
+        auto result = NavmeshCreator::CreateNavmesh(mNavmeshData);
+        mNodes = std::move(result.nodes);
+        mWalls = std::move(result.walls);
+        mNodeGrid = std::move(result.nodeGrid);
+        mWallGrid = std::move(result.wallGrid);
+        mVertexGrid = std::move(result.vertexGrid);
+        mDimensions = result.dimensions;
     }
 
     std::vector<Point3f> Navmesh::FindPath(const Point3f& startPosition, const NavmeshPositionData& endData) const

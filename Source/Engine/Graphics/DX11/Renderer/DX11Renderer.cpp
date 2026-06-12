@@ -210,7 +210,8 @@ namespace CLX
     {
         PROFILER_FUNCTION(profiler::colors::Red);
 
-        DX11RenderContext* r = renderState.GetRenderContext()->GetUnderlying<DX11RenderContext>();
+        DX11RenderContext* r = renderState.GetRenderContext()->Cast<DX11RenderContext>();
+        ASSERT(r != nullptr);
 
         const Dimension2u size = GetDimension(*renderState.GetRenderRect());
 

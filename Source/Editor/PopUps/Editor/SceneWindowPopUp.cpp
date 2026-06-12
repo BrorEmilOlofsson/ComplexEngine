@@ -206,12 +206,17 @@ namespace CLX
             renderRect = AABB2i::FromDefaultAndExtent(Vector2u(100, 100));
         }
 
-        ImGui::End();
-
 
         SceneManager& sceneManager = blackboard.Get<Key_SceneManager>();
         Scene& activeScene = sceneManager.GetActiveScene().Get();
         RenderState& sceneRenderState = activeScene.GetRenderState();
+
+        EditorSceneSettings& editorSceneSettings = blackboard.Get<Key_EditorSceneSettings>();
+        const bool isPlaying = blackboard.Get<Key_IsPlaying>();
+
+        EditorCommandTracker& commandTracker = blackboard.Get<Key_CommandTracker>();
+
+        ImGui::End();
 
         const WindowView windowView = blackboard.Get<Key_WindowView>();
         FreeFlyCameraSettings& cameraSettings = blackboard.Get<Key_FreeFlyCameraSettings>();
@@ -220,7 +225,6 @@ namespace CLX
         OperatingSystem& os = blackboard.Get<Key_OperatingSystem>();
         Editor& editor = blackboard.Get<Key_Editor>();
 
-        const bool isPlaying = blackboard.Get<Key_IsPlaying>();
 
         if (isPlaying)
         {
@@ -265,10 +269,6 @@ namespace CLX
             mUseEditorCameraWhenPlaying = false;
         }
 
-        EditorCommandTracker& commandTracker = blackboard.Get<Key_CommandTracker>();
-
-        EditorSceneSettings& editorSceneSettings = blackboard.Get<Key_EditorSceneSettings>();
-
         UpdateTransformOperation(os.IsCursorVisible(), input, editorSceneSettings.transformOperation);
 
         if (isOpen)
@@ -302,15 +302,6 @@ namespace CLX
                     const EntityID entityID = *mHierarchyPopUp.GetSelectedEntityIDs().begin();
                     TeleportCameraToEntity(sceneManager.GetActiveScene()->GetECS(), entityID, mEditorCamera, false);
                 }
-            }
-
-            const bool showNavmeshEditor = editorSceneSettings.showNavmeshEditor;
-            if (!isPlaying && showNavmeshEditor)
-            {
-                ImGui::Begin(WindowName);
-                static NavmeshEditorData navmeshEditorData;
-                ShowNavmeshEditor(activeScene, mEditorCamera, sceneRenderState.GetRenderRect().value(), blackboard.Get<Key_InputState>(), navmeshEditorData);
-                ImGui::End();
             }
         }
 
@@ -378,6 +369,15 @@ namespace CLX
                     mTransformEntityData,
                     commandTracker
                 );
+            }
+
+            //const bool showNavmeshEditor = editorSceneSettings.showNavmeshEditor;
+            if (!isPlaying && showNavmeshEditor)
+            {
+                //ImGui::Begin(WindowName);
+                static NavmeshEditorData navmeshEditorData;
+                ShowNavmeshEditor(activeScene, mEditorCamera, sceneRenderState.GetRenderRect().value(), blackboard.Get<Key_InputState>(), navmeshEditorData, commandTracker);
+                //ImGui::End();
             }
 
             ImGui::PopStyleVar();

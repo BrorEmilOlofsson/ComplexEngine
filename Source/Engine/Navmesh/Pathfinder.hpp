@@ -11,9 +11,9 @@ namespace CLX
 	{
 	public:
 
-		static std::vector<Point3f> FindPath(const Navmesh& aNavmesh, const Point3f& aStartPosition, const NavmeshPositionData& aEndPosition);
-		static std::vector<Point3f> FindPath(const Navmesh& aNavmesh, const Point3f& aStartPosition, const Point3f& aEndPosition);
-		static std::vector<Point3f> FindPath(const Navmesh& aNavmesh, const NavmeshPositionData& aStartData, const NavmeshPositionData& aEndData);
+		static std::vector<Point3f> FindPath(const Navmesh& navmesh, const Point3f& startPosition, const NavmeshPositionData& endPosition);
+		static std::vector<Point3f> FindPath(const Navmesh& navmesh, const Point3f& startPosition, const Point3f& endPosition);
+		static std::vector<Point3f> FindPath(const Navmesh& navmesh, const NavmeshPositionData& startData, const NavmeshPositionData& endData);
 
 	};
 }

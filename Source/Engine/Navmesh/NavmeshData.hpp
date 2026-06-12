@@ -1,5 +1,7 @@
 #pragma once
 #include <vector>
+#include <utility>
+#include <array>
 #include "Engine/Math/Point2.hpp"
 #include "Engine/Math/Point3.hpp"
 #include "NavmeshDefines.hpp"
@@ -13,6 +15,7 @@ namespace CLX
 
 	using NavmeshNodeIndex = unsigned int;
 	using NavmeshVertexIndex = unsigned int;
+	using NavmeshWallIndex = int;
 
 	using NavmeshEdge = std::pair<NavmeshVertexIndex, NavmeshVertexIndex>;
 	using NavmeshWall = NavmeshEdge;

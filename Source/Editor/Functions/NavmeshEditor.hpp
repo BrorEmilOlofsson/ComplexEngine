@@ -2,6 +2,7 @@
 #include "Engine/Math/Shapes/AABB2.hpp"
 #include "Engine/Navmesh/NavmeshData.hpp"
 #include "Engine/Utility/IDWrapper.hpp"
+#include "Editor/Command/Core/EditorCommandTracker.hpp"
 
 namespace CLX
 {
@@ -17,5 +18,5 @@ namespace CLX
 
     };
 
-    void ShowNavmeshEditor(Scene& scene, const Camera& camera, const AABB2i& renderRect, const InputState& input, NavmeshEditorData& navmeshEditorData);
+    void ShowNavmeshEditor(Scene& scene, const Camera& camera, const AABB2i& renderRect, const InputState& input, NavmeshEditorData& navmeshEditorData, EditorCommandTracker& commandTracker);
 }

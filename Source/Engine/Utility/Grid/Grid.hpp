@@ -62,8 +62,8 @@ namespace CLX
 		constexpr Grid(const VectorTypeui& gridSize, const VectorTypef& cellSize, const PointTypef& minPos, const VectorTypef& offset = VectorTypef::Zero());
 		constexpr Grid(const PrimitiveGridType& primitiveGrid);
 
-		[[nodiscard]] constexpr std::optional<GridCell<T>*> GetCellByPosition(const PointTypef& position);
-		[[nodiscard]] constexpr std::optional<const GridCell<T>*> GetCellByPosition(const PointTypef& position) const;
+		[[nodiscard]] constexpr GridCell<T>* GetCellByPosition(const PointTypef& position);
+		[[nodiscard]] constexpr const GridCell<T>* GetCellByPosition(const PointTypef& position) const;
 
 		[[nodiscard]] constexpr const VectorTypef& GetCellSize() const noexcept;
 		[[nodiscard]] constexpr const VectorTypeui& GetGridSize() const noexcept;
@@ -112,26 +112,26 @@ namespace CLX
 	}
 
 	template<typename T, typename Types>
-	constexpr std::optional<GridCell<T>*> Grid<T, Types>::GetCellByPosition(const PointTypef& position)
+	constexpr GridCell<T>* Grid<T, Types>::GetCellByPosition(const PointTypef& position)
 	{
 		const PointTypei coords = GetGridCoordinatesByPosition(position, mMinPos, mCellSize, mOffset);
 
 		if (!IsValidGridCoordinates(coords, mGridSize))
 		{
-			return std::nullopt;
+			return nullptr;
 		}
 
 		return &GetCellByCoordinates(PointTypeui(coords));
 	}
 
 	template<typename T, typename Types>
-	constexpr std::optional<const GridCell<T>*> Grid<T, Types>::GetCellByPosition(const PointTypef& position) const
+	constexpr const GridCell<T>* Grid<T, Types>::GetCellByPosition(const PointTypef& position) const
 	{
 		const PointTypei coords = GetGridCoordinatesByPosition(position, mMinPos, mCellSize, mOffset);
 
 		if (!IsValidGridCoordinates(coords, mGridSize))
 		{
-			return std::nullopt;
+			return nullptr;
 		}
 
 		return &GetCellByCoordinates(PointTypeui(coords));
@@ -228,7 +228,7 @@ namespace CLX
 		auto cell = GetCellByPosition(position);
 		if (cell)
 		{
-			cell.value()->Add(std::move(object));
+			cell->Add(std::move(object));
 		}
 	}
 

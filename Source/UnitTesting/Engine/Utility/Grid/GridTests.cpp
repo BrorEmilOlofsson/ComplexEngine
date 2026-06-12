@@ -48,9 +48,9 @@ TEST_CASE("Grid2 Add")
 
 	auto cell = grid.GetCellByPosition(Point2f(1.5f, 6.5f));
 
-	REQUIRE(cell.has_value());
-	REQUIRE(cell.value()->GetObjects().size() == 1);
-	REQUIRE(cell.value()->GetObjects().find(std::string(str)) != cell.value()->GetObjects().end());
+	REQUIRE(cell != nullptr);
+	REQUIRE(cell->GetObjects().size() == 1);
+	REQUIRE(cell->GetObjects().find(std::string(str)) != cell->GetObjects().end());
 }
 
 TEST_CASE("Grid3 GetCellsByAABB")
@@ -61,7 +61,7 @@ TEST_CASE("Grid3 GetCellsByAABB")
 	grid.Add(Point3f(1.5f, 6.5f, 2.58f), std::string(str));
 	const auto cell = grid.GetCellByPosition(Point3f(1.5f, 6.5f, 2.58f));
 
-	REQUIRE(cell.has_value());
-	REQUIRE(cell.value()->GetObjects().size() == 1);
-	REQUIRE(cell.value()->GetObjects().find(std::string(str)) != cell.value()->GetObjects().end());
+	REQUIRE(cell != nullptr);
+	REQUIRE(cell->GetObjects().size() == 1);
+	REQUIRE(cell->GetObjects().find(std::string(str)) != cell->GetObjects().end());
 }

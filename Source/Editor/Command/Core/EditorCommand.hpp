@@ -98,9 +98,9 @@ namespace CLX
 			{
 			}
 
-			void ExecuteCommand() override
+			void ExecuteCommand() const override
 			{
-				Do(mData);
+				Execute(mData);
 			}
 
 			void UndoCommand() const override

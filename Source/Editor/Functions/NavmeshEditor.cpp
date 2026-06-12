@@ -7,7 +7,6 @@
 namespace CLX
 {
 
-
     void DebugFindPath(const Navmesh& navmesh, const InputState& input, RenderList& renderList, const Ray3f& mouseRay)
     {
         static Ray3f startRay;
@@ -97,8 +96,9 @@ namespace CLX
         return dir;
     }
 
-    void NavmeshBuild(Navmesh& navmesh, const Ray3f& mouseRay, const InputState& input, const NavmeshEditorData&, RenderList& renderList)
+    void NavmeshBuild(Navmesh& navmesh, const Ray3f& mouseRay, const InputState& input, const NavmeshEditorData&, RenderList& renderList, EditorCommandTracker& commandTracker)
     {
+        commandTracker;
         if (input.IsKeyHeld(eInputKey::Ctrl))
         {
             auto result = navmesh.Raycast(mouseRay);
@@ -122,6 +122,7 @@ namespace CLX
                             return !(connectedNodes.first != InvalidID<NavmeshNodeIndex>() && connectedNodes.second != InvalidID<NavmeshNodeIndex>());
                         }) | std::ranges::to<std::vector>();
 
+                    
                     ASSERT_NEW(v.size() <= 2, "A vertex should not be connected to more than 2 other vertices in a well formed navmesh");
 
                     const Point3f closestPoint = navmesh.GetNavmeshData().m3DVertices[closestVertex];
@@ -134,7 +135,7 @@ namespace CLX
                         p1 = *p;
                     }
                     renderList.AddSphere(DrawSphere{ .sphere = Spheref::FromCenterAndRadius(p1, Radiusf(0.2f)), .color = Colors::Cardinal });
-                    renderList.AddLine(DrawLine{ .startPosition = l2.StartPoint(), .endPosition = l2.EndPoint(), .color = Colors::Cardinal});
+                    renderList.AddLine(DrawLine{ .startPosition = l2.StartPoint(), .endPosition = l2.EndPoint(), .color = Colors::Cardinal });
 
                     NavmeshVertexIndex best = InvalidID<NavmeshVertexIndex>();
                     if (v.size() > 1)
@@ -142,7 +143,7 @@ namespace CLX
                         if (p)
                         {
                             LineSegment2f l1 = LineSegment2f::FromPoints(ToPoint2XZ(closestPoint), ToPoint2XZ(closestPoint) + FSFS(navmesh, closestVertex, v[0], v.size() > 1 ? v[1] : v[0]));
-                            
+
                             if (IsOnNormalSide(ToPoint2XZ(*p), l1))
                             {
                                 best = v[0];
@@ -171,7 +172,6 @@ namespace CLX
 
                     if (best != InvalidID<NavmeshVertexIndex>())
                     {
-
                         if (p)
                         {
                             renderList.AddLine(DrawLine{ *p, navmesh.GetNavmeshData().m3DVertices[closestVertex], Colors::Yellow });
@@ -183,7 +183,7 @@ namespace CLX
         }
     }
 
-    void ShowNavmeshEditor(Scene& scene, const Camera& camera, const AABB2i& renderRect, const InputState& input, NavmeshEditorData& navmeshEditorData)
+    void ShowNavmeshEditor(Scene& scene, const Camera& camera, const AABB2i& renderRect, const InputState& input, NavmeshEditorData& navmeshEditorData, EditorCommandTracker& commandTracker)
     {
         Navmesh& navmesh = scene.GetNavmesh();
 
@@ -194,16 +194,18 @@ namespace CLX
 
         Ray3f mouseRay = scene.GetMouseRay();
         DebugFindPath(navmesh, input, scene.GetRenderState().GetRenderList(), mouseRay);
-        NavmeshBuild(navmesh, mouseRay, input, navmeshEditorData, scene.GetRenderState().GetRenderList());
+        NavmeshBuild(navmesh, mouseRay, input, navmeshEditorData, scene.GetRenderState().GetRenderList(), commandTracker);
 
         NavmeshVertexIndex& selectedVertexIndex = navmeshEditorData.selectedVertexIndex;
 
         if (input.IsKeyReleased(eInputKey::LMB))
         {
-            NavmeshVertexIndex best = FindClosestVertex(navmesh, mouseRay);
-            if (best != InvalidID<NavmeshVertexIndex>())
+            NavmeshVertexIndex closestVertexIndex = FindClosestVertex(navmesh, mouseRay);
+            if (closestVertexIndex != InvalidID<NavmeshVertexIndex>() 
+                && closestVertexIndex != selectedVertexIndex
+                && GetDistance(mouseRay, navmesh.GetNavmeshData().m3DVertices[closestVertexIndex]) < navmeshEditorData.vertexSelectDistance)
             {
-                selectedVertexIndex = best;
+                selectedVertexIndex = closestVertexIndex;
             }
         }
 
@@ -302,5 +304,4 @@ namespace CLX
             }
         }
     }
-
 }
