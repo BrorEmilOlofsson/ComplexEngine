@@ -478,7 +478,7 @@ namespace CLX
 
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> DX11Factory::LoadDDS(ID3D11Device& device, ID3D11DeviceContext& context, const std::filesystem::path& fileName)
 	{
-		const std::filesystem::path texturePath = std::filesystem::absolute("") / fileName;
+		const std::filesystem::path texturePath = fileName;
 
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shaderResourceView;
 		const HRESULT result = DirectX::CreateDDSTextureFromFile(&device, &context, texturePath.c_str(), nullptr, &shaderResourceView);
