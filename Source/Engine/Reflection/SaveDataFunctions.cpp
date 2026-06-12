@@ -14,46 +14,46 @@
 
 namespace CLX
 {
-	nlohmann::json SaveDataPtr(const DataTypeID dataTypeID, const void* dataPtr, const Blackboard& blackboard)
-	{
+    nlohmann::json SaveDataPtr(const DataTypeID dataTypeID, const void* dataPtr, const Blackboard& blackboard)
+    {
         const DataTypeRegistry& dataTypeRegistry = blackboard.Get<Key_DataTypeRegistry>();
-		return dataTypeRegistry.SaveDataJSON(dataTypeID, dataPtr, blackboard);
-	}
+        return dataTypeRegistry.SaveDataJSON(dataTypeID, dataPtr, blackboard);
+    }
 }
 
 nlohmann::json ToJSON(const bool& value)
 {
-	return nlohmann::json(value);
+    return nlohmann::json(value);
 }
 
 nlohmann::json ToJSON(const char& value)
 {
-	return ToJSON(static_cast<int>(value));
+    return ToJSON(static_cast<int>(value));
 }
 
 nlohmann::json ToJSON(const int& value)
 {
-	return nlohmann::json(value);
+    return nlohmann::json(value);
 }
 
 nlohmann::json ToJSON(const unsigned int& value)
 {
-	return nlohmann::json(value);
+    return nlohmann::json(value);
 }
 
 nlohmann::json ToJSON(const int64_t& value)
 {
-	return nlohmann::json(value);
+    return nlohmann::json(value);
 }
 
 nlohmann::json ToJSON(const uint64_t& value)
 {
-	return nlohmann::json(value);
+    return nlohmann::json(value);
 }
 
 nlohmann::json ToJSON(const float& value)
 {
-	return nlohmann::json(value);
+    return nlohmann::json(value);
 }
 
 nlohmann::json ToJSON(const std::nullptr_t& value)
@@ -63,311 +63,318 @@ nlohmann::json ToJSON(const std::nullptr_t& value)
 
 namespace std
 {
-	nlohmann::json ToJSON(const std::string& value)
-	{
-		return nlohmann::json(value);
-	}
+    nlohmann::json ToJSON(const std::string& value)
+    {
+        return nlohmann::json(value);
+    }
 }
 
 namespace CLX
 {
-	nlohmann::json ToJSON(const Transform& transform)
-	{
-		nlohmann::json json;
+    nlohmann::json ToJSON(const Transform& transform)
+    {
+        nlohmann::json json;
 
-		const Point3f position = transform.GetPosition();
-		const Rotatorf rotation = ToRotator(transform.GetRotation());
-		const Vector3f scale = transform.GetScale();
+        const Point3f position = transform.GetPosition();
+        const Rotatorf rotation = ToRotator(transform.GetRotation());
+        const Vector3f scale = transform.GetScale();
 
-		json["Position"]["x"] = position.x;
-		json["Position"]["y"] = position.y;
-		json["Position"]["z"] = position.z;
+        json["Position"]["x"] = position.x;
+        json["Position"]["y"] = position.y;
+        json["Position"]["z"] = position.z;
 
-		json["Rotation"]["x"] = rotation.Pitch().Value();
-		json["Rotation"]["y"] = rotation.Yaw().Value();
-		json["Rotation"]["z"] = rotation.Roll().Value();
+        json["Rotation"]["x"] = rotation.Pitch().Value();
+        json["Rotation"]["y"] = rotation.Yaw().Value();
+        json["Rotation"]["z"] = rotation.Roll().Value();
 
-		json["Scale"]["x"] = scale.x;
-		json["Scale"]["y"] = scale.y;
-		json["Scale"]["z"] = scale.z;
+        json["Scale"]["x"] = scale.x;
+        json["Scale"]["y"] = scale.y;
+        json["Scale"]["z"] = scale.z;
 
-		return json;
-	}
+        return json;
+    }
 
-	nlohmann::json ToJSON(const Vector2f& vector)
-	{
-		nlohmann::json json;
+    nlohmann::json ToJSON(const Vector2f& vector)
+    {
+        nlohmann::json json;
 
-		json["x"] = vector.x;
-		json["y"] = vector.y;
+        json["x"] = vector.x;
+        json["y"] = vector.y;
 
-		return json;
-	}
+        return json;
+    }
 
-	nlohmann::json ToJSON(const Vector3f& vector)
-	{
-		nlohmann::json json;
+    nlohmann::json ToJSON(const Vector3f& vector)
+    {
+        nlohmann::json json;
 
-		json["x"] = vector.x;
-		json["y"] = vector.y;
-		json["z"] = vector.z;
+        json["x"] = vector.x;
+        json["y"] = vector.y;
+        json["z"] = vector.z;
 
-		return json;
-	}
+        return json;
+    }
 
-	nlohmann::json ToJSON(const Vector4f& vector)
-	{
-		nlohmann::json json;
+    nlohmann::json ToJSON(const Vector4f& vector)
+    {
+        nlohmann::json json;
 
-		json["x"] = vector.x;
-		json["y"] = vector.y;
-		json["z"] = vector.z;
-		json["w"] = vector.w;
+        json["x"] = vector.x;
+        json["y"] = vector.y;
+        json["z"] = vector.z;
+        json["w"] = vector.w;
 
-		return json;
-	}
+        return json;
+    }
 
-	nlohmann::json ToJSON(const Point2f& point)
-	{
-		nlohmann::json json;
+    nlohmann::json ToJSON(const Point2f& point)
+    {
+        nlohmann::json json;
 
-		json["x"] = point.x;
-		json["y"] = point.y;
+        json["x"] = point.x;
+        json["y"] = point.y;
 
-		return json;
-	}
+        return json;
+    }
 
-	nlohmann::json ToJSON(const Point3f& point)
-	{
-		nlohmann::json json;
+    nlohmann::json ToJSON(const Point3f& point)
+    {
+        nlohmann::json json;
 
-		json["x"] = point.x;
-		json["y"] = point.y;
-		json["z"] = point.z;
+        json["x"] = point.x;
+        json["y"] = point.y;
+        json["z"] = point.z;
 
-		return json;
-	}
+        return json;
+    }
 
-	nlohmann::json ToJSON(const UnitVector2f& vector)
-	{
-		nlohmann::json json;
+    nlohmann::json ToJSON(const UnitVector2f& vector)
+    {
+        nlohmann::json json;
 
-		json["x"] = vector.X();
-		json["y"] = vector.Y();
+        json["x"] = vector.X();
+        json["y"] = vector.Y();
 
-		return json;
-	}
+        return json;
+    }
 
-	nlohmann::json ToJSON(const UnitVector3f& vector)
-	{
-		nlohmann::json json;
+    nlohmann::json ToJSON(const UnitVector3f& vector)
+    {
+        nlohmann::json json;
 
-		json["x"] = vector.X();
-		json["y"] = vector.Y();
-		json["z"] = vector.Z();
+        json["x"] = vector.X();
+        json["y"] = vector.Y();
+        json["z"] = vector.Z();
 
-		return json;
-	}
+        return json;
+    }
 
-	nlohmann::json ToJSON(const Color& color)
-	{
-		nlohmann::json json;
+    nlohmann::json ToJSON(const Color& color)
+    {
+        nlohmann::json json;
 
-		json["r"] = color.r;
-		json["g"] = color.g;
-		json["b"] = color.b;
-		json["a"] = color.a;
+        json["r"] = color.r;
+        json["g"] = color.g;
+        json["b"] = color.b;
+        json["a"] = color.a;
 
-		return json;
-	}
+        return json;
+    }
 
-	nlohmann::json ToJSON(const RGBColor& color)
-	{
-		nlohmann::json json;
+    nlohmann::json ToJSON(const RGBColor& color)
+    {
+        nlohmann::json json;
 
-		json["r"] = color.r;
-		json["g"] = color.g;
-		json["b"] = color.b;
+        json["r"] = color.r;
+        json["g"] = color.g;
+        json["b"] = color.b;
 
-		return json;
-	}
+        return json;
+    }
 
-	nlohmann::json ToJSON(const EntityID& entityID)
-	{
-		return ::ToJSON(entityID.id);
-	}
+    nlohmann::json ToJSON(const EntityID& entityID)
+    {
+        return ::ToJSON(entityID.id);
+    }
 
-	nlohmann::json ToJSON(const EntityID& entityID, const Blackboard& blackboard)
-	{
+    nlohmann::json ToJSON(const EntityID& entityID, const Blackboard& blackboard)
+    {
         const ECS& ecs = blackboard.Get<Key_CurrentECS>();
-		auto serializationID = ecs.GetSerializationID(entityID);
-		const bool normalSave = ecs.IsEntityActive(entityID) && ecs.IsEntityValid(entityID);
+        if (entityID == InvalidEntityID)
+        {
+            return ::ToJSON(nullptr);
+        }
+        const bool normalSave = ecs.IsEntityActive(entityID) && ecs.IsEntityValid(entityID);
         if (!normalSave)
         {
             return ::ToJSON(nullptr);
         }
-		return ::ToJSON(serializationID.id);
-	}
+        else
+        {
+            auto serializationID = ecs.GetSerializationID(entityID);
+            return ::ToJSON(serializationID.id);
+        }
+    }
 
-	nlohmann::json ToJSON(const PointLight& pointLight)
-	{
-		nlohmann::json json;
+    nlohmann::json ToJSON(const PointLight& pointLight)
+    {
+        nlohmann::json json;
 
-		json["Color"] = ToJSON(pointLight.color);
-		json["Intensity"] = pointLight.intensity;
-		json["Range"] = pointLight.range;
+        json["Color"] = ToJSON(pointLight.color);
+        json["Intensity"] = pointLight.intensity;
+        json["Range"] = pointLight.range;
 
-		return json;
-	}
+        return json;
+    }
 
-	nlohmann::json ToJSON(const DirectionalLight& directionalLight)
-	{
-		nlohmann::json json;
-		json["Direction"] = ToJSON(directionalLight.direction);
-		json["Color"] = ToJSON(directionalLight.color);
-		json["Intensity"] = directionalLight.intensity;
-		return json;
-	}
+    nlohmann::json ToJSON(const DirectionalLight& directionalLight)
+    {
+        nlohmann::json json;
+        json["Direction"] = ToJSON(directionalLight.direction);
+        json["Color"] = ToJSON(directionalLight.color);
+        json["Intensity"] = directionalLight.intensity;
+        return json;
+    }
 
-	nlohmann::json ToJSON(const Camera& camera)
-	{
-		nlohmann::json json;
+    nlohmann::json ToJSON(const Camera& camera)
+    {
+        nlohmann::json json;
 
-		json["Position"] = ToJSON(camera.GetPosition());
+        json["Position"] = ToJSON(camera.GetPosition());
 
-		json["HorizontalFoV"] = camera.GetHorizontalFOV().Value();
-		json["NearPlane"] = camera.GetNearPlane();
-		json["FarPlane"] = camera.GetFarPlane();
+        json["HorizontalFoV"] = camera.GetHorizontalFOV().Value();
+        json["NearPlane"] = camera.GetNearPlane();
+        json["FarPlane"] = camera.GetFarPlane();
 
-		return json;
-	}
+        return json;
+    }
 
-	nlohmann::json ToJSON(const Shape& shape, const Blackboard& blackboard)
-	{
-		auto variantInfo = GetVariantInfo(shape);
-		nlohmann::json json;
+    nlohmann::json ToJSON(const Shape& shape, const Blackboard& blackboard)
+    {
+        auto variantInfo = GetVariantInfo(shape);
+        nlohmann::json json;
         const DataTypeRegistry& dataTypeRegistry = blackboard.Get<Key_DataTypeRegistry>();
         json["ShapeType"] = dataTypeRegistry.Find(variantInfo.first)->name;
         json["ShapeData"] = dataTypeRegistry.SaveDataJSON(variantInfo.first, variantInfo.second, blackboard);
-		return json;
-	}
+        return json;
+    }
 
-	nlohmann::json ToJSON(const MeshAssetHandle& meshAsset)
-	{
-		nlohmann::json json;
-		std::filesystem::path meshPath;
+    nlohmann::json ToJSON(const MeshAssetHandle& meshAsset)
+    {
+        nlohmann::json json;
+        std::filesystem::path meshPath;
 
-		if (meshAsset)
-		{
-			meshPath = meshAsset->GetPath();
-		}
+        if (meshAsset)
+        {
+            meshPath = meshAsset->GetPath();
+        }
 
-		json = meshPath;
-		return json;
-	}
+        json = meshPath;
+        return json;
+    }
 
-	nlohmann::json ToJSON(const ModelAssetHandle& modelAsset)
-	{
-		nlohmann::json json;
-		std::filesystem::path meshPath;
+    nlohmann::json ToJSON(const ModelAssetHandle& modelAsset)
+    {
+        nlohmann::json json;
+        std::filesystem::path meshPath;
 
-		if (modelAsset)
-		{
-			meshPath = modelAsset->GetPath();
-		}
+        if (modelAsset)
+        {
+            meshPath = modelAsset->GetPath();
+        }
 
-		json = meshPath;
-		return json;
-	}
+        json = meshPath;
+        return json;
+    }
 
-	nlohmann::json ToJSON(const AnimatedModelAssetHandle& asset)
-	{
-		nlohmann::json json;
-		std::filesystem::path meshPath;
+    nlohmann::json ToJSON(const AnimatedModelAssetHandle& asset)
+    {
+        nlohmann::json json;
+        std::filesystem::path meshPath;
 
-		if (asset)
-		{
-			meshPath = asset->GetPath();
-		}
+        if (asset)
+        {
+            meshPath = asset->GetPath();
+        }
 
-		json = meshPath;
-		return json;
-	}
+        json = meshPath;
+        return json;
+    }
 
-	nlohmann::json ToJSON(const TextureAssetHandle& textureAsset)
-	{
-		nlohmann::json json;
+    nlohmann::json ToJSON(const TextureAssetHandle& textureAsset)
+    {
+        nlohmann::json json;
 
-		std::filesystem::path textureName;
+        std::filesystem::path textureName;
 
-		if (textureAsset)
-		{
-			textureName = textureAsset.GetRelativePath();
-		}
+        if (textureAsset)
+        {
+            textureName = textureAsset.GetRelativePath();
+        }
 
-		json = textureName;
+        json = textureName;
 
-		return json;
-	}
+        return json;
+    }
 
-	nlohmann::json ToJSON(const PixelShaderAssetHandle& pixelShader)
-	{
-		nlohmann::json json;
+    nlohmann::json ToJSON(const PixelShaderAssetHandle& pixelShader)
+    {
+        nlohmann::json json;
 
-		std::filesystem::path pixelShaderPath;
+        std::filesystem::path pixelShaderPath;
 
-		if (pixelShader)
-		{
-			pixelShaderPath = pixelShader.GetRelativePath();
-		}
+        if (pixelShader)
+        {
+            pixelShaderPath = pixelShader.GetRelativePath();
+        }
 
-		json["PixelShader"] = pixelShaderPath;
+        json["PixelShader"] = pixelShaderPath;
 
-		return json;
-	}
+        return json;
+    }
 
-	nlohmann::json ToJSON(const VertexShaderAssetHandle& vertexShader)
-	{
-		nlohmann::json json;
+    nlohmann::json ToJSON(const VertexShaderAssetHandle& vertexShader)
+    {
+        nlohmann::json json;
 
-		std::filesystem::path vertexShaderPath;
+        std::filesystem::path vertexShaderPath;
 
-		if (vertexShader)
-		{
-			vertexShaderPath = vertexShader.GetRelativePath();
-		}
+        if (vertexShader)
+        {
+            vertexShaderPath = vertexShader.GetRelativePath();
+        }
 
-		json["VertexShader"] = vertexShaderPath;
+        json["VertexShader"] = vertexShaderPath;
 
-		return json;
-	}
+        return json;
+    }
 
-	nlohmann::json ToJSON(const AnimationAssetHandle& animationAsset)
-	{
-		nlohmann::json json;
+    nlohmann::json ToJSON(const AnimationAssetHandle& animationAsset)
+    {
+        nlohmann::json json;
 
-		std::filesystem::path animationRelativePath;
+        std::filesystem::path animationRelativePath;
 
-		if (animationAsset)
-		{
-			animationRelativePath = animationAsset.GetRelativePath();
-		}
+        if (animationAsset)
+        {
+            animationRelativePath = animationAsset.GetRelativePath();
+        }
 
-		json = animationRelativePath;
+        json = animationRelativePath;
 
-		return json;
-	}
+        return json;
+    }
 
-	nlohmann::json ToJSON(const SceneAssetHandle& sceneAsset)
-	{
-		nlohmann::json json;
-		std::filesystem::path sceneRelativePath;
-		if (sceneAsset)
-		{
-			sceneRelativePath = sceneAsset.GetRelativePath();
-		}
-		json["ScenePath"] = sceneRelativePath;
-		return json;
+    nlohmann::json ToJSON(const SceneAssetHandle& sceneAsset)
+    {
+        nlohmann::json json;
+        std::filesystem::path sceneRelativePath;
+        if (sceneAsset)
+        {
+            sceneRelativePath = sceneAsset.GetRelativePath();
+        }
+        json["ScenePath"] = sceneRelativePath;
+        return json;
     }
 
     nlohmann::json ToJSON(const EntityCompositionAssetHandle& entityCompositionAsset)
@@ -382,21 +389,21 @@ namespace CLX
         return json;
     }
 
-	nlohmann::json CustomToJSON(const std::array<TextureAssetHandle, 3>& textureAssets)
-	{
-		nlohmann::json json;
+    nlohmann::json CustomToJSON(const std::array<TextureAssetHandle, 3>& textureAssets)
+    {
+        nlohmann::json json;
 
-		TextureAssetHandle albedoTextureHandle = textureAssets[TextureSlots::Albedo];
-		TextureAssetHandle normalTextureHandle = textureAssets[TextureSlots::Normal];
-		TextureAssetHandle materialTextureHandle = textureAssets[TextureSlots::Material];
-		const std::filesystem::path albedoTexture = albedoTextureHandle ? albedoTextureHandle.GetRelativePath() : std::filesystem::path();
-		const std::filesystem::path normalTexture = normalTextureHandle ? normalTextureHandle.GetRelativePath() : std::filesystem::path();
-		const std::filesystem::path materialTexture = materialTextureHandle ? materialTextureHandle.GetRelativePath() : std::filesystem::path();
+        TextureAssetHandle albedoTextureHandle = textureAssets[TextureSlots::Albedo];
+        TextureAssetHandle normalTextureHandle = textureAssets[TextureSlots::Normal];
+        TextureAssetHandle materialTextureHandle = textureAssets[TextureSlots::Material];
+        const std::filesystem::path albedoTexture = albedoTextureHandle ? albedoTextureHandle.GetRelativePath() : std::filesystem::path();
+        const std::filesystem::path normalTexture = normalTextureHandle ? normalTextureHandle.GetRelativePath() : std::filesystem::path();
+        const std::filesystem::path materialTexture = materialTextureHandle ? materialTextureHandle.GetRelativePath() : std::filesystem::path();
 
-		json["Albedo"] = albedoTexture;
-		json["Normal"] = normalTexture;
-		json["Material"] = materialTexture;
+        json["Albedo"] = albedoTexture;
+        json["Normal"] = normalTexture;
+        json["Material"] = materialTexture;
 
-		return json;
-	}
+        return json;
+    }
 }
