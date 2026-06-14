@@ -15,6 +15,7 @@ namespace CLX
 	void SceneLoader::SaveScene(const Scene& scene, const std::filesystem::path& filePath, const Blackboard& blackboard)
 	{
 		PROFILER_FUNCTION(profiler::colors::TealA400);
+
 		nlohmann::ordered_json sceneJson;
 		SaveECS(scene.GetECS(), sceneJson, blackboard);
 		sceneJson["NavmeshPath"] = std::filesystem::relative(scene.GetNavmeshPath(), std::filesystem::path(SIMPLE_DIR_ASSETS));

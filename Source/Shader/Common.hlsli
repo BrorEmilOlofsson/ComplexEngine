@@ -15,6 +15,7 @@ Texture2D GBufferNormalTexture : register(t6);
 Texture2D GBufferMaterialTexture : register(t7);
 Texture2D GBufferPositionTexture : register(t8);
 Texture2D GBufferObjectIDTexture : register(t9);
+Texture2D ShadowMapTexture : register(t10);
 //Texture2D GlobalBufferAmbientOcclusionAndCustom : register(t9);
 
 cbuffer CameraBuffer : register(b0)
@@ -100,6 +101,12 @@ cbuffer ObjectIDBufferData : register(b8)
 cbuffer ColorBufferData : register(b9)
 {
     float4 Color;
+};
+
+cbuffer ShadowBufferData : register(b10)
+{
+    row_major float4x4 world;
+    row_major float4x4 lightViewProjection;
 };
 
 struct FullScreenVertexInput

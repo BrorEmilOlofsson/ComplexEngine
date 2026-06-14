@@ -199,7 +199,7 @@ namespace CLX
 
     nlohmann::json ToJSON(const EntityID& entityID, const Blackboard& blackboard)
     {
-        const ECS& ecs = blackboard.Get<Key_CurrentECS>();
+        const ECS& ecs = blackboard.Get<Key_CurrentECSConst>();
         if (entityID == InvalidEntityID)
         {
             return ::ToJSON(nullptr);

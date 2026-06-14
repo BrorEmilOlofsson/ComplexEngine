@@ -1,6 +1,7 @@
 #include "Engine/Precompiled/EnginePch.hpp"
 #include "DX11RenderContext.hpp"
 #include "Engine/Graphics/DX11/DX11Factory.hpp"
+#include "Engine/Graphics/GraphicsConstants.hpp"
 
 namespace CLX
 {
@@ -8,6 +9,9 @@ namespace CLX
 	DX11RenderContext::DX11RenderContext(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, Dimension2u size)
 		: mGBuffer(context, device, size)
 		, mOutputRT(context, device, *DX11Factory::CreateRenderTargetTexture(*device.Get(), DX11Factory::CreateRenderTargetTextureDesc(size)).Get(), size)
+		, mShadowMapTexture(DX11Factory::CreateShadowMapTexture(*device.Get(), ShadowMapSize))
+		, mShadowMapDSV(DX11Factory::CreateShadowDSV(*device.Get(), *mShadowMapTexture.Get()))
+		, mShadowMapSRV(DX11Factory::CreateShadowSRV(*device.Get(), *mShadowMapTexture.Get()))
 		, mDevice(device)
 		, mContext(context)
 	{
@@ -62,6 +66,11 @@ namespace CLX
 		return mOutputRT.GetShaderResourceView();
 	}
 
+	ID3D11ShaderResourceView* DX11RenderContext::GetShadowMapSRV()
+	{
+		return mShadowMapSRV.Get();
+	}
+
 	DX11GBuffer& DX11RenderContext::GetGBuffer()
 	{
 		return mGBuffer;
@@ -80,6 +89,11 @@ namespace CLX
 		mOutputRT.Clear(Colors::Black);
 	}
 
+	void DX11RenderContext::ClearShadowMap()
+	{
+		mContext->ClearDepthStencilView(mShadowMapDSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+	}
+
 	void DX11RenderContext::SetOutputRenderTarget()
 	{
 		mOutputRT.Set();
@@ -93,6 +107,17 @@ namespace CLX
 	void DX11RenderContext::SetGBufferShaderResources()
 	{
 		mGBuffer.SetShaderResources();
+	}
+
+	void DX11RenderContext::SetShadowMapRenderTarget()
+	{
+		mContext->OMSetRenderTargets(0, nullptr, mShadowMapDSV.Get());
+	}
+
+	void DX11RenderContext::SetShadowMapShaderResource()
+	{
+		ID3D11ShaderResourceView* srv = mShadowMapSRV.Get();
+		mContext->PSSetShaderResources(TextureSlots::ShadowMap, 1, &srv);
 	}
 
 }

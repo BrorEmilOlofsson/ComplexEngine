@@ -24,21 +24,29 @@ namespace CLX
 		[[nodiscard]] uint32_t GetObjectIDAt(const Point2i& point);
 		[[nodiscard]] DX11RenderTarget& GetOutputRenderTarget();
 		[[nodiscard]] ID3D11ShaderResourceView* GetOutputSRV();
+		[[nodiscard]] ID3D11ShaderResourceView* GetShadowMapSRV();
 		[[nodiscard]] DX11GBuffer& GetGBuffer();
 
 		void ResizeBuffers(const Dimension2u& size);
 		void ClearBuffers();
+		void ClearShadowMap();
 
 
 
 		void SetOutputRenderTarget();
 		void SetGBufferRenderTargets();
 		void SetGBufferShaderResources();
+		void SetShadowMapRenderTarget();
+		void SetShadowMapShaderResource();
 
 	private:
+		static constexpr UINT ShadowMapSize = 2048;
 
 		DX11GBuffer mGBuffer;
 		DX11RenderTarget mOutputRT;
+		Microsoft::WRL::ComPtr<ID3D11Texture2D> mShadowMapTexture;
+		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> mShadowMapDSV;
+		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> mShadowMapSRV;
 
 		Microsoft::WRL::ComPtr<ID3D11Device> mDevice;
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext> mContext;

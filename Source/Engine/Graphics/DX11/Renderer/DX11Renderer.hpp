@@ -48,6 +48,11 @@ namespace CLX
 			VertexShaderAssetHandle vertexShader, 
 			DX11ConstantBuffer<ColorBufferData>& colorCB);
 
+		void RenderShadowMap(const RenderState& renderState,
+			DX11RenderContext& renderContext,
+			AssetManager& assetManager,
+			DX11ConstantBuffer<BoneBufferData>& boneBuffer);
+
 
 	private:
 		
@@ -63,6 +68,9 @@ namespace CLX
 		DX11MeshRenderer mSphereRenderer;
 		DX11MeshRenderer mBoxRenderer;
 		DX11TextRenderer mTextRenderer;
+		DX11ConstantBuffer<ShadowBufferData> mShadowBuffer;
+		Microsoft::WRL::ComPtr<ID3D11RasterizerState> mDefaultRasterizerState;
+		Microsoft::WRL::ComPtr<ID3D11RasterizerState> mShadowRasterizerState;
 
 		Microsoft::WRL::ComPtr<ID3D11Device> mDevice;
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext> mDeviceContext;

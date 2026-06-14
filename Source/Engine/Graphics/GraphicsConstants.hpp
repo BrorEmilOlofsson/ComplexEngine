@@ -18,6 +18,7 @@ namespace CLX
 		constexpr uint32_t SkyBox = 7;
 		constexpr uint32_t ObjectID = 8;
 		constexpr uint32_t Color = 9;
+		constexpr uint32_t Shadow = 10;
 	}
 
 	constexpr std::size_t Global_StartSlot_GBuffer = 5;
@@ -30,5 +31,6 @@ namespace CLX
 		constexpr uint32_t Material = 2;
 		constexpr uint32_t CubeMap = 4;
 		constexpr uint32_t GBufferStart = 5;
+		constexpr uint32_t ShadowMap = 10;
 	}
 }

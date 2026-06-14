@@ -1,6 +1,26 @@
 #include "../Common.hlsli"
 
 
+float CalculateShadowFactor(float3 pixelPosition)
+{
+    const float4 lightClipPosition = mul(float4(pixelPosition, 1.0f), lightViewProjection);
+    const float3 projectedPosition = lightClipPosition.xyz / lightClipPosition.w;
+    const float2 shadowUV = projectedPosition.xy * float2(0.5f, -0.5f) + 0.5f;
+
+    float shadowFactor = 1.0f;
+    const bool isInsideShadowMap = shadowUV.x >= 0.0f && shadowUV.x <= 1.0f && shadowUV.y >= 0.0f && shadowUV.y <= 1.0f;
+
+    if (isInsideShadowMap)
+    {
+        const float closestDepth = ShadowMapTexture.Sample(GlobalDefaultSampler, shadowUV).r;
+        const float currentDepth = projectedPosition.z;
+        const float bias = 0.001f;
+        shadowFactor = currentDepth - bias <= closestDepth ? 1.0f : 0.35f;
+    }
+
+    return shadowFactor;
+}
+
 float3 CalculatePixelColor(float3 albedo, float3 pixelNormal, float3 pixelPosition, float3 cameraPosition, float3 directionalLightDirection, float3 ambientLightColor, float ambientLightIntensity)
 {
     float3 L = normalize(-directionalLightDirection); // toward light
@@ -24,8 +44,9 @@ float3 CalculatePixelColor(float3 albedo, float3 pixelNormal, float3 pixelPositi
     specular *= lerp(1.0, 2.0, fresnel);
 
     float3 ambient = albedo * (ambientLightColor * ambientLightIntensity);
+    float shadowFactor = CalculateShadowFactor(pixelPosition);
 
-    float3 finalColor = albedo * diffuse + specular + ambient;
+    float3 finalColor = (albedo * diffuse + specular) * shadowFactor + ambient;
     return finalColor;
 }
 

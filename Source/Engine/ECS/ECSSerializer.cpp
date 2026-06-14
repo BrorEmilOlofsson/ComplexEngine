@@ -29,7 +29,8 @@ namespace CLX
 
     void SaveECS(const ECS& ecs, nlohmann::ordered_json& json, const Blackboard& blackboard)
     {
-        
+        Blackboard newBlackboard = blackboard;
+        newBlackboard.Insert<Key_CurrentECSConst>(ecs);
 
         auto& entityIDsJSON = json["EntityIDs"];
         for (auto entityView : ecs.ViewEntities())
@@ -45,7 +46,7 @@ namespace CLX
             nlohmann::ordered_json& entityJson = entitiesJSON[i];
             entityJson["SID"] = entityView.GetSerializationID().id;
 
-            SaveComponents(entityView, entityJson, blackboard);
+            SaveComponents(entityView, entityJson, newBlackboard);
             i++;
         }
     }

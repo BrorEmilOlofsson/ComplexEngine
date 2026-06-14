@@ -32,6 +32,7 @@ namespace CLX
     using Key_EntityIDGenerator = BlackboardKey<class EntitySerializationIDGenerator&, "EntityIDGenerator">;
     using Key_OnEntitySelected = BlackboardKey<std::function<void(struct EntityID)>&, "OnEntitySelected">;
     using Key_CurrentECS = BlackboardKey<class ECS&, "CurrentECS">;
+    using Key_CurrentECSConst = BlackboardKey<const class ECS&, "CurrentECSConst">;
     using Key_CurrentPropertyPath = BlackboardKey<struct PropertyPath&, "CurrentPropertyPath">;
     using Key_ActivePropertyPath = BlackboardKey<struct PropertyPath&, "ActivePropertyPath">;
     using Key_EntitySerializationMap = BlackboardKey<const std::unordered_map<EntitySerializationID, EntityID>&, "EntitySerializationMap">;

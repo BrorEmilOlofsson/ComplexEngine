@@ -75,6 +75,12 @@ namespace CLX
 		Matrix4x4f modelWorldMatrix = Matrix4x4f::Identity();
 	};
 
+	struct alignas(16) ShadowBufferData final
+	{
+		Matrix4x4f world = Matrix4x4f::Identity();
+		Matrix4x4f lightViewProjection = Matrix4x4f::Identity();
+	};
+
 	struct alignas(16) ColorBufferData final
 	{
 		Color color = Colors::White;

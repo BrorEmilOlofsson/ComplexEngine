@@ -478,12 +478,9 @@ namespace CLX
 
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> DX11Factory::CreateShadowMapTexture(ID3D11Device& device, UINT shadowSize)
 	{
-		shadowSize;
-		constexpr UINT ShadowSize = 2048;
-
 		D3D11_TEXTURE2D_DESC texDesc = {};
-		texDesc.Width = ShadowSize;
-		texDesc.Height = ShadowSize;
+		texDesc.Width = shadowSize;
+		texDesc.Height = shadowSize;
 		texDesc.MipLevels = 1;
 		texDesc.ArraySize = 1;
 		texDesc.Format = DXGI_FORMAT_R24G8_TYPELESS;

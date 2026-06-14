@@ -141,6 +141,76 @@ namespace CLX
         }
     }
 
+    static void RenderModelToShadowMap(const ModelInstance& modelInstance, const Matrix4x4f& lightViewProjection, DX11ConstantBuffer<ShadowBufferData>& shadowCB, ID3D11DeviceContext& context)
+    {
+        if (!modelInstance.mesh)
+        {
+            if (!modelInstance.model)
+            {
+                return;
+            }
+
+            shadowCB.UpdateAndBind(ShadowBufferData{ modelInstance.transform.GetMatrix(), lightViewProjection }, context);
+
+            DX11Model* dx11Model = modelInstance.model->Get<DX11Model>();
+            ASSERT_NEW(dx11Model != nullptr, "ModelInstance has a model that is not a DX11Model");
+            for (DX11Mesh& mesh : dx11Model->GetMeshes())
+            {
+                RenderMesh(context, mesh);
+            }
+
+            return;
+        }
+
+        shadowCB.UpdateAndBind(ShadowBufferData{ modelInstance.transform.GetMatrix(), lightViewProjection }, context);
+
+        DX11Mesh* mesh = modelInstance.mesh->Get<DX11Mesh>();
+        ASSERT_NEW(mesh != nullptr, "ModelInstance has a mesh that is not a DX11Mesh");
+        RenderMesh(context, mesh->GetVertexBuffer(), mesh->GetIndexBuffer(), mesh->GetMeshData());
+    }
+
+    static void RenderModelsToShadowMap(std::span<const ModelInstance> modelInstances, const Matrix4x4f& lightViewProjection, DX11ConstantBuffer<ShadowBufferData>& shadowCB, ID3D11DeviceContext& context)
+    {
+        for (const ModelInstance& modelInstance : modelInstances)
+        {
+            RenderModelToShadowMap(modelInstance, lightViewProjection, shadowCB, context);
+        }
+    }
+
+    static void RenderAnimatedModelsToShadowMap(std::span<const AnimatedModelInstance> modelInstances, const Matrix4x4f& lightViewProjection, DX11ConstantBuffer<ShadowBufferData>& shadowCB, DX11ConstantBuffer<BoneBufferData>& boneCB, ID3D11DeviceContext& context)
+    {
+        for (const AnimatedModelInstance& modelInstance : modelInstances)
+        {
+            if (!modelInstance.animatedModel)
+            {
+                continue;
+            }
+
+            shadowCB.UpdateAndBind(ShadowBufferData{ modelInstance.transform.GetMatrix(), lightViewProjection }, context);
+            boneCB.UpdateAndBind(BoneBufferData{ modelInstance.boneMatrices }, context);
+
+            DX11AnimatedModel* dx11AnimatedModel = modelInstance.animatedModel->Get<DX11AnimatedModel>();
+            for (DX11Mesh& mesh : dx11AnimatedModel->GetMeshes())
+            {
+                RenderMesh(context, mesh);
+            }
+        }
+    }
+
+    static Matrix4x4f CalculateDirectionalLightViewProjection(const DirectionalLight& directionalLight, const Camera& camera)
+    {
+        constexpr float ShadowHalfSize = 5000.0f;
+        constexpr float ShadowCameraDistance = 5000.0f;
+        constexpr float ShadowNearPlane = 1.0f;
+        constexpr float ShadowFarPlane = 10000.0f;
+
+        const Point3f lightPosition = camera.GetPosition() - directionalLight.direction * ShadowCameraDistance;
+        const Transform lightTransform = Transform::FromPositionRotationScale(lightPosition, RotationMatrix3f::FromZ(directionalLight.direction), Vector3f::One());
+        const Matrix4x4f lightView = Matrix4x4f::ToInverse(lightTransform.GetMatrix());
+        const Matrix4x4f lightProjection = Camera::CreateOrthographicProjectionMatrix(ShadowHalfSize, ShadowNearPlane, ShadowFarPlane);
+        return lightView * lightProjection;
+    }
+
     static void RenderSkyBox(const std::optional<SkyBox>& skyBoxOpt, DX11ConstantBuffer<TransformBufferData>& transformCB, ID3D11DeviceContext& context)
     {
         if (!skyBoxOpt)
@@ -188,6 +258,14 @@ namespace CLX
         mCylinderRenderer.Init(*mDevice.Get(), ShapeCreator3000::CreateCylinder());
         mSphereRenderer.Init(*mDevice.Get(), ShapeCreator3000::CreateSphere());
         mBoxRenderer.Init(*mDevice.Get(), ShapeCreator3000::CreateCube());
+        mShadowBuffer.Init(*mDevice.Get(), ConstantBufferSlots::Shadow);
+        mDefaultRasterizerState = DX11Factory::CreateRasterizerState_BackfaceCulling(*mDevice.Get());
+
+        D3D11_RASTERIZER_DESC shadowRasterizerDesc = DX11Factory::CreateRasterizerDesc_BackfaceCulling();
+        shadowRasterizerDesc.CullMode = D3D11_CULL_NONE;
+        shadowRasterizerDesc.DepthBias = 1000;
+        shadowRasterizerDesc.SlopeScaledDepthBias = 2.0f;
+        mShadowRasterizerState = DX11Factory::CreateRasterizerState(*mDevice.Get(), shadowRasterizerDesc);
 
         mWireBoundingBoxDrawer.Init(*mDevice.Get(), assetManager);
         mTextRenderer.Init(mDeviceContext.Get(), mDevice.Get(), ToWString(Directory::Assets) + std::wstring(L"Fonts/arial.spritefont"));
@@ -227,6 +305,10 @@ namespace CLX
 
         renderContext.ClearBuffers();
 
+        RenderShadowMap(renderState, renderContext, assetManager, boneBuffer);
+        mDeviceContext->RSSetViewports(1, &viewport);
+        mDeviceContext->RSSetState(mDefaultRasterizerState.Get());
+
         renderContext.SetGBufferRenderTargets();
 
         Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilState = DX11Factory::CreateDepthBuffer(*mDevice.Get());
@@ -253,6 +335,7 @@ namespace CLX
         mDeviceContext->PSSetShaderResources(TextureSlots::GBufferStart, static_cast<UINT>(renderContext.GetGBufferSRVs().size()), dummy); // Clear old
 
         renderContext.SetGBufferShaderResources();
+        renderContext.SetShadowMapShaderResource();
 
         RenderFullScreen(
             *mDeviceContext.Get(),
@@ -281,6 +364,45 @@ namespace CLX
         RenderDebugLines(renderState.GetRenderList(), assetManager, vertexShader, colorCB);
 
         mTextRenderer.Render(renderState.GetRenderList().GetText3Ds(), *renderState.GetCamera(), size);
+    }
+
+    void DX11Renderer::RenderShadowMap(const RenderState& renderState,
+        DX11RenderContext& renderContext,
+        AssetManager& assetManager,
+        DX11ConstantBuffer<BoneBufferData>& boneBuffer)
+    {
+        PROFILER_FUNCTION(profiler::colors::DeepOrange);
+
+        if (!renderState.GetDirectionalLight() || !renderState.GetCamera())
+        {
+            return;
+        }
+
+        ID3D11ShaderResourceView* nullShadowSRV = nullptr;
+        mDeviceContext->PSSetShaderResources(TextureSlots::ShadowMap, 1, &nullShadowSRV);
+
+        constexpr Dimension2u ShadowMapDimensions(2048, 2048);
+        auto shadowViewport = DX11Factory::CreateViewport(ShadowMapDimensions);
+        mDeviceContext->RSSetViewports(1, &shadowViewport);
+        mDeviceContext->RSSetState(mShadowRasterizerState.Get());
+
+        Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilState = DX11Factory::CreateDepthBuffer(*mDevice.Get());
+        mDeviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
+
+        renderContext.ClearShadowMap();
+        renderContext.SetShadowMapRenderTarget();
+
+        mDeviceContext->PSSetShader(nullptr, nullptr, 0);
+
+        const Matrix4x4f lightViewProjection = CalculateDirectionalLightViewProjection(*renderState.GetDirectionalLight(), *renderState.GetCamera());
+
+        assetManager.GetVertexShader(GetShaderPath("ShadowVS"))->Bind();
+        RenderModelsToShadowMap(renderState.GetRenderList().GetModelInstances(), lightViewProjection, mShadowBuffer, *mDeviceContext.Get());
+
+        assetManager.GetVertexShader(GetShaderPath("AnimatedShadowVS"))->Bind();
+        RenderAnimatedModelsToShadowMap(renderState.GetRenderList().GetAnimatedModelInstances(), lightViewProjection, mShadowBuffer, boneBuffer, *mDeviceContext.Get());
+
+        mShadowBuffer.UpdateAndBind(ShadowBufferData{ Matrix4x4f::Identity(), lightViewProjection }, *mDeviceContext.Get());
     }
 
     void DX11Renderer::RenderDebugLines(const RenderList& renderList, AssetManager& assetManager,
