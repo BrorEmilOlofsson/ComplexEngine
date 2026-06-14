@@ -24,7 +24,9 @@ namespace CLX
 	using AABB3f = AABB3<float>;
 	using AABB3d = AABB3<double>;
     using AABB3i32 = AABB3<int32_t>;
+    using AABB3u32 = AABB3<uint32_t>;
 	using AABB3i = AABB3i32;
+	using AABB3u = AABB3u32;
 
 	template<std::ranges::range R>
 	[[nodiscard]] constexpr auto CreateAABB3FromPoints(const R& points)

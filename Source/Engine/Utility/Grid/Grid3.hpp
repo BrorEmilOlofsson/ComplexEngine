@@ -26,35 +26,35 @@ namespace CLX
 		return Point3i(xIndex, yIndex, zIndex);
 	}
 
-	[[nodiscard]] constexpr unsigned int GetIndexByCoordinates(const Point3ui& coords, const Vector3u& gridSize) noexcept
+	[[nodiscard]] constexpr unsigned int GetIndexByCoordinates(const Point3u& coords, const Vector3u& gridSize) noexcept
 	{
 		return coords.z * gridSize.x * gridSize.y + coords.y * gridSize.x + coords.x;
 	}
 
 	template<std::ranges::range Range>
-	[[nodiscard]] constexpr decltype(auto) GetElementByCoordinates(Range& range, const Point3ui& coords, const Vector3u& gridSize)
+	[[nodiscard]] constexpr decltype(auto) GetElementByCoordinates(Range& range, const Point3u& coords, const Vector3u& gridSize)
 	{
 		return range[GetIndexByCoordinates(coords, gridSize)];
 	}
 
 	template<std::ranges::range Range>
-	[[nodiscard]] constexpr decltype(auto) GetElementByCoordinates(const Range& range, const Point3ui& coords, const Vector3u& gridSize)
+	[[nodiscard]] constexpr decltype(auto) GetElementByCoordinates(const Range& range, const Point3u& coords, const Vector3u& gridSize)
 	{
 		return range[GetIndexByCoordinates(coords, gridSize)];
 	}
 
 	template<typename Func>
-	constexpr void ForEachGridCell(const AABB3<unsigned int>& aabb, Func&& function)
+	constexpr void ForEachGridCell(const AABB3u& aabb, Func&& function)
 	{
-		const Point3ui& minCoords = aabb.GetMin();
-		const Point3ui& maxCoords = aabb.GetMax();
+		const Point3u& minCoords = aabb.GetMin();
+		const Point3u& maxCoords = aabb.GetMax();
 		for (unsigned int z = minCoords.z; z <= maxCoords.z; ++z)
 		{
 			for (unsigned int y = minCoords.y; y <= maxCoords.y; ++y)
 			{
 				for (unsigned int x = minCoords.x; x <= maxCoords.x; ++x)
 				{
-					function(Point3ui(x, y, z));
+					function(Point3u(x, y, z));
 				}
 			}
 		}
