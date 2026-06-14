@@ -148,7 +148,7 @@ namespace CLX
 
         mAssetManager->GetAssetLoader().SetSceneLoader([this](const std::filesystem::path& path)
             {
-                Scene scene(mBlackboard);
+                Scene scene(mBlackboard, mGraphicsFoundation.CreateRenderContext(Dimension2u(1080, 720)));
                 SceneLoader::LoadScene(scene, path, *mBlackboard);
 
                 return SceneAsset(std::move(scene), path);
@@ -196,7 +196,7 @@ namespace CLX
         mSceneManager.ChangeSceneDirectly(defaultScene);
 
         RenderContext r = mGraphicsFoundation.CreateRenderContext(mOperatingSystem.get().GetWindow(mMainWindow).GetClientSize());
-        mSceneManager.GetActiveScene()->GetRenderState().SetRenderContext(std::move(r));
+        mSceneManager.GetActiveScene()->GetRenderContext() = std::move(r);
 
 #ifndef _EDITOR
         mSceneManager.BeginPlay();
@@ -293,7 +293,7 @@ namespace CLX
 #ifndef _EDITOR
         mSceneManager.GetActiveScene()->GetRenderState().SetRenderRect(AABB2i::FromDefaultAndExtent(ToVector2(mOperatingSystem.get().GetWindow(mMainWindow).GetClientSize())));
 #endif
-        mGraphicsFoundation.Render(mSceneManager.GetActiveScene()->GetRenderState());
+        mGraphicsFoundation.Render(mSceneManager.GetActiveScene()->GetRenderState(), mSceneManager.GetActiveScene()->GetRenderContext());
     }
 
     WindowView Engine::GetMainWindow()

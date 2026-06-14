@@ -21,8 +21,8 @@ namespace CLX
 		template<typename U>
 		constexpr explicit Vector2(const Vector2<U>& vector) noexcept;
 
-		[[nodiscard]] static constexpr Vector2<T> Zero() noexcept;
-		[[nodiscard]] static constexpr Vector2<T> One() noexcept;
+		[[nodiscard]] static consteval Vector2<T> Zero() noexcept;
+		[[nodiscard]] static consteval Vector2<T> One() noexcept;
 
 		using value_type = T;
 	};
@@ -58,13 +58,13 @@ namespace CLX
 	}
 
 	template<typename T>
-	constexpr Vector2<T> Vector2<T>::Zero() noexcept
+	consteval Vector2<T> Vector2<T>::Zero() noexcept
 	{
 		return Vector2<T>(0, 0);
 	}
 
 	template<typename T>
-	constexpr Vector2<T> Vector2<T>::One() noexcept
+	consteval Vector2<T> Vector2<T>::One() noexcept
 	{
 		return Vector2<T>(1, 1);
 	}

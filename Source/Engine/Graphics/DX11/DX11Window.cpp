@@ -5,6 +5,8 @@
 #include "Engine/Asset/AssetManager.hpp"
 #include "Engine/OperatingSystem/WindowView.hpp"
 #include "Engine/Graphics/DX11/RenderTarget/DX11RenderTarget.hpp"
+#include "Engine/Graphics/DX11/DX11RenderContext.hpp"
+#include "Engine/Graphics/DX11/DX11RenderFunctions.hpp"
 
 #ifdef _DEBUG
 #define REPORT_DX_WARNINGS
@@ -70,9 +72,12 @@ namespace CLX
 
 		if (renderContext)
 		{
+            DX11RenderContext* dx11RenderContext = renderContext->Cast<DX11RenderContext>();
+            ASSERT(dx11RenderContext != nullptr);
+
 			RenderFullScreen(
 				*mContext.Get(),
-				static_cast<DX11RenderTarget*>(renderContext->GetOutputRenderTarget())->GetShaderResourceView(),
+				dx11RenderContext->GetOutputRenderTarget().GetShaderResourceView(),
 				*mSamplerState.lock(),
 				mAssetManager.lock()->GetVertexShader(GetPath(eVertexShaderType::FullScreen)),
 				mAssetManager.lock()->GetPixelShader(GetPath(ePixelShaderType::FullScreen))

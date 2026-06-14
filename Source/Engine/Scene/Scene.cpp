@@ -15,9 +15,10 @@ namespace CLX
         return CreateECS(sharedBlackboard->Get<Key_ECSManager>(), sharedBlackboard->Get<Key_ECSRegistry>(), sharedBlackboard->Get<Key_EntityIDGenerator>());
 	}
 
-	Scene::Scene(std::weak_ptr<Blackboard> blackboard)
+	Scene::Scene(std::weak_ptr<Blackboard> blackboard, RenderContext&& renderContext)
 		: mECS(CreateECS(blackboard))
 		, mBackupECS(std::nullopt)
+		, mRenderContext(std::move(renderContext))
 		, mBlackboard(blackboard)
 	{
 		mBlackboard.lock()->Insert<Key_IsPlaying>(false);

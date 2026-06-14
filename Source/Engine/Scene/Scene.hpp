@@ -1,10 +1,17 @@
 #pragma once
+#include <optional>
+#include <string>
+#include <filesystem>
 #include "Engine/ECS/ECS.hpp"
 #include "Engine/ECS/ECSManager.hpp"
 #include "Engine/ECS/ECSHandle.hpp"
 #include "Engine/Graphics/RenderState.hpp"
+#include "Engine/Graphics/RenderContext.hpp"
 #include "Engine/Navmesh/Navmesh.hpp"
 #include "Engine/Math/Shapes/Ray3.hpp"
+#include "Engine/Math/Point2.hpp"
+#include "Engine/Math/Dimension2.hpp"
+#include "Engine/Utility/Blackboard.hpp"
 
 namespace CLX
 {
@@ -13,7 +20,7 @@ namespace CLX
 	{
 	public:
 
-		explicit Scene(std::weak_ptr<Blackboard> blackboard);
+		explicit Scene(std::weak_ptr<Blackboard> blackboard, RenderContext&& renderContext);
 
 		void BeginPlay();
 		void EndPlay();
@@ -28,6 +35,9 @@ namespace CLX
 		[[nodiscard]] constexpr ECSHandle GetECSHandle();
 
 		[[nodiscard]] constexpr RenderState& GetRenderState();
+		[[nodiscard]] constexpr const RenderState& GetRenderState() const;
+		[[nodiscard]] constexpr RenderContext& GetRenderContext();
+		[[nodiscard]] constexpr const RenderContext& GetRenderContext() const;
 
 		[[nodiscard]] constexpr Navmesh& GetNavmesh();
 		[[nodiscard]] constexpr const Navmesh& GetNavmesh() const;
@@ -49,6 +59,7 @@ namespace CLX
 		std::filesystem::path mNavmeshPath;
 		std::optional<ECSOwningHandle> mBackupECS;
 		RenderState mRenderState;
+        RenderContext mRenderContext;
 		std::weak_ptr<Blackboard> mBlackboard;
 		Ray3f mMouseRay;
 	};
@@ -68,10 +79,26 @@ namespace CLX
 		return ToHandle(mECS);
 	}
 
-	[[nodiscard]] constexpr RenderState& Scene::GetRenderState()
+	constexpr RenderState& Scene::GetRenderState()
 	{
 		return mRenderState;
 	}
+
+	constexpr const RenderState& Scene::GetRenderState() const
+	{
+		return mRenderState;
+	}
+
+	constexpr RenderContext& Scene::GetRenderContext()
+	{
+		return mRenderContext;
+	}
+
+	constexpr const RenderContext& Scene::GetRenderContext() const
+	{
+		return mRenderContext;
+	}
+
 
 	constexpr Navmesh& Scene::GetNavmesh()
 	{

@@ -57,7 +57,6 @@ namespace CLX
 		[[nodiscard]] constexpr const Transform& GetTransform() const noexcept;
 
 		[[nodiscard]] constexpr Point3f GetPosition() const noexcept;
-		//[[nodiscard]] constexpr Rotatorf GetRotation() const noexcept;
 		[[nodiscard]] constexpr UnitVector3f GetForward() const noexcept;
 		[[nodiscard]] constexpr UnitVector3f GetUp() const noexcept;
 		[[nodiscard]] constexpr UnitVector3f GetRight() const noexcept;
@@ -122,11 +121,6 @@ namespace CLX
 	{
 		return mTransform.GetPosition();
 	}
-
-	//constexpr Rotatorf Camera::GetRotation() const noexcept
-	//{
-	//	return mTransform.GetRotation();
-	//}
 
 	constexpr float Camera::GetNearPlane() const noexcept
 	{
@@ -197,13 +191,13 @@ namespace CLX
 
 		Matrix4x4f matrix = Matrix4x4f::Identity();
 
-		matrix(1, 1) = 2.0f / (right - left);
-		matrix(2, 2) = 2.0f / (bottom - top);
-		matrix(3, 3) = 1.0f / (farPlane - nearPlane);
+		matrix(0, 0) = 2.0f / (right - left);
+		matrix(1, 1) = 2.0f / (bottom - top);
+		matrix(2, 2) = 1.0f / (farPlane - nearPlane);
 
-		matrix(4, 1) = -(right + left) / (right - left);
-		matrix(4, 2) = -(bottom + top) / (bottom - top);
-		matrix(4, 3) = -(nearPlane) / (farPlane - nearPlane);
+		matrix(3, 0) = -(right + left) / (right - left);
+		matrix(3, 1) = -(bottom + top) / (bottom - top);
+		matrix(3, 2) = -(nearPlane) / (farPlane - nearPlane);
 
 		return matrix;
 	}
@@ -217,11 +211,6 @@ namespace CLX
 	{
 		mTransform.SetPosition(position);
 	}
-
-	/*constexpr void Camera::SetRotation(const Rotatorf& rotation)
-	{
-		mTransform.SetRotation(rotation);
-	}*/
 
 	constexpr void Camera::SetRotation(const RotationMatrix3f& rotationMatrix)
 	{

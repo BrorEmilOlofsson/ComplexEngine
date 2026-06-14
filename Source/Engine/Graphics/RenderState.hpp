@@ -6,11 +6,8 @@
 #include "Engine/Utility/Camera.hpp"
 #include "Engine/Graphics/SkyBox/Skybox.hpp"
 #include "Engine/Graphics/Light/DirectionalLight.hpp"
-#include "Engine/Graphics/Light/PointLight.hpp"
 #include "Engine/Graphics/Light/AmbientLight.hpp"
-#include "Engine/Graphics/RenderTarget/RenderTargetView.hpp"
-#include "Engine/Graphics/DepthBuffer/DepthStencilViewHandle.hpp"
-#include "Engine/Graphics/RenderContext.hpp"
+#include "Engine/Math/Shapes/AABB2.hpp"
 
 namespace CLX
 {
@@ -20,7 +17,6 @@ namespace CLX
 	public:
 
 		constexpr RenderState() = default;
-		constexpr RenderState(RenderContext&& renderContext);
 
 		[[nodiscard]] constexpr RenderList& GetRenderList() noexcept;
 		[[nodiscard]] constexpr const RenderList& GetRenderList() const noexcept;
@@ -29,17 +25,13 @@ namespace CLX
 		[[nodiscard]] constexpr const std::optional<DirectionalLight>& GetDirectionalLight() const noexcept;
 		[[nodiscard]] constexpr const std::optional<AmbientLight>& GetAmbientLight() const noexcept;
 		[[nodiscard]] constexpr const std::optional<AABB2i>& GetRenderRect() const noexcept;
-		[[nodiscard]] constexpr RenderContext* GetRenderContext() noexcept;
-		[[nodiscard]] constexpr const RenderContext* GetRenderContext() const noexcept;
 		
 		constexpr void SetSkyBox(const SkyBox& skyBox) noexcept;
 		constexpr void SetDirectionalLight(const DirectionalLight& directionalLight) noexcept;
 		constexpr void SetAmbientLight(const AmbientLight& ambientLight) noexcept;
 		constexpr void SetCamera(const Camera& camera) noexcept;
 		constexpr void SetRenderRect(const AABB2i& renderRect) noexcept;
-		constexpr void SetRenderContext(RenderContext&& renderContext);
 		constexpr void SetRenderList(const RenderList& renderList);
-
 
 		constexpr void Reset();
 
@@ -51,13 +43,7 @@ namespace CLX
 		std::optional<DirectionalLight> mDirectionalLight;
 		std::optional<AmbientLight> mAmbientLight;
 		std::optional<AABB2i> mRenderRect;
-		std::unique_ptr<RenderContext> mRenderContext;
 	};
-
-	constexpr RenderState::RenderState(RenderContext&& renderContext)
-        : mRenderContext(std::make_unique<RenderContext>(std::move(renderContext)))
-	{
-    }
 
 	constexpr RenderList& RenderState::GetRenderList() noexcept
 	{
@@ -94,16 +80,6 @@ namespace CLX
 		return mRenderRect;
 	}
 
-	constexpr RenderContext* RenderState::GetRenderContext() noexcept
-	{
-		return mRenderContext.get();
-	}
-
-	constexpr const RenderContext* RenderState::GetRenderContext() const noexcept
-	{
-		return mRenderContext.get();
-	}
-
 	constexpr void RenderState::SetSkyBox(const SkyBox& skyBox) noexcept
 	{
 		mSkyBox = skyBox;
@@ -127,11 +103,6 @@ namespace CLX
 	constexpr void RenderState::SetRenderRect(const AABB2i& renderRect) noexcept
 	{
 		mRenderRect = renderRect;
-	}
-
-	constexpr void RenderState::SetRenderContext(RenderContext&& renderContext)
-	{
-		mRenderContext = std::make_unique<RenderContext>(std::move(renderContext));
 	}
 
 	constexpr void RenderState::SetRenderList(const RenderList& renderList)

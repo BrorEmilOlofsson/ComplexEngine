@@ -23,7 +23,7 @@ namespace CLX
 		[[nodiscard]] static D3D11_VIEWPORT CreateViewport(Dimension2u windowSize);
 		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11Resource> GetBackBuffer(IDXGISwapChain& swapChain);
 		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11DepthStencilState> CreateDepthBuffer(ID3D11Device& device);
-		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11DepthStencilView> CreateDepthStencilView(ID3D11Device& device, Dimension2u windowSize);
+		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11DepthStencilView> CreateDepthStencilView(ID3D11Device& device, Dimension2u size);
 		
 		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11RasterizerState> CreateRasterizerState(ID3D11Device& device, D3D11_RASTERIZER_DESC desc);
 		[[nodiscard]] static D3D11_RASTERIZER_DESC CreateRasterizerDesc_BackfaceCulling();
@@ -59,6 +59,10 @@ namespace CLX
 		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11Buffer> CreateIndexBuffer(ID3D11Device& device, const void* data, unsigned int size);
 		
 		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11Buffer> CreateInstanceBuffer(ID3D11Device& device, unsigned int size);
+
+        [[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11Texture2D> CreateShadowMapTexture(ID3D11Device& device, UINT shadowSize);
+        [[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11DepthStencilView> CreateShadowDSV(ID3D11Device& device, ID3D11Texture2D& shadowTexture);
+        [[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> CreateShadowSRV(ID3D11Device& device, ID3D11Texture2D& shadowTexture);
 
 		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> LoadDDS(ID3D11Device& device, ID3D11DeviceContext& context, const std::filesystem::path& fileName);
 		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> LoadNonDDS(ID3D11Device& device, const std::filesystem::path& fileName);

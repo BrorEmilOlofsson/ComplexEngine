@@ -24,9 +24,9 @@ namespace CLX
         mConcept->Shutdown();
     }
 
-    void GraphicsFoundation::Render(RenderState& renderState)
+    void GraphicsFoundation::Render(const RenderState& renderState, RenderContext& renderContext)
     {
-        mConcept->Render(renderState);
+        mConcept->Render(renderState, renderContext);
     }
 
     RenderContext GraphicsFoundation::CreateRenderContext(const Dimension2u& size)

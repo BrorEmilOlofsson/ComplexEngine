@@ -71,7 +71,7 @@ namespace CLX
     }
 
     EntityCompositionPopUp::EntityCompositionPopUp(EntityCompositionAssetHandle assetHandle, RenderContext&& renderContext)
-        : mRenderState(std::move(renderContext))
+        : mRenderContext(std::move(renderContext))
     {
         SetCompositionAsset(assetHandle);
         sGuizmoIDCounter++;
@@ -79,7 +79,7 @@ namespace CLX
     }
 
     EntityCompositionPopUp::EntityCompositionPopUp(RenderContext&& renderContext)
-        : mRenderState(std::move(renderContext))
+        : mRenderContext(std::move(renderContext))
     {
         sGuizmoIDCounter++;
         mGuizmoID = sGuizmoIDCounter;
@@ -165,7 +165,7 @@ namespace CLX
                 {
                     const Point2i mappedPos = MapToRenderRect(mouseScreenPosition, renderRect);
 
-                    const uint32_t id = mRenderState.GetRenderContext()->GetObjectIDAt(mappedPos);
+                    const uint32_t id = mRenderContext.GetObjectIDAt(mappedPos);
 
                     const EntityID entityID{ id };
                     if (entityID != InvalidEntityID)
@@ -208,7 +208,7 @@ namespace CLX
             if (hasValidEntityComposition)
             {
                 mEntityCompositionAsset->GetECS().Render(newBlackboard);
-                blackboard.Get<Key_GraphicsFoundation>().Render(mRenderState);
+                blackboard.Get<Key_GraphicsFoundation>().Render(mRenderState, mRenderContext);
             }
         }
 
@@ -259,7 +259,7 @@ namespace CLX
             if (hasValidEntityComposition)
             {
 
-                const AABB2i renderRect = RenderImage(mRenderState.GetRenderContext()->GetOutputSRV());
+                const AABB2i renderRect = RenderImage(mRenderContext.GetOutputSRV());
 
                 //mRenderState.SetRenderRect(renderRect);*/
 

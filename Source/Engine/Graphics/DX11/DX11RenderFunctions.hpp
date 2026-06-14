@@ -6,6 +6,8 @@
 #include "Engine/Asset/AssetTypes/VertexShaderAsset.hpp"
 #include "Engine/Graphics/RenderTarget/RenderTargetView.hpp"
 #include "Engine/Graphics/DX11/DX11SamplerState.hpp"
+#include "Engine/Graphics/DX11/ConstantBuffer/DX11ConstantBuffer.hpp"
+#include "Engine/Graphics/ConstantBufferData.hpp"
 
 namespace CLX
 {

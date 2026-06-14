@@ -47,11 +47,11 @@ namespace CLX
 		return depthStencilState;
 	}
 
-	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> DX11Factory::CreateDepthStencilView(ID3D11Device& device, Dimension2u windowSize)
+	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> DX11Factory::CreateDepthStencilView(ID3D11Device& device, Dimension2u size)
 	{
 		D3D11_TEXTURE2D_DESC descDepth{};
-		descDepth.Width = windowSize.GetWidth();
-		descDepth.Height = windowSize.GetHeight();
+		descDepth.Width = size.GetWidth();
+		descDepth.Height = size.GetHeight();
 		descDepth.MipLevels = 1u;
 		descDepth.ArraySize = 1u;
 		descDepth.Format = DXGI_FORMAT_D32_FLOAT;
@@ -474,6 +474,55 @@ namespace CLX
 		instanceBufferDesc.StructureByteStride = 0;
 
 		return CreateBuffer(device, instanceBufferDesc, nullptr);
+	}
+
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> DX11Factory::CreateShadowMapTexture(ID3D11Device& device, UINT shadowSize)
+	{
+		shadowSize;
+		constexpr UINT ShadowSize = 2048;
+
+		D3D11_TEXTURE2D_DESC texDesc = {};
+		texDesc.Width = ShadowSize;
+		texDesc.Height = ShadowSize;
+		texDesc.MipLevels = 1;
+		texDesc.ArraySize = 1;
+		texDesc.Format = DXGI_FORMAT_R24G8_TYPELESS;
+		texDesc.SampleDesc.Count = 1;
+		texDesc.Usage = D3D11_USAGE_DEFAULT;
+		texDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
+
+		Microsoft::WRL::ComPtr<ID3D11Texture2D> shadowTexture;
+		const HRESULT result = device.CreateTexture2D(&texDesc, nullptr, &shadowTexture);
+		WIN_CHECK_HRESULT(result);
+
+		return shadowTexture;
+	}
+
+	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> DX11Factory::CreateShadowDSV(ID3D11Device& device, ID3D11Texture2D& shadowTexture)
+	{
+		D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
+		dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+
+		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> shadowDSV;
+		const HRESULT result = device.CreateDepthStencilView(&shadowTexture, &dsvDesc, &shadowDSV);
+		WIN_CHECK_HRESULT(result);
+
+        return shadowDSV;
+	}
+
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> DX11Factory::CreateShadowSRV(ID3D11Device& device, ID3D11Texture2D& shadowTexture)
+	{
+		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+		srvDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+		srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+		srvDesc.Texture2D.MipLevels = 1;
+
+		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shadowSRV;
+		const HRESULT result = device.CreateShaderResourceView(&shadowTexture, &srvDesc, &shadowSRV);
+		WIN_CHECK_HRESULT(result);
+
+        return shadowSRV;
 	}
 
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> DX11Factory::LoadDDS(ID3D11Device& device, ID3D11DeviceContext& context, const std::filesystem::path& fileName)

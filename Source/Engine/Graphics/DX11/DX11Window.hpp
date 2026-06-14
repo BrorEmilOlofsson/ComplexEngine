@@ -1,21 +1,22 @@
 #pragma once
 #include <memory>
-
+#include <optional>
 
 #ifdef _WIN32
 
 #include "Engine/Win/WinDefines.hpp"
 
-#include "Engine/Graphics/DX11/Renderer/DX11Renderer.hpp"
 #include "Engine/Graphics/GraphicsSettings.hpp"
 #include "Engine/Graphics/DX11/RenderTarget/DX11RenderTarget.hpp"
 #include "Engine/Graphics/DX11/DX11SamplerState.hpp"
 #include "Engine/Graphics/DX11/ImGui/DX11ImGuiWindow.hpp"
 #include "Engine/Graphics/DX11/DX11DepthStencilViewManager.hpp"
 #include "Engine/OperatingSystem/WindowView.hpp"
+#include "Engine/Graphics/RenderContext.hpp"
 
 #include <wrl/client.h>
 #include <d3d11.h>
+#include <dxgi.h>
 
 namespace CLX
 {

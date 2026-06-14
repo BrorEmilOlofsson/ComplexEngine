@@ -21,7 +21,6 @@ namespace CLX
         explicit GraphicsFoundation(T&& object)
             : mConcept(std::make_unique<Model<T>>(std::move(object)))
         {
-
         }
 
         GraphicsFoundation(const GraphicsFoundation&) = delete;
@@ -33,7 +32,7 @@ namespace CLX
         void EndFrame();
         void Init();
         void Shutdown();
-        void Render(RenderState& renderState);
+        void Render(const RenderState& renderState, RenderContext& renderContext);
 
         [[nodiscard]] RenderContext CreateRenderContext(const Dimension2u& size);
         GraphicsWindowView MakeWindow(WindowView windowView);
@@ -53,7 +52,7 @@ namespace CLX
             virtual void EndFrame() = 0;
             virtual void Init() = 0;
             virtual void Shutdown() = 0;
-            virtual void Render(RenderState& renderState) = 0;
+            virtual void Render(const RenderState& renderState, RenderContext& renderContext) = 0;
 
             [[nodiscard]] virtual RenderContext CreateRenderContext(const Dimension2u& size) = 0;
             virtual GraphicsWindowView MakeWindow(WindowView windowView) = 0;
@@ -93,9 +92,9 @@ namespace CLX
                 mObject.Shutdown();
             }
 
-            void Render(RenderState& renderState) override
+            void Render(const RenderState& renderState, RenderContext& renderContext) override
             {
-                mObject.Render(renderState);
+                mObject.Render(renderState, renderContext);
             }
 
             [[nodiscard]] RenderContext CreateRenderContext(const Dimension2u& size) override

@@ -159,11 +159,6 @@ namespace CLX
 			throw std::runtime_error("No camera set in RenderState");
 		}
 
-		if (renderState.GetRenderContext() == nullptr)
-		{
-			throw std::runtime_error("No render context set in RenderState");
-		}
-
 		if (!renderState.GetRenderRect().has_value())
 		{
 			throw std::runtime_error("No render rect set in RenderState");
@@ -224,21 +219,21 @@ namespace CLX
 		return lightData;
 	}
 
-	void DX11Foundation::Render(RenderState& renderState)
+	void DX11Foundation::Render(const RenderState& renderState, RenderContext& renderContext)
 	{
 		PROFILER_FUNCTION(profiler::colors::Red);
 
 		ValidateRenderState(renderState);
 
-		const Dimension2u bufferSize = renderState.GetRenderContext()->GetBufferSize();
+		const Dimension2u bufferSize = renderContext.GetBufferSize();
 		const Dimension2u renderSize = GetDimension(*renderState.GetRenderRect());
 		if (renderSize.GetWidth() == 0 || renderSize.GetHeight() == 0)
 		{
 			return;
 		}
-		if (renderState.GetRenderContext()->GetBufferSize() != renderSize)
+		if (renderContext.GetBufferSize() != renderSize)
 		{
-			renderState.GetRenderContext()->ResizeBuffers(renderSize);
+			renderContext.ResizeBuffers(renderSize);
 
 			RenderState& r = const_cast<RenderState&>(renderState);
 			Camera camera = *renderState.GetCamera();
@@ -255,9 +250,12 @@ namespace CLX
 			mConstantBufferManager.UpdateLightBuffer(lightData, *GetContext().Get());
 		}
 
+        DX11RenderContext* dx11RenderContext = renderContext.Cast<DX11RenderContext>();
+        ASSERT(dx11RenderContext != nullptr);
 
 		mRenderer.Render(
 			renderState,
+			*dx11RenderContext,
 			*mAssetManager.lock(),
 			mAssetManager.lock()->GetPixelShader(GetPath(ePixelShaderType::LitDefault)),
 			mAssetManager.lock()->GetVertexShader(GetPath(eVertexShaderType::Default)),

@@ -12,6 +12,7 @@
 #include "Engine/Graphics/DX11/Text/DX11TextRenderer.hpp"
 #include "Engine/Graphics/ConstantBufferData.hpp"
 #include "Engine/Graphics/RenderState.hpp"
+#include "Engine/Graphics/DX11/DX11RenderContext.hpp"
 
 #include <wrl/client.h>
 #include <d3d11.h>
@@ -29,7 +30,8 @@ namespace CLX
 
 		void Init(AssetManager& assetManager);
 
-		void Render(RenderState& renderState, 
+		void Render(const RenderState& renderState,
+            DX11RenderContext& renderContext,
 			AssetManager& assetManager, 
 			PixelShaderAssetHandle pixelShader,
 			VertexShaderAssetHandle vertexShader,
@@ -41,7 +43,10 @@ namespace CLX
 
 	private:
 
-		void RenderDebugLines(const RenderList& renderList, AssetManager& assetManager, VertexShaderAssetHandle vertexShader, DX11ConstantBuffer<ColorBufferData>& colorCB);
+		void RenderDebugLines(const RenderList& renderList, 
+			AssetManager& assetManager,
+			VertexShaderAssetHandle vertexShader, 
+			DX11ConstantBuffer<ColorBufferData>& colorCB);
 
 
 	private:

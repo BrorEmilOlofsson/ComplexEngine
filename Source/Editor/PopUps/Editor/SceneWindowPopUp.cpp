@@ -165,7 +165,7 @@ namespace CLX
         }
     }
 
-    static void UpdateEntitySceneClickSelection(const InputState& input, const OperatingSystem& os, RenderState& renderState, std::set<EntityID>& selectedEntityIDs, EditorCommandTracker& commandTracker)
+    static void UpdateEntitySceneClickSelection(const InputState& input, const OperatingSystem& os, const RenderState& renderState, RenderContext& renderContext, std::set<EntityID>& selectedEntityIDs, EditorCommandTracker& commandTracker)
     {
         if (input.IsKeyReleased(eInputKey::LMB))
         {
@@ -174,7 +174,7 @@ namespace CLX
             {
                 const Point2i mappedPos = MapToRenderRect(mouseScreenPos, renderState.GetRenderRect().value());
 
-                const uint32_t id = renderState.GetRenderContext()->GetObjectIDAt(mappedPos);
+                const uint32_t id = renderContext.GetObjectIDAt(mappedPos);
 
                 const EntityID entityID{ id };
                 if (entityID != InvalidEntityID)
@@ -210,6 +210,7 @@ namespace CLX
         SceneManager& sceneManager = blackboard.Get<Key_SceneManager>();
         Scene& activeScene = sceneManager.GetActiveScene().Get();
         RenderState& sceneRenderState = activeScene.GetRenderState();
+        RenderContext& sceneRenderContext = activeScene.GetRenderContext();
 
         EditorSceneSettings& editorSceneSettings = blackboard.Get<Key_EditorSceneSettings>();
         const bool isPlaying = blackboard.Get<Key_IsPlaying>();
@@ -293,7 +294,7 @@ namespace CLX
             sceneRenderState.SetRenderRect(renderRect);
             mEditorCamera.SetResolution(GetDimension(renderRect));
 
-            UpdateEntitySceneClickSelection(input, os, sceneRenderState, mHierarchyPopUp.GetSelectedEntityIDs(), commandTracker);
+            UpdateEntitySceneClickSelection(input, os, sceneRenderState, sceneRenderContext, mHierarchyPopUp.GetSelectedEntityIDs(), commandTracker);
 
             if (input.IsKeyPressed(eInputKey::F) && isFocused && !isPlaying)
             {
@@ -306,6 +307,45 @@ namespace CLX
         }
 
         sceneRenderState.SetCamera(mEditorCamera);
+    }
+
+    RenderState testRenderState;
+    std::unique_ptr<RenderContext> testRenderContext = nullptr;
+
+    void TestOrthographicCamera(GraphicsFoundation& gfx, RenderState& sceneRenderState, Camera& testCamera)
+    {
+        if (testRenderContext == nullptr)
+        {
+            RenderContext ctx = gfx.CreateRenderContext(ToDimension2(sceneRenderState.GetRenderRect()->GetExtent()));
+            testRenderContext = std::make_unique<RenderContext>(std::move(ctx));
+        }
+
+        testRenderState.Reset();
+        testRenderState.SetRenderList(sceneRenderState.GetRenderList());
+        static float halfSize = 10.f;
+        static float nearPlane = 0.1f;
+        static float farPlane = 100.f;
+        testCamera.SetOrthographicProjection(halfSize, nearPlane, farPlane);
+        testRenderState.SetCamera(testCamera);
+        testCamera.SetPosition(Point3f(0, 10, -20));
+
+        if (ImGui::Begin("Test Render State"))
+        {
+            ImGui::SliderFloat("Half Size", &halfSize, 1.f, 100.f);
+            ImGui::SliderFloat("Near Plane", &nearPlane, 0.1f, 10.f);
+            ImGui::SliderFloat("Far Plane", &farPlane, 10.f, 200.f);
+            AABB2i r = RenderImage(testRenderContext->GetOutputSRV());
+
+            testRenderState.SetRenderRect(r);
+
+            if (r.GetExtent() != Vector2u::Zero())
+            {
+                gfx.Render(testRenderState, *testRenderContext);
+            }
+        }
+
+        ImGui::End();
+
     }
 
     void SceneWindowPopUp::Render(const Blackboard& blackboard)
@@ -323,10 +363,13 @@ namespace CLX
         EntityCompositionInstantiationManager& compositionInstantiations = blackboard.Get<Key_EntityCompositionInstantiationManager>();
 
         const WindowView windowView = blackboard.Get<Key_WindowView>();
-        void* const sceneTextureID = activeScene.GetRenderState().GetRenderContext()->GetOutputSRV();
+        void* const sceneTextureID = activeScene.GetRenderContext().GetOutputSRV();
         RenderState& sceneRenderState = activeScene.GetRenderState();
+        RenderContext& sceneRenderContext = activeScene.GetRenderContext();
         mHierarchyPopUp.Render(newBlackboard);
         mInspectorPopUp.Render(newBlackboard);
+
+        TestOrthographicCamera(blackboard.Get<Key_GraphicsFoundation>(), sceneRenderState, mTestCamera);
 
         const bool isPlaying = blackboard.Get<Key_IsPlaying>();
 
@@ -401,7 +444,7 @@ namespace CLX
             constexpr int columns = 3;
             float m = (available.x / columns) / size.x;
             size *= m;
-            auto srvs = sceneRenderState.GetRenderContext()->GetGBufferSRVs();
+            auto srvs = sceneRenderContext.GetGBufferSRVs();
 
             assert(srvs.size() == 5);
 

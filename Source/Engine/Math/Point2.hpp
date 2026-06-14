@@ -20,8 +20,8 @@ namespace CLX
         template<typename U>
         constexpr explicit Point2(const Point2<U>& point) noexcept;
 
-        [[nodiscard]] static constexpr Point2<T> Zero() noexcept;
-        [[nodiscard]] static constexpr Point2<T> One() noexcept;
+        [[nodiscard]] static consteval Point2<T> Zero() noexcept;
+        [[nodiscard]] static consteval Point2<T> One() noexcept;
 
     public:
 
@@ -32,11 +32,11 @@ namespace CLX
     using Point2f = Point2<float>;
     using Point2d = Point2<double>;
     using Point2i32 = Point2<int32_t>;
-    using Point2ui32 = Point2<uint32_t>;
+    using Point2u32 = Point2<uint32_t>;
     using Point2i64 = Point2<int64_t>;
-    using Point2ui64 = Point2<uint64_t>;
+    using Point2u64 = Point2<uint64_t>;
     using Point2i = Point2i32;
-    using Point2ui = Point2ui32;
+    using Point2u = Point2u32;
 
     template<typename T, typename U>
     struct rebind<Point2<T>, U>
@@ -60,13 +60,13 @@ namespace CLX
     }
 
     template<typename T>
-    constexpr Point2<T> Point2<T>::Zero() noexcept
+    consteval Point2<T> Point2<T>::Zero() noexcept
     {
         return Point2<T>(0, 0);
     }
 
     template<typename T>
-    constexpr Point2<T> Point2<T>::One() noexcept
+    consteval Point2<T> Point2<T>::One() noexcept
     {
         return Point2<T>(1, 1);
     }

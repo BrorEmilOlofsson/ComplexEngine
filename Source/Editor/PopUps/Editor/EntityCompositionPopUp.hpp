@@ -9,6 +9,7 @@
 #include "Engine/Graphics/RenderState.hpp"
 #include "Engine/Asset/AssetTypes/EntityCompositionAsset.hpp"
 #include "Editor/Utility/ComponentBufferData.hpp"
+#include "Engine/Graphics/RenderContext.hpp"
 
 #include "Editor/Utility/TransformEntityData.hpp"
 
@@ -40,6 +41,7 @@ namespace CLX
 		std::vector<EntityID> mRootEntities;
 		Camera mCamera;
 		RenderState mRenderState;
+		RenderContext mRenderContext;
 		TransformEntityData mTransformEntityData;
 		bool mIsOpen = false;
         std::string mEntitySearchBuffer;

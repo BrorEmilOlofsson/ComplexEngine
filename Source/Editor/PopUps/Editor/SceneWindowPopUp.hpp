@@ -25,6 +25,7 @@ namespace CLX
 		SceneInspectorPopUp mInspectorPopUp;
 		Camera mEditorCamera;
 		Camera mInGameCamera;
+		Camera mTestCamera;
 		bool mUseEditorCameraWhenPlaying = false;
 		// TODO: Refactor
 		int mGuizmoID = -1;

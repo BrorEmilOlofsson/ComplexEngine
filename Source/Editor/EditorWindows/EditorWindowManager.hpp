@@ -2,6 +2,8 @@
 #include <vector>
 #include <memory>
 #include "Editor/PopUps/Editor/EntityCompositionPopUp.hpp"
+#include "Engine/Utility/Blackboard.hpp"
+#include "Engine/Graphics/RenderContext.hpp"
 
 namespace CLX
 {

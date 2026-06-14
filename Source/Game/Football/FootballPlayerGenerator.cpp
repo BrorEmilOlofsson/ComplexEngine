@@ -4,7 +4,7 @@
 #include "MathExpression.hpp"
 #include "NameGenerator.hpp"
 #include "HumanNames.hpp"
-#include "Random.hpp"
+#include "Engine/Utility/Random.hpp"
 
 MathExpressionf GaussianExpression()
 {
@@ -27,7 +27,7 @@ Height GenerateHeight()
 
 eNationalAssociation GenerateNationalAssociation()
 {
-	return static_cast<eNationalAssociation>(GetRandomNumber(std::size_t{0}, EnumCount<eNationalAssociation>::value - 1));
+	return static_cast<eNationalAssociation>(CLX::GetRandomNumber(std::size_t{0}, EnumCount<eNationalAssociation>::value - 1));
 }
 
 FootballPlayer GenerateFootballPlayer()

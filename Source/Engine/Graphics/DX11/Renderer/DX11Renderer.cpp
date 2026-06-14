@@ -198,7 +198,8 @@ namespace CLX
         return std::filesystem::path(SIMPLE_DIR_SHADERS) / (std::string(name) + ".cso");
     }
 
-    void DX11Renderer::Render(RenderState& renderState,
+    void DX11Renderer::Render(const RenderState& renderState,
+        DX11RenderContext& renderContext,
         AssetManager& assetManager,
         PixelShaderAssetHandle,
         VertexShaderAssetHandle vertexShader,
@@ -210,15 +211,15 @@ namespace CLX
     {
         PROFILER_FUNCTION(profiler::colors::Red);
 
-        DX11RenderContext* r = renderState.GetRenderContext()->Cast<DX11RenderContext>();
-        ASSERT(r != nullptr);
+        //DX11RenderContext* renderContextPtr = renderContext.Cast<DX11RenderContext>();
+        //ASSERT(renderContextPtr != nullptr);
+        //DX11RenderContext& renderContext = *renderContextPtr;
 
         const Dimension2u size = GetDimension(*renderState.GetRenderRect());
 
         auto viewport = DX11Factory::CreateViewport(size);
         mDeviceContext->RSSetViewports(1, &viewport);
 
-        RenderContext& renderContext = *renderState.GetRenderContext();
         if (renderContext.GetBufferSize() != size)
         {
             renderContext.ResizeBuffers(size);
@@ -248,20 +249,18 @@ namespace CLX
         mDeviceContext->OMSetRenderTargets(_countof(nullRTVs), nullRTVs, nullptr);
 
         renderContext.SetOutputRenderTarget();
-        ID3D11ShaderResourceView* dummy[5] = {};
+        ID3D11ShaderResourceView* dummy[DX11GBuffer::GBufferCount] = {};
         mDeviceContext->PSSetShaderResources(TextureSlots::GBufferStart, static_cast<UINT>(renderContext.GetGBufferSRVs().size()), dummy); // Clear old
 
         renderContext.SetGBufferShaderResources();
 
         RenderFullScreen(
             *mDeviceContext.Get(),
-            r->GetOutputRenderTarget().GetShaderResourceView(),
+            renderContext.GetOutputRenderTarget().GetShaderResourceView(),
             samplerState,
             assetManager.GetVertexShader(GetShaderPath("FullScreenQuadVS")),
             assetManager.GetPixelShader(GetShaderPath("DeferredLightingPS"))
         );
-
-        // Render debug lines
 
         // TODO: Remove the creation of this depth stencil state every frame. It can be created once and stored in the renderer.
         D3D11_DEPTH_STENCIL_DESC dsDesc = {};
@@ -272,9 +271,9 @@ namespace CLX
         Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthReadOnlyState;
         mDevice->CreateDepthStencilState(&dsDesc, &depthReadOnlyState);
 
-        auto rtv = r->GetOutputRenderTarget().GetRenderTargetView();
+        auto rtv = renderContext.GetOutputRenderTarget().GetRenderTargetView();
         // Re-bind the same GBuffer depth buffer used before!
-        mDeviceContext->OMSetRenderTargets(1, &rtv, r->GetGBuffer().GetDepthStencilView());
+        mDeviceContext->OMSetRenderTargets(1, &rtv, renderContext.GetGBuffer().GetDepthStencilView());
         mDeviceContext->OMSetDepthStencilState(depthReadOnlyState.Get(), 0);
 
         RenderSkyBox(renderState.GetSkyBox(), transformCB, *mDeviceContext.Get());

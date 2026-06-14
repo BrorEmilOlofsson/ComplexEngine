@@ -25,11 +25,11 @@ namespace CLX
 	using AABB2f = AABB2<float>;
 	using AABB2d = AABB2<double>;
 	using AABB2i32 = AABB2<int32_t>;
-	using AABB2ui32 = AABB2<uint32_t>;
+	using AABB2u32 = AABB2<uint32_t>;
     using AABB2i64 = AABB2<int64_t>;
-    using AABB2ui64 = AABB2<uint64_t>;
+    using AABB2u64 = AABB2<uint64_t>;
     using AABB2i = AABB2i32;
-    using AABB2ui = AABB2ui32;
+    using AABB2u = AABB2u32;
 
 	template<typename T, typename U>
 	[[nodiscard]] constexpr AABB2<T> ToAABB(const AABB2<U>& aabb)

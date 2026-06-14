@@ -29,9 +29,9 @@ namespace CLX
 	}
 
 	template<typename T, typename Rand> requires std::integral<T> || std::floating_point<T>
-	[[nodiscard]] constexpr T GetRandomNumber(Rand&& engine, const Bounds<T>&bounds)
+	[[nodiscard]] constexpr T GetRandomNumber(Rand&& engine, const Bounds<T>& bounds)
 	{
-		return GetRandomNumber(bounds.GetMin(), bounds.GetMax());
+		return GetRandomNumber(engine, bounds.GetMin(), bounds.GetMax());
 	}
 
 	template<typename T> requires std::integral<T> || std::floating_point<T>

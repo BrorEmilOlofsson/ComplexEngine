@@ -49,7 +49,7 @@ namespace CLX
         void Init();
         void Shutdown();
 
-        void Render(RenderState& renderState);
+        void Render(const RenderState& renderState, RenderContext& renderContext);
 
         GraphicsWindowView MakeWindow(WindowView windowView)
         {

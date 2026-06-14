@@ -16,9 +16,11 @@ namespace CLX
 	{
 	public:
 
+        static constexpr uint32_t GBufferCount = 5;
+
 		explicit DX11GBuffer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, Microsoft::WRL::ComPtr<ID3D11Device> device, Dimension2u size);
 
-		[[nodiscard]] std::array<ID3D11RenderTargetView*, 5> GetRTVArray()
+		[[nodiscard]] std::array<ID3D11RenderTargetView*, GBufferCount> GetRTVArray()
 		{
 			return
 			{
@@ -30,7 +32,7 @@ namespace CLX
 			};
 		}
 
-		[[nodiscard]] std::array<ID3D11ShaderResourceView*, 5> GetSRVArray()
+		[[nodiscard]] std::array<ID3D11ShaderResourceView*, GBufferCount> GetSRVArray()
 		{
 			return
 			{

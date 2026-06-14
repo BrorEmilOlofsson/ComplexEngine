@@ -19,8 +19,8 @@ namespace CLX
 		template<typename U>
 		constexpr explicit Point3(const Point3<U>& point) noexcept;
 
-		[[nodiscard]] static constexpr Point3<T> Zero() noexcept;
-		[[nodiscard]] static constexpr Point3<T> One() noexcept;
+		[[nodiscard]] static consteval Point3<T> Zero() noexcept;
+		[[nodiscard]] static consteval Point3<T> One() noexcept;
 
 	public:
 
@@ -32,11 +32,11 @@ namespace CLX
 	using Point3f = Point3<float>;
 	using Point3d = Point3<double>;
 	using Point3i32 = Point3<int32_t>;
-	using Point3ui32 = Point3<uint32_t>;
+	using Point3u32 = Point3<uint32_t>;
     using Point3i64 = Point3<int64_t>;
-    using Point3ui64 = Point3<uint64_t>;
+    using Point3u64 = Point3<uint64_t>;
     using Point3i = Point3i32;
-    using Point3ui = Point3ui32;
+    using Point3u = Point3u32;
 
 	template<typename T>
 	constexpr Point3<T>::Point3(const T& x, const T& y, const T& z) noexcept
@@ -56,13 +56,13 @@ namespace CLX
 	}
 
 	template<typename T>
-	constexpr Point3<T> Point3<T>::Zero() noexcept
+	consteval Point3<T> Point3<T>::Zero() noexcept
 	{
 		return Point3<T>(0, 0, 0);
 	}
 
 	template<typename T>
-	constexpr Point3<T> Point3<T>::One() noexcept
+	consteval Point3<T> Point3<T>::One() noexcept
 	{
 		return Point3<T>(1, 1, 1);
 	}
