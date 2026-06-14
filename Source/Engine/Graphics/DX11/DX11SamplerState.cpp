@@ -13,5 +13,6 @@ namespace CLX
 	void DX11SamplerState::Bind(ID3D11DeviceContext& context)
 	{
 		context.VSSetSamplers(0, 1, mSamplerState.GetAddressOf());
+		context.PSSetSamplers(0, 1, mSamplerState.GetAddressOf());
 	}
 }

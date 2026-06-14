@@ -3,19 +3,24 @@
 
 float CalculateShadowFactor(float3 pixelPosition)
 {
+    static const float ShadowDepthBias = 0.00002f;
+    static const float ShadowedLightFactor = 0.35f;
+
     const float4 lightClipPosition = mul(float4(pixelPosition, 1.0f), lightViewProjection);
     const float3 projectedPosition = lightClipPosition.xyz / lightClipPosition.w;
     const float2 shadowUV = projectedPosition.xy * float2(0.5f, -0.5f) + 0.5f;
 
     float shadowFactor = 1.0f;
-    const bool isInsideShadowMap = shadowUV.x >= 0.0f && shadowUV.x <= 1.0f && shadowUV.y >= 0.0f && shadowUV.y <= 1.0f;
+    const bool isInsideShadowMap =
+        shadowUV.x >= 0.0f && shadowUV.x <= 1.0f &&
+        shadowUV.y >= 0.0f && shadowUV.y <= 1.0f &&
+        projectedPosition.z >= 0.0f && projectedPosition.z <= 1.0f;
 
     if (isInsideShadowMap)
     {
         const float closestDepth = ShadowMapTexture.Sample(GlobalDefaultSampler, shadowUV).r;
         const float currentDepth = projectedPosition.z;
-        const float bias = 0.001f;
-        shadowFactor = currentDepth - bias <= closestDepth ? 1.0f : 0.35f;
+        shadowFactor = currentDepth - ShadowDepthBias <= closestDepth ? 1.0f : ShadowedLightFactor;
     }
 
     return shadowFactor;

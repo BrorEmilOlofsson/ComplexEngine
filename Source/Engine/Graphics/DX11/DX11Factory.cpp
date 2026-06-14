@@ -483,7 +483,7 @@ namespace CLX
 		texDesc.Height = shadowSize;
 		texDesc.MipLevels = 1;
 		texDesc.ArraySize = 1;
-		texDesc.Format = DXGI_FORMAT_R24G8_TYPELESS;
+		texDesc.Format = DXGI_FORMAT_R32_TYPELESS;
 		texDesc.SampleDesc.Count = 1;
 		texDesc.Usage = D3D11_USAGE_DEFAULT;
 		texDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
@@ -498,7 +498,7 @@ namespace CLX
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> DX11Factory::CreateShadowDSV(ID3D11Device& device, ID3D11Texture2D& shadowTexture)
 	{
 		D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
-		dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;
 		dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 
 		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> shadowDSV;
@@ -511,7 +511,7 @@ namespace CLX
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> DX11Factory::CreateShadowSRV(ID3D11Device& device, ID3D11Texture2D& shadowTexture)
 	{
 		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-		srvDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+		srvDesc.Format = DXGI_FORMAT_R32_FLOAT;
 		srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 		srvDesc.Texture2D.MipLevels = 1;
 

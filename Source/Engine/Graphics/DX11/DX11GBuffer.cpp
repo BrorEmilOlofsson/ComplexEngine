@@ -5,12 +5,18 @@
 
 namespace CLX
 {
+	static D3D11_TEXTURE2D_DESC CreatePositionTextureDesc(const Dimension2u size)
+	{
+		D3D11_TEXTURE2D_DESC desc = DX11Factory::CreateRenderTargetTextureDesc(size);
+		desc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+		return desc;
+	}
 
 	DX11GBuffer::DX11GBuffer(Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, Microsoft::WRL::ComPtr<ID3D11Device> device, const Dimension2u size)
 		: mAlbedoRT(context, device, *DX11Factory::CreateRenderTargetTexture(*device.Get(), DX11Factory::CreateRenderTargetTextureDesc(size)).Get(), size)
 		, mNormalRT(context, device, *DX11Factory::CreateRenderTargetTexture(*device.Get(), DX11Factory::CreateRenderTargetTextureDesc(size)).Get(), size)
 		, mMaterialRT(context, device, *DX11Factory::CreateRenderTargetTexture(*device.Get(), DX11Factory::CreateRenderTargetTextureDesc(size)).Get(), size)
-		, mPositionRT(context, device, *DX11Factory::CreateRenderTargetTexture(*device.Get(), DX11Factory::CreateRenderTargetTextureDesc(size)).Get(), size)
+		, mPositionRT(context, device, *DX11Factory::CreateRenderTargetTexture(*device.Get(), CreatePositionTextureDesc(size)).Get(), size)
 		, mObjectIDTexture(DX11Factory::CreateRenderTargetTexture(*device.Get(), DX11Factory::CreateObjectSelectionTextureDesc(size)))
 		, mObjectIDRT(context, device, *mObjectIDTexture.Get(), size)
 		, mContext(context)
@@ -72,7 +78,7 @@ namespace CLX
 		).Get(), size);
 		mPositionRT.Resize(*DX11Factory::CreateRenderTargetTexture(
 			*mDevice.Get(),
-			DX11Factory::CreateRenderTargetTextureDesc(size)
+			CreatePositionTextureDesc(size)
 		).Get(), size);
 		mObjectIDTexture = DX11Factory::CreateRenderTargetTexture(*mDevice.Get(), DX11Factory::CreateObjectSelectionTextureDesc(size));
 

@@ -199,10 +199,10 @@ namespace CLX
 
     static Matrix4x4f CalculateDirectionalLightViewProjection(const DirectionalLight& directionalLight, const Camera& camera)
     {
-        constexpr float ShadowHalfSize = 5000.0f;
-        constexpr float ShadowCameraDistance = 5000.0f;
-        constexpr float ShadowNearPlane = 1.0f;
-        constexpr float ShadowFarPlane = 10000.0f;
+        constexpr float ShadowHalfSize = 100.0f;
+        constexpr float ShadowCameraDistance = 100.0f;
+        constexpr float ShadowNearPlane = 0.1f;
+        constexpr float ShadowFarPlane = 250.0f;
 
         const Point3f lightPosition = camera.GetPosition() - directionalLight.direction * ShadowCameraDistance;
         const Transform lightTransform = Transform::FromPositionRotationScale(lightPosition, RotationMatrix3f::FromZ(directionalLight.direction), Vector3f::One());
