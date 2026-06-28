@@ -6,6 +6,7 @@
 #include "Engine/Math/ShapeMath.hpp"
 #include "Engine/ECSEngine/Utility/ECSUtilityFunctions.hpp"
 #include "Engine/Math/RotationMath.hpp"
+#include "Engine/Utility/BlackboardKeys.hpp"
 
 namespace CLX
 {

@@ -17,6 +17,7 @@
 #include "Engine/Reflection/MemberVariable.hpp"
 #include "Engine/Reflection/ViewAndEditResult.hpp"
 #include "Engine/Utility/Algorithm.hpp"
+#include "Engine/Utility/Assert.hpp"
 
 namespace CLX
 {

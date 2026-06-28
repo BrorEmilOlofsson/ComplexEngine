@@ -2,6 +2,7 @@
 #include "ECSSerializer.hpp"
 #include "Engine/ECS/EntityComposition.hpp"
 #include "Engine/Reflection/DataTypeRegistry.hpp"
+#include "Engine/Utility/BlackboardKeys.hpp"
 #include <fstream>
 #include <ranges>
 #include <algorithm>

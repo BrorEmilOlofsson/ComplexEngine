@@ -3,6 +3,7 @@
 #include <External/imgui/imgui.h>
 #include "PropertyPath.hpp"
 #include "Engine/Utility/Memory/GenericBufferArena.hpp"
+#include "Engine/Utility/BlackboardKeys.hpp"
 #include <fstream>
 
 namespace CLX

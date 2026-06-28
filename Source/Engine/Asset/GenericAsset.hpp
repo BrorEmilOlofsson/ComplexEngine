@@ -1,7 +1,11 @@
 #pragma once
+#include <memory>
+#include "Engine/Utility/IDWrapper.hpp"
 
 namespace CLX
 {
+
+    using GenericAssetID = IDWrapper<std::size_t, struct GenericAssetTag>;
 
     class GenericAsset
     {
@@ -10,32 +14,42 @@ namespace CLX
         GenericAsset() = default;
 
         template<typename T>
-        GenericAsset(Asset<T> asset)
+        GenericAsset(T asset)
             : mConcept(std::make_unique<Model<T>>(std::move(asset)))
         {
-            std::construct_at()
         }
 
         template<typename T>
-        T* Get()
+        [[nodiscard]] T* Cast()
         {
             if (auto model = dynamic_cast<Model<T>*>(mConcept.get()))
             {
-                return &model->mAsset;
+                return &model->Get();
             }
             return nullptr;
         }
 
         template<typename T>
-        const T* Get() const
+        [[nodiscard]] const T* Cast() const
         {
             if (auto model = dynamic_cast<const Model<T>*>(mConcept.get()))
             {
-                return &model->mAsset;
+                return &model->Get();
             }
             return nullptr;
         }
 
+        template<typename T>
+        [[nodiscard]] T& UnsafeCast()
+        {
+            return static_cast<Model<T>*>(mConcept.get())->Get();
+        }
+
+        template<typename T>
+        [[nodiscard]] const T& UnsafeCast() const
+        {
+            return static_cast<const Model<T>*>(mConcept.get())->Get();
+        }
 
 
 
@@ -46,25 +60,35 @@ namespace CLX
         public:
 
             virtual ~Concept() = default;
-
-
         };
 
         template<typename T>
         class Model : public Concept
         {
-            Model();
+        public:
+            Model(T&& object)
+                : mObject(std::move(object))
+            {
+            }
 
+            [[nodiscard]] T& Get()
+            {
+                return mObject;
+            }
 
+            [[nodiscard]] const T& Get() const
+            {
+                return mObject;
+            }
 
         private:
 
-            Asset<T> mAsset;
+            T mObject;
         };
 
     private:
 
-        std::array<std::byte, 64> mStorage;
+        std::unique_ptr<Concept> mConcept;
     };
 
 

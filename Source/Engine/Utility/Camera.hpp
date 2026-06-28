@@ -6,6 +6,7 @@
 #include "Engine/Math/Angle.hpp"
 #include "Engine/Math/Dimension2.hpp"
 #include "Engine/Math/VectorMath.hpp"
+#include "Engine/Utility/Assert.hpp"
 
 namespace CLX
 {
@@ -15,12 +16,12 @@ namespace CLX
 		Orthographic
 	};
 
-	constexpr Radiansf CalculateHorizontalFOV(Radiansf verticalFOV, float aspectRatio)
+	[[nodiscard]] constexpr Radiansf CalculateHorizontalFOV(Radiansf verticalFOV, float aspectRatio)
 	{
 		return 2.0f * ATan(Tan(verticalFOV * 0.5f) * aspectRatio);
 	}
 
-	constexpr Radiansf CalculateVerticalFOV(Radiansf horizontalFOV, float aspectRatio)
+	[[nodiscard]] constexpr Radiansf CalculateVerticalFOV(Radiansf horizontalFOV, float aspectRatio)
 	{
 		return 2.0f * ATan(Tan(horizontalFOV / 2.0f) / aspectRatio);
 	}

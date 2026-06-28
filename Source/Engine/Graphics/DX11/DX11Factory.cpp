@@ -224,7 +224,7 @@ namespace CLX
 		return swapChain;
 	}
 
-	Microsoft::WRL::ComPtr<ID3D11Buffer> DX11Factory::CreateConstantBuffer(ID3D11Device& device, const unsigned int byteSize)
+	Microsoft::WRL::ComPtr<ID3D11Buffer> DX11Factory::CreateConstantBuffer(ID3D11Device& device, const UINT byteSize)
 	{
 		D3D11_BUFFER_DESC bufferDescription = {};
 		bufferDescription.Usage = D3D11_USAGE_DYNAMIC;
@@ -423,7 +423,7 @@ namespace CLX
 		return vertexBuffer;
 	}
 
-	Microsoft::WRL::ComPtr<ID3D11Buffer> DX11Factory::CreateVertexBuffer(ID3D11Device& device, const void* data, const unsigned int size)
+	Microsoft::WRL::ComPtr<ID3D11Buffer> DX11Factory::CreateVertexBuffer(ID3D11Device& device, const void* data, const UINT size)
 	{
 		D3D11_BUFFER_DESC vertexBufferDesc = {};
 		vertexBufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
@@ -445,7 +445,7 @@ namespace CLX
 		return vertexBuffer;
 	}
 
-	Microsoft::WRL::ComPtr<ID3D11Buffer> DX11Factory::CreateIndexBuffer(ID3D11Device& device, const void* data, const unsigned int size)
+	Microsoft::WRL::ComPtr<ID3D11Buffer> DX11Factory::CreateIndexBuffer(ID3D11Device& device, const void* data, const UINT size)
 	{
 		D3D11_BUFFER_DESC indexBufferDesc = {};
 		indexBufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
@@ -463,7 +463,7 @@ namespace CLX
 		return CreateBuffer(device, indexBufferDesc, &indexData);
 	}
 
-	Microsoft::WRL::ComPtr<ID3D11Buffer> DX11Factory::CreateInstanceBuffer(ID3D11Device& device, const unsigned int size)
+	Microsoft::WRL::ComPtr<ID3D11Buffer> DX11Factory::CreateInstanceBuffer(ID3D11Device& device, const UINT size)
 	{
 		D3D11_BUFFER_DESC instanceBufferDesc = {};
 		instanceBufferDesc.Usage = D3D11_USAGE_DYNAMIC;

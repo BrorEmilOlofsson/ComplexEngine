@@ -5,6 +5,7 @@
 #include "Engine/Math/ShapeMath.hpp"
 #include "Engine/Utility/Blackboard.hpp"
 #include "Engine/ECS/ECSRegistry.hpp"
+#include "Engine/Utility/BlackboardKeys.hpp"
 
 namespace CLX
 {

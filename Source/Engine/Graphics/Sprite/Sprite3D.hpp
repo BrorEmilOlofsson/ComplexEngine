@@ -23,7 +23,7 @@ namespace CLX
 		Color mColor = Colors::White;
 		Vector2f mPivot;
 		TextureAssetHandle mTexture;
-		Radiansf mRotation;
+		Radiansf mRotation = Radiansf(0.0f);
 		//DirectX::SpriteEffects mEffect = DirectX::SpriteEffects_None;
 		float mLayerDepth = 0.0f;
 	};

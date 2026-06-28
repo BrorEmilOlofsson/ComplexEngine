@@ -12,7 +12,6 @@
 
 #include "Engine/Math/Dimension2.hpp"
 
-
 namespace CLX
 {
 
@@ -37,7 +36,7 @@ namespace CLX
 		[[nodiscard]] static Microsoft::WRL::ComPtr<IDXGISwapChain> CreateSwapChainAndDeviceAndContext(HWND hwnd, const Dimension2u windowSize,
 			Microsoft::WRL::ComPtr<ID3D11Device>& aDevice, Microsoft::WRL::ComPtr<ID3D11DeviceContext>& context);
 
-		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11Buffer> CreateConstantBuffer(ID3D11Device& device, const unsigned int size);
+		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11Buffer> CreateConstantBuffer(ID3D11Device& device, const UINT size);
 	
 		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> CreateTexture(ID3D11Device& device, Dimension2u size, const void* memory);
 		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11Texture2D> CreateRenderTargetTexture(ID3D11Device& device, Dimension2u size);
@@ -55,10 +54,10 @@ namespace CLX
 		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11PixelShader> CreatePixelShader(const std::filesystem::path& path, ID3D11Device& device);
 	
 		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11Buffer> CreateBuffer(ID3D11Device& device, const D3D11_BUFFER_DESC& desc, const D3D11_SUBRESOURCE_DATA* data);
-		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11Buffer> CreateVertexBuffer(ID3D11Device& device, const void* data, unsigned int size);
-		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11Buffer> CreateIndexBuffer(ID3D11Device& device, const void* data, unsigned int size);
+		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11Buffer> CreateVertexBuffer(ID3D11Device& device, const void* data, UINT size);
+		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11Buffer> CreateIndexBuffer(ID3D11Device& device, const void* data, UINT size);
 		
-		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11Buffer> CreateInstanceBuffer(ID3D11Device& device, unsigned int size);
+		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11Buffer> CreateInstanceBuffer(ID3D11Device& device, UINT size);
 
         [[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11Texture2D> CreateShadowMapTexture(ID3D11Device& device, UINT shadowSize);
         [[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11DepthStencilView> CreateShadowDSV(ID3D11Device& device, ID3D11Texture2D& shadowTexture);
@@ -66,6 +65,8 @@ namespace CLX
 
 		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> LoadDDS(ID3D11Device& device, ID3D11DeviceContext& context, const std::filesystem::path& fileName);
 		[[nodiscard]] static Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> LoadNonDDS(ID3D11Device& device, const std::filesystem::path& fileName);
+	
+		
 	};
 }
 

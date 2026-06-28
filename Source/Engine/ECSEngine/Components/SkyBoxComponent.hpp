@@ -4,6 +4,7 @@
 #include "Engine/Asset/AssetTypes/MeshAsset.hpp"
 #include "Engine/Asset/AssetTypes/PixelShaderAsset.hpp"
 #include "Engine/Asset/AssetTypes/VertexShaderAsset.hpp"
+#include "Engine/Utility/Blackboard.hpp"
 
 namespace CLX
 {

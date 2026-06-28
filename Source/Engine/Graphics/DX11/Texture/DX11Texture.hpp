@@ -2,9 +2,6 @@
 
 #ifdef _WIN32
 
-#include <string>
-#include <filesystem>
-
 #include "Engine/Win/WinDefines.hpp"
 
 #include <wrl/client.h>

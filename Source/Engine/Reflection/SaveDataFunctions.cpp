@@ -8,9 +8,11 @@
 #include "Engine/Graphics/Model/AnimatedModel.hpp"
 #include "Engine/Graphics/GraphicsConstants.hpp"
 #include "Engine/Reflection/DataTypeRegistry.hpp"
-#include "Engine/Scene/Scene.hpp"
 #include "Engine/Reflection/VariantReflection.hpp"
 #include "Engine/Math/RotationMath.hpp"
+#include "Engine/Utility/BlackboardKeys.hpp"
+
+#include <filesystem>
 
 namespace CLX
 {

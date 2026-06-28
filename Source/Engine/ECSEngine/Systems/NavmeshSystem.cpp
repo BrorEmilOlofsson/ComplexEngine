@@ -8,6 +8,7 @@
 #include "Engine/Scene/SceneManager.hpp"
 #include "Engine/Input/InputState.hpp"
 #include <External/fmt/format.h>
+#include "Engine/Utility/BlackboardKeys.hpp"
 
 namespace CLX
 {

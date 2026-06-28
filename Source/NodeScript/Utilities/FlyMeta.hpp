@@ -358,42 +358,51 @@ namespace FLY_NAMESPACE
 		return FindFirstOfTypeFromArgsImpl<Find, 0, Args...>();
 	}
 
-	template<typename T, typename First, typename... Rest>
-	constexpr decltype(auto) Extract_Impl(First&& first, [[maybe_unused]] Rest&&... rest)
+	template<typename>
+	inline constexpr bool AlwaysFalse = false;
+
+	template<typename T>
+	consteval std::size_t TypeIndex()
 	{
-		if constexpr (std::same_as<T, std::decay_t<First>>)
+		static_assert(AlwaysFalse<T>, "Type not found in argument pack.");
+		return 0;
+	}
+
+	template<typename T, typename First, typename... Rest>
+	consteval std::size_t TypeIndex()
+	{
+		if constexpr (std::same_as<T, std::remove_cvref_t<First>>)
 		{
-			return std::forward<First>(first);
+			return 0;
 		}
 		else
 		{
-			return Extract_Impl<T>(std::forward<Rest>(rest)...);
+			return 1 + TypeIndex<T, Rest...>();
 		}
-	}
-
-	template<typename T>
-	[[nodiscard]] constexpr decltype(auto) Extract_Impl()
-	{
-		//static_assert(false);
-		return T{};
 	}
 
 	template<typename T, typename... Types> requires ContainsType<T, Types...>
 	[[nodiscard]] constexpr decltype(auto) Extract(Types&&... types)
 	{
-		return Extract_Impl<T, Types...>(std::forward<Types>(types)...);
+		constexpr std::size_t index = TypeIndex<T, Types...>();
+
+		return std::get<index>(
+			std::forward_as_tuple(std::forward<Types>(types)...)
+		);
 	}
 
-	template<typename T, typename... Types>
-	[[nodiscard]] constexpr decltype(auto) TryExtract(const T& defaultValue, [[maybe_unused]] Types&&... types)
+	template<typename Default, typename... Types>
+	[[nodiscard]] constexpr decltype(auto) TryExtract(Default&& defaultValue, [[maybe_unused]] Types&&... types)
 	{
+		using T = std::remove_cvref_t<Default>;
+
 		if constexpr (ContainsType<T, Types...>)
 		{
-			return Extract_Impl<T, Types...>(std::forward<Types>(types)...);
+			return Extract<T>(std::forward<Types>(types)...);
 		}
 		else
 		{
-			return defaultValue;
+			return std::forward<Default>(defaultValue);
 		}
 	}
 

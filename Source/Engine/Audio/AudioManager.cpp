@@ -2,6 +2,7 @@
 #include "AudioManager.hpp"
 #include <External/fmod/studio/fmod_studio.hpp>
 #include "FMODUtility.hpp"
+#include "Engine/Utility/Assert.hpp"
 
 namespace CLX
 {

@@ -7,6 +7,7 @@
 #include "Engine/Asset/AssetLoader.hpp"
 #include "Engine/Utility/File/FileUtility.hpp"
 #include "Engine/Asset/AssetExtensions.hpp"
+#include "Engine/Asset/GenericAsset.hpp"
 
 namespace CLX
 {
@@ -423,5 +424,10 @@ namespace CLX
         std::function<void(AssetManager&)> mDefaultLoader;
 
         AssetLoader mAssetLoader;
+
+        std::vector<std::unique_ptr<GenericAsset>> mGenericAssets;
+        //std::unordered_map<GenericAssetID, GenericAssetHandle> mGenericAssetsByID;
+        //std::unordered_map<std::filesystem::path, GenericAssetHandle> mGenericAssetsByPath;
+
     };
 }

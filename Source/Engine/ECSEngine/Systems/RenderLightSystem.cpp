@@ -5,6 +5,7 @@
 #include "Engine/ECSEngine/Components/TransformComponent.hpp"
 #include "Engine/Graphics/RenderState.hpp"
 #include "Engine/ECSEngine/Utility/ECSUtilityFunctions.hpp"
+#include "Engine/Utility/BlackboardKeys.hpp"
 
 namespace CLX
 {

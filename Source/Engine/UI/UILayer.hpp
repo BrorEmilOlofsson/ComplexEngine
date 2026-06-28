@@ -1,5 +1,7 @@
 #pragma once
+#include <optional>
 #include <vector>
+#include <span>
 #include "UIElement.hpp"
 
 namespace CLX

@@ -1,4 +1,5 @@
 #pragma once
+#include "Engine/Utility/Blackboard.hpp"
 
 namespace CLX
 {

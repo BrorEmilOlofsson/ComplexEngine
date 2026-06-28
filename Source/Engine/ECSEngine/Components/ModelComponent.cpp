@@ -3,6 +3,7 @@
 #include "Engine/Reflection/Reflection.hpp"
 #include "Engine/Asset/AssetManager.hpp"
 #include "Engine/Graphics/GraphicsConstants.hpp"
+#include "Engine/Utility/BlackboardKeys.hpp"
 
 namespace CLX
 {

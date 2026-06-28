@@ -7,6 +7,7 @@
 #include "Engine/ECSEngine/Utility/ECSUtilityFunctions.hpp"
 #include "Engine/Audio/AudioManager.hpp"
 #include "Engine/ECSEngine/Components/CameraComponent.hpp"
+#include "Engine/Utility/BlackboardKeys.hpp"
 
 namespace CLX
 {

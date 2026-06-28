@@ -9,6 +9,7 @@
 #include "Engine/Input/InputState.hpp"
 #include "Engine/Graphics/RenderState.hpp"
 #include "Engine/Utility/DebugShapes.hpp"
+#include "Engine/Utility/BlackboardKeys.hpp"
 
 namespace CLX
 {

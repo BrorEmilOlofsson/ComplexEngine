@@ -8,6 +8,7 @@
 #include "Engine/Graphics/Animation/AnimationUtility.hpp"
 #include "Engine/Graphics/RenderState.hpp"
 #include <External/imgui/imgui.h>
+#include "Engine/Utility/BlackboardKeys.hpp"
 
 namespace CLX
 {

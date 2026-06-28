@@ -13,6 +13,7 @@
 #include "Engine/Graphics/DX11/DX11DepthStencilViewManager.hpp"
 #include "Engine/OperatingSystem/WindowView.hpp"
 #include "Engine/Graphics/RenderContext.hpp"
+#include "Engine/Asset/AssetManager.hpp"
 
 #include <wrl/client.h>
 #include <d3d11.h>
