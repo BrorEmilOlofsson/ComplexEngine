@@ -29,16 +29,6 @@ namespace CLX
 		return mConcept->MakeWindow(size, title);
 	}
 
-	//GraphicsFoundation& OperatingSystem::GetGraphicsFoundation()
-	//{
-	//	return mConcept->GetGraphicsFoundation();
-	//}
-
-	//const GraphicsFoundation& OperatingSystem::GetGraphicsFoundation() const
-	//{
-	//	return mConcept->GetGraphicsFoundation();
- //   }
-
 	const InputState& OperatingSystem::GetInputState() const
 	{
         return mConcept->GetInputState();

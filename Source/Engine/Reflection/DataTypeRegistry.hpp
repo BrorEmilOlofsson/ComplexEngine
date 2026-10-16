@@ -82,7 +82,7 @@ namespace CLX
         [[nodiscard]] size_t GetDataTypeSize(DataTypeID dataTypeID) const;
         [[nodiscard]] InplaceConstructFunction GetInplaceConstructFunction(DataTypeID dataTypeID) const;
         [[nodiscard]] DestroyFunction GetDestroyFunction(DataTypeID dataTypeID) const;
-        [[nodiscard]] CopyFunction GetCopyFunction(DataTypeID dataTypeID) const;
+        [[nodiscard]] CopyAssignFunction GetCopyAssignFunction(DataTypeID dataTypeID) const;
 
         [[nodiscard]] DataType* Find(DataTypeID dataTypeID);
         [[nodiscard]] const DataType* Find(DataTypeID dataTypeID) const;
@@ -189,8 +189,10 @@ namespace CLX
             .prettyName = std::move(prettyName),
             .inplaceConstruct = CreateInplaceConstructFunction<T>(),
             .destroy = CreateDestroyFunction<T>(),
-            .copy = CreateCopyFunction<T>(),
-            .move = CreateMoveFunction<T>(),
+            .copyConstruct = CreateCopyConstructFunction<T>(),
+            .copyAssign = CreateCopyAssignFunction<T>(),
+            .moveConstruct = CreateMoveConstructFunction<T>(),
+            .moveAssign = CreateMoveAssignFunction<T>(),
             .swap = CreateSwapFunction<T>(),
             .equals = equalsFunction,
             .toAny = CreateToAnyFunction<T>(),

@@ -32,31 +32,31 @@ namespace CLX
 		delete[] mStartPtr;
 	}
 
-	DynamicMemoryArena::DynamicMemoryArena(const DynamicMemoryArena& aOther)
+	DynamicMemoryArena::DynamicMemoryArena(const DynamicMemoryArena& other)
 	{
-		mStartPtr = new std::byte[aOther.mCapacity];
-		mCapacity = aOther.mCapacity;
-		mSize = aOther.mSize;
+		mStartPtr = new std::byte[other.mCapacity];
+		mCapacity = other.mCapacity;
+		mSize = other.mSize;
 
-		for (const MemoryObject& memoryObject : aOther.mObjects)
+		for (const MemoryObject& memoryObject : other.mObjects)
 		{
 			std::byte* newAddress = &mStartPtr[memoryObject.handle.id];
-			const std::byte* oldAddress = aOther.MemoryAt(memoryObject.handle);
-			memoryObject.copy(newAddress, oldAddress);
+			const std::byte* oldAddress = other.MemoryAt(memoryObject.handle);
+			memoryObject.copyAssign(newAddress, oldAddress);
 
 			mObjects.push_back(memoryObject);
 		}
 	}
 
-	DynamicMemoryArena::DynamicMemoryArena(DynamicMemoryArena&& aOther) noexcept
-		: mStartPtr(std::exchange(aOther.mStartPtr, nullptr))
-		, mCapacity(std::exchange(aOther.mCapacity, 0))
-		, mSize(std::exchange(aOther.mSize, 0))
-		, mObjects(std::move(aOther.mObjects))
+	DynamicMemoryArena::DynamicMemoryArena(DynamicMemoryArena&& other) noexcept
+		: mStartPtr(std::exchange(other.mStartPtr, nullptr))
+		, mCapacity(std::exchange(other.mCapacity, 0))
+		, mSize(std::exchange(other.mSize, 0))
+		, mObjects(std::move(other.mObjects))
 	{
 	}
 
-	DynamicMemoryArena& DynamicMemoryArena::operator=(const DynamicMemoryArena& aOther)
+	DynamicMemoryArena& DynamicMemoryArena::operator=(const DynamicMemoryArena& other)
 	{
 		for (const MemoryObject& memoryObject : mObjects)
 		{
@@ -64,15 +64,15 @@ namespace CLX
 		}
 		delete[] mStartPtr;
 
-		mStartPtr = new std::byte[aOther.mCapacity];
-		mCapacity = aOther.mCapacity;
-		mSize = aOther.mSize;
+		mStartPtr = new std::byte[other.mCapacity];
+		mCapacity = other.mCapacity;
+		mSize = other.mSize;
 
-		for (const MemoryObject& memoryObject : aOther.mObjects)
+		for (const MemoryObject& memoryObject : other.mObjects)
 		{
 			std::byte* newAddress = &mStartPtr[memoryObject.handle.id];
-			const std::byte* oldAddress = aOther.MemoryAt(memoryObject.handle);
-			memoryObject.copy(newAddress, oldAddress);
+			const std::byte* oldAddress = other.MemoryAt(memoryObject.handle);
+			memoryObject.copyAssign(newAddress, oldAddress);
 
 			mObjects.push_back(memoryObject);
 		}
@@ -80,26 +80,26 @@ namespace CLX
 		return *this;
 	}
 
-	DynamicMemoryArena& DynamicMemoryArena::operator=(DynamicMemoryArena&& aOther) noexcept
+	DynamicMemoryArena& DynamicMemoryArena::operator=(DynamicMemoryArena&& other) noexcept
 	{
-		mStartPtr = aOther.mStartPtr;
-		mCapacity = aOther.mCapacity;
-		mSize = aOther.mSize;
+		mStartPtr = other.mStartPtr;
+		mCapacity = other.mCapacity;
+		mSize = other.mSize;
 
-		mObjects = std::move(aOther.mObjects);
+		mObjects = std::move(other.mObjects);
 
-		aOther.mStartPtr = nullptr;
-		aOther.mCapacity = 0;
-		aOther.mSize = 0;
+		other.mStartPtr = nullptr;
+		other.mCapacity = 0;
+		other.mSize = 0;
 
 		return *this;
 	}
 
-	DynamicMemoryArenaHandle DynamicMemoryArena::AllocateUnsafe(const size_t size, InplaceConstructFunction inplaceAllocateFunction, DestroyFunction destructorFunction, CopyFunction copyFunction, [[maybe_unused]] std::type_index type)
+	DynamicMemoryArenaHandle DynamicMemoryArena::AllocateUnsafe(const size_t size, InplaceConstructFunction inplaceAllocateFunction, DestroyFunction destructorFunction, CopyAssignFunction copyAssignFunction, [[maybe_unused]] std::type_index type)
 	{
 		assert(inplaceAllocateFunction);
 		assert(destructorFunction);
-		assert(copyFunction);
+		assert(copyAssignFunction);
 
 		AllocateSize(size);
 
@@ -112,7 +112,7 @@ namespace CLX
 			{
 				.handle = memoryHandle,
 				.destroy = destructorFunction,
-				.copy = copyFunction,
+				.copyAssign = copyAssignFunction,
 #ifdef _DEBUG
 				.type = type
 #endif
@@ -161,7 +161,7 @@ namespace CLX
 		{
 			std::byte* newAddress = &newStart[memoryObject.handle.id];
 			const std::byte* oldAddress = MemoryAt(memoryObject.handle);
-			memoryObject.copy(newAddress, oldAddress);
+			memoryObject.copyAssign(newAddress, oldAddress);
 		}
 		delete[] oldStart;
 

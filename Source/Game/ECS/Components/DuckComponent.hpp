@@ -1,4 +1,6 @@
 #pragma once
+#include <vector>
+#include "Engine/ECS/EntityID.hpp"
 
 struct DuckComponent final
 {

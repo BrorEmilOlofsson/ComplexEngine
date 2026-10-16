@@ -6,6 +6,7 @@
 #include "FlyScriptEditorUtilities.hpp"
 #include "EditorNodeRegistration.hpp"
 #include "Editor/ImGui/ImGuiBegin.hpp"
+#include "Engine/Utility/File/FileUtility.hpp"
 
 #include <External/imgui/imnodes/imnodes_internal.h>
 #include <External/imgui/imgui-node-editor/imgui_node_editor.h>
@@ -93,13 +94,15 @@ namespace CLX
 			auto classes = Fly::GetClasses();
 			if (classes.empty())
 			{
-				Fly::CreateClassWithoutTarget("Default Class", ASSET_FILE_PATH);
+				std::filesystem::path filePath = GetAbsoluteAssetPath(ASSET_FILE_PATH);
+				Fly::CreateClassWithoutTarget("Default Class", filePath);
 			}
 
 			classes = Fly::GetClasses();
 			if (classes.begin()->second.empty())
 			{
-				Fly::CreateClass(Fly::GenericDataTypeProxy(Fly::GetClasses().begin()->first), "Default Class", ASSET_FILE_PATH);
+				std::filesystem::path filePath = GetAbsoluteAssetPath(ASSET_FILE_PATH);
+				Fly::CreateClass(Fly::GenericDataTypeProxy(Fly::GetClasses().begin()->first), "Default Class", filePath);
 			}
 
 			Fly::ClassProxy flyClass = classes.begin()->second.front();

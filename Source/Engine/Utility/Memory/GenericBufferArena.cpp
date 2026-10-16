@@ -4,10 +4,10 @@
 namespace CLX
 {
 
-	MemoryObject::MemoryObject(void* const dataPtr, const DestroyFunction destroyFunction, CopyFunction copyFunction, [[maybe_unused]] const std::type_index type)
+	MemoryObject::MemoryObject(void* const dataPtr, const DestroyFunction destroyFunction, CopyConstructFunction copyConstructFunction, [[maybe_unused]] const std::type_index type)
 		: mDataPtr(dataPtr)
         , mRelease(destroyFunction)
-        , mCopy(copyFunction)
+        , mCopyConstruct(copyConstructFunction)
 #ifdef _DEBUG
 		, mType(type)
 #endif
@@ -25,18 +25,18 @@ namespace CLX
 	MemoryObject::MemoryObject(const MemoryObject& other, void* const dataPtr)
 		: mDataPtr(dataPtr)
 		, mRelease(other.mRelease)
-		, mCopy(other.mCopy)
+		, mCopyConstruct(other.mCopyConstruct)
 #ifdef _DEBUG
 		, mType(other.mType)
 #endif
 	{
-		mCopy(dataPtr, other.mDataPtr);
+		mCopyConstruct(dataPtr, other.mDataPtr);
 	}
 
 	MemoryObject::MemoryObject(MemoryObject&& other) noexcept
 		: mDataPtr(std::exchange(other.mDataPtr, nullptr))
 		, mRelease(std::exchange(other.mRelease, nullptr))
-		, mCopy(std::exchange(other.mCopy, nullptr))
+		, mCopyConstruct(std::exchange(other.mCopyConstruct, nullptr))
 #ifdef _DEBUG
 		, mType(other.mType)
 #endif

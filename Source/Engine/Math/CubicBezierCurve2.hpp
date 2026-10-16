@@ -33,7 +33,7 @@ namespace CLX
 
         void Clear();
 
-        void SetPoints(const std::vector<Point2<T>>& points) noexcept
+        void SetPoints(const std::vector<Point2<T>>& points)
         {
             mPoints = points;
         }

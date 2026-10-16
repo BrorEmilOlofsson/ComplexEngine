@@ -2,6 +2,8 @@
 #include "CurveEditorWindow.hpp"
 #include "Editor/Functions/CurveEditorFunctions.hpp"
 #include "Engine/Math/Transform2.hpp"
+#include "Engine/Math/CurveMath.hpp"
+#include "Engine/Utility/ImGui/ImGuiUtility.hpp"
 
 namespace CLX
 {
@@ -82,9 +84,9 @@ namespace CLX
         }
     }
 
+    static float t = 0.f;
     void ShowCubicBezierCurve(ImDrawList& draw_list, Point2f windowOrigin, std::array<Point2f, 4> controlPoints, bool includeFirst)
     {
-
         // Transform control points to window space
         auto transformedControlPoints = TransformPoints(Transform2::FromPosition(windowOrigin), controlPoints);
         DrawBezierCurve(draw_list, transformedControlPoints, Colors::White, 2.f);
@@ -97,6 +99,9 @@ namespace CLX
         draw_list.AddCircleFilled(ToImVec2(transformedControlPoints[1]), 4, IM_COL32(0, 255, 0, 255));
         draw_list.AddCircleFilled(ToImVec2(transformedControlPoints[2]), 4, IM_COL32(0, 255, 0, 255));
         draw_list.AddCircleFilled(ToImVec2(transformedControlPoints[3]), 4, IM_COL32(255, 0, 0, 255));
+
+        Point2f p1 = CubicCurve(transformedControlPoints[0], transformedControlPoints[1], transformedControlPoints[2], transformedControlPoints[3], t);
+        ImGuiUtility::DrawRect(ToPoint2<int>(ImVec2(p1.x, p1.y)), Colors::Yellow);
     }
 
     void ShowCurve(const CubicBezierCurve2f& curve, ImDrawList& drawList, Point2f windowOrigin)
@@ -105,6 +110,13 @@ namespace CLX
         {
             auto controlPoints = curve.GetControlPointsAt(i);
             ShowCubicBezierCurve(drawList, windowOrigin, controlPoints, i == 0);
+        }
+
+        Spline3f spline;
+
+        for (const auto& [p1, p2, p3, p4] : spline)
+        {
+            
         }
     }
 
@@ -116,7 +128,7 @@ namespace CLX
         if (ImGui::Begin("Curve Editor", &isWindowActive))
         {
 
-            ImVec2 canvas_size(500, 500);
+            ImVec2 canvas_size(600, 600);
             ImGui::BeginChild("CurveCanvas", canvas_size, true);
 
             ImDrawList& drawList = *ImGui::GetWindowDrawList();
@@ -126,10 +138,11 @@ namespace CLX
             if (curve.GetPoints().size() < 4)
             {
                 curve.AddAnchorPoint({ 20.f, size.y - 20.f });
-                curve.AddAnchorPoint({ size.x - 20.f, 20.f });
+                curve.AddAnchorPoint({ size.x - 100.f, 400.f });
             }
 
             static Point2f pointPositionWhenDragStarted = Point2f::Zero();
+            ImGui::DragFloat("t", &t, 0.01f, 0.f, 1.f);
             UpdateCurvePointPositions(curve, origin, pointPositionWhenDragStarted, commandTracker);
             CheckForPointAdding(curve, origin, commandTracker);
             ShowCurve(curve, drawList, origin);

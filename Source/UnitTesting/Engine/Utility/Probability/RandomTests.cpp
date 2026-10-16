@@ -1,5 +1,6 @@
 #include <External/Catch2/catch_amalgamated.hpp>
 #include "Engine/Utility/Random.hpp"
+#include <print>
 
 using namespace CLX;
 
@@ -28,4 +29,8 @@ TEST_CASE("GetRandomValueInOutcomeTable")
 	table.Insert("Emil 3", 500);
 
 	const std::string_view s = GetRandomValue(table);
+}
+
+TEST_CASE("XorShift")
+{
 }

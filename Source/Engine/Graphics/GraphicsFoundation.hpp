@@ -4,8 +4,8 @@
 #include "Engine/Graphics/RenderContext.hpp"
 #include "Engine/Math/Vector2.hpp"
 #include "Engine/Graphics/GraphicsWindowView.hpp"
-#include "Engine/OperatingSystem/WindowView.hpp"
 #include "Engine/Utility/GraphicsBufferData.hpp"
+#include "Engine/OperatingSystem/WindowHandle.hpp"
 
 namespace CLX
 {
@@ -35,7 +35,7 @@ namespace CLX
         void Render(const RenderState& renderState, RenderContext& renderContext);
 
         [[nodiscard]] RenderContext CreateRenderContext(const Dimension2u& size);
-        GraphicsWindowView MakeWindow(WindowView windowView);
+        GraphicsWindowView MakeWindow(WindowHandle windowHandle);
 
         void SetAssetManager(std::weak_ptr<AssetManager> assetManager);
         void SetGraphicsSettings(std::weak_ptr<GraphicsSettings> graphicsSettings);
@@ -55,7 +55,7 @@ namespace CLX
             virtual void Render(const RenderState& renderState, RenderContext& renderContext) = 0;
 
             [[nodiscard]] virtual RenderContext CreateRenderContext(const Dimension2u& size) = 0;
-            virtual GraphicsWindowView MakeWindow(WindowView windowView) = 0;
+            virtual GraphicsWindowView MakeWindow(WindowHandle windowHandle) = 0;
 
             virtual void SetAssetManager(std::weak_ptr<AssetManager> assetManager) = 0;
             virtual void SetGraphicsSettings(std::weak_ptr<GraphicsSettings> graphicsSettings) = 0;
@@ -102,9 +102,9 @@ namespace CLX
                 return mObject.CreateRenderContext(size);
             }
 
-            GraphicsWindowView MakeWindow(WindowView windowView) override
+            GraphicsWindowView MakeWindow(WindowHandle windowHandle) override
             {
-                return mObject.MakeWindow(windowView);
+                return mObject.MakeWindow(windowHandle);
             }
 
             void SetAssetManager(std::weak_ptr<AssetManager> assetManager)

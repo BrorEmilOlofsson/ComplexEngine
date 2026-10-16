@@ -276,4 +276,19 @@ namespace CLX
         ASSERT(nameComponent != nullptr);
         nameComponent->name = std::move(name);
     }
+
+    [[nodiscard]] constexpr EntityID FindFirstEntity(std::ranges::range auto&& range, auto&& predicate)
+    {
+        auto it = std::ranges::find_if(range, predicate);
+        if (it != std::ranges::end(range))
+        {
+            return *it;
+        }
+        return InvalidEntityID;
+    }
+
+    [[nodiscard]] inline EntityID FindFirstEntityInChildren(const ECS& ecs, EntityID entityID, auto&& predicate)
+    {
+        return FindFirstEntity(GetEntityChildren(ecs, entityID), predicate);
+    }
 }

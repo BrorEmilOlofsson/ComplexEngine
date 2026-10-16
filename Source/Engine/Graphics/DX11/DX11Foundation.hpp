@@ -26,7 +26,7 @@ namespace CLX
     {
     public:
 
-        DX11Foundation();
+        DX11Foundation(Win_OperatingSystem* operatingSystem);
 
         DX11Foundation(const DX11Foundation&) = delete;
         DX11Foundation& operator=(const DX11Foundation&) = delete;
@@ -51,13 +51,14 @@ namespace CLX
 
         void Render(const RenderState& renderState, RenderContext& renderContext);
 
-        GraphicsWindowView MakeWindow(WindowView windowView)
+        GraphicsWindowView MakeWindow(WindowHandle windowHandle)
         {
             const uint32_t windowID = mCurrentWindowID++;
-            mWindows.emplace(windowID, DX11Window(
+            mWindows.emplace(windowID, DX11Window::Create(
                 GetDevice(),
                 GetContext(),
-                windowView,
+                mOperatingSystem,
+                windowHandle,
                 mAssetManager,
                 mGraphicsSettings,
                 mDepthStencilViewManager,
@@ -108,6 +109,7 @@ namespace CLX
 
     private:
 
+        Win_OperatingSystem* mOperatingSystem = nullptr;
         std::pair<Microsoft::WRL::ComPtr<ID3D11Device>, Microsoft::WRL::ComPtr<ID3D11DeviceContext>> mDeviceAndContext;
 
         DX11ImGuiFoundation mImGui;

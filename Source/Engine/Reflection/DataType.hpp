@@ -29,8 +29,10 @@ namespace CLX
 
         InplaceConstructFunction inplaceConstruct;
         DestroyFunction destroy;
-        CopyFunction copy;
-        MoveFunction move;
+        CopyConstructFunction copyConstruct;
+        CopyAssignFunction copyAssign;
+        MoveConstructFunction moveConstruct;
+        MoveAssignFunction moveAssign;
         SwapFunction swap;
         EqualsFunction equals;
         ToAnyFunction toAny;

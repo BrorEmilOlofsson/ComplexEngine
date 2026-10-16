@@ -197,14 +197,14 @@ TEST_CASE("Copy construct function")
     }
 }
 
-TEST_CASE("Copy function")
+TEST_CASE("Copy assign function")
 {
     {
         // Trivial test
 
         static_assert(std::is_trivially_copyable_v<TrivialType>);
 
-        CopyFunction f = CreateCopyFunction<TrivialType>();
+        CopyAssignFunction f = CreateCopyAssignFunction<TrivialType>();
         {
             TrivialType trivial;
             TrivialType source{ 50 };
@@ -220,7 +220,7 @@ TEST_CASE("Copy function")
 
         static_assert(!std::is_trivially_copyable_v<NonTrivialType>);
 
-        CopyFunction f = CreateCopyFunction<NonTrivialType>();
+        CopyAssignFunction f = CreateCopyAssignFunction<NonTrivialType>();
         {
             NonTrivialType nonTrivial;
             NonTrivialType source{ "SFDKFFSJF" };
@@ -280,7 +280,7 @@ TEST_CASE("Move function")
 
         static_assert(std::is_trivially_copyable_v<TrivialType>);
 
-        MoveFunction f = CreateMoveFunction<TrivialType>();
+        MoveAssignFunction f = CreateMoveAssignFunction<TrivialType>();
         {
             TrivialType trivial;
             TrivialType source{ 50 };
@@ -297,7 +297,7 @@ TEST_CASE("Move function")
 
         static_assert(!std::is_trivially_copyable_v<NonTrivialType>);
 
-        MoveFunction f = CreateMoveFunction<NonTrivialType>();
+        MoveAssignFunction f = CreateMoveAssignFunction<NonTrivialType>();
         {
             NonTrivialType nonTrivial;
             NonTrivialType source{ "SFDKFFSJF" };

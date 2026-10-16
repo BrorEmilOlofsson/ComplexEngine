@@ -14,6 +14,7 @@
 #include "Engine/OperatingSystem/WindowView.hpp"
 #include "Engine/Graphics/RenderContext.hpp"
 #include "Engine/Asset/AssetManager.hpp"
+#include "Engine/OperatingSystem/WindowHandle.hpp"
 
 #include <wrl/client.h>
 #include <d3d11.h>
@@ -21,19 +22,35 @@
 
 namespace CLX
 {
-	class Win_Window;
+    class Win_OperatingSystem;
 }
 
 namespace CLX
 {
 	class DX11Window final
 	{
+	private:
+
+		DX11Window(
+			Microsoft::WRL::ComPtr<ID3D11Device> device, 
+			Microsoft::WRL::ComPtr<ID3D11DeviceContext> context, 
+			Microsoft::WRL::ComPtr<IDXGISwapChain> swapChain,
+			Win_OperatingSystem* operatingSystem, 
+			WindowHandle windowHandle, 
+			std::weak_ptr<AssetManager> assetManager, 
+			std::weak_ptr<GraphicsSettings> graphicsSettings,
+			DX11RenderTarget backBuffer,
+			std::optional<DX11ImGuiWindow> imGuiWindow,
+			std::weak_ptr<DX11DepthStencilViewManager> dsvManager, 
+			std::weak_ptr<DX11SamplerState> samplerState
+		);
+
 	public:
 
-		DX11Window(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context,
-			WindowView windowView, std::weak_ptr<AssetManager> assetManager, std::weak_ptr<GraphicsSettings> graphicsSettings,
+		[[nodiscard]] static DX11Window Create(Microsoft::WRL::ComPtr<ID3D11Device> device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context,
+			Win_OperatingSystem* operatingSystem, WindowHandle windowHandle, std::weak_ptr<AssetManager> assetManager, std::weak_ptr<GraphicsSettings> graphicsSettings,
 			std::weak_ptr<DX11DepthStencilViewManager> dsvManager, std::weak_ptr<DX11SamplerState> samplerState, bool instantiateImGui);
-
+		
         DX11Window(const DX11Window&) = delete;
         DX11Window& operator=(const DX11Window&) = delete;
         DX11Window(DX11Window&&) = default;
@@ -55,7 +72,8 @@ namespace CLX
 		Microsoft::WRL::ComPtr<ID3D11Device> mDevice;
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext> mContext;
 		Microsoft::WRL::ComPtr<IDXGISwapChain> mSwapChain;
-		WindowView mWindowView;
+		Win_OperatingSystem* mOperatingSystem = nullptr;
+		WindowHandle mWindowHandle;
 		DX11RenderTarget mBackBuffer;
 		Microsoft::WRL::ComPtr<ID3D11RasterizerState> mRasterizerState;
 		DepthStencilViewHandle mDepthStencilViewHandle;

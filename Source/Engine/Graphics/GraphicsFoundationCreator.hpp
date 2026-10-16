@@ -12,9 +12,9 @@ namespace CLX
 
 #ifdef _WIN32
 
-    [[nodiscard]] GraphicsFoundation CreateDX11Foundation();
+    [[nodiscard]] GraphicsFoundation CreateDX11Foundation(OperatingSystem* operatingSystem);
 
 #endif
 
-    [[nodiscard]] GraphicsFoundation CreateGraphicsFoundation(eGraphicsAPI type);
+    [[nodiscard]] GraphicsFoundation CreateGraphicsFoundation(eGraphicsAPI type, OperatingSystem* operatingSystem);
 }

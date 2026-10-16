@@ -112,6 +112,12 @@ namespace CLX
 			return mConstOperations.getHandleFunc(mWindow);
 		}
 
+		template<typename T>
+		[[nodiscard]] T* Cast() const
+        {
+            return static_cast<T*>(mWindow);
+        }
+
 	private:
 
 		void* mWindow = nullptr;

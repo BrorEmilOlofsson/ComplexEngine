@@ -165,14 +165,15 @@ namespace CLX
         }
     }
 
-    static void UpdateEntitySceneClickSelection(const InputState& input, const OperatingSystem& os, const RenderState& renderState, RenderContext& renderContext, std::set<EntityID>& selectedEntityIDs, EditorCommandTracker& commandTracker)
+    static void UpdateEntitySceneClickSelection(const InputState& input, const OperatingSystem& os, const AABB2i& renderRect, RenderContext& renderContext, std::set<EntityID>& selectedEntityIDs, EditorCommandTracker& commandTracker, const TransformEntityData& transformEntityData)
     {
-        if (input.IsKeyReleased(eInputKey::LMB))
+        if (input.IsKeyReleased(eInputKey::LMB) && !transformEntityData.isDraggingEntity)
         {
             const Point2i mouseScreenPos = os.GetCursorScreenPosition();
-            if (IsInsideRenderRect(mouseScreenPos, renderState.GetRenderRect().value()))
+
+            if (IsInsideRenderRect(mouseScreenPos, renderRect))
             {
-                const Point2i mappedPos = MapToRenderRect(mouseScreenPos, renderState.GetRenderRect().value());
+                const Point2i mappedPos = MapToRenderRect(mouseScreenPos, renderRect);
 
                 const uint32_t id = renderContext.GetObjectIDAt(mappedPos);
 
@@ -294,7 +295,7 @@ namespace CLX
             sceneRenderState.SetRenderRect(renderRect);
             mEditorCamera.SetResolution(GetDimension(renderRect));
 
-            UpdateEntitySceneClickSelection(input, os, sceneRenderState, sceneRenderContext, mHierarchyPopUp.GetSelectedEntityIDs(), commandTracker);
+            UpdateEntitySceneClickSelection(input, os, renderRect, sceneRenderContext, mHierarchyPopUp.GetSelectedEntityIDs(), commandTracker, mTransformEntityData);
 
             if (input.IsKeyPressed(eInputKey::F) && isFocused && !isPlaying)
             {
@@ -307,6 +308,9 @@ namespace CLX
         }
 
         sceneRenderState.SetCamera(mEditorCamera);
+
+        ShowComponentReflectionInspector(InvalidDataTypeID, blackboard.Get<Key_DataTypeRegistry>());
+        ShowEntityCompositionInstantiationInspector(blackboard.Get<Key_EntityCompositionInstantiationManager>());
     }
 
     RenderState testRenderState;

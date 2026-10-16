@@ -90,7 +90,7 @@ namespace CLX
 
 		Fly::FunctionProxy mSelectedFunction;
 
-		static constexpr const char* ASSET_FILE_PATH = "Assets/FlyClasses";
+		static constexpr const char* ASSET_FILE_PATH = "Fly/";
 
 	};
 }

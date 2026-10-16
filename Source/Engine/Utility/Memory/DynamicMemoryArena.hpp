@@ -23,20 +23,67 @@ namespace CLX
 		return (n + (a - 1)) & ~(a - 1);
 	}
 
+
+	//template<typename T>
+	//class DynamicMemoryArenaIterator
+	//{
+	//public:
+
+	//	constexpr Iterator(DynamicMemoryArena* arena, size_t index = 0)
+	//		: mArena(arena)
+	//		, mIndex(index)
+	//	{}
+
+	//	Iterator& operator++()
+	//	{
+	//		++mIndex;
+	//		return *this;
+	//	}
+	//	[[nodiscard]] DynamicMemoryArenaHandle operator*() const
+	//	{
+	//		return mArena->mObjects[mIndex].handle;
+	//	}
+	//	[[nodiscard]] constexpr bool operator==(const Iterator& other) const
+	//	{
+	//		return mIndex == other.mIndex && mArena == other.mArena;
+	//	}
+
+	//private:
+
+	//	DynamicMemoryArena* mArena = nullptr;
+	//	size_t mIndex = 0;
+
+	//};
+
+
+
+	//class DynamicMemoryArenaSentinel
+	//{
+	//};
+
+ //   constexpr bool operator==(const Iterator<DynamicMemoryArenaHandle>& lhs, const DynamicMemoryArenaSentinel& rhs)
+ //   {
+ //       return lhs == rhs;
+ //   }
+
 	class DynamicMemoryArena final
 	{
 	private:
+
 
 		struct MemoryObject
 		{
 			DynamicMemoryArenaHandle handle;
 			DestroyFunction destroy = nullptr;
-			CopyFunction copy = nullptr;
+			CopyAssignFunction copyAssign = nullptr;
 #ifdef _DEBUG
 			std::type_index type;
 #endif
 		};
 	public:
+
+		//using iterator = Iterator;
+		//using sentinel = DynamicMemoryArenaSentinel;
 
 		DynamicMemoryArena(size_t defaultCapacity = 0);
 		~DynamicMemoryArena();
@@ -49,7 +96,7 @@ namespace CLX
 		template<typename T, typename... Args>
 		[[nodiscard]] DynamicMemoryArenaHandle Allocate(Args&&... args);
 
-		[[nodiscard]] DynamicMemoryArenaHandle AllocateUnsafe(size_t size, InplaceConstructFunction inplaceAllocateFunction, DestroyFunction destructFunction, CopyFunction copyFunction, std::type_index type);
+		[[nodiscard]] DynamicMemoryArenaHandle AllocateUnsafe(size_t size, InplaceConstructFunction inplaceAllocateFunction, DestroyFunction destructFunction, CopyAssignFunction copyAssignFunction, std::type_index type);
 
 		template<typename T>
 		[[nodiscard]] T& At(DynamicMemoryArenaHandle handle);
@@ -65,6 +112,16 @@ namespace CLX
 		[[nodiscard]] const std::byte* MemoryAt(DynamicMemoryArenaHandle handle) const;
 
 		void Clear();
+
+		//iterator begin()
+		//{
+  //          return iterator(this, 0);
+		//}
+
+  //      constexpr sentinel end() const
+  //      {
+  //          return sentinel();
+  //      }
 
 	private:
 

@@ -619,21 +619,20 @@ namespace CLX
     }
 
     void ShowEntityAddButtons(ECS& ecs, std::set<EntityID>& selectedEntityIDs, std::vector<EntityID>& rootEntities,
+        EntityCompositionAssetHandle entityCompositionAssetHandle, EntityCompositionInstantiationManager& m,
         EditorCommandTracker& commandTracker, const std::string& imGuiTag, const EntityID defaultParent)
     {
-        const std::string addButton = "Add" + imGuiTag;
-        const std::string addSceneObjectButton = "Add Scene Object" + imGuiTag;
+        const std::string addEntityPopup = "Add Scene Object" + imGuiTag;
 
-        if (ImGui::Button(addButton.c_str()))
+        if (ImGui::Button("Add"))
         {
-            ImGui::OpenPopup(addSceneObjectButton.c_str());
+            ImGui::OpenPopup(addEntityPopup.c_str());
         }
 
-        if (ImGui::BeginPopup(addSceneObjectButton.c_str()))
+        if (ImGui::BeginPopup(addEntityPopup.c_str()))
         {
-            const std::string addEntityItem = "Add Entity" + imGuiTag;
 
-            if (ImGui::MenuItem(addEntityItem.c_str()))
+            if (ImGui::MenuItem("Add Entity"))
             {
                 commandTracker.BeginComposite("Create Entity + Select Entity");
 
@@ -641,11 +640,52 @@ namespace CLX
 
                 SetEntitySelection(createdEntityID, selectedEntityIDs, commandTracker);
 
+                if (entityCompositionAssetHandle.IsValid())
+                {
+                    auto s = m.GetInstantiations(entityCompositionAssetHandle);
+
+                    if (s.has_value())
+                    {
+                        auto getParentComps = [&](this auto& self, const EntityCompositionInstantiation& inst)
+                            {
+                                std::vector<EntityCompositionAssetHandle> parentComps;
+                                auto getParentCompsInternal = [&](this auto& self, const EntityCompositionInstantiation& inst, std::vector<EntityCompositionAssetHandle>& comps) -> void
+                                    {
+                                        if (inst.parentComposition.IsValid())
+                                        {
+                                            comps.push_back(inst.parentComposition);
+
+                                            auto parentInsts = m.GetInstantiations(inst.parentComposition);
+
+                                            if (parentInsts.has_value())
+                                            {
+                                                for (const auto& parentInst : parentInsts.value())
+                                                {
+                                                    self(parentInst, comps);
+                                                }
+                                            }
+                                        }
+                                    };
+
+                                getParentCompsInternal(inst, parentComps);
+
+                                return parentComps;
+                            };
+
+                        auto instantiations = s.value();
+
+                        for (const auto& inst : instantiations)
+                        {
+                            std::vector<EntityCompositionAssetHandle> parentComps = getParentComps(inst);
+                            std::println("EntityID: {}, ECSHandle: {}, ParentComp: {}", inst.rootEntityID.id, inst.ecsHandle.GetID().id, parentComps.empty() ? "null" : parentComps[0].GetRelativePath().string());
+                        }
+                    }
+                }
+
                 commandTracker.EndComposite();
             }
 
-            const std::string addCubeItem = "Add Cube" + imGuiTag;
-            if (ImGui::MenuItem(addCubeItem.c_str()))
+            if (ImGui::MenuItem("Add Cube"))
             {
                 commandTracker.BeginComposite("Create Entity + Select Entity");
 
@@ -1359,7 +1399,16 @@ namespace CLX
         EntityCompositionInstantiationManager& compositionInstantiations, const DataTypeRegistry& dataTypeRegistry, AssetManager& assetManager)
     {
         ASSERT(ecsHandle.IsValid());
-        ShowEntityAddButtons(*ecsHandle.Get(), selectedEntityIDs, rootEntities, commandTracker, imGuiTag, defaultParent);
+        ShowEntityAddButtons(
+            *ecsHandle.Get(),
+            selectedEntityIDs,
+            rootEntities,
+            compositionHandle,
+            compositionInstantiations,
+            commandTracker,
+            imGuiTag,
+            defaultParent
+        );
         ImGui::Separator();
         ShowEntitySearchBar(entitySearchBuffer);
         ImGui::Separator();
@@ -1564,7 +1613,7 @@ namespace CLX
 
         auto inplaceConstructFunc = dataTypeRegistry.GetInplaceConstructFunction(componentTypeID);
         auto destructFunc = dataTypeRegistry.GetDestroyFunction(componentTypeID);
-        auto copyFunc = dataTypeRegistry.GetCopyFunction(componentTypeID);
+        auto copyFunc = dataTypeRegistry.GetCopyAssignFunction(componentTypeID);
 
         DynamicMemoryArenaHandle handle1 = arena.AllocateUnsafe(
             dataTypeRegistry.GetDataTypeSize(componentTypeID),
@@ -1647,25 +1696,37 @@ namespace CLX
             };
     }
 
-    [[nodiscard]] static std::vector<EditorAction> ShowComponentData(ECS& ecs, const EntityID entityID, const DataTypeID componentTypeID,
-        void* const componentPtr, bool& isComponentActive, std::any& copiedComponent,
-        EntityCompositionAssetHandle entityCompositionAsset, EntityCompositionInstantiationManager& entityInstantiations,
-        const DataTypeRegistry& dataTypeRegistry, const Blackboard& blackboard)
+    struct ShowComponentDataData
+    {
+        ECS& ecs;
+        EntityID entityID;
+        DataTypeID componentTypeID;
+        void* componentPtr;
+        bool& isComponentActive;
+        std::any& copiedComponent;
+        DataTypeID& reflectionDataType;
+        EntityCompositionAssetHandle entityCompositionAsset;
+        EntityCompositionInstantiationManager& entityInstantiations;
+        const DataTypeRegistry& dataTypeRegistry;
+        const Blackboard& blackboard;
+    };
+
+    [[nodiscard]] static std::vector<EditorAction> ShowComponentData(const ShowComponentDataData& data)
     {
         PROFILER_FUNCTION(profiler::colors::Lime400);
 
-        ASSERT(componentPtr != nullptr);
+        ASSERT(data.componentPtr != nullptr);
         ImGui::AlignTextToFramePadding();
 
-        const DataType* dataType = dataTypeRegistry.Find(componentTypeID);
+        const DataType* dataType = data.dataTypeRegistry.Find(data.componentTypeID);
         if (dataType == nullptr)
         {
             return {};
         }
 
-        Blackboard newBlackboard = blackboard;
+        Blackboard newBlackboard = data.blackboard;
         PropertyPath propertyPath;
-        propertyPath.dataTypeID = componentTypeID;
+        propertyPath.dataTypeID = data.componentTypeID;
         newBlackboard.Insert<Key_CurrentPropertyPath>(propertyPath);
 
         const std::string& componentName = dataType->prettyName + "##Component";
@@ -1688,28 +1749,28 @@ namespace CLX
         {
             PROFILER_BEGIN("View Component Data");
 
-            const ViewAndEditResult viewAndEditResult = dataTypeRegistry.ViewAndEditData(componentTypeID, componentPtr, newBlackboard);
+            const ViewAndEditResult viewAndEditResult = data.dataTypeRegistry.ViewAndEditData(data.componentTypeID, data.componentPtr, newBlackboard);
             PROFILER_END();
 
-            isComponentActive = viewAndEditResult.isActive;
+            data.isComponentActive = viewAndEditResult.isActive;
 
             if (viewAndEditResult.isEdited)
             {
                 HandleEntityCompositionModification(
-                    entityCompositionAsset,
-                    entityInstantiations,
-                    entityID,
+                    data.entityCompositionAsset,
+                    data.entityInstantiations,
+                    data.entityID,
                     viewAndEditResult.dataPtr,
                     viewAndEditResult.dataTypeID,
-                    componentTypeID,
+                    data.componentTypeID,
                     viewAndEditResult.propertyPath,
                     viewAndEditResult.vectorEditOperation,
-                    dataTypeRegistry
+                    data.dataTypeRegistry
                 );
 
                 HandleOverrideModification(
-                    entityID,
-                    ecs,
+                    data.entityID,
+                    data.ecs,
                     viewAndEditResult.propertyPath
                 );
             }
@@ -1718,25 +1779,30 @@ namespace CLX
         std::vector<EditorAction> actions;
         if (ImGui::BeginPopup("Component Options"))
         {
-            ImGui::BeginDisabled(HasAnyFlag(ecs.GetRegistry().GetComponentType(componentTypeID.typeIndex).traits, eECSComponentTrait::Default | eECSComponentTrait::NoManualAdd));
+            ImGui::BeginDisabled(HasAnyFlag(data.ecs.GetRegistry().GetComponentType(data.componentTypeID.typeIndex).traits, eECSComponentTrait::Default | eECSComponentTrait::NoManualAdd));
             if (ImGui::MenuItem("Remove"))
             {
-                actions.push_back(CreateRemoveComponentAction(ecs, entityID, componentTypeID, dataTypeRegistry, blackboard));
+                actions.push_back(CreateRemoveComponentAction(data.ecs, data.entityID, data.componentTypeID, data.dataTypeRegistry, data.blackboard));
             }
             ImGui::EndDisabled();
 
             if (ImGui::MenuItem("Copy"))
             {
-                copiedComponent = dataTypeRegistry.ToAny(componentTypeID, componentPtr);
+                data.copiedComponent = data.dataTypeRegistry.ToAny(data.componentTypeID, data.componentPtr);
             }
 
-            ImGui::BeginDisabled(!copiedComponent.has_value());
+            ImGui::BeginDisabled(!data.copiedComponent.has_value());
             if (ImGui::MenuItem("Paste"))
             {
-                const std::any oldValue = dataTypeRegistry.ToAny(componentTypeID, componentPtr);
-                actions.push_back(CreateSetComponentDataAction(ecs, entityID, componentTypeID, copiedComponent, oldValue, dataTypeRegistry));
+                const std::any oldValue = data.dataTypeRegistry.ToAny(data.componentTypeID, data.componentPtr);
+                actions.push_back(CreateSetComponentDataAction(data.ecs, data.entityID, data.componentTypeID, data.copiedComponent, oldValue, data.dataTypeRegistry));
             }
             ImGui::EndDisabled();
+
+            if (ImGui::MenuItem("Open Reflection Inspector"))
+            {
+                data.reflectionDataType = data.componentTypeID;
+            }
 
             ImGui::EndPopup();
         }
@@ -1870,6 +1936,8 @@ namespace CLX
             || type == typeid(EntityCompositionInstantiationComponent);
     }
 
+    static DataTypeID reflectionDataType = InvalidDataTypeID;
+
     [[nodiscard]] std::vector<EditorAction> ShowEntityComponents(const ShowEntityComponentsData& data)
     {
         PROFILER_FUNCTION(profiler::colors::Brown400);
@@ -1909,16 +1977,20 @@ namespace CLX
             bool isComponentActive = false;
 
             auto showComponentDataActions = ShowComponentData(
-                ecs,
-                selectedEntityID,
-                GetDataTypeID(type),
-                componentPtr,
-                isComponentActive,
-                copiedComponent,
-                entityCompositionAsset,
-                entityInstantiations,
-                blackboard.Get<Key_DataTypeRegistry>(),
-                blackboard
+                ShowComponentDataData
+                {
+                    .ecs = ecs,
+                    .entityID = selectedEntityID,
+                    .componentTypeID = GetDataTypeID(type),
+                    .componentPtr = componentPtr,
+                    .isComponentActive = isComponentActive,
+                    .copiedComponent = copiedComponent,
+                    .reflectionDataType = reflectionDataType,
+                    .entityCompositionAsset = entityCompositionAsset,
+                    .entityInstantiations = entityInstantiations,
+                    .dataTypeRegistry = blackboard.Get<Key_DataTypeRegistry>(),
+                    .blackboard = blackboard
+                }
             );
 
             InsertRange(editorActions, std::move(showComponentDataActions));
@@ -2469,5 +2541,75 @@ namespace CLX
             const Point3f newCamPos = entityPos + (-camera.GetForward()) * offsetDistance;
             camera.SetPosition(newCamPos);
         }
+    }
+
+
+    void ShowComponentReflectionInspector([[maybe_unused]] DataTypeID dataTypeID, const DataTypeRegistry& dataTypeRegistry)
+    {
+        const DataType* dataType = dataTypeRegistry.Find(reflectionDataType);
+        if (dataType == nullptr)
+        {
+            return;
+        }
+
+        if (ImGui::Begin("Component Reflection Inspector"))
+        {
+
+            ImGui::Text("Type: %s", dataType->name.c_str());
+            ImGui::Text("Size: %zu bytes", dataType->size);
+            ImGui::Text("Alignment: %zu bytes", dataType->alignment);
+
+            auto& members = dataType->memberVariables;
+
+            ImGui::BeginTable("ComponentReflectionInspector", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg);
+
+            for (const auto& member : members)
+            {
+                ImGui::TableNextRow();
+                ImGui::TableSetColumnIndex(0);
+                ImGui::Text("%s", member.name.c_str());
+                ImGui::TableSetColumnIndex(1);
+                const DataType* memberDataType = dataTypeRegistry.Find(member.dataTypeID);
+                ImGui::Text("%s", memberDataType->name.c_str());
+                ImGui::TableSetColumnIndex(2);
+                auto& offset = std::get<ByteOffset>(member.memberType);
+                ImGui::Text("Offset: %zu bytes", offset.value);
+            }
+
+            ImGui::EndTable();
+
+
+        }
+
+        ImGui::End();
+
+    }
+
+    void ShowEntityCompositionInstantiationInspector(const EntityCompositionInstantiationManager& entityInstantiations)
+    {
+        if (ImGui::Begin("Entity Composition Instantiation Inspector"))
+        {
+            ImGui::Text("Instantiated Compositions:");
+            ImGui::Separator();
+            const auto& instantiationMap = entityInstantiations.GetAllInstantiations();
+            for (const auto& [assetHandle, instantiations] : instantiationMap)
+            {
+                ImGui::Text("Asset: %s", assetHandle.GetRelativePath().string().c_str());
+                for (const auto& instantiation : instantiations)
+                {
+                    ImGui::Text("Root Entity ID: %u", instantiation.rootEntityID.id);
+                    ImGui::Text("Target ECS Handle: %p", static_cast<void*>(instantiation.ecsHandle.Get()));
+                    ImGui::Text("Parent Composition: %s", instantiation.parentComposition.IsValid() ? instantiation.parentComposition.GetRelativePath().string().c_str() : "None");
+                    if (instantiation.parentComposition.IsValid())
+                    {
+                        assert(instantiation.parentComposition.Get().GetECSHandle() == instantiation.ecsHandle);
+                    }
+
+                    ImGui::Separator();
+                }
+                ImGui::Separator();
+            }
+        }
+        ImGui::End();
     }
 }

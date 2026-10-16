@@ -10,6 +10,7 @@
 
 #include "Engine/Utility/Memory/HeapObject.hpp"
 #include "Engine/Utility/FundamentalFunctionDefinitions.hpp"
+#include "Engine/Utility/ByteOffset.hpp"
 
 namespace CLX
 {
@@ -25,14 +26,14 @@ namespace CLX
         explicit MemoryObject(T* value)
             : mDataPtr(value)
             , mRelease(CreateDestroyFunction<T>())
-            , mCopy(CreateCopyFunction<T>())
-        {
-#ifdef FLY_DEBUG
-            mTypeInfo = &typeid(T);
+            , mCopyConstruct(CreateCopyConstructFunction<T>())
+#ifdef _DEBUG
+            , mType(typeid(T))
 #endif
+        {
         }
 
-        MemoryObject(void* dataPtr, const DestroyFunction destroyFunction, CopyFunction copyFunction, [[maybe_unused]] const std::type_index type);
+        MemoryObject(void* dataPtr, const DestroyFunction destroyFunction, CopyConstructFunction copyConstructFunction, [[maybe_unused]] const std::type_index type);
 
         ~MemoryObject();
 
@@ -47,7 +48,7 @@ namespace CLX
     public:
         void* mDataPtr = nullptr;
         DestroyFunction mRelease;
-        CopyFunction mCopy;
+        CopyConstructFunction mCopyConstruct;
 #ifdef _DEBUG
         std::type_index mType;
 #endif
@@ -65,6 +66,8 @@ namespace CLX
     class MemoryBuffer final
     {
     public:
+
+        static constexpr size_t Alignment = 16;
 
         MemoryBuffer()
             : mBuffer{}
@@ -112,6 +115,7 @@ namespace CLX
         template<MemSizeLessEqual<Capacity> T, typename... Args>
         T& Allocate(Args&&... args)
         {
+            static_assert(alignof(T) <= Alignment, "Type alignment exceeds buffer alignment.");
             void* currentMemory = AllocateSizeAligned(sizeof(T), alignof(T));
 
             T* valuePtr = static_cast<T*>(currentMemory);
@@ -141,11 +145,11 @@ namespace CLX
             return p;
         }
 
-        void RegisterMemoryObject(void* dataPtr, const DestroyFunction destroyFuncton, const CopyFunction copyFunction, std::type_index type)
+        void RegisterMemoryObject(void* dataPtr, const DestroyFunction destroyFuncton, const CopyConstructFunction copyConstructFunction, std::type_index type)
         {
             assert(GetPointerDiff(dataPtr, GetDataPtr()) < Capacity);
 
-            mMemoryObjects.emplace_back(MemoryObject(dataPtr, destroyFuncton, copyFunction, type));
+            mMemoryObjects.emplace_back(MemoryObject(dataPtr, destroyFuncton, copyConstructFunction, type));
         }
 
         [[nodiscard]] size_t GetSizeLeft() const
@@ -173,9 +177,19 @@ namespace CLX
             return (&mBuffer[0]) + mSize;
         }
 
+        [[nodiscard]] void* At(ByteOffset offset)
+        {
+            return GetDataPtr() + offset;
+        }
+
+        [[nodiscard]] const void* At(ByteOffset offset) const
+        {
+            return GetDataPtr() + offset;
+        }
+
     private:
 
-        std::array<std::byte, Capacity> mBuffer;
+        alignas(Alignment) std::array<std::byte, Capacity> mBuffer;
         size_t mSize = 0;
 
         std::vector<MemoryObject> mMemoryObjects;
@@ -201,13 +215,13 @@ namespace CLX
         template<MemSizeLessEqual<BufferCapacity> T, typename... Args>
         T& Allocate(Args&&... args);
 
-        void* AllocateTypeErased(std::size_t size, std::size_t alignment, const DestroyFunction destroyFuncton, const CopyFunction copyFunction, std::type_index type);
+        void* AllocateTypeErased(std::size_t size, std::size_t alignment, const DestroyFunction destroyFuncton, const CopyConstructFunction copyConstructFunction, std::type_index type);
 
         // Returns a raw pointer to a memory block at the start of the allocated size.
         void* AllocateSizeAligned(std::size_t size, std::size_t alignment);
 
 
-        void RegisterMemoryObject(void* dataPtr, const DestroyFunction destroyFuncton, const CopyFunction copyFunction, std::type_index type);
+        void RegisterMemoryObject(void* dataPtr, const DestroyFunction destroyFuncton, const CopyConstructFunction copyConstructFunction, std::type_index type);
 
         [[nodiscard]] void* GetRenewedPointer(const void* dataPtr, const GenericBufferArena& previous) const;
 
@@ -270,14 +284,14 @@ namespace CLX
     }
 
     template<size_t BufferCapacity>
-    inline void* GenericBufferArena<BufferCapacity>::AllocateTypeErased(std::size_t size, std::size_t alignment, const DestroyFunction destroyFuncton, const CopyFunction copyFunction, std::type_index type)
+    inline void* GenericBufferArena<BufferCapacity>::AllocateTypeErased(std::size_t size, std::size_t alignment, const DestroyFunction destroyFuncton, const CopyConstructFunction copyConstructFunction, std::type_index type)
     {
         void* dataPtr = AllocateSizeAligned(size, alignment);
-        RegisterMemoryObject(dataPtr, destroyFuncton, copyFunction, type);
+        RegisterMemoryObject(dataPtr, destroyFuncton, copyConstructFunction, type);
         return dataPtr;
     }
 
-    template<size_t BufferCapacity>
+    template<size_t BufferCapacity> 
     inline void* GenericBufferArena<BufferCapacity>::AllocateSizeAligned(const std::size_t size, const std::size_t alignment)
     {
         if (size > BufferCapacity)
@@ -294,10 +308,10 @@ namespace CLX
     }
 
     template<size_t BufferCapacity>
-    inline void GenericBufferArena<BufferCapacity>::RegisterMemoryObject(void* const dataPtr, const DestroyFunction destroyFunction, const CopyFunction copyFunction, std::type_index type)
+    inline void GenericBufferArena<BufferCapacity>::RegisterMemoryObject(void* const dataPtr, const DestroyFunction destroyFunction, const CopyConstructFunction copyConstructFunction, std::type_index type)
     {
         MemoryBuffer& buffer = GetCurrentBuffer();
-        buffer.RegisterMemoryObject(dataPtr, destroyFunction, copyFunction, type);
+        buffer.RegisterMemoryObject(dataPtr, destroyFunction, copyConstructFunction, type);
     }
 
     template<size_t BufferCapacity>

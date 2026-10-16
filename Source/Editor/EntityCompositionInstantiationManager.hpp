@@ -34,6 +34,11 @@ namespace CLX
 			return std::nullopt;
 		}
 
+        const std::map<EntityCompositionAssetHandle, std::vector<EntityCompositionInstantiation>>& GetAllInstantiations() const
+        {
+            return map;
+        }
+
 		void Add(EntityCompositionAssetHandle entityCompositionAssetHandle, EntityCompositionInstantiation instantiation)
 		{
             map[entityCompositionAssetHandle].push_back(std::move(instantiation));

@@ -64,24 +64,60 @@ constexpr CLX::Vector3f MaxLength(const CLX::Vector3f& vector, const float maxLe
 //}
 
 
-struct LessDistanceSorter
+template<template <typename> typename Comparator>
+struct EntityDistanceSorter
 {
-    CLX::Point3f targetPoint;
     CLX::ECS& ecs;
+    CLX::Point3f targetPoint;
+    [[no_unique_address]] Comparator<float> comparator;
 
     bool operator()(CLX::EntityID lhs, CLX::EntityID rhs) const
     {
         const float distance1 = CLX::DistanceSquared(GetEntityWorldTransform(ecs, lhs).GetPosition(), targetPoint);
         const float distance2 = CLX::DistanceSquared(GetEntityWorldTransform(ecs, rhs).GetPosition(), targetPoint);
-        return distance1 < distance2;
+        return comparator(distance1, distance2);
     }
 };
 
+using EntityDistanceSorterLess = EntityDistanceSorter<std::less>;
+
+static void MoveEntityTowardsTarget(CLX::ECS& ecs, const CLX::EntityID ducklingID, const CLX::Point3f& target, const float speed, const float deltaTime)
+{
+    const CLX::Transform ducklingTransform = GetEntityWorldTransform(ecs, ducklingID);
+    const CLX::Point3f currentPosition = ducklingTransform.GetPosition();
+    constexpr float minDistance = 0.5f;
+    if (CLX::IsInRange(currentPosition, target, minDistance))
+    {
+        return;
+    }
+
+    const CLX::Point3f newWorldPosition = CLX::InterpPoint(currentPosition, target, speed, deltaTime);
+    const CLX::RotationMatrix3f worldRotation = CLX::RotationMatrix3f::FromYZ(CLX::UnitVector3f::Up(), CLX::GetUnitVector(newWorldPosition, target));
+
+    CLX::Transform newWorldTransform = ducklingTransform;
+    newWorldTransform.SetPosition(newWorldPosition);
+    newWorldTransform.SetRotation(worldRotation);
+
+    CLX::SetEntityWorldTransform(ecs, ducklingID, newWorldTransform);
+}
+
+static void UpdateDuckMovement(CLX::ECS& ecs, const CLX::EntityID entityID, DuckComponent& duckComponent, const float deltaTime)
+{
+    static constexpr CLX::Point3f p1 = { -5.f, 0.f, 0.f };
+    static constexpr CLX::Point3f p2 = { 5.f, 0.f, 0.f };
+    static constexpr CLX::Point3f p3 = { 0.f, 0.f, 5.f };
+    static constexpr CLX::Point3f p4 = { 0.f, 0.f, -5.f };
+
+    MoveEntityTowardsTarget(ecs, entityID, p4, duckComponent.speed, deltaTime);
+}
+
 static void UpdateFollowMovement(CLX::ECS& ecs, const float deltaTime)
 {
-    ecs.ForEach([&ecs, deltaTime](CLX::EntityID entityID, DuckComponent& duckComponent, const CLX::TransformHierarchyComponent& transformHierarchy)
+    ecs.ForEach([&ecs, deltaTime](CLX::EntityID entityID, DuckComponent& duckComponent)
         {
-            auto& children = transformHierarchy.children;
+            UpdateDuckMovement(ecs, entityID, duckComponent, deltaTime);
+
+            auto& children = duckComponent.ducklingIDs;
 
             if (children.empty())
             {
@@ -95,29 +131,16 @@ static void UpdateFollowMovement(CLX::ECS& ecs, const float deltaTime)
                 | std::ranges::to<std::vector>();
 
             const CLX::Transform parentTransform = GetEntityWorldTransform(ecs, entityID);
-            std::ranges::sort(ducklingChildren, LessDistanceSorter{ parentTransform.GetPosition(), ecs});
+            std::ranges::sort(ducklingChildren, EntityDistanceSorterLess{ ecs, parentTransform.GetPosition() });
 
-            auto moveTowardsTarget = [&ecs](const CLX::EntityID ducklingID, const CLX::Point3f& target, const float speed, const float deltaTime)
-                {
-                    const CLX::Transform ducklingTransform = GetEntityWorldTransform(ecs, ducklingID);
-                    const CLX::Point3f currentPosition = ducklingTransform.GetPosition();
-                    constexpr float minDistance = 0.5f;
-                    if (CLX::IsInRange(currentPosition, target, minDistance))
-                    {
-                        return;
-                    }
 
-                    const CLX::Point3f newPosition = CLX::InterpPoint(currentPosition, target, speed, deltaTime);
 
-                    CLX::Transform newTransform = ducklingTransform;
-                    newTransform.SetPosition(newPosition);
-
-                    ecs.GetComponent<CLX::TransformComponent>(ducklingID)->transform = GetEntityLocalTransform(ecs, ducklingID, newTransform);
-                };
             {
                 const CLX::Point3f target = parentTransform.GetPosition();
 
-                moveTowardsTarget(ducklingChildren.front(), target, duckComponent.speed, deltaTime);
+                const CLX::EntityID ducklingID = ducklingChildren.front();
+                DucklingComponent* ducklingComponent = ecs.GetComponent<DucklingComponent>(ducklingID);
+                MoveEntityTowardsTarget(ecs, ducklingID, target, ducklingComponent->speed, deltaTime);
             }
 
             for (std::size_t i = 1; i < ducklingChildren.size(); i++)
@@ -129,7 +152,8 @@ static void UpdateFollowMovement(CLX::ECS& ecs, const float deltaTime)
 
                 const CLX::Point3f target = CLX::Lerp(previousTransform.GetPosition(), parentTransform.GetPosition(), 0.2f);
 
-                moveTowardsTarget(ducklingID, target, duckComponent.speed, deltaTime);
+                DucklingComponent* ducklingComponent = ecs.GetComponent<DucklingComponent>(ducklingID);
+                MoveEntityTowardsTarget(ecs, ducklingID, target, ducklingComponent->speed, deltaTime);
             }
         });
 }

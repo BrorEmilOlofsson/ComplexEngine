@@ -1,6 +1,9 @@
 #pragma once
 #include "Engine/Math/Point2.hpp"
+#include "Engine/Math/Point3.hpp"
+#include "Engine/Math/Spline3.hpp"
 #include <span>
+#include <ranges>
 
 namespace CLX
 {
@@ -14,6 +17,14 @@ namespace CLX
     }
 
     template<typename T, typename U>
+    [[nodiscard]] constexpr Point3<T> QuadraticCurve(const Point3<T>& a, const Point3<T>& b, const Point3<T>& c, const U& t) noexcept
+    {
+        const Point3<T> ab = Lerp(a, b, t);
+        const Point3<T> bc = Lerp(b, c, t);
+        return Lerp(ab, bc, t);
+    }
+
+    template<typename T, typename U>
     [[nodiscard]] constexpr Point2<T> CubicCurve(const Point2<T>& a, const Point2<T>& b, const Point2<T>& c, const Point2<T>& d, const U& t) noexcept
     {
         const Point2<T> ab_bc = QuadraticCurve(a, b, c, t);
@@ -21,9 +32,36 @@ namespace CLX
         return Lerp(ab_bc, bc_cd, t);
     }
 
+    template<typename T, typename U>
+    [[nodiscard]] constexpr Point3<T> CubicCurve(const Point3<T>& a, const Point3<T>& b, const Point3<T>& c, const Point3<T>& d, const U& t) noexcept
+    {
+        const Point3<T> ab_bc = QuadraticCurve(a, b, c, t);
+        const Point3<T> bc_cd = QuadraticCurve(b, c, d, t);
+        return Lerp(ab_bc, bc_cd, t);
+    }
+
+    template<typename T, typename U>
+    [[nodiscard]] constexpr std::optional<Point3<T>> SampleSpline(const Spline3<T>& spline, const U& t)
+    {
+        const auto& points = spline.GetPoints();
+        for (size_t i = 3; i < std::ranges::size(points); i += 3)
+        {
+            if (t <= static_cast<U>(i - 2))
+            {
+                const Point3<T>& p0 = points[i - 3];
+                const Point3<T>& p1 = points[i - 2];
+                const Point3<T>& p2 = points[i - 1];
+                const Point3<T>& p3 = points[i];
+                const U localT = t - static_cast<U>(i - 3);
+                return CubicCurve(p0, p1, p2, p3, localT);
+            }
+        }
+        return std::nullopt;
+    }
+
     [[nodiscard]] constexpr bool PointsAreMonotonicIncreasingX(const std::ranges::range auto& points)
     {
-        const std::size_t size = points.size();
+        const std::size_t size = std::ranges::size(points);
         if (size < 2)
         {
             return true;
@@ -43,7 +81,7 @@ namespace CLX
     {
         ASSERT(PointsAreMonotonicIncreasingX(points));
         //using T = typename std::decay_t<decltype(points)>::value_type::value_type;
-        const std::size_t size = points.size();
+        const std::size_t size = std::ranges::size(points);
         ASSERT(size % 3 == 1);
         if (size < 2)
         {

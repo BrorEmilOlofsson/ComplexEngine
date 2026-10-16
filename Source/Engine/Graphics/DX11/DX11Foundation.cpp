@@ -95,8 +95,9 @@ namespace CLX
 		return { device, context };
 	}
 
-	DX11Foundation::DX11Foundation()
-		: mDeviceAndContext(CreateDeviceAndContext())
+	DX11Foundation::DX11Foundation(Win_OperatingSystem* operatingSystem)
+		: mOperatingSystem(operatingSystem)
+		, mDeviceAndContext(CreateDeviceAndContext())
 		, mImGui(GetDevice().Get(), GetContext().Get())
 		, mConstantBufferManager(*GetDevice().Get())
 		, mRenderer(GetDevice(), GetContext())

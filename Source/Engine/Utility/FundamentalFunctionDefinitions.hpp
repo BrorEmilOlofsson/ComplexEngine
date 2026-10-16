@@ -15,9 +15,9 @@ namespace CLX
     using InplaceConstructFunction = FunctionPtrWrapper<void(void*, const void*), struct InplaceFTag>;
     using DestroyFunction = FunctionPtrWrapper<void(void*), struct DestructFTag>;
     using CopyConstructFunction = FunctionPtrWrapper<void(void*, const void*), struct CopyConstructFTag>;
-    using CopyFunction = FunctionPtrWrapper<void(void*, const void*), struct CopyFTag>;
+    using CopyAssignFunction = FunctionPtrWrapper<void(void*, const void*), struct CopyAssignFTag>;
     using MoveConstructFunction = FunctionPtrWrapper<void(void*, void*), struct MoveConstructFTag>;
-    using MoveFunction = FunctionPtrWrapper<void(void*, void*), struct MoveFTag>;
+    using MoveAssignFunction = FunctionPtrWrapper<void(void*, void*), struct MoveAssignFTag>;
     using SwapFunction = FunctionPtrWrapper<void(void*, void*), struct SwapFTag>;
     using EqualsFunction = FunctionPtrWrapper<bool(const void*, const void*), struct EqualsFTag>;
     using ToAnyFunction = FunctionPtrWrapper<std::any(const void*), struct ToAnyFTag>;
@@ -65,9 +65,9 @@ namespace CLX
     }
 
     template<typename T>
-    [[nodiscard]] constexpr CopyFunction CreateCopyFunction()
+    [[nodiscard]] constexpr CopyAssignFunction CreateCopyAssignFunction()
     {
-        return CopyFunction(
+        return CopyAssignFunction(
             [](void* destinationPtr, const void* sourcePtr) -> void
             {
                 if constexpr (std::is_trivially_copyable_v<T>)
@@ -95,9 +95,9 @@ namespace CLX
     }
 
     template<typename T>
-    [[nodiscard]] constexpr MoveFunction CreateMoveFunction()
+    [[nodiscard]] constexpr MoveAssignFunction CreateMoveAssignFunction()
     {
-        return MoveFunction(
+        return MoveAssignFunction(
             [](void* destinationPtr, void* sourcePtr) -> void
             {
                 T& sourceValue = *reinterpret_cast<T*>(sourcePtr);

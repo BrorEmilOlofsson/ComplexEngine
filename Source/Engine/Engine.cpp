@@ -91,7 +91,7 @@ namespace CLX
 
     Engine::Engine(OperatingSystem& operatingSystem)
         : mOperatingSystem(operatingSystem)
-        , mGraphicsFoundation(CreateGraphicsFoundation(eGraphicsAPI::DX11))
+        , mGraphicsFoundation(CreateGraphicsFoundation(eGraphicsAPI::DX11, &operatingSystem))
         , mAssetManager(std::make_shared<AssetManager>())
         , mBlackboard(std::make_shared<Blackboard>())
         , mGraphicsSettings(std::make_shared<GraphicsSettings>())

@@ -78,7 +78,7 @@ namespace CLX
                 ASSERT(memberDataType != nullptr);
                 void* ownerPtr = dataPtr;
                 GenericBufferArena<1028> arena;
-                void* allocatedDataPtr = arena.AllocateTypeErased(memberDataType->size, memberDataType->alignment, memberDataType->destroy, memberDataType->copy, memberDataType->type);
+                void* allocatedDataPtr = arena.AllocateTypeErased(memberDataType->size, memberDataType->alignment, memberDataType->destroy, memberDataType->copyConstruct, memberDataType->type);
                 FunctionMember functionMember = std::get<FunctionMember>(member.memberType);
                 functionMember.getFunction(ownerPtr, allocatedDataPtr);
                 viewAndEditResult = ViewAndEditData(member.dataTypeID, allocatedDataPtr, blackboard);
@@ -174,7 +174,7 @@ namespace CLX
 
     void DataTypeRegistry::CopyData(DataTypeID dataTypeID, void* destination, const void* source) const
     {
-        mDataTypes.at(dataTypeID).copy(destination, source);
+        mDataTypes.at(dataTypeID).copyAssign(destination, source);
     }
 
     void DataTypeRegistry::SwapData(DataTypeID dataTypeID, void* dataPtr1, void* dataPtr2) const
@@ -189,7 +189,7 @@ namespace CLX
 
     void DataTypeRegistry::MoveData(DataTypeID dataTypeID, void* destination, void* source) const
     {
-        mDataTypes.at(dataTypeID).move(destination, source);
+        mDataTypes.at(dataTypeID).moveAssign(destination, source);
     }
 
     bool DataTypeRegistry::EqualsData(DataTypeID dataTypeID, const void* dataPtr1, const void* dataPtr2) const
@@ -243,9 +243,9 @@ namespace CLX
         return mDataTypes.at(dataTypeID).destroy;
     }
 
-    CopyFunction DataTypeRegistry::GetCopyFunction(DataTypeID dataTypeID) const
+    CopyAssignFunction DataTypeRegistry::GetCopyAssignFunction(DataTypeID dataTypeID) const
     {
-        return mDataTypes.at(dataTypeID).copy;
+        return mDataTypes.at(dataTypeID).copyAssign;
     }
 
     DataType* DataTypeRegistry::Find(DataTypeID dataTypeID)

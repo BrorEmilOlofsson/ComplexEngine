@@ -34,9 +34,9 @@ namespace CLX
         return mConcept->CreateRenderContext(size);
     }
 
-    GraphicsWindowView GraphicsFoundation::MakeWindow(WindowView windowView)
+    GraphicsWindowView GraphicsFoundation::MakeWindow(WindowHandle windowHandle)
     {
-        return mConcept->MakeWindow(windowView);
+        return mConcept->MakeWindow(windowHandle);
     }
 
     void GraphicsFoundation::SetAssetManager(std::weak_ptr<AssetManager> assetManager)

@@ -308,9 +308,9 @@ namespace FLY_NAMESPACE
 
 		void SaveClass(const Class& c, const std::filesystem::path& fileDirectory)
 		{
-			const std::filesystem::path filePath = fileDirectory.string() + c.mName + FLY_FILE_EXTENSION;
+			const std::filesystem::path filePath = std::filesystem::absolute(fileDirectory / (c.mName + FLY_FILE_EXTENSION));
 
-			std::filesystem::create_directories(filePath);
+			std::filesystem::create_directories(fileDirectory);
 			if (!std::filesystem::exists(fileDirectory))
 			{
 				throw std::runtime_error("Failed to create directory: " + fileDirectory.string());

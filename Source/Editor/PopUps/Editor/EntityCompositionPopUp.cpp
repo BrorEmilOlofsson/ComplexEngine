@@ -152,12 +152,11 @@ namespace CLX
             }
             else
             {
-
                 mCamera.SetResolution(GetDimension(renderRect));
             }
 
 
-            if (input.IsKeyReleased(eInputKey::LMB))
+            if (input.IsKeyReleased(eInputKey::LMB) && !mTransformEntityData.isDraggingEntity)
             {
                 const Point2i mouseScreenPosition = os.GetCursorScreenPosition();
 

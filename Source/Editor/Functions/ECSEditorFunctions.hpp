@@ -109,4 +109,8 @@ namespace CLX
 		TransformEntityData& transformEntityData, EditorCommandTracker& commandTracker);
 
 	void TeleportCameraToEntity(const ECS& ecs, EntityID entityID, Camera& camera, bool changeRotation = true, const float offsetDistance = 5.f);
+
+	void ShowComponentReflectionInspector(DataTypeID dataTypeID, const DataTypeRegistry& dataTypeRegistry);
+
+	void ShowEntityCompositionInstantiationInspector(const EntityCompositionInstantiationManager& entityInstantiations);
 }

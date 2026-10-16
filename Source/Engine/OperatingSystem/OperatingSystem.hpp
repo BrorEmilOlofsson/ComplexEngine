@@ -40,6 +40,16 @@ namespace CLX
         void ShowCursor();
 		void HideCursor();
 
+		template<typename T>
+		[[nodiscard]] T* Cast()
+		{
+            if (auto model = dynamic_cast<OperatingSystemModel<T>*>(mConcept.get()))
+            {
+                return &model->Get();
+            }
+            return nullptr;
+		}
+
 	private:
 
 		class OperatingSystemConcept
@@ -146,6 +156,16 @@ namespace CLX
 			void HideCursor() override
 			{
 				OSHideCursor(mObject);
+            }
+
+			T& Get()
+			{
+                return mObject;
+			}
+
+            const T& Get() const
+            {
+                return mObject;
             }
 
 		private:

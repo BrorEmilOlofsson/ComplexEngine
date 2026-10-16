@@ -147,24 +147,24 @@ namespace CLX
         return 0;
     }
 
-    uint32_t Win_OperatingSystem::MakeWindow(Dimension2u size, std::wstring title)
+    WindowHandle Win_OperatingSystem::MakeWindow(Dimension2u size, std::wstring title)
     {
         try
         {
-            auto window = std::make_unique<Win_Window>(
+            const WindowHandle windowHandle{ static_cast<uint32_t>(mWindows.size()) };
+            auto& window = mWindows.emplace_back(std::make_unique<Win_Window>(
                 size,
                 title,
                 *mWindowClass,
                 this
-            );
-            GraphicsWindowView windowView = mGraphicsFoundation->MakeWindow(WindowView(*window));
+            ));
+            GraphicsWindowView windowView = mGraphicsFoundation->MakeWindow(windowHandle);
             window->SetGraphicsWindowView(windowView);
             SetWindowLongPtr(window->GetHandle(), GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 
             window->GetGraphicsWindow().Init();
 
-            mWindows.push_back(std::move(window));
-            return static_cast<uint32_t>(mWindows.size() - 1);
+            return windowHandle;
         }
         catch (const WinException& exception)
         {
@@ -179,17 +179,17 @@ namespace CLX
         }
 
         ASSERT(false);
-        return std::numeric_limits<uint32_t>::max();
+        return WindowHandle{ std::numeric_limits<uint32_t>::max() };
     }
 
-    Win_Window& Win_OperatingSystem::GetWindow(const WindowID windowID)
+    Win_Window& Win_OperatingSystem::GetWindow(const WindowHandle windowHandle)
     {
-        return *mWindows[windowID];
+        return *mWindows[windowHandle.id];
     }
 
-    const Win_Window& Win_OperatingSystem::GetWindow(const WindowID windowID) const
+    const Win_Window& Win_OperatingSystem::GetWindow(const WindowHandle windowHandle) const
     {
-        return *mWindows[windowID];
+        return *mWindows[windowHandle.id];
     }
 
     const InputState& Win_OperatingSystem::GetInputState() const noexcept

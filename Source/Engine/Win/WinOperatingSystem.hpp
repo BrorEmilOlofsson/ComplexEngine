@@ -23,8 +23,6 @@
 namespace CLX
 {
 
-	using WindowID = uint32_t;
-
 	class Win_OperatingSystem final
 	{
 	public:
@@ -41,9 +39,9 @@ namespace CLX
 
 		LRESULT HandleMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-		WindowID MakeWindow(Dimension2u size, std::wstring title);
-		[[nodiscard]] Win_Window& GetWindow(const WindowID windowID);
-		[[nodiscard]] const Win_Window& GetWindow(const WindowID windowID) const;
+		WindowHandle MakeWindow(Dimension2u size, std::wstring title);
+		[[nodiscard]] Win_Window& GetWindow(const WindowHandle windowHandle);
+		[[nodiscard]] const Win_Window& GetWindow(const WindowHandle windowHandle) const;
         void SetGraphicsFoundation(GraphicsFoundation* graphicsFoundation) { mGraphicsFoundation = graphicsFoundation; }
         [[nodiscard]] const InputState& GetInputState() const noexcept;
 
@@ -79,12 +77,12 @@ namespace CLX
 
 	[[nodiscard]] inline Win_Window& GetOSWindow(Win_OperatingSystem& os, WindowHandle windowHandle)
 	{
-		return os.GetWindow(windowHandle.id);
+		return os.GetWindow(windowHandle);
 	}
 
 	[[nodiscard]] inline const Win_Window& GetOSWindow(const Win_OperatingSystem& os, WindowHandle windowHandle)
 	{
-		return os.GetWindow(windowHandle.id);
+		return os.GetWindow(windowHandle);
 	}
 
 	[[nodiscard]] inline WindowHandle OSCreateWindow(Win_OperatingSystem& os, Dimension2u size, std::wstring title)
