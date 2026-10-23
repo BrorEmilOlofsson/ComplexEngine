@@ -14,9 +14,10 @@ namespace CLX
 {
     class AudioManager
     {
+        AudioManager(FMOD::Studio::System* studioSystem, FMOD::System* coreSystem);
     public:
 
-        AudioManager();
+        static AudioManager Create();
 
         AudioChannelID Play(AudioAssetHandle handle, float volume = 1.0f, const Point3f& position = Point3f::Zero());
 

@@ -29,13 +29,13 @@ namespace CLX
             getStateFunc = reinterpret_cast<decltype(&XInputGetState)>(GetProcAddress(xinputModule, "XInputGetState"));
             if (getStateFunc == nullptr)
             {
-                ASSERT(false);
+                ASSERT(false, "Failed to get XInputGetState function");
             }
 
             setStateFunc = reinterpret_cast<decltype(&XInputSetState)>(GetProcAddress(xinputModule, "XInputSetState"));
             if (setStateFunc == nullptr)
             {
-                ASSERT(false);
+                ASSERT(false, "Failed to get XInputSetState function");
             }
         }
         static_assert(XUSER_MAX_COUNT == 4, "XUSER_MAX_COUNT is expected to be 4");

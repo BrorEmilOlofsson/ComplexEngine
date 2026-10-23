@@ -33,7 +33,7 @@ namespace CLX
 
             newNode.mPlane = Planef::FromPoints(newNode.mCenter3D, pos23D, pos33D);
 
-            ASSERT_NEW(newNode.mPlane.GetNormal().Y() >= 0, "Normal of navmesh face points down");
+            ASSERT(newNode.mPlane.GetNormal().Y() >= 0, "Normal of navmesh face points down");
 
         }
         return nodes;

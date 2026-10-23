@@ -16,14 +16,14 @@ namespace CLX
 
         FMOD::Sound* ptr = nullptr;
         [[maybe_unused]] auto result = system.createSound((path.string()).c_str(), loadMode, nullptr, &ptr);
-        ASSERT(result == FMOD_OK);
+        ASSERT(result == FMOD_OK, "Failed to create sound");
         if (ptr)
         {
             // Reset looping
             if (!shouldLoop)
             {
                 result = ptr->setMode(FMOD_LOOP_OFF);
-                ASSERT(result == FMOD_OK);
+                ASSERT(result == FMOD_OK, "Failed to set sound mode");
             }
 
             return ptr;
@@ -32,22 +32,32 @@ namespace CLX
         return std::nullopt;
     }
 
-    AudioManager::AudioManager()
+    AudioManager::AudioManager(FMOD::Studio::System* studioSystem, FMOD::System* coreSystem)
+        : mFMODStudioSystem(studioSystem)
+        , mFMODSystem(coreSystem)
     {
-        FMOD::Studio::System::create(&mFMODStudioSystem);
-        [[maybe_unused]] auto result = mFMODStudioSystem->initialize(512, FMOD_STUDIO_INIT_NORMAL, FMOD_INIT_NORMAL, nullptr);
-        ASSERT(result == FMOD_OK);
-        result = mFMODStudioSystem->getCoreSystem(&mFMODSystem);
-        ASSERT(result == FMOD_OK);
+    }
+
+    AudioManager AudioManager::Create()
+    {
+        FMOD::Studio::System* studioSystem = nullptr;
+        FMOD::System* coreSystem = nullptr;
+        [[maybe_unused]] auto result = FMOD::Studio::System::create(&studioSystem);
+        ASSERT(result == FMOD_OK, "Failed to create FMOD Studio system");
+        result = studioSystem->initialize(512, FMOD_STUDIO_INIT_NORMAL, FMOD_INIT_NORMAL, nullptr);
+        ASSERT(result == FMOD_OK, "Failed to initialize FMOD Studio system");
+        result = studioSystem->getCoreSystem(&coreSystem);
+        ASSERT(result == FMOD_OK, "Failed to get FMOD core system");
+        return AudioManager(studioSystem, coreSystem);
     }
 
     AudioChannelID AudioManager::Play(AudioAssetHandle handle, const float volume, const Point3f& position)
     {
-        ASSERT(handle);
+        ASSERT(handle, "Invalid audio asset handle");
 
         FMOD::Channel* soundChannel = nullptr;
         [[maybe_unused]] auto errorCode = mFMODSystem->playSound(handle->soundPtr, nullptr, true, &soundChannel);
-        ASSERT(errorCode == FMOD_OK);
+        ASSERT(errorCode == FMOD_OK, "Failed to play sound");
 
         if (soundChannel)
         {
@@ -73,7 +83,7 @@ namespace CLX
     void AudioManager::Update()
     {
         [[maybe_unused]] auto result = mFMODStudioSystem->update();
-        ASSERT(result == FMOD_OK);
+        ASSERT(result == FMOD_OK, "Failed to update FMOD Studio system");
     }
 
     void AudioManager::SetChannelPosition(AudioChannelID channelId, const Point3f& position)
@@ -86,7 +96,7 @@ namespace CLX
 
         FMOD_VECTOR relativePos = ToFmodVector(position);
         [[maybe_unused]] auto result = channelIt->second->set3DAttributes(&relativePos, nullptr);
-        ASSERT(result == FMOD_OK);
+        ASSERT(result == FMOD_OK, "Failed to set channel 3D attributes");
     }
 
     void AudioManager::SetChannelVolume(AudioChannelID channelId, const float volume)
@@ -98,7 +108,7 @@ namespace CLX
         }
 
         [[maybe_unused]] auto result = channelIt->second->setVolume(volume);
-        ASSERT(result == FMOD_OK);
+        ASSERT(result == FMOD_OK, "Failed to set channel volume");
     }
 
     void AudioManager::SetChannelPaused(AudioChannelID channelId, bool paused)
@@ -109,7 +119,7 @@ namespace CLX
             return;
         }
         [[maybe_unused]] auto result = channelIt->second->setPaused(paused);
-        ASSERT(result == FMOD_OK);
+        ASSERT(result == FMOD_OK, "Failed to set channel paused state");
     }
 
     std::optional<Audio> AudioManager::LoadAudio(const std::filesystem::path& path)

@@ -49,7 +49,7 @@ namespace CLX
         [[nodiscard]] ECSID CreateECS(const ECSRegistry& registry, EntitySerializationIDGenerator& entityIDGenerator)
         {
             const ECSID ecsID = ECSID{ mECSIDCounter.id++ };
-            ASSERT(!mECSMap.contains(ecsID));
+            ASSERT(!mECSMap.contains(ecsID), "ECSID already exists in the map");
             mECSMap.emplace(ecsID, ECS(registry, entityIDGenerator));
             return ecsID;
         }
@@ -58,8 +58,8 @@ namespace CLX
         {
             const ECSID ecsID = ECSID{ mECSIDCounter.id++ };
             ECS* otherECS = GetECS(other);
-            ASSERT(otherECS != nullptr);
-            ASSERT(!mECSMap.contains(ecsID));
+            ASSERT(otherECS != nullptr, "Other ECS does not exist");
+            ASSERT(!mECSMap.contains(ecsID), "ECSID already exists in the map");
             mECSMap.emplace(ecsID, ECS(*otherECS));
             return ecsID;
         }
@@ -72,7 +72,7 @@ namespace CLX
     private:
 
         std::map<ECSID, ECS> mECSMap;
-        ECSID mECSIDCounter = 0;
+        ECSID mECSIDCounter = ECSID{ 0 };
     };
 
     /*
@@ -134,14 +134,14 @@ namespace CLX
         [[nodiscard]] ECS& Get()
         {
             ECS* ecs = mECSManager->GetECS(mECSID);
-            ASSERT(ecs != nullptr);
+            ASSERT(ecs != nullptr, "ECS does not exist");
             return *ecs;
         }
 
         [[nodiscard]] const ECS& Get() const
         {
             const ECS* ecs = mECSManager->GetECS(mECSID);
-            ASSERT(ecs != nullptr);
+            ASSERT(ecs != nullptr, "ECS does not exist");
             return *ecs;
         }
 

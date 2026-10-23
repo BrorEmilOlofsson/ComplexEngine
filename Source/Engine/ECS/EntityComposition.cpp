@@ -10,8 +10,8 @@ namespace CLX
 		: mECSHandle(std::move(ecsOwningHandle))
 		, mRootEntityID(rootEntityID)
 	{
-        ASSERT(mRootEntityID != InvalidEntityID);
-		ASSERT(GetParentEntity(mECSHandle.Get(), mRootEntityID) == InvalidEntityID);
+        ASSERT(mRootEntityID != InvalidEntityID, "Invalid root entity ID");
+		ASSERT(GetParentEntity(mECSHandle.Get(), mRootEntityID) == InvalidEntityID, "Root entity has a parent");
 	}
 
 	EntityID EntityComposition::GetRootEntity() const noexcept

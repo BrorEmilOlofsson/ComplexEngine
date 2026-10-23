@@ -35,7 +35,7 @@ namespace CLX
         case eGrid2Direction::Right:
             return "Right";
         default:
-            ASSERT(false && "Invalid eGrid2Direction value.");
+            ASSERT(false, "Invalid eGrid2Direction value.");
             return "";
         }
     }
@@ -79,7 +79,7 @@ namespace CLX
         case eGrid2HorizontalDirection::UpLeft:
             return "UpLeft";
         default:
-            ASSERT(false && "Invalid eGrid2HorizontalDirection value.");
+            ASSERT(false, "Invalid eGrid2HorizontalDirection value.");
             return "";
         }
     }

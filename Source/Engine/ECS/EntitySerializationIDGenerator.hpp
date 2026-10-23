@@ -28,7 +28,7 @@ namespace CLX
             }
             else
             {
-                ASSERT(false);
+                ASSERT(false, "No available IDs to generate");
             }
 
             mUsedIDs.insert(id);
@@ -39,7 +39,7 @@ namespace CLX
         {
             mUsedBounds.ExpandToContain(id);
             auto [_, inserted] = mUsedIDs.insert(id);
-            ASSERT(inserted);
+            ASSERT(inserted, "ID has already been marked as used");
         }
 
         [[nodiscard]] bool IsIDUsed(const EntitySerializationID id) const

@@ -1,12 +1,22 @@
 #pragma once
+#include <ranges>
+#include <utility>
+#include <vector>
+#include <typeindex>
+#include <unordered_map>
+
+#include "Engine/Utility/Assert.hpp"
 #include "Engine/Asset/AssetTypes/EntityCompositionAsset.hpp"
 #include "Engine/ECS/ECS.hpp"
+#include "Engine/Reflection/DataTypeID.hpp"
+#include "Engine/Reflection/DataType.hpp"
 #include "Engine/Reflection/DataTypeRegistry.hpp"
 #include "Engine/ECS/EntityID.hpp"
 #include "Engine/ECS/ECSHandle.hpp"
 #include "Engine/ECSEngine/Utility/ECSUtilityFunctions.hpp"
 #include "Engine/ECSEngine/Components/EntityCompositionInstantiationComponent.hpp"
 #include "Editor/EntityCompositionInstantiationManager.hpp"
+#include <External/profiler.h>
 
 namespace CLX
 {
@@ -20,7 +30,7 @@ namespace CLX
         for (auto [typeinfo, componentPtr] : ECS::EntityView(&ecs, newEntityID))
         {
             const DataType* dataType = dataTypeRegistry.Find(GetDataTypeID(typeinfo));
-            ASSERT(dataType != nullptr);
+            ASSERT(dataType != nullptr, "Data type not found in registry");
             auto& members = dataType->memberVariables;
 
             auto membersFiltered = members | std::views::filter([](const DataTypeMemberVariable& member)
@@ -57,7 +67,7 @@ namespace CLX
                 }
                 else
                 {
-                    ASSERT_NEW(false, "Unexpected type info for member variable when duplicating entity and children");
+                    ASSERT(false, "Unexpected type info for member variable when duplicating entity and children");
                 }
             }
         }
@@ -86,6 +96,7 @@ namespace CLX
     inline EntityID InstantiateEntityComposition(const EntityCompositionAssetHandle compositionAsset, ECS& targetECS, 
         const EntityID parentID, const DataTypeRegistry& dataTypeRegistry)
     {
+        PROFILER_FUNCTION();
         const EntityComposition& entityComposition = compositionAsset.Get();
         const EntityIDConverter entityConverter = MergeECS(targetECS, entityComposition.GetECS());
         UpdateEntityIDs(entityComposition.GetECS(), targetECS, entityConverter, dataTypeRegistry);

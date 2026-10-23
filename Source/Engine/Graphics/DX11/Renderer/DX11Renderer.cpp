@@ -80,7 +80,7 @@ namespace CLX
             objectIDCB.UpdateAndBind(ObjectIDBufferData{ modelInstance.objectID }, context);
 
             DX11Model* dx11Model = modelInstance.model->Get<DX11Model>();
-            ASSERT_NEW(dx11Model != nullptr, "ModelInstance has a model that is not a DX11Model");
+            ASSERT(dx11Model != nullptr, "ModelInstance has a model that is not a DX11Model");
             for (DX11Mesh& mesh : dx11Model->GetMeshes())
             {
                 RenderMesh(context, mesh);
@@ -96,7 +96,7 @@ namespace CLX
         transformCB.UpdateAndBind(TransformBufferData{ modelInstance.transform.GetMatrix() }, context);
         objectIDCB.UpdateAndBind(ObjectIDBufferData{ modelInstance.objectID }, context);
         DX11Mesh* mesh = modelInstance.mesh->Get<DX11Mesh>();
-        ASSERT_NEW(mesh != nullptr, "ModelInstance has a mesh that is not a DX11Mesh");
+        ASSERT(mesh != nullptr, "ModelInstance has a mesh that is not a DX11Mesh");
         RenderMesh(context, mesh->GetVertexBuffer(), mesh->GetIndexBuffer(), mesh->GetMeshData());
     }
 
@@ -153,7 +153,7 @@ namespace CLX
             shadowCB.UpdateAndBind(ShadowBufferData{ modelInstance.transform.GetMatrix(), lightViewProjection }, context);
 
             DX11Model* dx11Model = modelInstance.model->Get<DX11Model>();
-            ASSERT_NEW(dx11Model != nullptr, "ModelInstance has a model that is not a DX11Model");
+            ASSERT(dx11Model != nullptr, "ModelInstance has a model that is not a DX11Model");
             for (DX11Mesh& mesh : dx11Model->GetMeshes())
             {
                 RenderMesh(context, mesh);
@@ -165,7 +165,7 @@ namespace CLX
         shadowCB.UpdateAndBind(ShadowBufferData{ modelInstance.transform.GetMatrix(), lightViewProjection }, context);
 
         DX11Mesh* mesh = modelInstance.mesh->Get<DX11Mesh>();
-        ASSERT_NEW(mesh != nullptr, "ModelInstance has a mesh that is not a DX11Mesh");
+        ASSERT(mesh != nullptr, "ModelInstance has a mesh that is not a DX11Mesh");
         RenderMesh(context, mesh->GetVertexBuffer(), mesh->GetIndexBuffer(), mesh->GetMeshData());
     }
 

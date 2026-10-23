@@ -123,7 +123,7 @@ namespace CLX
                         }) | std::ranges::to<std::vector>();
 
                     
-                    ASSERT_NEW(v.size() <= 2, "A vertex should not be connected to more than 2 other vertices in a well formed navmesh");
+                    ASSERT(v.size() <= 2, "A vertex should not be connected to more than 2 other vertices in a well formed navmesh");
 
                     const Point3f closestPoint = navmesh.GetNavmeshData().m3DVertices[closestVertex];
                     std::optional<Point3f> p = GetPointAtY(mouseRay, closestPoint.y);

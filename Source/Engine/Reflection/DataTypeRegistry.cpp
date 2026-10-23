@@ -23,7 +23,7 @@ namespace CLX
 
             if (n != 0 && n != 3)
             {
-                ASSERT(false && "DataType must have either all or none of the edit, save, and load functions defined.");
+                ASSERT(false, "DataType must have either all or none of the edit, save, and load functions defined.");
             }
         }
     }
@@ -73,9 +73,9 @@ namespace CLX
             }
             else
             {
-                ASSERT_NEW(false, "Path has not been tested");
+                ASSERT(false, "Path has not been tested");
                 const DataType* memberDataType = Find(member.dataTypeID);
-                ASSERT(memberDataType != nullptr);
+                ASSERT(memberDataType != nullptr, "Member data type is not registered");
                 void* ownerPtr = dataPtr;
                 GenericBufferArena<1028> arena;
                 void* allocatedDataPtr = arena.AllocateTypeErased(memberDataType->size, memberDataType->alignment, memberDataType->destroy, memberDataType->copyConstruct, memberDataType->type);
@@ -206,7 +206,7 @@ namespace CLX
 
         for (auto& member : dataType->memberVariables)
         {
-            ASSERT(Find(member.dataTypeID) != nullptr);
+            ASSERT(Find(member.dataTypeID) != nullptr, "Member data type is not registered");
             const void* memberDataPtr1 = dataPtr1 + std::get<ByteOffset>(member.memberType);
             const void* memberDataPtr2 = dataPtr2 + std::get<ByteOffset>(member.memberType);
             if (!EqualsData(member.dataTypeID, memberDataPtr1, memberDataPtr2))
@@ -300,7 +300,7 @@ namespace CLX
                 const auto member = findMember(propertyPath.dataTypeID, memberName);
                 if (!member.has_value())
                 {
-                    ASSERT(false && "Member not found in data type.");
+                    ASSERT(false, "Member not found in data type.");
                 }
 
                 byteOffset += std::get<ByteOffset>(member->memberType);
@@ -308,7 +308,7 @@ namespace CLX
             }
             else
             {
-                ASSERT(false && "Indexing into vectors or arrays is not yet supported.");
+                ASSERT(false, "Indexing into vectors or arrays is not yet supported.");
             }
         }
 

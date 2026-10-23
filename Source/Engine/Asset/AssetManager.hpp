@@ -370,7 +370,7 @@ namespace CLX
             }
             else
             {
-                ASSERT(false);
+                ASSERT(false, "Unsupported asset type");
             }
         }
 
@@ -404,7 +404,7 @@ namespace CLX
             }
             else
             {
-                ASSERT(false);
+                ASSERT(false, "Unsupported asset type");
             }
         }
 

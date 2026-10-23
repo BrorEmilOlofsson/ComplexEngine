@@ -131,7 +131,7 @@ namespace CLX
         if (auto entityCompositionPath = ObjectTarget<AssetPath_EntityComposition>())
         {
             const std::filesystem::path path(entityCompositionPath->Value().mData);
-            ASSERT(path.extension() == AssetExtensions::EntityComposition);
+            ASSERT(path.extension() == AssetExtensions::EntityComposition, "Invalid entity composition file extension");
 
             InstantiateEntityCompositionAndSelectRoot(
                 ecsHandle,

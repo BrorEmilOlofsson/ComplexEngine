@@ -1,7 +1,10 @@
 #pragma once
 #include "Engine/Math/UnitVector3.hpp"
+#include "Engine/Math/Point3.hpp"
 #include "Engine/Math/Shapes/Sphere.hpp"
 #include "Engine/Utility/Height.hpp"
+#include "Engine/Math/GeometryMath.hpp"
+#include "Engine/Utility/Assert.hpp"
 
 namespace CLX
 {
@@ -48,7 +51,7 @@ namespace CLX
         , mNormal(normal)
         , mHeight(height)
     {
-        ASSERT(height.Value() <= sphere.GetDiameter().Value() && "Height of spherical cap cannot be greater than the diameter of the sphere");
+        ASSERT(height.Value() <= sphere.GetDiameter().Value(), "Height of spherical cap cannot be greater than the diameter of the sphere");
     }
 
     template<typename T>

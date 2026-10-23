@@ -1259,7 +1259,7 @@ public:
     void ECSRegistry::RegisterComponentType(const eECSComponentTrait traits)
     {
         [[maybe_unused]] const bool hasBeenRegistered = mComponentTypeToIDMap.contains(std::type_index(typeid(T)));
-        ASSERT(!hasBeenRegistered);
+        ASSERT(!hasBeenRegistered, "Component type has already been registered");
 
         ECSComponentType componentType;
 

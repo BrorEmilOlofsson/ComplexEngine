@@ -90,21 +90,14 @@ namespace CLX
 		{
 			return false;
 		}
-		for (std::size_t i = 0; i < a.GetDimensionCount(); i++)
-		{
-			if (a[i] != b[i])
-			{
-				return false;
-			}
-		}
-		return true;
+        return std::ranges::equal(a, b);
 	}
 
 	template<typename T>
 	[[nodiscard]] constexpr DynamicVector<T> operator+(const DynamicVector<T>& a, const DynamicVector<T>& b)
 	{
 		const std::size_t dimensionCount = a.GetDimensionCount();
-		ASSERT(dimensionCount == b.GetDimensionCount() && "Dimensions are not the same");
+		ASSERT(dimensionCount == b.GetDimensionCount(), "Dimensions are not the same");
 		DynamicVector<T> result = DynamicVector<T>::CreateFromDimensionCount(dimensionCount);
 		for (std::size_t i = 0; i < dimensionCount; i++)
 		{
@@ -117,7 +110,7 @@ namespace CLX
 	[[nodiscard]] constexpr DynamicVector<T> operator-(const DynamicVector<T>& a, const DynamicVector<T>& b)
 	{
 		const std::size_t dimensionCount = a.GetDimensionCount();
-		ASSERT(dimensionCount == b.GetDimensionCount() && "Dimensions are not the same");
+		ASSERT(dimensionCount == b.GetDimensionCount(), "Dimensions are not the same");
 		DynamicVector<T> result = DynamicVector<T>::CreateFromDimensionCount(dimensionCount);
 		for (std::size_t i = 0; i < dimensionCount; i++)
 		{
@@ -172,7 +165,7 @@ namespace CLX
 	constexpr DynamicVector<T>& operator+=(DynamicVector<T>& a, const DynamicVector<T>& b)
 	{
 		const std::size_t dimensionCount = a.GetDimensionCount();
-		ASSERT(dimensionCount == b.GetDimensionCount() && "Dimensions are not the same");
+		ASSERT(dimensionCount == b.GetDimensionCount(), "Dimensions are not the same");
 		for (std::size_t i = 0; i < dimensionCount; i++)
 		{
 			a[i] += b[i];
@@ -184,7 +177,7 @@ namespace CLX
 	constexpr DynamicVector<T>& operator-=(DynamicVector<T>& a, const DynamicVector<T>& b)
 	{
 		const std::size_t dimensionCount = a.GetDimensionCount();
-		ASSERT(dimensionCount == b.GetDimensionCount() && "Dimensions are not the same");
+		ASSERT(dimensionCount == b.GetDimensionCount(), "Dimensions are not the same");
 		for (std::size_t i = 0; i < dimensionCount; i++)
 		{
 			a[i] -= b[i];

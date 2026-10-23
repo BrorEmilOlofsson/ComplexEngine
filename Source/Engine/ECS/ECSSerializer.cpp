@@ -112,7 +112,7 @@ namespace CLX
         {
             if (usedSerializationIDBounds->Contains(loadedSerializationID.id) && entityIDGenerator.IsIDUsed(loadedSerializationID))
             {
-                ASSERT(false);
+                ASSERT(false, "Duplicate serialization ID detected");
             }
             else
             {

@@ -518,7 +518,7 @@ namespace CLX
             if (ecs.IsEntityValid(entityID) && ecs.IsEntityActive(entityID))
             {
                 const NameComponent* nameComponent = ecs.GetComponent<NameComponent>(entityID);
-                ASSERT_NEW(nameComponent, "Entity does not have a NameComponent");
+                ASSERT(nameComponent, "Entity does not have a NameComponent");
                 btnStr = nameComponent->name + " (" + std::to_string(entityID.id) + ")";
                 entitySerializationID = ecs.GetSerializationID(entityID);
             }
@@ -666,7 +666,7 @@ namespace CLX
         std::pair<DataTypeID, void*> variantResult = GetVariantInfo(variant);
 
         const DataType* currentDataType = dataTypeRegistry.Find(variantResult.first);
-        ASSERT(currentDataType != nullptr);
+        ASSERT(currentDataType != nullptr, "Current data type not found in registry");
 
         if (ImGui::BeginCombo("Shape Type", currentDataType->name.c_str()))
         {

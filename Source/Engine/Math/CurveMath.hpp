@@ -79,10 +79,10 @@ namespace CLX
     template<typename T>
     [[nodiscard]] constexpr T GetBezierCubicY(const std::ranges::range auto& points, const T& x)
     {
-        ASSERT(PointsAreMonotonicIncreasingX(points));
+        DEBUG_ASSERT(PointsAreMonotonicIncreasingX(points), "Points are not monotonic increasing in X");
         //using T = typename std::decay_t<decltype(points)>::value_type::value_type;
         const std::size_t size = std::ranges::size(points);
-        ASSERT(size % 3 == 1);
+        ASSERT(size % 3 == 1, "Invalid number of points for cubic Bezier curve");
         if (size < 2)
         {
             return T{};

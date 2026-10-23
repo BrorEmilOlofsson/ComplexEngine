@@ -96,6 +96,7 @@ namespace CLX
         , mBlackboard(std::make_shared<Blackboard>())
         , mGraphicsSettings(std::make_shared<GraphicsSettings>())
         , mSceneManager(mAssetManager)
+        , mAudioManager(AudioManager::Create())
     {
         RegisterEngineComponents();
         DummyRegister();

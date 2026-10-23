@@ -252,7 +252,7 @@ namespace CLX
 		}
 
         DX11RenderContext* dx11RenderContext = renderContext.Cast<DX11RenderContext>();
-        ASSERT(dx11RenderContext != nullptr);
+        ASSERT(dx11RenderContext != nullptr, "Failed to cast RenderContext to DX11RenderContext");
 
 		mRenderer.Render(
 			renderState,

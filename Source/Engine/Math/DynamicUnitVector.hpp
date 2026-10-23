@@ -37,7 +37,7 @@ namespace CLX
 		{
 			if constexpr (Assert)
 			{
-				ASSERT(false && "Cannot normalize a zero-length vector");
+				ASSERT(false, "Cannot normalize a zero-length vector");
 			}
 			else
 			{
@@ -81,7 +81,7 @@ namespace CLX
 
 		[[nodiscard]] static constexpr DynamicUnitVector<T> CreateFromDimensionCount(const std::size_t dimensionCount)
 		{
-			ASSERT(dimensionCount > 0 && "Dimension Count cannot be 0");
+			ASSERT(dimensionCount > 0, "Dimension Count cannot be 0");
 			return DynamicUnitVector<T>(dimensionCount);
 		}
 
@@ -138,7 +138,7 @@ namespace CLX
 
 		constexpr void AssertNormalized()
 		{
-			ASSERT(IsNormalized(mValues));
+			ASSERT(IsNormalized(mValues), "DynamicUnitVector is not normalized");
 		}
 
 	private:
@@ -170,7 +170,7 @@ namespace CLX
 	[[nodiscard]] constexpr DynamicVector<T> operator+(const DynamicVector<T>& a, const DynamicUnitVector<T>& b)
 	{
 		const std::size_t dimensions = a.GetDimensionCount();
-		ASSERT(dimensions == b.GetDimensionCount() && "Dimensions are not the same");
+		ASSERT(dimensions == b.GetDimensionCount(), "Dimensions are not the same");
 		DynamicVector<T> v = a;
 		for (std::size_t i = 0; i < dimensions; i++)
 		{
@@ -189,7 +189,7 @@ namespace CLX
 	[[nodiscard]] constexpr DynamicVector<T> operator-(const DynamicVector<T>& a, const DynamicUnitVector<T>& b)
 	{
 		const std::size_t dimensions = a.GetDimensionCount();
-		ASSERT(dimensions == b.GetDimensionCount() && "Dimensions are not the same");
+		ASSERT(dimensions == b.GetDimensionCount(), "Dimensions are not the same");
 		DynamicVector<T> v = a;
 		for (std::size_t i = 0; i < dimensions; i++)
 		{
@@ -202,7 +202,7 @@ namespace CLX
 	[[nodiscard]] constexpr DynamicVector<T> operator-(const DynamicUnitVector<T>& a, const DynamicVector<T>& b)
 	{
 		const std::size_t dimensions = a.GetDimensionCount();
-		ASSERT(dimensions == b.GetDimensionCount() && "Dimensions are not the same");
+		ASSERT(dimensions == b.GetDimensionCount(), "Dimensions are not the same");
 		DynamicVector<T> v = DynamicVector<T>::CreateFromDimensionCount(dimensions);
 		for (std::size_t i = 0; i < dimensions; i++)
 		{

@@ -12,7 +12,7 @@ namespace CLX
 	template<typename BoundsChecker, typename T>
 	constexpr void AssertBounds([[maybe_unused]] const T& min, [[maybe_unused]] const T& max)
 	{
-		ASSERT(BoundsChecker{}(min, max));
+		ASSERT(BoundsChecker{}(min, max), "Bounds are invalid");
 	}
 
 	template<typename T>

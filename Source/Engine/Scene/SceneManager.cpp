@@ -7,7 +7,7 @@ namespace CLX
 
     void SetActiveSceneAndRunSceneEvents(SceneAssetHandle& outScene, SceneAssetHandle newScene, auto&& postChangeEvents)
     {
-        ASSERT(newScene && "Failed to set active scene! The provided scene asset handle is invalid.");
+        ASSERT(newScene, "Failed to set active scene! The provided scene asset handle is invalid.");
         Scene& sceneRef = newScene.Get();
         outScene = newScene;
         for (const auto& function : postChangeEvents)

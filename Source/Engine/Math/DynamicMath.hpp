@@ -46,7 +46,7 @@ namespace CLX
 	template<typename T>
 	[[nodiscard]] constexpr T DistanceSquared(const DynamicPoint<T>& point1, const DynamicPoint<std::optional<T>>& point2)
 	{
-		ASSERT(point1.GetDimensionCount() == point2.GetDimensionCount() && "The input values are not the same dimension");
+		ASSERT(point1.GetDimensionCount() == point2.GetDimensionCount(), "The input values are not the same dimension");
 
 		T result{};
 		const std::size_t dimensionCount = point1.GetDimensionCount();
@@ -73,7 +73,7 @@ namespace CLX
 	{
 		using ReturnType = decltype(transformation1(point1[0]));
 		const std::size_t dimensionCount = size(point1);
-		ASSERT(dimensionCount == size(point2) && "The input values are not the same dimension");
+		ASSERT(dimensionCount == size(point2), "The input values are not the same dimension");
 
 		ReturnType result{};
 		for (size_t i = 0; i < dimensionCount; i++)

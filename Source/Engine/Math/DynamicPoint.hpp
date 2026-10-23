@@ -138,7 +138,7 @@ namespace CLX
 	constexpr DynamicPoint<T>& operator+=(DynamicPoint<T>& point, const IsDynamicVector auto& vector)
 	{
 		const std::size_t dimensionCount = point.GetDimensionCount();
-		ASSERT(dimensionCount == vector.GetDimensionCount() && "Dimensions are not the same");
+		ASSERT(dimensionCount == vector.GetDimensionCount(), "Dimensions are not the same");
 
 		for (std::size_t i = 0; i < dimensionCount; i++)
 		{
@@ -152,7 +152,7 @@ namespace CLX
 	constexpr DynamicPoint<T>& operator-=(DynamicPoint<T>& point, const IsDynamicVector auto& vector)
 	{
 		const std::size_t dimensionCount = point.GetDimensionCount();
-		ASSERT(dimensionCount == vector.GetDimensionCount() && "Dimensions are not the same");
+		ASSERT(dimensionCount == vector.GetDimensionCount(), "Dimensions are not the same");
 
 		for (std::size_t i = 0; i < dimensionCount; i++)
 		{
@@ -180,7 +180,7 @@ namespace CLX
 	[[nodiscard]] constexpr DynamicVector<T> operator-(const DynamicPoint<T>& a, const DynamicPoint<T>& b)
 	{
 		const std::size_t dimensionCount = a.GetDimensionCount();
-		ASSERT(dimensionCount == b.GetDimensionCount() && "Dimensions are not the same");
+		ASSERT(dimensionCount == b.GetDimensionCount(), "Dimensions are not the same");
 
 		DynamicVector<T> result;
 		result.SetDimensionCount(dimensionCount);

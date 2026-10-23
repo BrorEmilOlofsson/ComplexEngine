@@ -178,7 +178,7 @@ namespace CLX
             }
         }
 
-        ASSERT(false);
+        ASSERT(false, "Failed to make window");
         return WindowHandle{ std::numeric_limits<uint32_t>::max() };
     }
 

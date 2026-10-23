@@ -41,7 +41,7 @@ namespace CLX
         {
             if (value < 0)
             {
-                ASSERT(false && "Value must be 0 or positive");
+                ASSERT(false, "Value must be 0 or positive");
             }
         });
 

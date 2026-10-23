@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <format>
 #include <string>
+#include <concepts>
 
 #include "Engine/Utility/Assert.hpp"
 #include "Engine/Utility/Rebind.hpp"
@@ -122,7 +123,7 @@ namespace CLX
 		{
 			if (scalar == 0)
 			{
-                ASSERT(false && "Division by zero in Vector2 operator/.");
+                ASSERT(false, "Division by zero in Vector2 operator/.");
 			}
 		}
 		const T inverse = static_cast<T>(1) / static_cast<T>(scalar);

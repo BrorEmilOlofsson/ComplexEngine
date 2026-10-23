@@ -22,7 +22,7 @@ namespace CLX
 
     void EditorWindowManager::CreateWindow(const EntityCompositionAssetHandle assetHandle, RenderContext&& renderContext)
     {
-        ASSERT(assetHandle.IsValid());
+        ASSERT(assetHandle.IsValid(), "Invalid entity composition asset handle");
         if (std::ranges::find_if(mEntityCompositionWindows, [&](const auto& window) { return window->GetCompositionAsset() == assetHandle; }) != mEntityCompositionWindows.end())
         {
             return;

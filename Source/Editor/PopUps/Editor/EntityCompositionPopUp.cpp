@@ -16,7 +16,7 @@ namespace CLX
 
     std::string GetEntityCompositionName(EntityCompositionAssetHandle handle)
     {
-        ASSERT(handle.IsValid());
+        ASSERT(handle.IsValid(), "Invalid entity composition asset handle");
         return handle.GetRelativePath().stem().string();
     }
 

@@ -151,7 +151,7 @@ namespace CLX
         const DataTypeID dataTypeID = GetDataTypeID<T>();
         [[maybe_unused]] const bool alreadyExistOrHashCollision = mDataTypes.contains(dataTypeID);
 
-        ASSERT(alreadyExistOrHashCollision == false);
+        ASSERT(alreadyExistOrHashCollision == false, "Data type already exists or hash collision occurred");
 
         std::string name = ConvertTypeIndexNameToPrettyName(typeid(T).name());
         std::string prettyName = RemoveSubStringIfExist(name, "Component");
@@ -280,8 +280,8 @@ namespace CLX
             member.customName = ConvertAndAddSpaceToSubStringWithUpperCase(variableName);
         }
 
-        ASSERT(Find<OwnerType>() != nullptr);
-        ASSERT(Find<MemberType>() != nullptr);
+        ASSERT(Find<OwnerType>() != nullptr, "Owner type not found");
+        ASSERT(Find<MemberType>() != nullptr, "Member type not found");
 
         auto& ownerMembers = Find<OwnerType>()->memberVariables;
         auto it = std::ranges::find_if(ownerMembers, [&variableName](const DataTypeMemberVariable& obj) { return obj.name == variableName; });
@@ -315,7 +315,7 @@ namespace CLX
             member.customName = ConvertAndAddSpaceToSubStringWithUpperCase(variableName);
         }
 
-        ASSERT(memberMetaData.ownerDataTypeID != InvalidDataTypeID);
+        ASSERT(memberMetaData.ownerDataTypeID != InvalidDataTypeID, "Invalid owner data type ID");
 
         auto& ownerMembers = Find(memberMetaData.ownerDataTypeID)->memberVariables;
         auto it = std::ranges::find_if(ownerMembers, [&variableName](const DataTypeMemberVariable& obj) { return obj.name == variableName; });

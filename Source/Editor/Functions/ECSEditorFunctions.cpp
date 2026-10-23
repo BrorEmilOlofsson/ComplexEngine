@@ -67,15 +67,15 @@ namespace CLX
         if (parentID == InvalidEntityID)
         {
             auto it = std::ranges::find(rootEntities, entityID);
-            ASSERT(it != end(rootEntities));
+            ASSERT(it != end(rootEntities), "Entity ID not found in root entities");
             return std::ranges::distance(begin(rootEntities), it);
         }
         else
         {
             auto parentTransformComponent = ecs.GetComponent<TransformHierarchyComponent>(parentID);
-            ASSERT(parentTransformComponent != nullptr);
+            ASSERT(parentTransformComponent != nullptr, "Invalid parent transform component");
             auto it = std::ranges::find(parentTransformComponent->children, entityID);
-            ASSERT(it != end(parentTransformComponent->children));
+            ASSERT(it != end(parentTransformComponent->children), "Entity ID not found in parent's children");
             return std::ranges::distance(begin(parentTransformComponent->children), it);
         }
     }
@@ -121,7 +121,7 @@ namespace CLX
         }
 
         const EntityID parentID = GetParentEntity(ecs, entityID);
-        ASSERT(parentID == GetParentEntity(ecs, createdEntityID));
+        ASSERT(parentID == GetParentEntity(ecs, createdEntityID), "Parent ID mismatch");
         if (parentID != InvalidEntityID)
         {
             AddBasedOnChildIndexVariant(ecs.GetComponent<TransformHierarchyComponent>(parentID)->children, createdEntityID, childIndex);
@@ -383,8 +383,8 @@ namespace CLX
     static void DestroyChildEntity(ECS& ecs, const EntityID entityID, EditorCommandTracker& commandTracker)
     {
         TransformHierarchyComponent* hierarchyComponent = ecs.GetComponent<TransformHierarchyComponent>(entityID);
-        ASSERT(hierarchyComponent != nullptr);
-        ASSERT(hierarchyComponent->parent != InvalidEntityID);
+        ASSERT(hierarchyComponent != nullptr, "Invalid hierarchy component");
+        ASSERT(hierarchyComponent->parent != InvalidEntityID, "Invalid parent ID");
 
         struct DestroyEntityData final
         {
@@ -395,7 +395,7 @@ namespace CLX
         };
 
         TransformHierarchyComponent* parentChildrenTransformComponent = ecs.GetComponent<TransformHierarchyComponent>(hierarchyComponent->parent);
-        ASSERT(parentChildrenTransformComponent != nullptr);
+        ASSERT(parentChildrenTransformComponent != nullptr, "Invalid parent transform component");
 
         DestroyEntityData data
         {
@@ -720,7 +720,7 @@ namespace CLX
 
     void ReorderEntity(ECS& ecs, const EntityID entityID, std::vector<EntityID>& rootEntities, std::size_t newIndex, EditorCommandTracker& commandTracker)
     {
-        ASSERT(entityID != InvalidEntityID);
+        ASSERT(entityID != InvalidEntityID, "Invalid entity ID");
 
         struct ReorderEntityData final
         {
@@ -763,7 +763,7 @@ namespace CLX
                 if (parentID != InvalidEntityID)
                 {
                     TransformHierarchyComponent* parentTransformComponent = data.ecs.get().GetComponent<TransformHierarchyComponent>(parentID);
-                    ASSERT(parentTransformComponent != nullptr);
+                    ASSERT(parentTransformComponent != nullptr, "Invalid parent transform component");
                     ReorderInternal(parentTransformComponent->children, data.oldIndex, data.newIndex);
                 }
                 else
@@ -780,7 +780,7 @@ namespace CLX
                 if (parentID != InvalidEntityID)
                 {
                     TransformHierarchyComponent* parentTransformComponent = data.ecs.get().GetComponent<TransformHierarchyComponent>(parentID);
-                    ASSERT(parentTransformComponent != nullptr);
+                    ASSERT(parentTransformComponent != nullptr, "Invalid parent transform component");
                     ReorderInternal(parentTransformComponent->children, data.oldIndex, data.newIndex);
                 }
                 else
@@ -1033,8 +1033,8 @@ namespace CLX
 
     static void OnEntityDroppedBetween(ECS& ecs, const EntityID droppedEntityID, const EntityID droppedBeforeEntityID, std::vector<EntityID>& rootEntities, std::set<EntityID>& selectedEntityIDs, const bool droppedAfter, EditorCommandTracker& commandTracker)
     {
-        ASSERT(droppedEntityID != InvalidEntityID);
-        ASSERT(droppedBeforeEntityID != InvalidEntityID);
+        ASSERT(droppedEntityID != InvalidEntityID, "Invalid dropped entity ID");
+        ASSERT(droppedBeforeEntityID != InvalidEntityID, "Invalid dropped before entity ID");
         if (droppedEntityID == droppedBeforeEntityID)
         {
             return;
@@ -1103,7 +1103,7 @@ namespace CLX
     template<typename T>
     EntityID FindFirstParentEntityWithComponent(const ECS& ecs, const EntityID childEntityID, const bool includeChild = true)
     {
-        ASSERT(childEntityID != InvalidEntityID);
+        ASSERT(childEntityID != InvalidEntityID, "Invalid child entity ID");
         EntityID check = includeChild ? childEntityID : GetParentEntity(ecs, childEntityID);
         while (check != InvalidEntityID)
         {
@@ -1178,7 +1178,7 @@ namespace CLX
             auto children = GetEntityChildren(ecs, entityID);
             for (const EntityID childEntityID : children)
             {
-                ASSERT(childEntityID != InvalidEntityID);
+                ASSERT(childEntityID != InvalidEntityID, "Invalid child entity ID");
                 if (!filter(childEntityID))
                 {
                     continue;
@@ -1209,7 +1209,7 @@ namespace CLX
         ImGui::PushStyleColor(ImGuiCol_Border, ImColor(0.12f, 0.12f, 0.12f, 0.0f).Value);
         ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
 
-        ASSERT(ecsHandle.IsValid());
+        ASSERT(ecsHandle.IsValid(), "Invalid ECS handle");
         ECS& ecs = *ecsHandle.Get();
 
         auto filter = [&](const EntityID entityID)
@@ -1398,7 +1398,7 @@ namespace CLX
         const std::set<EntityID>& uneditableEntities, std::string& entitySearchBuffer, EntityCompositionAssetHandle compositionHandle,
         EntityCompositionInstantiationManager& compositionInstantiations, const DataTypeRegistry& dataTypeRegistry, AssetManager& assetManager)
     {
-        ASSERT(ecsHandle.IsValid());
+        ASSERT(ecsHandle.IsValid(), "Invalid ECS handle");
         ShowEntityAddButtons(
             *ecsHandle.Get(),
             selectedEntityIDs,
@@ -1455,20 +1455,20 @@ namespace CLX
         const DataTypeID modifiedDataTypeID, const void* sourcePtr, const DataTypeID componentTypeID, const PropertyPath& propertyPath,
         const std::optional<VectorEditOperation>& vectorOperation, const DataTypeRegistry& dataTypeRegistry)
     {
-        ASSERT(instantiationECS.GetComponent<EntityCompositionInstantiationComponent>(entityID) != nullptr);
+        ASSERT(instantiationECS.GetComponent<EntityCompositionInstantiationComponent>(entityID) != nullptr, "Invalid entity composition instantiation component");
 
         std::optional<EntityID> foundEntityID = FindEntity(instantiationECS, [&instantiationECS, modifiedEntityID](const EntityID entityID)
             {
                 auto* compositionComponent = instantiationECS.GetComponent<EntityCompositionInstantiationComponent>(entityID);
-                ASSERT(compositionComponent != nullptr);
+                ASSERT(compositionComponent != nullptr, "Invalid entity composition instantiation component");
                 return compositionComponent->mappedEntityID == modifiedEntityID;
             }, entityID);
 
-        ASSERT(foundEntityID.has_value());
+        ASSERT(foundEntityID.has_value(), "Failed to find corresponding entity ID");
         const EntityID correspondingEntityID = foundEntityID.value();
 
         const EntityCompositionInstantiationComponent* correspondingCompositionComponent = instantiationECS.GetComponent<EntityCompositionInstantiationComponent>(correspondingEntityID);
-        ASSERT(correspondingCompositionComponent != nullptr);
+        ASSERT(correspondingCompositionComponent != nullptr, "Invalid entity composition instantiation component");
         if (std::ranges::find_if(correspondingCompositionComponent->overrides, [&](const EntityCompositionOverride& ecOverride) { return ecOverride.path == propertyPath; }) != correspondingCompositionComponent->overrides.end())
         {
             // This property has been overridden in this instantiation, so we should not apply the modification
@@ -1483,19 +1483,19 @@ namespace CLX
             std::optional<EntityID> f = FindEntity(instantiationECS, [&instantiationECS, newEntityID](const EntityID entityID)
                 {
                     auto* compositionComponent = instantiationECS.GetComponent<EntityCompositionInstantiationComponent>(entityID);
-                    ASSERT(compositionComponent != nullptr);
+                    ASSERT(compositionComponent != nullptr, "Invalid entity composition instantiation component");
                     return compositionComponent->mappedEntityID == newEntityID;
                 }, entityID);
 
-            ASSERT(f.has_value());
+            ASSERT(f.has_value(), "Failed to find corresponding entity ID");
         }
         else if (modifiedDataTypeID == GetDataTypeID<std::vector<EntityID>>())
         {
-            ASSERT(vectorOperation.has_value());
+            ASSERT(vectorOperation.has_value(), "Invalid vector operation");
             const std::vector<EntityID> newEntityIDs = *static_cast<const std::vector<EntityID>*>(sourcePtr);
 
             void* componentPtr = instantiationECS.GetComponent(correspondingEntityID, componentTypeID.typeIndex);
-            ASSERT(componentPtr != nullptr);
+            ASSERT(componentPtr != nullptr, "Invalid component pointer");
             void* destinationPtr = dataTypeRegistry.GetPropertyPathDataPtr(componentPtr, propertyPath);
             std::vector<EntityID>& entityIDVector = *static_cast<std::vector<EntityID>*>(destinationPtr);
             entityIDVector;
@@ -1519,7 +1519,7 @@ namespace CLX
                     },
                     [&](const auto&)
                     {
-                        ASSERT(newEntityIDs.size() == entityIDVector.size());
+                        ASSERT(newEntityIDs.size() == entityIDVector.size(), "Entity ID vector size mismatch");
 
                         for (auto [i, newEntityID] : std::views::enumerate(newEntityIDs))
                         {
@@ -1530,11 +1530,11 @@ namespace CLX
                             std::optional<EntityID> f = FindEntity(instantiationECS, [&](const EntityID entityID)
                                 {
                                     auto* compositionComponent = instantiationECS.GetComponent<EntityCompositionInstantiationComponent>(entityID);
-                                    ASSERT(compositionComponent != nullptr);
+                                    ASSERT(compositionComponent != nullptr, "Invalid composition component");
                                     return compositionComponent->mappedEntityID == newEntityID;
                                 }, entityID);
 
-                            ASSERT(f.has_value());
+                            ASSERT(f.has_value(), "Corresponding entity ID not found");
 
                             const EntityID correspondingEntityID2 = f.value();
 
@@ -1641,8 +1641,8 @@ namespace CLX
     static void SetComponentData(ECS& ecs, const EntityID entityID, const DataTypeID componentType, const std::any& newValue, const std::any& oldValue,
         const DataTypeRegistry& dataTypeRegistry, EditorCommandTracker& commandTracker)
     {
-        ASSERT(newValue.has_value());
-        ASSERT(oldValue.has_value());
+        ASSERT(newValue.has_value(), "Invalid new value");
+        ASSERT(oldValue.has_value(), "Invalid old value");
 
         if (AreAnyValuesEqual(dataTypeRegistry, componentType, newValue, oldValue))
         {
@@ -1715,7 +1715,7 @@ namespace CLX
     {
         PROFILER_FUNCTION(profiler::colors::Lime400);
 
-        ASSERT(data.componentPtr != nullptr);
+        ASSERT(data.componentPtr != nullptr, "Invalid component pointer");
         ImGui::AlignTextToFramePadding();
 
         const DataType* dataType = data.dataTypeRegistry.Find(data.componentTypeID);
@@ -1865,7 +1865,7 @@ namespace CLX
             return std::nullopt;
         }
         NameComponent* nameComponent = ecs.GetComponent<NameComponent>(selectedEntityID);
-        ASSERT(nameComponent != nullptr);
+        ASSERT(nameComponent != nullptr, "Invalid name component");
         std::string& selectedEntityName = nameComponent->name;
 
         char nameBuffer[256]{};
@@ -2014,9 +2014,9 @@ namespace CLX
 
         if (!anyActiveItem && anyItemActiveLastFrame)
         {
-            ASSERT(storedComponent.has_value());
+            ASSERT(storedComponent.has_value(), "Invalid stored component");
             DataTypeID changedComponentTypeID = GetDataTypeID(storedComponent.type());
-            ASSERT(changedComponentTypeID != InvalidDataTypeID);
+            ASSERT(changedComponentTypeID != InvalidDataTypeID, "Invalid changed component type ID");
             std::any newValue = blackboard.Get<Key_DataTypeRegistry>().ToAny(changedComponentTypeID, ecs.GetComponent(selectedEntityID, changedComponentTypeID.typeIndex));
             auto action = CreateSetComponentDataAction(
                 ecs,
@@ -2201,9 +2201,9 @@ namespace CLX
     EntityID InstantiateEntityComposition(const ECSHandle targetECSHandle, const EntityCompositionAssetHandle compositionAsset, const EntityCompositionAssetHandle parentComposition,
         const EntityID parentID, EntityCompositionInstantiationManager& entityInstantiations, const DataTypeRegistry& dataTypeRegistry, std::vector<EntityID>& rootEntities, EditorCommandTracker& commandTracker)
     {
-        ASSERT(compositionAsset.IsValid());
-        ASSERT(targetECSHandle.Get() != nullptr);
-        ASSERT(targetECSHandle != compositionAsset.Get().GetECSHandle());
+        ASSERT(compositionAsset.IsValid(), "Invalid composition asset");
+        ASSERT(targetECSHandle.Get() != nullptr, "Invalid target ECS handle");
+        ASSERT(targetECSHandle != compositionAsset.Get().GetECSHandle(), "Target ECS handle cannot be the same as the composition asset's ECS handle");
 
         commandTracker.BeginComposite("Instantiate Entity Composition (" + compositionAsset.GetRelativePath().string() + ")");
 
@@ -2372,7 +2372,7 @@ namespace CLX
         case eTransformOperation::All:
             return static_cast<ImGuizmo::OPERATION>(~0);
         default:
-            ASSERT_NEW(false, "Invalid transform operation.");
+            ASSERT(false, "Invalid transform operation.");
             return static_cast<ImGuizmo::OPERATION>(0);
         }
     }
@@ -2468,7 +2468,7 @@ namespace CLX
         const bool isDraggingCurrentFrame = ImGuizmo::IsUsing();
 
         TransformComponent* transformComponent = ecs.GetComponent<TransformComponent>(selectedEntityID);
-        ASSERT_NEW(transformComponent != nullptr, "Selected entity does not have a TransformComponent.");
+        ASSERT(transformComponent != nullptr, "Selected entity does not have a TransformComponent.");
 
         if (isDraggingCurrentFrame && !isDraggingPreviousFrame)
         {

@@ -1,10 +1,13 @@
 #pragma once
 #include <vector>
+#include <algorithm>
 
+#include "Engine/Utility/Assert.hpp"
 #include "Engine/Utility/Index.hpp"
 #include "Engine/Utility/Visitor.hpp"
 
 #include "Engine/Math/Transform3.hpp"
+#include "Engine/ECS/EntityID.hpp"
 #include "Engine/ECS/ECS.hpp"
 #include "Engine/ECSEngine/Components/TransformHierarchyComponent.hpp"
 #include "Engine/ECSEngine/Components/TransformComponent.hpp"
@@ -24,7 +27,7 @@ namespace CLX
     inline bool IsEntityDescendant(const ECS& ecs, const EntityID isChildID, const EntityID parentID)
     {
         const TransformHierarchyComponent* hiererchyChild = ecs.GetComponent<TransformHierarchyComponent>(isChildID);
-        ASSERT(hiererchyChild != nullptr);
+        ASSERT(hiererchyChild != nullptr, "Hierarchy component is null");
 
         if (hiererchyChild->parent == parentID)
         {
@@ -66,9 +69,9 @@ namespace CLX
             },
             [&](const Index& index)
             {
-                ASSERT(index.value <= entities.size());
-                    entities.insert(begin(entities) + index.value, entityID);
-                    },
+                ASSERT(index.value <= entities.size(), "Index is out of bounds");
+                entities.insert(begin(entities) + index.value, entityID);
+            },
             [&](const LastIndex&)
             {
                 entities.push_back(entityID);
@@ -162,7 +165,7 @@ namespace CLX
     {
         std::vector<EntityID> allChildren;
         auto* tch = ecs.GetComponent<TransformHierarchyComponent>(entityID);
-        ASSERT(tch != nullptr);
+        ASSERT(tch != nullptr, "Hierarchy component is null");
         const auto& children = tch->children;
         allChildren.insert(allChildren.end(), children.begin(), children.end());
         for (const auto& child : children)
@@ -214,7 +217,7 @@ namespace CLX
     [[nodiscard]] inline const Transform& GetEntityTransform(const ECS& ecs, const EntityID entityID)
     {
         const TransformComponent* transformComponent = ecs.GetComponent<TransformComponent>(entityID);
-        ASSERT(transformComponent != nullptr);
+        ASSERT(transformComponent != nullptr, "Transform component is null");
         return transformComponent->transform;
     }
 
@@ -233,7 +236,7 @@ namespace CLX
     [[nodiscard]] inline Transform GetEntityLocalTransform(const ECS& ecs, const EntityID entityID, const Transform& worldTransform)
     {
         const TransformHierarchyComponent* hierarchyComponent = ecs.GetComponent<TransformHierarchyComponent>(entityID);
-        ASSERT(hierarchyComponent != nullptr);
+        ASSERT(hierarchyComponent != nullptr, "Hierarchy component is null");
         if (hierarchyComponent->parent != InvalidEntityID)
         {
             return Transform::FromMatrix(ToLocalSpace(worldTransform.GetMatrix(), GetEntityWorldTransform(ecs, hierarchyComponent->parent).GetMatrix()));
@@ -245,7 +248,7 @@ namespace CLX
     inline void SetEntityTransform(ECS& ecs, const EntityID entityID, const Transform& transform)
     {
         TransformComponent* transformComponent = ecs.GetComponent<TransformComponent>(entityID);
-        ASSERT(transformComponent != nullptr);
+        ASSERT(transformComponent != nullptr, "Transform component is null");
         transformComponent->transform = transform;
     }
 
@@ -266,14 +269,14 @@ namespace CLX
     [[nodiscard]] inline const std::string& GetEntityName(const ECS& ecs, const EntityID entityID)
     {
         const NameComponent* nameComponent = ecs.GetComponent<NameComponent>(entityID);
-        ASSERT(nameComponent != nullptr);
+        ASSERT(nameComponent != nullptr, "Name component is null");
         return nameComponent->name;
     }
 
     [[nodiscard]] inline void SetEntityName(ECS& ecs, const EntityID entityID, std::string name)
     {
         NameComponent* nameComponent = ecs.GetComponent<NameComponent>(entityID);
-        ASSERT(nameComponent != nullptr);
+        ASSERT(nameComponent != nullptr, "Name component is null");
         nameComponent->name = std::move(name);
     }
 

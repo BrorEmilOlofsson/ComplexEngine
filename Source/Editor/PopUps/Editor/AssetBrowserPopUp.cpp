@@ -116,7 +116,7 @@ namespace CLX
         ECSID ecsID = ecsManager.CreateECS(ecsRegistry, entityIDGenerator);
         EntityComposition entityComposition(ECSOwningHandle(ecsManager, ecsID));
         NameComponent* nameComponent = entityComposition.GetECS().GetComponent<NameComponent>(entityComposition.GetRootEntity());
-        ASSERT(nameComponent);
+        ASSERT(nameComponent, "Invalid name component");
         nameComponent->name = std::move(name);
         return entityComposition;
     }

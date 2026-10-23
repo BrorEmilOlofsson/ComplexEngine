@@ -3,6 +3,7 @@
 #include <random>
 #include "Engine/Utility/Probability/OutcomeTable.hpp"
 #include "Engine/Utility/Bounds.hpp"
+#include "Engine/Utility/Assert.hpp"
 
 namespace CLX
 {
@@ -92,7 +93,7 @@ namespace CLX
         XorShiftState() : mState(GetRandomNumber(T{ 1 }, std::numeric_limits<T>::max())) {}
         constexpr XorShiftState(T seed) : mState(seed) 
         {
-            ASSERT(seed != 0 && "Seed must be non-zero for XorShiftState.");
+            ASSERT(seed != 0, "Seed must be non-zero for XorShiftState.");
         }
 
         constexpr T operator()()

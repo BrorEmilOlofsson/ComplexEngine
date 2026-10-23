@@ -391,7 +391,7 @@ namespace CLX
     [[nodiscard]] constexpr AABB3<T> GetBounds(const SphericalCap<T>& cap)
     {
         cap;
-        ASSERT(false && "Not implemented yet");
+        ASSERT(false, "Not implemented yet");
         return AABB3<T>();
     }
 

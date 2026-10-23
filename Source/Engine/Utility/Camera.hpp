@@ -276,7 +276,7 @@ namespace CLX
 	{
 		if (aspectRatio == 0)
 		{
-            ASSERT(false && "Aspect ratio cannot be zero");
+            ASSERT(false, "Aspect ratio cannot be zero");
 		}
         mAspectRatio = aspectRatio;
 		if (mCameraType == eCameraType::Perspective)

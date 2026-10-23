@@ -83,7 +83,7 @@ namespace CLX
 			, mUp(up)
 			, mForward(forward)
 		{
-			ASSERT(IsPure(ToMatrix()) && "The provided axes do not form a pure rotation matrix.");
+			ASSERT(IsPure(ToMatrix()), "The provided axes do not form a pure rotation matrix.");
 		}
 
 	private:
@@ -103,7 +103,7 @@ namespace CLX
 		, mUp(values[3], values[4], values[5])
 		, mForward(values[6], values[7], values[8])
 	{
-		ASSERT(IsPure(ToMatrix()) && "The provided matrix is not a pure rotation matrix.");
+		ASSERT(IsPure(ToMatrix()), "The provided matrix is not a pure rotation matrix.");
 	}
 
 	template<typename T>

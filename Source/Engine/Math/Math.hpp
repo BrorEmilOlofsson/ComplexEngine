@@ -307,7 +307,7 @@ namespace CLX
 	{
 		if (!IsNormalized(x, y))
 		{
-			ASSERT(false && "Vector is not normalized");
+			ASSERT(false, "Vector is not normalized");
 		}
 	}
 
@@ -320,7 +320,7 @@ namespace CLX
 	template<typename T>
 	constexpr void AssertNormalized(const T& x, const T& y, const T& z)
 	{
-		ASSERT(IsNormalized(x, y, z) && "Vector is not normalized");
+		ASSERT(IsNormalized(x, y, z), "Vector is not normalized");
 	}
 
 	template<bool Assert = true, typename T>
@@ -331,7 +331,7 @@ namespace CLX
 		{
 			if constexpr (Assert)
 			{
-				ASSERT(false && "Cannot normalize zero vector");
+				ASSERT(false, "Cannot normalize zero vector");
 			}
 			else
 			{
@@ -360,7 +360,7 @@ namespace CLX
 		{
 			if constexpr (Assert)
 			{
-				ASSERT(false && "Cannot normalize zero vector");
+				ASSERT(false, "Cannot normalize zero vector");
 			}
 			else
 			{
@@ -388,7 +388,7 @@ namespace CLX
 		{
 			if constexpr (Assert)
 			{
-				ASSERT(false && "Cannot normalize zero vector");
+				ASSERT(false, "Cannot normalize zero vector");
 			}
 			else
 			{
