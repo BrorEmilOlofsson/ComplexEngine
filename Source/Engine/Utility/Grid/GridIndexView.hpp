@@ -5,84 +5,44 @@
 
 namespace CLX
 {
-
-    template<std::integral T>
-    class GridIndexRowBasedIterator final
+    struct GridIndexRowBasedViewGenerator
     {
-    public:
-
-        using value_type = T;
-        using difference_type = std::ptrdiff_t;
-
-        constexpr GridIndexRowBasedIterator() = default;
-
-        constexpr GridIndexRowBasedIterator(T index)
-            : mIndex(index)
-        {}
-
-        [[nodiscard]] constexpr T operator*() const
+        template<std::integral U>
+        constexpr auto operator()(U width, U height) const
         {
-            return mIndex;
+            const auto totalSize = static_cast<U>(width * height);
+            return std::views::iota(static_cast<U>(0), totalSize);
         }
 
-        constexpr GridIndexRowBasedIterator& operator++()
+        template<std::integral U>
+        constexpr auto operator()(U size) const
         {
-            ++mIndex;
-            return *this;
+            return std::views::iota(static_cast<U>(0), size);
         }
-
-        constexpr GridIndexRowBasedIterator operator++(int)
-        {
-            GridIndexRowBasedIterator temp = *this;
-            ++(*this);
-            return temp;
-        }
-
-        [[nodiscard]] constexpr bool operator==(const GridIndexRowBasedIterator& other) const
-        {
-            return mIndex == other.mIndex;
-        }
-
-    private:
-
-        T mIndex = 0;
     };
 
-    static_assert(std::input_iterator<GridIndexRowBasedIterator<std::size_t>>, "GridIndexRowBasedIterator must satisfy the input iterator concept.");
+    inline constexpr GridIndexRowBasedViewGenerator GridIndexRowBasedView;
 
-    template<std::integral T, std::unsigned_integral U = std::size_t>
-    class GridIndexRowBasedView final : public std::ranges::view_interface<GridIndexRowBasedView<T, U>>
+    struct GridIndexRowBasedOffsetViewGenerator
     {
-    public:
-
-        constexpr GridIndexRowBasedView() = default;
-        constexpr GridIndexRowBasedView(U width, U height)
-            : mWidth(width)
-            , mHeight(height)
-        {}
-
-        constexpr GridIndexRowBasedIterator<T> begin() const
+        template<typename T, typename U, typename V, typename W>
+        constexpr auto operator()(T width, U height, V startRow, W startCol) const
         {
-            return GridIndexRowBasedIterator<T>(0);
+            using A = std::conditional_t<std::is_signed<V>::value || std::is_signed<W>::value, std::make_signed_t<std::common_type_t<T, U, V, W>>, std::common_type_t<T, U, V, W>>;
+            const auto totalSize = width * height;
+            return std::views::iota(static_cast<T>(0), totalSize)
+                | std::views::transform([=](auto index)
+                    {
+                        using Ret = std::pair<A, A>;
+                        const auto row = GetRow(index, width);
+                        const auto col = GetColumn(index, width);
+                        return Ret{ row + startRow, col + startCol };
+                    });
         }
-
-        constexpr GridIndexRowBasedIterator<T> end() const
-        {
-            return GridIndexRowBasedIterator<T>(mWidth * mHeight);
-        }
-
-    private:
-
-        U mWidth = 0;
-        U mHeight = 0;
     };
 
-    template<std::unsigned_integral U>
-    GridIndexRowBasedView(U, U) -> GridIndexRowBasedView<std::size_t, U>;
+    inline constexpr GridIndexRowBasedOffsetViewGenerator GridIndexRowBasedOffsetView;
 
-    static_assert(std::ranges::range<GridIndexRowBasedView<std::size_t>>, "GridIndexRowBasedView must satisfy the range concept.");
-    static_assert(std::ranges::view<GridIndexRowBasedView<std::size_t>>, "GridIndexRowBasedView must satisfy the view concept.");
-    
     template<std::integral T, std::unsigned_integral U = std::size_t>
     class GridIndexColumnBasedIterator final
     {
@@ -123,10 +83,10 @@ namespace CLX
             return temp;
         }
 
-        [[nodiscard]] constexpr bool operator==(const GridIndexColumnBasedIterator& other) const
-        {
-            return mRow == other.mRow && mColumn == other.mColumn && mWidth == other.mWidth && mHeight == other.mHeight;
-        }
+        [[nodiscard]] constexpr auto GetWidth() const { return mWidth; }
+        [[nodiscard]] constexpr auto GetHeight() const { return mHeight; }
+        [[nodiscard]] constexpr auto GetRow() const { return mRow; }
+        [[nodiscard]] constexpr auto GetColumn() const { return mColumn; }
 
     private:
 
@@ -135,6 +95,17 @@ namespace CLX
         U mRow = 0;
         U mColumn = 0;
     };
+
+    struct GridIndexColumnBasedViewSentinel
+    {
+    };
+
+    template<typename T, typename U>
+    [[nodiscard]] constexpr bool operator==(const GridIndexColumnBasedIterator<T, U>& other, const GridIndexColumnBasedViewSentinel&) 
+    {
+        return other.GetColumn() == other.GetWidth();
+    }
+
 
     static_assert(std::input_iterator<GridIndexColumnBasedIterator<std::size_t>>, "GridIndexColumnBasedIterator must satisfy the input iterator concept.");
 
@@ -155,9 +126,9 @@ namespace CLX
             return GridIndexColumnBasedIterator<T, U>(mWidth, mHeight, 0, 0);
         }
 
-        constexpr GridIndexColumnBasedIterator<T, U> end() const
+        constexpr GridIndexColumnBasedViewSentinel end() const
         {
-            return GridIndexColumnBasedIterator<T, U>(mWidth, mHeight, 0, mWidth);
+            return GridIndexColumnBasedViewSentinel{};
         }
 
     private:

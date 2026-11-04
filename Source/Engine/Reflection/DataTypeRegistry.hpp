@@ -70,10 +70,12 @@ namespace CLX
         nlohmann::json SaveDataJSON(DataTypeID dataTypeID, const void* dataPtr, const Blackboard& blackboard) const;
 
         void InplaceAllocateData(DataTypeID dataTypeID, void* destinationPtr, const void* defaultValuePtr = nullptr) const;
-        void CopyData(DataTypeID dataTypeID, void* destinationPtr, const void* sourcePtr) const;
+        void CopyConstructData(DataTypeID dataTypeID, void* destinationPtr, const void* sourcePtr) const;
+        void CopyAssignData(DataTypeID dataTypeID, void* destinationPtr, const void* sourcePtr) const;
+        void MoveConstructData(DataTypeID dataTypeID, void* destinationPtr, void* sourcePtr) const;
+        void MoveAssignData(DataTypeID dataTypeID, void* destinationPtr, void* sourcePtr) const;
         void SwapData(DataTypeID dataTypeID, void* dataPtr1, void* dataPtr2) const;
         void DestroyData(DataTypeID dataTypeID, void* dataPtr) const;
-        void MoveData(DataTypeID dataTypeID, void* destinationPtr, void* sourcePtr) const;
         bool EqualsData(DataTypeID dataTypeID, const void* dataPtr1, const void* dataPtr2) const;
 
         [[nodiscard]] std::any ToAny(DataTypeID dataTypeID, const void* dataPtr) const;

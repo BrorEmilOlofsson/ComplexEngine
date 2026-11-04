@@ -26,14 +26,12 @@ namespace CLX
         return row * width + column;
     }
 
-    template<std::integral T>
-    [[nodiscard]] constexpr T GetRightOffset()
+    [[nodiscard]] constexpr auto GetRightOffset()
     {
         return 1;
     }
 
-    template<std::integral T>
-    [[nodiscard]] constexpr T GetLeftOffset()
+    [[nodiscard]] constexpr auto GetLeftOffset()
     {
         return -1;
     }
@@ -55,13 +53,13 @@ namespace CLX
     template<std::integral T>
     [[nodiscard]] constexpr T GetPositionRightUnchecked(const T& position)
     {
-        return position + GetRightOffset<T>();
+        return position + GetRightOffset();
     }
 
     template<std::integral T>
     [[nodiscard]] constexpr T GetPositionLeftUnchecked(const T& position)
     {
-        return position + GetLeftOffset<T>();
+        return position + GetLeftOffset();
     }
 
     template<std::integral T, std::unsigned_integral U>

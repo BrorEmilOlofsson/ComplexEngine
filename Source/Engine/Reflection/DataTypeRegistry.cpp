@@ -172,9 +172,24 @@ namespace CLX
         mDataTypes.at(dataTypeID).inplaceConstruct(dataPtr, defaultValuePtr);
     }
 
-    void DataTypeRegistry::CopyData(DataTypeID dataTypeID, void* destination, const void* source) const
+    void DataTypeRegistry::CopyConstructData(DataTypeID dataTypeID, void* destination, const void* source) const
+    {
+        mDataTypes.at(dataTypeID).copyConstruct(destination, source);
+    }
+
+    void DataTypeRegistry::CopyAssignData(DataTypeID dataTypeID, void* destination, const void* source) const
     {
         mDataTypes.at(dataTypeID).copyAssign(destination, source);
+    }
+
+    void DataTypeRegistry::MoveConstructData(DataTypeID dataTypeID, void* destination, void* source) const
+    {
+        mDataTypes.at(dataTypeID).moveConstruct(destination, source);
+    }
+
+    void DataTypeRegistry::MoveAssignData(DataTypeID dataTypeID, void* destination, void* source) const
+    {
+        mDataTypes.at(dataTypeID).moveAssign(destination, source);
     }
 
     void DataTypeRegistry::SwapData(DataTypeID dataTypeID, void* dataPtr1, void* dataPtr2) const
@@ -185,11 +200,6 @@ namespace CLX
     void DataTypeRegistry::DestroyData(DataTypeID dataTypeID, void* dataPtr) const
     {
         mDataTypes.at(dataTypeID).destroy(dataPtr);
-    }
-
-    void DataTypeRegistry::MoveData(DataTypeID dataTypeID, void* destination, void* source) const
-    {
-        mDataTypes.at(dataTypeID).moveAssign(destination, source);
     }
 
     bool DataTypeRegistry::EqualsData(DataTypeID dataTypeID, const void* dataPtr1, const void* dataPtr2) const
