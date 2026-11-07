@@ -148,12 +148,17 @@ namespace CLX
         mBlackboard->Insert<Key_EntityIDGenerator>(mEntityIDGenerator);
         mBlackboard->Insert<Key_AudioManager>(mAudioManager);
 
-        mAssetManager->GetAssetLoader().SetSceneLoader([this](const std::filesystem::path& path)
+        mAssetManager->GetAssetLoader().SetSceneLoader([this](const std::filesystem::path& path) -> std::optional<SceneAsset>
             {
-                Scene scene(mBlackboard, mGraphicsFoundation.CreateRenderContext(Dimension2u(1080, 720)));
-                SceneLoader::LoadScene(scene, path, *mBlackboard);
+                RenderContext renderContext = mGraphicsFoundation.CreateRenderContext(Dimension2u(1080, 720));
+                std::expected<Scene, eSceneLoaderError> scene = SceneLoader::LoadScene(std::move(renderContext), path, mBlackboard);
 
-                return SceneAsset(std::move(scene), path);
+                if (scene.has_value())
+                {
+                    return  SceneAsset(std::move(scene.value()), path);
+                }
+
+                return std::nullopt;
             });
 
         ProjectSettings projectSettings = LoadProjectSettings();

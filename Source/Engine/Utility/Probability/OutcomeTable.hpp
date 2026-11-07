@@ -1,32 +1,34 @@
 #pragma once
-#include <vector>
+#include <cstdint>
+#include <unordered_map>
 #include <stdexcept>
 #include <numeric>
 #include <concepts>
+#include <ranges>
 
 namespace CLX
 {
-	template<typename ValueType, std::integral WeightType>
-	class OutcomeTable final
+	template<typename ValueType, std::unsigned_integral WeightType>
+	class BasicOutcomeTable final
 	{
-		struct Outcome
-		{
-			ValueType value = ValueType{};
-			WeightType weight = WeightType{};
-		};
 	public:
 
-		constexpr OutcomeTable() = default;
+		constexpr BasicOutcomeTable() = default;
 
 		constexpr void Insert(const ValueType& value, WeightType weight)
 		{
-			mOutcomes.push_back({ value, weight });
+			mOutcomes.push_back({ value, std::move(weight) });
 		}
 
 		constexpr void Insert(ValueType&& value, WeightType weight)
 		{
-			mOutcomes.push_back({ std::move(value), weight });
+			mOutcomes[std::move(value)] = std::move(weight);
 		}
+
+        void Erase(const ValueType& value)
+        {
+            mOutcomes.erase(value);
+        }
 
 		constexpr void Clear() noexcept
 		{
@@ -38,41 +40,50 @@ namespace CLX
 			return mOutcomes.size();
 		}
 
-		[[nodiscard]] constexpr WeightType WeightSum() const noexcept
+		[[nodiscard]] WeightType& operator[](ValueType&& value)
 		{
-			return std::accumulate(mOutcomes.begin(), mOutcomes.end(), WeightType{},
-				[](WeightType sum, const Outcome& o) {
-					return sum + o.weight;
-				}
-			);
+			return mOutcomes[std::move(value)];
 		}
 
-		[[nodiscard]] constexpr const ValueType& GetOutcome(WeightType weightIndex) const
+		[[nodiscard]] WeightType& operator[](const ValueType& value)
 		{
-			if (weightIndex < 0)
-			{
-				throw std::out_of_range("Weight index is negative.");
-			}
-			WeightType cumulativeWeight = 0;
-			for (const auto& entry : mOutcomes)
-			{
-				cumulativeWeight += entry.weight;
-				if (weightIndex < cumulativeWeight)
-				{
-					return entry.value;
-				}
-			}
-			throw std::out_of_range("Weight index exceeds total weight.");
+			return mOutcomes[value];
 		}
+
+		[[nodiscard]] const WeightType& operator[](const ValueType& value) const
+        {
+            return mOutcomes.at(value);
+        }
+
+		[[nodiscard]] constexpr auto Values() const
+		{
+			return std::views::keys(mOutcomes);
+		}
+
+		[[nodiscard]] constexpr auto Weights() const
+		{
+			return std::views::values(mOutcomes);
+		}
+
+        [[nodiscard]] constexpr const auto& Outcomes() const
+        {
+            return mOutcomes;
+        }
 
 	private:
 
-		std::vector<Outcome> mOutcomes;
+		std::unordered_map<ValueType, WeightType> mOutcomes;
 	};
 
 	template<typename ValueType>
-	using OutcomeTableUInt32 = OutcomeTable<ValueType, uint32_t>;
+	using OutcomeTableUInt32 = BasicOutcomeTable<ValueType, uint32_t>;
 
 	template<typename ValueType>
 	using OutcomeTableUInt = OutcomeTableUInt32<ValueType>;
+
+	template<typename ValueType>
+    using OutcomeTableUInt64 = BasicOutcomeTable<ValueType, uint64_t>;
+
+	template<typename ValueType>
+    using OutcomeTable = OutcomeTableUInt64<ValueType>;
 }

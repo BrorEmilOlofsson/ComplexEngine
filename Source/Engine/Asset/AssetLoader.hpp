@@ -50,7 +50,7 @@ namespace CLX
 			return mEntityCompositionLoader(path);
 		}
 
-		[[nodiscard]] SceneAsset LoadScene(const std::filesystem::path& path) const
+		[[nodiscard]] std::optional<SceneAsset> LoadScene(const std::filesystem::path& path) const
 		{
 			return mSceneLoader(path);
 		}
@@ -90,7 +90,7 @@ namespace CLX
 			mEntityCompositionLoader = std::move(loader);
 		}
 
-		void SetSceneLoader(std::function<SceneAsset(const std::filesystem::path&)> loader)
+		void SetSceneLoader(std::function<std::optional<SceneAsset>(const std::filesystem::path&)> loader)
 		{
 			mSceneLoader = std::move(loader);
         }
@@ -108,7 +108,7 @@ namespace CLX
 		std::function<PixelShaderAsset(const std::filesystem::path&)> mPixelShaderLoader;
 		std::function<VertexShaderAsset(const std::filesystem::path&)> mVertexShaderLoader;
 		std::function<EntityCompositionAsset(const std::filesystem::path&)> mEntityCompositionLoader;
-        std::function<SceneAsset(const std::filesystem::path&)> mSceneLoader;
+        std::function<std::optional<SceneAsset>(const std::filesystem::path&)> mSceneLoader;
         std::function<AudioAsset(const std::filesystem::path&)> mAudioLoader;
 	};
 }

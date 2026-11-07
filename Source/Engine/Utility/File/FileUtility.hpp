@@ -17,6 +17,16 @@ namespace CLX
 		
 	};
 
+    inline std::filesystem::path GetRelativeAssetPath(const std::filesystem::path& absolutePath)
+    {
+        return std::filesystem::relative(absolutePath, SIMPLE_DIR_ASSETS);
+    }
+
+	inline std::filesystem::path GetRelativeAssetPath()
+	{
+		return std::filesystem::path(SIMPLE_DIR_ASSETS);
+	}
+
 	inline std::filesystem::path GetAbsoluteAssetPath(const std::filesystem::path& relativePath)
 	{
         return std::filesystem::absolute(SIMPLE_DIR_ASSETS / relativePath);

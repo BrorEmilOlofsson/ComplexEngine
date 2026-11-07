@@ -276,7 +276,7 @@ namespace CLX
 	static void AddMesh(AssetManager& assetManager, MeshData<Vertex>&& meshData, const std::string_view meshName, ID3D11Device& device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)
 	{
 		Mesh mesh = Mesh(DX11Mesh(meshData, meshName, meshName, device, context));
-		assetManager.AddMesh(meshName, MeshAsset(std::move(mesh), meshName));
+		assetManager.AddMesh(meshName, MeshAsset(std::move(mesh), std::string(meshName)));
 	}
 
 	static void AddModel(AssetManager& assetManager, MeshData<Vertex>&& meshData, const std::string_view meshName, ID3D11Device& device, Microsoft::WRL::ComPtr<ID3D11DeviceContext> context)

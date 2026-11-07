@@ -332,8 +332,11 @@ namespace CLX
             }
             else if (extension == AssetExtensions::Scene)
             {
-                SceneAsset asset = mAssetLoader.LoadScene(path);
-                AddScene(path, std::move(asset));
+                std::optional<SceneAsset> asset = mAssetLoader.LoadScene(path);
+                if (asset)
+                {
+                    AddScene(path, std::move(asset.value()));
+                }
             }
             else
             {

@@ -5,12 +5,14 @@
 
 namespace CLX
 {
+
     template<typename T, typename... Args>
-    [[nodiscard]] std::pair<DataTypeID, void*> GetVariantInfoImpl(auto& variant)
+    [[nodiscard]] auto GetVariantInfoImpl(auto&& variant)
     {
+        using Ret = std::conditional_t<std::is_const<std::remove_reference_t<decltype(variant)>>::value, const void*, void*>;
         if (std::holds_alternative<T>(variant))
         {
-            return { GetDataTypeID<T>(), &std::get<T>(variant) };
+            return std::pair{ GetDataTypeID<T>(), (Ret) & std::get<T>(variant)};
         }
         else if constexpr (sizeof...(Args) > 0)
         {
@@ -18,35 +20,19 @@ namespace CLX
         }
         else
         {
-            return {};
+            ASSERT(false, "Variant type not found");
+            throw std::runtime_error("Variant type not found");
         }
     }
 
     template<typename... Args>
-    [[nodiscard]] std::pair<DataTypeID, void*> GetVariantInfo(std::variant<Args...>& variant)
+    [[nodiscard]] auto GetVariantInfo(std::variant<Args...>& variant)
     {
         return GetVariantInfoImpl<Args...>(variant);
     }
 
-    template<typename T, typename... Args>
-    [[nodiscard]] std::pair<DataTypeID, const void*> GetVariantInfoImpl(const auto& variant)
-    {
-        if (std::holds_alternative<T>(variant))
-        {
-            return { GetDataTypeID<T>(), &std::get<T>(variant) };
-        }
-        else if constexpr (sizeof...(Args) > 0)
-        {
-            return GetVariantInfoImpl<Args...>(variant);
-        }
-        else
-        {
-            return {};
-        }
-    }
-
     template<typename... Args>
-    [[nodiscard]] std::pair<DataTypeID, const void*> GetVariantInfo(const std::variant<Args...>& variant)
+    [[nodiscard]] auto GetVariantInfo(const std::variant<Args...>& variant)
     {
         return GetVariantInfoImpl<Args...>(variant);
     }

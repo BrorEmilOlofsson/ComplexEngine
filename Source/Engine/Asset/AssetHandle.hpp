@@ -34,7 +34,7 @@ namespace CLX
 
 		[[nodiscard]] constexpr const std::filesystem::path& GetRelativePath() const noexcept
 		{
-			return mAssetData.lock()->relativePath;
+			return std::get<std::filesystem::path>(mAssetData.lock()->path);
         }
 
 		[[nodiscard]] constexpr bool IsValid() const noexcept
@@ -65,10 +65,16 @@ namespace CLX
 	template<typename T>
 	[[nodiscard]] constexpr bool operator==(const AssetHandle<T>& a, const AssetHandle<T>& b) noexcept
 	{
-		if (!a.IsValid() && !b.IsValid())
+        const bool aValid = a.IsValid();
+        const bool bValid = b.IsValid();
+		if (!aValid && !bValid)
 		{
 			return true;
 		}
+        else if (!aValid || !bValid)
+        {
+            return false;
+        }
 
 		return &a.Get() == &b.Get();
 	}

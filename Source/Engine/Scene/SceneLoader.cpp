@@ -44,13 +44,16 @@ namespace CLX
 		return shouldSave;
 	}
 
-	void SceneLoader::LoadScene(Scene& scene, const std::filesystem::path& filePath, const Blackboard& blackboard)
+	std::expected<Scene, eSceneLoaderError> SceneLoader::LoadScene(RenderContext&& renderContext, const std::filesystem::path& filePath, std::weak_ptr<Blackboard> blackboardPtr)
 	{
 		PROFILER_FUNCTION(profiler::colors::TealA400);
 		const auto jsonData = FileUtility::GetDataAsJson(std::filesystem::absolute(filePath));
 
+        const Blackboard& blackboard = *blackboardPtr.lock();
+
 		if (jsonData.has_value())
 		{
+			Scene scene(blackboardPtr, std::move(renderContext));
 			const bool shouldSave = LoadSceneInternal(scene, jsonData.value(), filePath, blackboard);
 
 			if (shouldSave)
@@ -59,10 +62,12 @@ namespace CLX
 				Console::Print(ConvertFilePathToPrettyName(filePath), ConsoleTextColor::Red, false);
 				Console::Print(" has been updated due to changes in the source code", ConsoleTextColor::White, true);
 			}
+			return scene;
 		}
 		else
 		{
 			Console::Print(filePath.string() + " does not exist", ConsoleTextColor::Red);
+            return std::unexpected(eSceneLoaderError::FileNotFound);
 		}
 	}
 

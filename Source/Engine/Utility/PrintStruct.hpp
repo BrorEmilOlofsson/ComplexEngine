@@ -37,5 +37,7 @@ namespace CLX
             std::println("PrintStruct move assignment operator");
             return *this;
         }
+
+        std::string test = "fddffldskfldsfksdöfsdkjfdkjfkl";
     };
 }

@@ -16,6 +16,7 @@
 #include "Engine/ECS/ECSRegistry.hpp"
 #include "Engine/Input/InputManager.hpp"
 #include "Engine/ECS/EntitySerializationIDGenerator.hpp"
+#include "Engine/Utility/UUIDGenerator.hpp"
 
 namespace CLX
 {
@@ -76,6 +77,7 @@ namespace CLX
 		DataTypeRegistry mDataTypeRegistry;
 		std::reference_wrapper<OperatingSystem> mOperatingSystem;
 		GraphicsFoundation mGraphicsFoundation;
+        UUIDGenerator mUUIDGenerator;
         EntitySerializationIDGenerator mEntityIDGenerator;
 		ECSRegistry mECSRegistry;
 		ECSManager mECSManager;
