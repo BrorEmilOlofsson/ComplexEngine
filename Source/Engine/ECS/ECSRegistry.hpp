@@ -1,8 +1,10 @@
 #pragma once
+#include <cstdint>
 #include <unordered_map>
 #include <span>
 #include <vector>
 #include <memory>
+#include <type_traits>
 
 #include "ECSSystem.hpp"
 #include "ComponentPool.hpp"
@@ -12,6 +14,11 @@
 
 namespace CLX
 {
+	struct ECSRegisterComponentHelper
+	{
+		template<typename T>
+		inline static std::size_t ComponentPoolID{ 1 };
+	};
 
 	enum class eECSComponentTrait : uint8_t
 	{
@@ -36,7 +43,6 @@ namespace CLX
 
 	template<typename T>
 	concept IsSystem = (StaticUpdateFunctionExists<T> || StaticRenderFunctionExists<T>) && sizeof(T) == 1;
-
 
 	class ECSRegistry final
 	{
@@ -75,7 +81,7 @@ namespace CLX
 			return mComponentTypes[index - 1];
 		}
 
-		[[nodiscard]] void SetBlackboard(std::shared_ptr<Blackboard> blackboard)
+		void SetBlackboard(std::shared_ptr<Blackboard> blackboard)
 		{
 			mBlackboard = blackboard;
 		}
@@ -93,16 +99,6 @@ namespace CLX
 				componentType.addComponentFunction(ecs, entityID, nullptr);
 			}
 		}
-
-		class ECSRegistryProxy final
-		{
-		public:
-
-			ECSRegistryProxy(std::unique_ptr<ECSRegistry>& instancePtr)
-			{
-				instancePtr = std::make_unique<ECSRegistry>();
-			}
-		};
 
 	private:
 

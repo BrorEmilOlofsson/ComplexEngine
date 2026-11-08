@@ -1,4 +1,5 @@
 #pragma once
+#include <concepts>
 
 namespace CLX
 {
@@ -29,5 +30,17 @@ namespace CLX
 
 
 		};
+	};
+
+
+	template<typename T, typename... Types>
+	struct TypeListIndex
+	{
+		static constexpr std::size_t value = []() constexpr
+			{
+				std::size_t index = 0;
+				((std::same_as<T, Types> ? true : (++index, false)) || ...);
+				return index;
+			}();
 	};
 }

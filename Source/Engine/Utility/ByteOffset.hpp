@@ -17,15 +17,31 @@ namespace CLX
     }
 
     template<typename T>
+    constexpr T*& operator+=(T*& ptr, const ByteOffset offset)
+    {
+        ptr = static_cast<T*>(static_cast<char*>(ptr) + offset.value);
+        return ptr;
+    }
+
+    template<typename T>
+    constexpr const T*& operator+=(const T*& ptr, const ByteOffset offset)
+    {
+        ptr = static_cast<const T*>(static_cast<const char*>(ptr) + offset.value);
+        return ptr;
+    }
+
+    template<typename T>
     [[nodiscard]] constexpr T* operator+(T* ptr, const ByteOffset offset)
     {
-        return static_cast<T*>(static_cast<char*>(ptr) + offset.value);
+        ptr += offset;
+        return ptr;
     }
 
     template<typename T>
     [[nodiscard]] constexpr const T* operator+(const T* ptr, const ByteOffset offset)
     {
-        return static_cast<const T*>(static_cast<const char*>(ptr) + offset.value);
+        ptr += offset;
+        return ptr;
     }
 
     constexpr ByteOffset operator+=(ByteOffset& offset1, const ByteOffset offset2)

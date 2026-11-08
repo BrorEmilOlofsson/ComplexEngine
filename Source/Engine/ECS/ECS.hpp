@@ -90,12 +90,6 @@ namespace CLX
         return result;
     }
 
-    struct ECSRegisterComponentHelper
-    {
-        template<typename T>
-        inline static std::size_t ComponentPoolID{ 1 };
-    };
-
     class EntityIDConverter final
     {
     public:

@@ -1,0 +1,348 @@
+#pragma once
+#include <type_traits>
+#include <vector>
+#include <concepts>
+#include <tuple>
+#include <utility>
+#include <bitset>
+#include <map>
+#include <queue>
+
+#include "Engine/ECS/ECSRegistryNew.hpp"
+#include "Engine/ECS/EntityID.hpp"
+#include "Engine/ECS/EntitySerializationIDGenerator.hpp"
+#include "Engine/ECS/ComponentPool.hpp"
+#include "Engine/Utility/TypeList.hpp"
+#include "Engine/Utility/DynamicBitset.hpp"
+
+
+namespace CLX
+{
+
+    using ComponentMaskNew = DynamicBitset;
+
+    struct MultiComponentSentinel final
+    {
+
+    };
+
+    template<typename... Types>
+    class MultiComponentIterator final
+    {
+    public:
+
+        static constexpr std::size_t TypeCount = sizeof...(Types);
+        static_assert(TypeCount > 0, "MultiComponentIterator requires at least one type");
+        static_assert((std::same_as<Types, std::remove_reference_t<Types>> && ...), "MultiComponentIterator requires non-reference types");
+
+        using ValueType = std::tuple<std::add_lvalue_reference_t<Types>...>;
+        using PrimaryType = std::tuple_element_t<0, std::tuple<Types...>>;
+
+        MultiComponentIterator() = default;
+
+        MultiComponentIterator(std::vector<ComponentPoolSBO>* componentPools, size_t primaryIndex, std::array<size_t, TypeCount> componentIndices)
+            : mComponentPools(componentPools)
+            , mPrimaryIndex(primaryIndex)
+            , mComponentIndices(componentIndices)
+            , mIterator(GetPrimaryComponentPool().Iterate<PrimaryType>().begin())
+            , mEntityIDs(GetPrimaryComponentPool().GetEntityIDs())
+        {}
+
+        MultiComponentIterator& operator++()
+        {
+            ++mIterator;
+            return *this;
+        }
+
+        [[nodiscard]] ValueType operator*() const
+        {
+            EntityID entityID = GetCurrentEntityID();
+            return ValueType
+            (
+                (*reinterpret_cast<Types*>(GetComponentPtrFromPool((*mComponentPools)[GetComponentIndex<Types>()], entityID)))...
+            );
+        }
+
+        [[nodiscard]] constexpr bool operator==(const MultiComponentIterator& other) const
+        {
+            return mIterator == other.mIterator;
+        }
+
+        [[nodiscard]] constexpr bool operator==(const MultiComponentSentinel&) const
+        {
+            return mIterator == typename ComponentPoolSBO::ComponentSentinel{};
+        }
+
+        //template<typename T>
+        //T* GetPtr()
+        //{
+        //    constexpr std::size_t typeIndex = TypeListIndex<T, Types...>::value;
+        //    auto& componentPools = *mComponentPools;
+        //    return 
+        //}
+
+        ComponentPoolSBO& GetPrimaryComponentPool()
+        {
+            return (*mComponentPools)[mPrimaryIndex];
+        }
+
+        static void* GetComponentPtrFromPool(ComponentPoolSBO& pool, EntityID entityID)
+        {
+            return pool.GetComponent(entityID);
+        }
+
+        EntityID GetCurrentEntityID() const
+        {
+            return mEntityIDs[mIterator.GetIndex()];
+        }
+
+        template<typename T>
+        [[nodiscard]] size_t GetComponentIndex() const
+        {
+            return mComponentIndices[TypeListIndex<T, Types...>::value];
+        }
+
+    private:
+
+        std::vector<ComponentPoolSBO>* mComponentPools;
+        size_t mPrimaryIndex = 0;
+        std::array<size_t, TypeCount> mComponentIndices{};
+        std::span<const EntityID> mEntityIDs;
+        typename ComponentPoolSBO::ComponentIterator<PrimaryType> mIterator;
+    };
+
+    template<typename... Types>
+    class MultiComponentView final
+    {
+    public:
+
+        MultiComponentView() = delete;
+        MultiComponentView(std::vector<ComponentPoolSBO>* componentPools, std::array<size_t, sizeof...(Types)> componentIndices)
+            : mComponentPools(componentPools), mPrimaryIndex(componentIndices[0]), mComponentIndices(componentIndices)
+        {}
+
+        [[nodiscard]] MultiComponentIterator<Types...> begin()
+        {
+            return  MultiComponentIterator<Types...>(mComponentPools, mPrimaryIndex, mComponentIndices);
+        }
+
+        [[nodiscard]] MultiComponentSentinel end()
+        {
+            return MultiComponentSentinel{};
+        }
+
+    private:
+
+        std::vector<ComponentPoolSBO>* mComponentPools;
+        size_t mPrimaryIndex;
+        std::array<size_t, sizeof...(Types)> mComponentIndices;
+    };
+
+    class ECSArchetypeSentinel final {};
+
+    template<typename... Types>
+    class ECSArchetypeIterator final
+    {
+    public:
+
+        using ValueType = std::tuple<std::add_lvalue_reference_t<Types>...>;
+
+        ECSArchetypeIterator() = delete;
+        ECSArchetypeIterator(std::vector<MultiComponentView<Types...>>& multiComponentIteratorViews)
+            : mMultiComponentIteratorViews(multiComponentIteratorViews)
+            , mCurrentIndex(0)
+            , mCurrentIterator(mMultiComponentIteratorViews.empty() ? MultiComponentIterator<Types...>() : mMultiComponentIteratorViews[mCurrentIndex].begin())
+        {}
+
+
+        [[nodiscard]] constexpr ValueType operator*()
+        {
+            return *mCurrentIterator;
+        }
+
+        ECSArchetypeIterator& operator++()
+        {
+            auto& currentView = mMultiComponentIteratorViews[mCurrentIndex];
+            ++mCurrentIterator;
+            if (mCurrentIterator == currentView.end())
+            {
+                mCurrentIndex++;
+                if (mCurrentIndex < mMultiComponentIteratorViews.size())
+                {
+                    mCurrentIterator = mMultiComponentIteratorViews[mCurrentIndex].begin();
+                }
+            }
+            return *this;
+        }
+
+        [[nodiscard]] constexpr bool operator==(const ECSArchetypeIterator& other) const
+        {
+            return mCurrentIndex == other.mCurrentIndex;
+        }
+
+        [[nodiscard]] constexpr bool operator==(const ECSArchetypeSentinel&) const
+        {
+            return mCurrentIndex == mMultiComponentIteratorViews.size();
+        }
+
+    private:
+
+        std::span<MultiComponentView<Types...>> mMultiComponentIteratorViews;
+        size_t mCurrentIndex = 0;
+        MultiComponentIterator<Types...> mCurrentIterator;
+    };
+
+    template<typename... Types>
+    class ECSArchetypeView final
+    {
+    public:
+
+        ECSArchetypeView() = delete;
+        ECSArchetypeView(std::vector<MultiComponentView<Types...>>&& multiComponentIteratorViews)
+            : mMultiComponentIteratorViews(std::move(multiComponentIteratorViews))
+        {}
+
+
+        ECSArchetypeIterator<Types...> begin()
+        {
+            return ECSArchetypeIterator<Types...>(mMultiComponentIteratorViews);
+        }
+
+        ECSArchetypeSentinel end()
+        {
+            return ECSArchetypeSentinel{};
+        }
+
+    private:
+
+        std::vector<MultiComponentView<Types...>> mMultiComponentIteratorViews;
+    };
+
+    class ECSNew final
+    {
+    public:
+
+        ECSNew() = delete;
+        explicit ECSNew(const ECSRegistryNew& ecsRegistry, EntitySerializationIDGenerator& entityIDGenerator);
+
+        EntityID CreateEntity();
+        EntityID CreateEntity(EntitySerializationID serializationID);
+
+        // Adds or replaces a component of type T to the specified entity. If the entity already has a component of type T, it will be replaced with the new component.
+        template<typename T>
+        T& AddComponent(EntityID entityID, T&& component);
+
+        template<typename... Types> requires (sizeof...(Types) > 0)
+            [[nodiscard]] ECSArchetypeView<Types...> ForEach();
+
+        struct EntityData
+        {
+            ComponentMaskNew mask = {};
+            EntitySerializationID serializationID = InvalidID<EntitySerializationID>();
+            uint32_t generation = 0;
+            bool isActive = true;
+        };
+
+        const EntityData& GetEntityData(const EntityID entityID) const
+        {
+            return mEntityData[entityID.id];
+        }
+
+    private:
+
+        std::reference_wrapper<const ECSRegistryNew> mRegistry;
+        std::reference_wrapper<EntitySerializationIDGenerator> mEntityIDGenerator;
+        std::map<DynamicBitset, std::vector<ComponentPoolSBO>> mComponentPools;
+        std::queue<uint32_t> mFreeEntityIDs;
+        std::vector<EntityData> mEntityData;
+    };
+
+    template<typename T>
+    T& ECSNew::AddComponent(EntityID entityID, T&& component)
+    {
+        EntityData& entityData = mEntityData[entityID.id];
+        ComponentMaskNew& mask = entityData.mask;
+        const size_t componentTypeIndex = mRegistry.get().GetComponentTypeIndex(typeid(T));
+        //bool isSet = mask[componentTypeIndex];
+        //if (isSet)
+        //{
+            T& existingComponent = *mComponentPools[mask][componentTypeIndex].GetComponent<T>(entityID);
+            existingComponent = std::forward<T>(component);
+            return existingComponent;
+        //}
+    }
+
+    template<typename... Types> requires (sizeof...(Types) > 0)
+        ECSArchetypeView<Types...> ECSNew::ForEach()
+    {
+        const DynamicBitset mask = mRegistry.get().CreateComponentMaskFromTypeList<Types...>();
+        std::vector<MultiComponentView<Types...>> multiComponentViews;
+        for (auto& [existingMask, componentPools] : mComponentPools)
+        {
+            if ((existingMask & mask) == mask)
+            {
+                constexpr size_t typeCount = sizeof...(Types);
+                std::array<size_t, typeCount> componentIndices{};
+                (componentIndices[TypeListIndex<Types, Types...>::value], ...) = 2;
+                multiComponentViews.emplace_back(&componentPools, componentIndices);
+            }
+        }
+        return ECSArchetypeView<Types...>(std::move(multiComponentViews));
+    }
+
+    template<typename T>
+    void ECSRegistryNew::RegisterComponentType(const eECSComponentTraitNew traits)
+    {
+        [[maybe_unused]] const bool hasBeenRegistered = mComponentTypeToIDMap.contains(std::type_index(typeid(T)));
+        ASSERT(!hasBeenRegistered, "Component type has already been registered");
+
+        ECSComponentTypeNew componentType;
+
+        componentType.traits = traits;
+
+        componentType.createComponentPoolFunction = []() -> ComponentPoolSBO
+            {
+                return ComponentPoolSBO::Create<T>();
+            };
+
+        componentType.copyComponentFunction = [](void* destinationPtr, const void* sourcePtr)
+            {
+                T& destination = *reinterpret_cast<T*>(destinationPtr);
+                const T& source = *reinterpret_cast<const T*>(sourcePtr);
+                destination = source;
+            };
+
+        //componentType.addComponentFunction = [](ECS& ecs, const EntityID entityID, const void* defaultValuePtr) -> void*
+        //    {
+        //        if (defaultValuePtr != nullptr)
+        //        {
+        //            const T& defaultValue = *reinterpret_cast<const T*>(defaultValuePtr);
+        //            T& component = ecs.AddComponent<T>(entityID, defaultValue);
+        //            return &component;
+        //        }
+        //        else
+        //        {
+        //            T& component = ecs.AddComponent<T>(entityID);
+        //            return &component;
+        //        }
+        //    };
+
+        //componentType.removeComponentFunction = [](ECSNew& ecs, const EntityID entityID)
+        //    {
+        //        ecs.RemoveComponent<T>(entityID);
+        //    };
+
+        mComponentTypes.push_back(componentType);
+
+        mComponentTypeToIDMap.emplace(std::type_index(typeid(T)), mCurrentID);
+
+        ECSRegisterComponentHelperNew::ComponentPoolID<T> = mCurrentID;
+        mCurrentID++;
+
+        if (HasFlag(traits, eECSComponentTraitNew::Default))
+        {
+            mDefaultComponentTypeIndices.push_back(std::type_index(typeid(T)));
+        }
+    }
+
+}

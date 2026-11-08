@@ -97,13 +97,8 @@ TEST_CASE("GetRandomValue (std::vector<int>, filtered)")
 
     std::vector<int> vec = { 1, 2, 3, 4, 5 };
 
-    std::vector<uint32_t> counts(5, 0);
-    for (int i = 0; i < 1000000; ++i)
-    {
-        const int result = GetRandomValue(vec, IsOdd{}, engine);
-        counts[result - 1]++;
-        //REQUIRE((result == 2 || result == 4));
-    }
+    const int result = GetRandomValue(vec, IsEven{}, engine);
+    REQUIRE((result == 2 || result == 4));
 }
 
 TEST_CASE("GetRandomValue (std::vector<int>, WeightRange)")

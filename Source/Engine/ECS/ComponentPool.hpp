@@ -1,444 +1,604 @@
 #pragma once
+#include <cstdint>
 #include <vector>
 #include <memory>
 #include <array>
+#include <cstddef>
+#include <typeindex>
+#include <typeinfo>
+#include <type_traits>
 #include "EntityID.hpp"
+#include "Engine/Utility/ByteOffset.hpp"
+#include "Engine/Utility/Assert.hpp"
 
 namespace CLX
 {
 
 
-	class ComponentPool final
-	{
-	public:
-
-		template<typename T>
-		constexpr ComponentPool(std::type_identity<T>)
-			: mConcept(std::make_unique<ComponentPoolModel<T>>())
-			, mTypeInfo(&typeid(T))
-		{
-		}
-
-		ComponentPool(const ComponentPool& other)
-			: mConcept(other.mConcept->Clone())
-			, mTypeInfo(other.mTypeInfo)
-		{
-		}
-
-		ComponentPool& operator=(const ComponentPool& other)
-		{
-			other.mConcept->Clone().swap(mConcept);
-			mTypeInfo = other.mTypeInfo;
-			return *this;
-		}
-
-		template<typename T>
-		T& AddComponent(const EntityID entityID, const T& defaultValue)
-		{
-			void* componentPtr = mConcept->AddComponent(entityID, &defaultValue);
-			return *reinterpret_cast<T*>(componentPtr);
-		}
-
-		template<typename T>
-		[[nodiscard]] T* GetComponent(const EntityID entityID)
-		{
-			void* componentPtr = mConcept->GetComponent(entityID);
-			return reinterpret_cast<T*>(componentPtr);
-		}
-
-		template<typename T>
-		[[nodiscard]] const T* GetComponent(const EntityID entityID) const
-		{
-			const void* component = mConcept->GetComponent(entityID);
-			return reinterpret_cast<const T*>(component);
-		}
-
-		[[nodiscard]] void* GetComponent(const EntityID entityID)
-		{
-			return mConcept->GetComponent(entityID);
-		}
-
-		[[nodiscard]] const void* GetComponent(const EntityID entityID) const
-		{
-			return mConcept->GetComponent(entityID);
-		}
-
-		[[nodiscard]] bool HasComponent(const EntityID entityID) const
-		{
-			return GetComponent(entityID) != nullptr;
-		}
-
-		void RemoveComponent(const EntityID entityID)
-		{
-			mConcept->RemoveComponent(entityID);
-		}
-
-		[[nodiscard]] std::size_t GetComponentCount() const
-		{
-			return mConcept->GetComponentCount();
-		}
-
-		void ResizeComponentIndices(const std::size_t size)
-		{
-			mConcept->ResizeComponentIndices(size);
-		}
-
-		[[nodiscard]] const std::type_info& GetTypeInfo() const
-		{
-			return *mTypeInfo;
-		}
-
-	private:
-
-		class ComponentPoolConcept
-		{
-		public:
-
-			ComponentPoolConcept() = default;
-			virtual ~ComponentPoolConcept() = default;
-
-			virtual void* AddComponent(EntityID entityID, const void* defaultValuePtr) = 0;
-			[[nodiscard]] virtual void* GetComponent(EntityID entityID) = 0;
-			[[nodiscard]] virtual const void* GetComponent(EntityID entityID) const = 0;
-			virtual void RemoveComponent(const EntityID entityID) = 0;
-			[[nodiscard]] virtual std::size_t GetComponentCount() const = 0;
-			virtual void ResizeComponentIndices(const std::size_t size) = 0;
-
-			virtual std::unique_ptr<ComponentPoolConcept> Clone() const = 0;
-		};
-
-
-		template<typename T>
-		class ComponentPoolModel final : public ComponentPoolConcept
-		{
-			static constexpr unsigned int InvalidComponentIndex = std::numeric_limits<unsigned int>::max();
-		public:
-
-			ComponentPoolModel() = default;
-
-			void* AddComponent(const EntityID entityID, const void* defaultValuePtr) override
-			{
-				const T& defaultValue = *reinterpret_cast<const T*>(defaultValuePtr);
-				const unsigned int previousComponentIndex = mEntityIDToComponentIndex[entityID.id];
-				if (previousComponentIndex != InvalidComponentIndex)
-				{
-					mComponents[previousComponentIndex] = defaultValue;
-					return &mComponents[previousComponentIndex];
-				}
-
-				const unsigned int componentIndex = static_cast<unsigned int>(mComponents.size());
-				mEntityIDToComponentIndex[entityID.id] = componentIndex;
-				mComponents.push_back(defaultValue);
-				mComponentIndexToEntityID[componentIndex] = entityID;
-				return &mComponents.back();
-			}
-
-			[[nodiscard]] void* GetComponent(const EntityID entityID) override
-			{
-				const unsigned int componentIndex = mEntityIDToComponentIndex[entityID.id];
-				if (componentIndex == InvalidComponentIndex)
-				{
-					return nullptr;
-				}
-				return &mComponents[componentIndex];
-			}
-
-			[[nodiscard]] const void* GetComponent(const EntityID entityID) const override
-			{
-				const unsigned int componentIndex = mEntityIDToComponentIndex[entityID.id];
-				if (componentIndex == InvalidComponentIndex)
-				{
-					return nullptr;
-				}
-				return &mComponents[componentIndex];
-			}
-
-			void RemoveComponent(const EntityID entityID) override
-			{
-				const unsigned int componentIndex = mEntityIDToComponentIndex[entityID.id];
-				const std::size_t lastIndex = mComponents.size() - 1;
-				mComponents[componentIndex] = std::move(mComponents[lastIndex]);
-				mComponents.pop_back();
-				const EntityID lastIndexEntityID = mComponentIndexToEntityID[lastIndex];
-				mEntityIDToComponentIndex[lastIndexEntityID.id] = componentIndex;
-				mEntityIDToComponentIndex[entityID.id] = InvalidComponentIndex;
-				mComponentIndexToEntityID[componentIndex] = lastIndexEntityID;
-			}
-
-			std::size_t GetComponentCount() const override
-			{
-				return mComponents.size();
-			}
-
-			void ResizeComponentIndices(const std::size_t size) override
-			{
-				mEntityIDToComponentIndex.resize(size, InvalidComponentIndex);
-				mComponentIndexToEntityID.resize(size);
-			}
-
-			std::unique_ptr<ComponentPoolConcept> Clone() const override
-			{
-				return std::make_unique<ComponentPoolModel<T>>(*this);
-			}
-
-		private:
-
-			std::vector<T> mComponents;
-			std::vector<unsigned int> mEntityIDToComponentIndex;
-			std::vector<EntityID> mComponentIndexToEntityID;
-		};
-
-	private:
-
-		std::unique_ptr<ComponentPoolConcept> mConcept;
-		const std::type_info* mTypeInfo = nullptr;
-	};
-
-	class ComponentPoolSBO final
-	{
-	public:
-
-		template<typename T>
-		constexpr explicit ComponentPoolSBO(std::type_identity<T>)
-			: mType(std::type_index(typeid(T)))
-		{
-			using M = Model<T>;
-			static_assert(sizeof(M) == BufferSize);
-			static_assert(alignof(M) <= BufferAlignment);
-			::new (GetConcept()) M();
-		}
-
-		~ComponentPoolSBO()
-		{
-			GetConcept()->~Concept();
-		}
-
-		ComponentPoolSBO(const ComponentPoolSBO& other)
-			: mType(other.mType)
-		{
-			other.GetConcept()->Clone(GetConcept());
-		}
-
-		ComponentPoolSBO& operator=(const ComponentPoolSBO& other)
-		{
-			ComponentPoolSBO temp(other);
-			mBuffer.swap(temp.mBuffer);
-			mType = other.mType;
-			return *this;
-		}
-
-		ComponentPoolSBO(ComponentPoolSBO&& other) noexcept
-			: mType(other.mType)
-		{
-			other.GetConcept()->Move(GetConcept());
-		}
-
-		ComponentPoolSBO& operator=(ComponentPoolSBO&& other) noexcept
-		{
-			ComponentPoolSBO temp(std::move(other));
-			mBuffer.swap(temp.mBuffer);
-			mType = other.mType;
-
-			return *this;
-		}
-
-
-		template<typename T>
-		T& AddComponent(const EntityID entityID, const T* defaultValuePtr)
-		{
-			void* componentPtr = GetConcept()->AddComponent(entityID, defaultValuePtr);
-			return *reinterpret_cast<T*>(componentPtr);
-		}
-
-		template<typename T>
-		[[nodiscard]] T* GetComponent(const EntityID entityID)
-		{
-			void* componentPtr = GetConcept()->GetComponent(entityID);
-			return reinterpret_cast<T*>(componentPtr);
-		}
-
-		template<typename T>
-		[[nodiscard]] const T* GetComponent(const EntityID entityID) const
-		{
-			const void* componentPtr = GetConcept()->GetComponent(entityID);
-			return reinterpret_cast<const T*>(componentPtr);
-		}
-
-		[[nodiscard]] void* GetComponent(const EntityID entityID)
-		{
-			return GetConcept()->GetComponent(entityID);
-		}
-
-		[[nodiscard]] const void* GetComponent(const EntityID entityID) const
-		{
-			return GetConcept()->GetComponent(entityID);
-		}
-
-		[[nodiscard]] bool HasComponent(const EntityID entityID) const
-		{
-			return GetComponent(entityID) != nullptr;
-		}
-
-		void RemoveComponent(const EntityID entityID)
-		{
-			GetConcept()->RemoveComponent(entityID);
-		}
-
-		[[nodiscard]] std::size_t GetComponentCount() const
-		{
-			return GetConcept()->GetComponentCount();
-		}
-
-		void ResizeComponentIndices(const std::size_t size)
-		{
-			GetConcept()->ResizeComponentIndices(size);
-		}
-
-		[[nodiscard]] std::type_index GetType() const
-		{
-			return mType;
-		}
-
-	private:
-
-		class Concept
-		{
-		public:
-
-			Concept() = default;
-			virtual ~Concept() = default;
-
-			virtual void* AddComponent(EntityID entityID, const void* defaultValuePtr) = 0;
-			[[nodiscard]] virtual void* GetComponent(EntityID entityID) = 0;
-			[[nodiscard]] virtual const void* GetComponent(EntityID entityID) const = 0;
-			virtual void RemoveComponent(const EntityID entityID) = 0;
-			[[nodiscard]] virtual std::size_t GetComponentCount() const = 0;
-			virtual void ResizeComponentIndices(const std::size_t size) = 0;
-
-			virtual void Clone(Concept* memory) const = 0;
-			virtual void Move(Concept* memory) = 0;
-		};
-
-		template<typename T>
-		class Model final : public Concept
-		{
-			static constexpr uint32_t InvalidComponentIndex = std::numeric_limits<uint32_t>::max();
-		public:
-
-			Model() = default;
-
-			void* AddComponent(const EntityID entityID, const void* defaultValuePtr) override
-			{
-				const uint32_t previousComponentIndex = mEntityIDToComponentIndex[entityID.id];
-				if (previousComponentIndex != InvalidComponentIndex)
-				{
-					if (defaultValuePtr)
-					{
-						mComponents[previousComponentIndex] = *reinterpret_cast<const T*>(defaultValuePtr);
-					}
-					else
-					{
-						mComponents[previousComponentIndex] = T{};
-					}
-					return &mComponents[previousComponentIndex];
-				}
-
-				const uint32_t componentIndex = static_cast<uint32_t>(mComponents.size());
-				mEntityIDToComponentIndex[entityID.id] = componentIndex;
-
-				if (defaultValuePtr)
-				{
-					mComponents.emplace_back(*reinterpret_cast<const T*>(defaultValuePtr));
-				}
-				else
-				{
-					mComponents.emplace_back();
-				}
-
-				mComponentIndexToEntityID[componentIndex] = entityID;
-				return &mComponents.back();
-			}
-
-			[[nodiscard]] void* GetComponent(const EntityID entityID) override
-			{
-				const uint32_t componentIndex = mEntityIDToComponentIndex[entityID.id];
-				if (componentIndex == InvalidComponentIndex)
-				{
-					return nullptr;
-				}
-				return &mComponents[componentIndex];
-			}
-
-			[[nodiscard]] const void* GetComponent(const EntityID entityID) const override
-			{
-				const uint32_t componentIndex = mEntityIDToComponentIndex[entityID.id];
-				if (componentIndex == InvalidComponentIndex)
-				{
-					return nullptr;
-				}
-				return &mComponents[componentIndex];
-			}
-
-			void RemoveComponent(const EntityID entityID) override
-			{
-				const uint32_t componentIndex = mEntityIDToComponentIndex[entityID.id];
-				const std::size_t lastIndex = mComponents.size() - 1;
-				mComponents[componentIndex] = std::move(mComponents[lastIndex]);
-				mComponents.pop_back();
-				const EntityID lastIndexEntityID = mComponentIndexToEntityID[lastIndex];
-				mEntityIDToComponentIndex[lastIndexEntityID.id] = componentIndex;
-				mEntityIDToComponentIndex[entityID.id] = InvalidComponentIndex;
-				mComponentIndexToEntityID[componentIndex] = lastIndexEntityID;
-			}
-
-			std::size_t GetComponentCount() const override
-			{
-				return mComponents.size();
-			}
-
-			void ResizeComponentIndices(const std::size_t size) override
-			{
-				mEntityIDToComponentIndex.resize(size, InvalidComponentIndex);
-				mComponentIndexToEntityID.resize(size);
-			}
-
-			void Clone(Concept* memory) const override
-			{
-				::new(memory) Model(*this);
-			}
-
-			// Should not be const?
-			void Move(Concept* memory) override
-			{
-				::new(memory) Model(std::move(*this));
-			}
-
-		private:
-
-			std::vector<T> mComponents;
-			std::vector<uint32_t> mEntityIDToComponentIndex;
-			std::vector<EntityID> mComponentIndexToEntityID;
-		};
-
-	private:
-
-		[[nodiscard]] Concept* GetConcept()
-		{
-			return reinterpret_cast<Concept*>(mBuffer.data());
-		}
-
-		[[nodiscard]] const Concept* GetConcept() const
-		{
-			return reinterpret_cast<const Concept*>(mBuffer.data());
-		}
-
-
-	private:
-
-		static constexpr std::size_t BufferSize = sizeof(Model<std::byte>);
-		static constexpr std::size_t BufferAlignment = 16;
-
-		alignas(BufferAlignment) std::array<std::byte, BufferSize> mBuffer = {};
-		std::type_index mType;
-	};
+    class ComponentPool final
+    {
+    public:
+
+        template<typename T>
+        constexpr ComponentPool(std::type_identity<T>)
+            : mConcept(std::make_unique<ComponentPoolModel<T>>())
+            , mTypeInfo(&typeid(T))
+        {}
+
+        ComponentPool(const ComponentPool& other)
+            : mConcept(other.mConcept->Clone())
+            , mTypeInfo(other.mTypeInfo)
+        {}
+
+        ComponentPool& operator=(const ComponentPool& other)
+        {
+            other.mConcept->Clone().swap(mConcept);
+            mTypeInfo = other.mTypeInfo;
+            return *this;
+        }
+
+        template<typename T>
+        T& AddComponent(const EntityID entityID, const T& defaultValue)
+        {
+            void* componentPtr = mConcept->AddComponent(entityID, &defaultValue);
+            return *reinterpret_cast<T*>(componentPtr);
+        }
+
+        template<typename T>
+        [[nodiscard]] T* GetComponent(const EntityID entityID)
+        {
+            void* componentPtr = mConcept->GetComponent(entityID);
+            return reinterpret_cast<T*>(componentPtr);
+        }
+
+        template<typename T>
+        [[nodiscard]] const T* GetComponent(const EntityID entityID) const
+        {
+            const void* component = mConcept->GetComponent(entityID);
+            return reinterpret_cast<const T*>(component);
+        }
+
+        [[nodiscard]] void* GetComponent(const EntityID entityID)
+        {
+            return mConcept->GetComponent(entityID);
+        }
+
+        [[nodiscard]] const void* GetComponent(const EntityID entityID) const
+        {
+            return mConcept->GetComponent(entityID);
+        }
+
+        [[nodiscard]] bool HasComponent(const EntityID entityID) const
+        {
+            return GetComponent(entityID) != nullptr;
+        }
+
+        void RemoveComponent(const EntityID entityID)
+        {
+            mConcept->RemoveComponent(entityID);
+        }
+
+        [[nodiscard]] std::size_t GetComponentCount() const
+        {
+            return mConcept->GetComponentCount();
+        }
+
+        void ResizeComponentIndices(const std::size_t size)
+        {
+            mConcept->ResizeComponentIndices(size);
+        }
+
+        [[nodiscard]] const std::type_info& GetTypeInfo() const
+        {
+            return *mTypeInfo;
+        }
+
+    private:
+
+        class ComponentPoolConcept
+        {
+        public:
+
+            ComponentPoolConcept() = default;
+            virtual ~ComponentPoolConcept() = default;
+
+            virtual void* AddComponent(EntityID entityID, const void* defaultValuePtr) = 0;
+            [[nodiscard]] virtual void* GetComponent(EntityID entityID) = 0;
+            [[nodiscard]] virtual const void* GetComponent(EntityID entityID) const = 0;
+            virtual void RemoveComponent(const EntityID entityID) = 0;
+            [[nodiscard]] virtual std::size_t GetComponentCount() const = 0;
+            virtual void ResizeComponentIndices(const std::size_t size) = 0;
+
+            virtual std::unique_ptr<ComponentPoolConcept> Clone() const = 0;
+        };
+
+
+        template<typename T>
+        class ComponentPoolModel final : public ComponentPoolConcept
+        {
+            static constexpr unsigned int InvalidComponentIndex = std::numeric_limits<unsigned int>::max();
+        public:
+
+            ComponentPoolModel() = default;
+
+            void* AddComponent(const EntityID entityID, const void* defaultValuePtr) override
+            {
+                const T& defaultValue = *reinterpret_cast<const T*>(defaultValuePtr);
+                const unsigned int previousComponentIndex = mEntityIDToComponentIndex[entityID.id];
+                if (previousComponentIndex != InvalidComponentIndex)
+                {
+                    mComponents[previousComponentIndex] = defaultValue;
+                    return &mComponents[previousComponentIndex];
+                }
+
+                const unsigned int componentIndex = static_cast<unsigned int>(mComponents.size());
+                mEntityIDToComponentIndex[entityID.id] = componentIndex;
+                mComponents.push_back(defaultValue);
+                mComponentIndexToEntityID[componentIndex] = entityID;
+                return &mComponents.back();
+            }
+
+            [[nodiscard]] void* GetComponent(const EntityID entityID) override
+            {
+                const unsigned int componentIndex = mEntityIDToComponentIndex[entityID.id];
+                if (componentIndex == InvalidComponentIndex)
+                {
+                    return nullptr;
+                }
+                return &mComponents[componentIndex];
+            }
+
+            [[nodiscard]] const void* GetComponent(const EntityID entityID) const override
+            {
+                const unsigned int componentIndex = mEntityIDToComponentIndex[entityID.id];
+                if (componentIndex == InvalidComponentIndex)
+                {
+                    return nullptr;
+                }
+                return &mComponents[componentIndex];
+            }
+
+            void RemoveComponent(const EntityID entityID) override
+            {
+                const unsigned int componentIndex = mEntityIDToComponentIndex[entityID.id];
+                const std::size_t lastIndex = mComponents.size() - 1;
+                mComponents[componentIndex] = std::move(mComponents[lastIndex]);
+                mComponents.pop_back();
+                const EntityID lastIndexEntityID = mComponentIndexToEntityID[lastIndex];
+                mEntityIDToComponentIndex[lastIndexEntityID.id] = componentIndex;
+                mEntityIDToComponentIndex[entityID.id] = InvalidComponentIndex;
+                mComponentIndexToEntityID[componentIndex] = lastIndexEntityID;
+            }
+
+            std::size_t GetComponentCount() const override
+            {
+                return mComponents.size();
+            }
+
+            void ResizeComponentIndices(const std::size_t size) override
+            {
+                mEntityIDToComponentIndex.resize(size, InvalidComponentIndex);
+                mComponentIndexToEntityID.resize(size);
+            }
+
+            std::unique_ptr<ComponentPoolConcept> Clone() const override
+            {
+                return std::make_unique<ComponentPoolModel<T>>(*this);
+            }
+
+        private:
+
+            std::vector<T> mComponents;
+            std::vector<unsigned int> mEntityIDToComponentIndex;
+            std::vector<EntityID> mComponentIndexToEntityID;
+        };
+
+    private:
+
+        std::unique_ptr<ComponentPoolConcept> mConcept;
+        const std::type_info* mTypeInfo = nullptr;
+    };
+
+    class ComponentPoolSBO final
+    {
+    public:
+
+        template<typename T>
+        constexpr explicit ComponentPoolSBO(std::type_identity<T>)
+            : mType(std::type_index(typeid(T)))
+        {
+            using M = Model<T>;
+            static_assert(sizeof(M) == BufferSize);
+            static_assert(alignof(M) <= BufferAlignment);
+            ::new (GetConcept()) M();
+        }
+
+        template<typename T>
+        [[nodiscard]] static ComponentPoolSBO Create()
+        {
+            return ComponentPoolSBO(std::type_identity<T>{});
+        }
+
+        ~ComponentPoolSBO()
+        {
+            GetConcept()->~Concept();
+        }
+
+        ComponentPoolSBO(const ComponentPoolSBO& other)
+            : mType(other.mType)
+        {
+            other.GetConcept()->Clone(GetConcept());
+        }
+
+        ComponentPoolSBO& operator=(const ComponentPoolSBO& other)
+        {
+            ComponentPoolSBO temp(other);
+            mBuffer.swap(temp.mBuffer);
+            mType = other.mType;
+            return *this;
+        }
+
+        ComponentPoolSBO(ComponentPoolSBO&& other) noexcept
+            : mType(other.mType)
+        {
+            other.GetConcept()->Move(GetConcept());
+        }
+
+        ComponentPoolSBO& operator=(ComponentPoolSBO&& other) noexcept
+        {
+            ComponentPoolSBO temp(std::move(other));
+            mBuffer.swap(temp.mBuffer);
+            mType = other.mType;
+
+            return *this;
+        }
+
+        template<typename T>
+        T& AddComponent(const EntityID entityID, const T* defaultValuePtr)
+        {
+            void* componentPtr = GetConcept()->AddComponent(entityID, defaultValuePtr);
+            return *reinterpret_cast<T*>(componentPtr);
+        }
+
+        template<typename T>
+        T& AddComponent(const EntityID entityID, const T& defaultValuePtr)
+        {
+            void* componentPtr = GetConcept()->AddComponent(entityID, &defaultValuePtr);
+            return *reinterpret_cast<T*>(componentPtr);
+        }
+
+        template<typename T>
+        T& AddComponent(const EntityID entityID, T&& defaultValuePtr)
+        {
+            void* componentPtr = GetConcept()->AddComponentMoved(entityID, &defaultValuePtr);
+            return *reinterpret_cast<T*>(componentPtr);
+        }
+
+        template<typename T> requires std::is_default_constructible_v<T>
+        T& AddComponent(const EntityID entityID)
+        {
+            return AddComponent<T>(entityID, T{});
+        }
+
+        template<typename T>
+        [[nodiscard]] T* GetComponent(const EntityID entityID)
+        {
+            void* componentPtr = GetConcept()->GetComponent(entityID);
+            return reinterpret_cast<T*>(componentPtr);
+        }
+
+        template<typename T>
+        [[nodiscard]] const T* GetComponent(const EntityID entityID) const
+        {
+            const void* componentPtr = GetConcept()->GetComponent(entityID);
+            return reinterpret_cast<const T*>(componentPtr);
+        }
+
+        [[nodiscard]] void* GetComponent(const EntityID entityID)
+        {
+            return GetConcept()->GetComponent(entityID);
+        }
+
+        [[nodiscard]] const void* GetComponent(const EntityID entityID) const
+        {
+            return GetConcept()->GetComponent(entityID);
+        }
+
+        [[nodiscard]] bool HasComponent(const EntityID entityID) const
+        {
+            return GetComponent(entityID) != nullptr;
+        }
+
+        void RemoveComponent(const EntityID entityID)
+        {
+            GetConcept()->RemoveComponent(entityID);
+        }
+
+        [[nodiscard]] std::size_t GetComponentCount() const
+        {
+            return GetConcept()->GetComponentCount();
+        }
+
+        void ResizeComponentIndices(const std::size_t size)
+        {
+            GetConcept()->ResizeComponentIndices(size);
+        }
+
+        [[nodiscard]] std::span<const EntityID> GetEntityIDs() const
+        {
+            return GetConcept()->GetEntityIDs();
+        }
+
+        [[nodiscard]] std::type_index GetType() const
+        {
+            return mType;
+        }
+
+
+        struct ComponentSentinel
+        {};
+
+        template<typename T>
+        class ComponentIterator
+        {
+        public:
+
+            ComponentIterator() = default;
+            ComponentIterator(void* beginPtr, size_t componentCount, size_t componentSize)
+                : mStartPtr(beginPtr)
+                , mCurrentPtr(beginPtr)
+                , mEndPtr(beginPtr + ByteOffset{ componentCount * componentSize })
+                , mComponentSize(componentSize)
+            {}
+
+            T& operator*() const
+            {
+                return *reinterpret_cast<T*>(mCurrentPtr);
+            }
+
+            ComponentIterator& operator++()
+            {
+                mCurrentPtr += ByteOffset{ mComponentSize };
+                return *this;
+            }
+
+            [[nodiscard]] friend bool operator==(const ComponentIterator& a, const ComponentIterator& b)
+            {
+                return a.mCurrentPtr == b.mCurrentPtr;
+            }
+
+            [[nodiscard]] friend bool operator==(const ComponentIterator& it, const ComponentSentinel&)
+            {
+                return  it.mCurrentPtr == it.mEndPtr;
+            }
+
+            [[nodiscard]] size_t GetIndex() const
+            {
+                return (static_cast<char*>(mCurrentPtr) - static_cast<char*>(mStartPtr)) / mComponentSize;
+            }
+
+        private:
+
+            void* mStartPtr = nullptr;
+            void* mCurrentPtr = nullptr;
+            void* mEndPtr = nullptr;
+            size_t mComponentSize = 0;
+        };
+
+
+        template<typename T>
+        class ComponentIteratorHelper
+        {
+        public:
+
+            ComponentIteratorHelper(void* dataPtr, size_t componentCount, size_t componentSize)
+                : mDataPtr(dataPtr)
+                , mComponentCount(componentCount)
+                , mComponentSize(componentSize)
+            {}
+
+            ComponentIterator<T> begin()
+            {
+                return ComponentIterator<T>(mDataPtr, mComponentCount, mComponentSize);
+            }
+
+            ComponentSentinel end()
+            {
+                return ComponentSentinel();
+            }
+        private:
+
+            void* mDataPtr = nullptr;
+            size_t mComponentCount = 0;
+            size_t mComponentSize = 0;
+        };
+
+        template<typename T>
+        ComponentIteratorHelper<T> Iterate()
+        {
+            ASSERT(mType == std::type_index(typeid(T)), "ComponentPoolSBO::Iterate: Type mismatch");
+            auto c = GetConcept();
+            return ComponentIteratorHelper<T>(c->Data(), c->GetComponentCount(), sizeof(T));
+        }
+
+    private:
+
+        class Concept
+        {
+        public:
+
+            Concept() = default;
+            virtual ~Concept() = default;
+
+            virtual void* AddComponent(EntityID entityID, const void* defaultValuePtr) = 0;
+            virtual void* AddComponentMoved(EntityID entityID, void* defaultValuePtr) = 0;
+            [[nodiscard]] virtual void* GetComponent(EntityID entityID) = 0;
+            [[nodiscard]] virtual const void* GetComponent(EntityID entityID) const = 0;
+            virtual void RemoveComponent(const EntityID entityID) = 0;
+            [[nodiscard]] virtual std::size_t GetComponentCount() const = 0;
+            virtual void ResizeComponentIndices(const std::size_t size) = 0;
+            [[nodiscard]] virtual const std::vector<EntityID>& GetEntityIDs() const = 0;
+            [[nodiscard]] virtual void* Data() = 0;
+            [[nodiscard]] virtual const void* Data() const = 0;
+
+            virtual void Clone(Concept* memory) const = 0;
+            virtual void Move(Concept* memory) = 0;
+        };
+
+        template<typename T>
+        class Model final : public Concept
+        {
+            static constexpr uint32_t InvalidComponentIndex = std::numeric_limits<uint32_t>::max();
+        public:
+
+            Model() = default;
+
+            void* AddComponent(const EntityID entityID, const void* defaultValuePtr) override
+            {
+                const uint32_t previousComponentIndex = mEntityIDToComponentIndex[entityID.id];
+                if (previousComponentIndex != InvalidComponentIndex)
+                {
+                    if (defaultValuePtr)
+                    {
+                        mComponents[previousComponentIndex] = *reinterpret_cast<const T*>(defaultValuePtr);
+                    }
+                    else
+                    {
+                        mComponents[previousComponentIndex] = T{};
+                    }
+                    return &mComponents[previousComponentIndex];
+                }
+
+                const uint32_t componentIndex = static_cast<uint32_t>(mComponents.size());
+                mEntityIDToComponentIndex[entityID.id] = componentIndex;
+
+                if (defaultValuePtr)
+                {
+                    mComponents.emplace_back(*reinterpret_cast<const T*>(defaultValuePtr));
+                }
+                else
+                {
+                    mComponents.emplace_back();
+                }
+
+                mComponentIndexToEntityID[componentIndex] = entityID;
+                return &mComponents.back();
+            }
+
+            void* AddComponentMoved(const EntityID entityID, void* defaultValuePtr) override
+            {
+                ASSERT(defaultValuePtr != nullptr, "ComponentPoolSBO::AddComponentMoved: defaultValuePtr is nullptr");
+                const uint32_t previousComponentIndex = mEntityIDToComponentIndex[entityID.id];
+                if (previousComponentIndex != InvalidComponentIndex)
+                {
+                    mComponents[previousComponentIndex] = std::move(*reinterpret_cast<T*>(defaultValuePtr));
+                    return &mComponents[previousComponentIndex];
+                }
+
+                const uint32_t componentIndex = static_cast<uint32_t>(mComponents.size());
+                mEntityIDToComponentIndex[entityID.id] = componentIndex;
+
+                mComponents.emplace_back(std::move(*reinterpret_cast<T*>(defaultValuePtr)));
+
+                mComponentIndexToEntityID[componentIndex] = entityID;
+                return &mComponents.back();
+            }
+
+            [[nodiscard]] void* GetComponent(const EntityID entityID) override
+            {
+                const uint32_t componentIndex = mEntityIDToComponentIndex[entityID.id];
+                if (componentIndex == InvalidComponentIndex)
+                {
+                    return nullptr;
+                }
+                return &mComponents[componentIndex];
+            }
+
+            [[nodiscard]] const void* GetComponent(const EntityID entityID) const override
+            {
+                const uint32_t componentIndex = mEntityIDToComponentIndex[entityID.id];
+                if (componentIndex == InvalidComponentIndex)
+                {
+                    return nullptr;
+                }
+                return &mComponents[componentIndex];
+            }
+
+            void RemoveComponent(const EntityID entityID) override
+            {
+                const uint32_t componentIndex = mEntityIDToComponentIndex[entityID.id];
+                const std::size_t lastIndex = mComponents.size() - 1;
+                mComponents[componentIndex] = std::move(mComponents[lastIndex]);
+                mComponents.pop_back();
+                const EntityID lastIndexEntityID = mComponentIndexToEntityID[lastIndex];
+                mEntityIDToComponentIndex[lastIndexEntityID.id] = componentIndex;
+                mEntityIDToComponentIndex[entityID.id] = InvalidComponentIndex;
+                mComponentIndexToEntityID[componentIndex] = lastIndexEntityID;
+            }
+
+            std::size_t GetComponentCount() const override
+            {
+                return mComponents.size();
+            }
+
+            void ResizeComponentIndices(const std::size_t size) override
+            {
+                mEntityIDToComponentIndex.resize(size, InvalidComponentIndex);
+                mComponentIndexToEntityID.resize(size);
+            }
+
+            [[nodiscard]] const std::vector<EntityID>& GetEntityIDs() const override
+            {
+                return mComponentIndexToEntityID;
+            }
+
+            [[nodiscard]] void* Data() override
+            {
+                return mComponents.data();
+            }
+
+            [[nodiscard]] const void* Data() const override
+            {
+                return mComponents.data();
+            }
+
+            void Clone(Concept* memory) const override
+            {
+                ::new(memory) Model(*this);
+            }
+
+            // Should not be const?
+            void Move(Concept* memory) override
+            {
+                ::new(memory) Model(std::move(*this));
+            }
+
+        private:
+
+            std::vector<T> mComponents;
+            std::vector<uint32_t> mEntityIDToComponentIndex;
+            std::vector<EntityID> mComponentIndexToEntityID;
+        };
+
+    private:
+
+        [[nodiscard]] Concept* GetConcept()
+        {
+            return reinterpret_cast<Concept*>(mBuffer.data());
+        }
+
+        [[nodiscard]] const Concept* GetConcept() const
+        {
+            return reinterpret_cast<const Concept*>(mBuffer.data());
+        }
+
+
+    private:
+
+        static constexpr std::size_t BufferSize = sizeof(Model<std::byte>);
+        static constexpr std::size_t BufferAlignment = 16;
+
+        alignas(BufferAlignment) std::array<std::byte, BufferSize> mBuffer = {};
+        std::type_index mType;
+    };
 }
