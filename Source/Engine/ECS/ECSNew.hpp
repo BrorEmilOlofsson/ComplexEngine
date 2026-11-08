@@ -5,6 +5,8 @@
 #include <tuple>
 #include <utility>
 #include <bitset>
+#include <array>
+#include <ranges>
 #include <map>
 #include <queue>
 
@@ -19,7 +21,36 @@
 namespace CLX
 {
 
-    using ComponentMaskNew = DynamicBitset;
+    struct ECSArchetype final
+    {
+        [[nodiscard]] size_t GetPoolIndex(const size_t componentTypeIndex) const
+        {
+            const auto it = std::ranges::find(componentTypeIndices, componentTypeIndex);
+            ASSERT(it != componentTypeIndices.end(), "Component type is not part of this archetype");
+            return static_cast<size_t>(std::distance(componentTypeIndices.begin(), it));
+        }
+
+        [[nodiscard]] ComponentPoolSBO& GetPoolByTypeIndex(const size_t componentTypeIndex)
+        {
+            return pools[GetPoolIndex(componentTypeIndex)];
+        }
+
+        [[nodiscard]] const ComponentPoolSBO& GetPoolByTypeIndex(const size_t componentTypeIndex) const
+        {
+            return pools[GetPoolIndex(componentTypeIndex)];
+        }
+
+        void ResizePoolIndices(const size_t entityCount)
+        {
+            for (ComponentPoolSBO& pool : pools)
+            {
+                pool.ResizeComponentIndices(entityCount);
+            }
+        }
+
+        std::vector<size_t> componentTypeIndices;
+        std::vector<ComponentPoolSBO> pools;
+    };
 
     struct MultiComponentSentinel final
     {
@@ -40,8 +71,8 @@ namespace CLX
 
         MultiComponentIterator() = default;
 
-        MultiComponentIterator(std::vector<ComponentPoolSBO>* componentPools, size_t primaryIndex, std::array<size_t, TypeCount> componentIndices)
-            : mComponentPools(componentPools)
+        MultiComponentIterator(ECSArchetype* archetype, size_t primaryIndex, std::array<size_t, TypeCount> componentIndices)
+            : mArchetype(archetype)
             , mPrimaryIndex(primaryIndex)
             , mComponentIndices(componentIndices)
             , mIterator(GetPrimaryComponentPool().Iterate<PrimaryType>().begin())
@@ -59,7 +90,7 @@ namespace CLX
             EntityID entityID = GetCurrentEntityID();
             return ValueType
             (
-                (*reinterpret_cast<Types*>(GetComponentPtrFromPool((*mComponentPools)[GetComponentIndex<Types>()], entityID)))...
+                (*reinterpret_cast<Types*>(GetComponentPtrFromPool(mArchetype->pools[GetComponentIndex<Types>()], entityID)))...
             );
         }
 
@@ -83,7 +114,7 @@ namespace CLX
 
         ComponentPoolSBO& GetPrimaryComponentPool()
         {
-            return (*mComponentPools)[mPrimaryIndex];
+            return mArchetype->pools[mPrimaryIndex];
         }
 
         static void* GetComponentPtrFromPool(ComponentPoolSBO& pool, EntityID entityID)
@@ -104,7 +135,7 @@ namespace CLX
 
     private:
 
-        std::vector<ComponentPoolSBO>* mComponentPools;
+        ECSArchetype* mArchetype;
         size_t mPrimaryIndex = 0;
         std::array<size_t, TypeCount> mComponentIndices{};
         std::span<const EntityID> mEntityIDs;
@@ -117,13 +148,13 @@ namespace CLX
     public:
 
         MultiComponentView() = delete;
-        MultiComponentView(std::vector<ComponentPoolSBO>* componentPools, std::array<size_t, sizeof...(Types)> componentIndices)
-            : mComponentPools(componentPools), mPrimaryIndex(componentIndices[0]), mComponentIndices(componentIndices)
+        MultiComponentView(ECSArchetype* archetype, std::array<size_t, sizeof...(Types)> componentIndices)
+            : mArchetype(archetype), mPrimaryIndex(componentIndices[0]), mComponentIndices(componentIndices)
         {}
 
         [[nodiscard]] MultiComponentIterator<Types...> begin()
         {
-            return  MultiComponentIterator<Types...>(mComponentPools, mPrimaryIndex, mComponentIndices);
+            return  MultiComponentIterator<Types...>(mArchetype, mPrimaryIndex, mComponentIndices);
         }
 
         [[nodiscard]] MultiComponentSentinel end()
@@ -133,7 +164,7 @@ namespace CLX
 
     private:
 
-        std::vector<ComponentPoolSBO>* mComponentPools;
+        ECSArchetype* mArchetype;
         size_t mPrimaryIndex;
         std::array<size_t, sizeof...(Types)> mComponentIndices;
     };
@@ -232,6 +263,9 @@ namespace CLX
         template<typename T>
         T& AddComponent(EntityID entityID, T&& component);
 
+        template<typename T>
+        T* GetComponent(EntityID entityID);
+
         template<typename... Types> requires (sizeof...(Types) > 0)
             [[nodiscard]] ECSArchetypeView<Types...> ForEach();
 
@@ -243,16 +277,41 @@ namespace CLX
             bool isActive = true;
         };
 
-        const EntityData& GetEntityData(const EntityID entityID) const
+        [[nodiscard]] const EntityData& GetEntityData(const EntityID entityID) const
         {
             return mEntityData[entityID.id];
+        }
+
+        [[nodiscard]] ECSArchetype* GetArchetype(const DynamicBitset& mask)
+        {
+            const auto it = mArchetypes.find(mask);
+            if (it == mArchetypes.end())
+            {
+                return nullptr;
+            }
+            return &it->second;
+        }
+
+        [[nodiscard]] const ECSArchetype* GetArchetype(const DynamicBitset& mask) const
+        {
+            const auto it = mArchetypes.find(mask);
+            if (it == mArchetypes.end())
+            {
+                return nullptr;
+            }
+            return &it->second;
+        }
+
+        [[nodiscard]] const std::map<DynamicBitset, ECSArchetype>& GetArchetypes() const
+        {
+            return mArchetypes;
         }
 
     private:
 
         std::reference_wrapper<const ECSRegistryNew> mRegistry;
         std::reference_wrapper<EntitySerializationIDGenerator> mEntityIDGenerator;
-        std::map<DynamicBitset, std::vector<ComponentPoolSBO>> mComponentPools;
+        std::map<DynamicBitset, ECSArchetype> mArchetypes;
         std::queue<uint32_t> mFreeEntityIDs;
         std::vector<EntityData> mEntityData;
     };
@@ -260,16 +319,88 @@ namespace CLX
     template<typename T>
     T& ECSNew::AddComponent(EntityID entityID, T&& component)
     {
+        using ComponentType = std::remove_cvref_t<T>;
+
         EntityData& entityData = mEntityData[entityID.id];
-        ComponentMaskNew& mask = entityData.mask;
-        const size_t componentTypeIndex = mRegistry.get().GetComponentTypeIndex(typeid(T));
-        //bool isSet = mask[componentTypeIndex];
-        //if (isSet)
-        //{
-            T& existingComponent = *mComponentPools[mask][componentTypeIndex].GetComponent<T>(entityID);
-            existingComponent = std::forward<T>(component);
-            return existingComponent;
-        //}
+        const std::size_t componentTypeIndex = mRegistry.get().GetComponentTypeIndex(typeid(ComponentType));
+
+        auto ensureArchetypePools = [this](const DynamicBitset& archetypeMask) -> ECSArchetype&
+            {
+                auto [it, inserted] = mArchetypes.try_emplace(archetypeMask);
+                if (inserted)
+                {
+                    ECSArchetype& archetype = it->second;
+                    for (std::size_t i = 0; i < archetypeMask.Count(); ++i)
+                    {
+                        if (!archetypeMask[i])
+                        {
+                            continue;
+                        }
+
+                        archetype.componentTypeIndices.push_back(i);
+                        archetype.pools.push_back(mRegistry.get().GetComponentTypes()[i].createComponentPool());
+                    }
+                }
+
+                it->second.ResizePoolIndices(mEntityData.size());
+
+                return it->second;
+            };
+
+        ComponentMaskNew oldMask = entityData.mask;
+        ComponentMaskNew newMask = oldMask;
+        newMask[componentTypeIndex] = true;
+
+        ECSArchetype& destinationArchetype = ensureArchetypePools(newMask);
+
+        if (oldMask == newMask)
+        {
+            return destinationArchetype.GetPoolByTypeIndex(componentTypeIndex).AddComponent<ComponentType>(entityID, std::forward<T>(component));
+        }
+
+        if (oldMask.Any())
+        {
+            // Move components from the old archetype to the new archetype
+            auto oldIt = mArchetypes.find(oldMask);
+            ASSERT(oldIt != mArchetypes.end(), "Entity archetype pools are missing");
+
+            ECSArchetype& sourceArchetype = oldIt->second;
+            for (std::size_t sourcePoolIndex = 0; sourcePoolIndex < sourceArchetype.componentTypeIndices.size(); ++sourcePoolIndex)
+            {
+                const std::size_t sourceTypeIndex = sourceArchetype.componentTypeIndices[sourcePoolIndex];
+                if (sourceTypeIndex == componentTypeIndex)
+                {
+                    continue;
+                }
+
+                ComponentPoolSBO& sourcePool = sourceArchetype.pools[sourcePoolIndex];
+                void* sourcePtr = sourcePool.GetComponent(entityID);
+                ASSERT(sourcePtr != nullptr, "Entity component is missing in source archetype");
+
+                ComponentPoolSBO& destinationPool = destinationArchetype.GetPoolByTypeIndex(sourceTypeIndex);
+                destinationPool.AddComponentMoved(entityID, sourcePtr);
+                sourcePool.RemoveComponent(entityID);   
+            }
+        }
+
+        ComponentType& addedComponent = destinationArchetype.GetPoolByTypeIndex(componentTypeIndex).AddComponent<ComponentType>(entityID, std::forward<T>(component));
+        entityData.mask = std::move(newMask);
+        return addedComponent;
+    }
+
+    template<typename T>
+    T* ECSNew::GetComponent(EntityID entityID)
+    {
+        using ComponentType = std::remove_cvref_t<T>;
+        const std::size_t componentTypeIndex = mRegistry.get().GetComponentTypeIndex(typeid(ComponentType));
+        const EntityData& entityData = mEntityData[entityID.id];
+        if (!entityData.mask[componentTypeIndex])
+        {
+            return nullptr;
+        }
+        ECSArchetype* archetype = GetArchetype(entityData.mask);
+        ASSERT(archetype != nullptr, "Entity archetype pools are missing");
+        return archetype->GetPoolByTypeIndex(componentTypeIndex).GetComponent<ComponentType>(entityID);
     }
 
     template<typename... Types> requires (sizeof...(Types) > 0)
@@ -277,14 +408,14 @@ namespace CLX
     {
         const DynamicBitset mask = mRegistry.get().CreateComponentMaskFromTypeList<Types...>();
         std::vector<MultiComponentView<Types...>> multiComponentViews;
-        for (auto& [existingMask, componentPools] : mComponentPools)
+        for (auto& [existingMask, archetype] : mArchetypes)
         {
             if ((existingMask & mask) == mask)
             {
                 constexpr size_t typeCount = sizeof...(Types);
                 std::array<size_t, typeCount> componentIndices{};
-                (componentIndices[TypeListIndex<Types, Types...>::value], ...) = 2;
-                multiComponentViews.emplace_back(&componentPools, componentIndices);
+                ((componentIndices[TypeListIndex<Types, Types...>::value] = archetype.GetPoolIndex(mRegistry.get().GetComponentTypeIndex(typeid(Types)))), ...);
+                multiComponentViews.emplace_back(&archetype, componentIndices);
             }
         }
         return ECSArchetypeView<Types...>(std::move(multiComponentViews));
@@ -300,19 +431,14 @@ namespace CLX
 
         componentType.traits = traits;
 
-        componentType.createComponentPoolFunction = []() -> ComponentPoolSBO
+        componentType.createComponentPool = []() -> ComponentPoolSBO
             {
                 return ComponentPoolSBO::Create<T>();
             };
 
-        componentType.copyComponentFunction = [](void* destinationPtr, const void* sourcePtr)
-            {
-                T& destination = *reinterpret_cast<T*>(destinationPtr);
-                const T& source = *reinterpret_cast<const T*>(sourcePtr);
-                destination = source;
-            };
+        componentType.copyAssign = CreateCopyAssignFunction<T>();
 
-        //componentType.addComponentFunction = [](ECS& ecs, const EntityID entityID, const void* defaultValuePtr) -> void*
+        //componentType.addComponent = [](ECS& ecs, const EntityID entityID, const void* defaultValuePtr) -> void*
         //    {
         //        if (defaultValuePtr != nullptr)
         //        {
@@ -327,7 +453,7 @@ namespace CLX
         //        }
         //    };
 
-        //componentType.removeComponentFunction = [](ECSNew& ecs, const EntityID entityID)
+        //componentType.removeComponent = [](ECSNew& ecs, const EntityID entityID)
         //    {
         //        ecs.RemoveComponent<T>(entityID);
         //    };

@@ -21,7 +21,7 @@ namespace CLX
                 .generation = entityDatas[id].generation
             };
             ECSNew::EntityData& entityData = entityDatas[entityID.id];
-            entityData.mask = ComponentMaskNew();
+            entityData.mask = registry.CreateEmptyComponentMask();
             entityData.isActive = true;
             entityData.serializationID = serializationID;
             freeEntityIDs.pop();
@@ -34,6 +34,8 @@ namespace CLX
                 .generation = 0
             };
             ECSNew::EntityData& entityData = entityDatas.emplace_back();
+            entityData.mask = registry.CreateEmptyComponentMask();
+            entityData.isActive = true;
             entityData.serializationID = serializationID;
             //for (auto& componentPool : mComponentPools)
             //{

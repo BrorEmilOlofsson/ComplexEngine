@@ -11,8 +11,9 @@ constexpr std::string GenerateName(const std::span<const std::string_view> pFirs
         return "Null Name";
     }
     
-    const std::size_t firstNameIndex = CLX::GetRandomNumber(std::size_t{ 0 }, size(pFirstNames) - 1);
-    const std::size_t lastNameIndex = CLX::GetRandomNumber(std::size_t{ 0 }, size(pLastNames) - 1);
+    auto randEngine = CLX::CreateDefaultRandomEngine();
+    const std::size_t firstNameIndex = CLX::GetRandomNumber(std::size_t{ 0 }, size(pFirstNames) - 1, randEngine);
+    const std::size_t lastNameIndex = CLX::GetRandomNumber(std::size_t{ 0 }, size(pLastNames) - 1, randEngine);
 
     return std::string(pFirstNames[firstNameIndex]) + " " + std::string(pLastNames[lastNameIndex]);
 }

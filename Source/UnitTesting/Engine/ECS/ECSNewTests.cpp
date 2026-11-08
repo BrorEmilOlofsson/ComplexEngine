@@ -18,6 +18,20 @@ struct TestComponent
     uint32_t value = 0;
 };
 
+ECSRegistryNew CreateECSRegistry()
+{
+    ECSRegistryNew ecsRegistry;
+    ecsRegistry.RegisterComponentType<TestComponent>();
+    ecsRegistry.RegisterComponentType<CounterStruct>();
+    ecsRegistry.RegisterComponentType<std::string>();
+    ecsRegistry.RegisterComponentType<int>();
+    REQUIRE(ECSRegisterComponentHelperNew::ComponentPoolID<TestComponent> == 0);
+    REQUIRE(ECSRegisterComponentHelperNew::ComponentPoolID<CounterStruct> == 1);
+    REQUIRE(ECSRegisterComponentHelperNew::ComponentPoolID<std::string> == 2);
+    REQUIRE(ECSRegisterComponentHelperNew::ComponentPoolID<int> == 3);
+    return ecsRegistry;
+}
+
 
 TEST_CASE("ComponentPoolSBO::AddComponent (const T&)")
 {
@@ -123,8 +137,13 @@ TEST_CASE("ECSNew::Multi Iterate")
     stringPool.AddComponent<std::string>(entityID1, "EntityID 1");
     stringPool.AddComponent<std::string>(entityID3, "EntityID 3");
 
+    ECSArchetype archetype
+    {
+        .componentTypeIndices = { 2, 3, 0 },
+        .pools = componentPools
+    };
 
-    MultiComponentView<TestComponent, std::string, CounterStruct> multiIterHelper(&componentPools, { 2, 3, 0 });
+    MultiComponentView<TestComponent, std::string, CounterStruct> multiIterHelper(&archetype, { 2, 3, 0 });
 
     int count = 0;
     for (auto [test, str, counter] : multiIterHelper)
@@ -215,9 +234,20 @@ TEST_CASE("ECSNew::Archetype Iterate")
     stringPool2.AddComponent<std::string>(entityID5, "EntityID 5");
     stringPool2.AddComponent<std::string>(entityID2, "EntityID 2");
 
+    ECSArchetype archetype1
+    {
+        .componentTypeIndices = { 2, 3, 0, 1 },
+        .pools = componentPools1
+    };
 
-    MultiComponentView<std::string, CounterStruct> cView1(&componentPools1, { 3, 0 });
-    MultiComponentView<std::string, CounterStruct> cView2(&componentPools2, { 0, 1 });
+    ECSArchetype archetype2
+    {
+        .componentTypeIndices = { 0, 1, 2 },
+        .pools = componentPools2
+    };
+
+    MultiComponentView<std::string, CounterStruct> cView1(&archetype1, { 3, 0 });
+    MultiComponentView<std::string, CounterStruct> cView2(&archetype2, { 0, 1 });
     std::vector archetypes = { cView1, cView2 };
     ECSArchetypeView<std::string, CounterStruct> archetypeView(std::move(archetypes));
     int count = 0;
@@ -251,35 +281,10 @@ TEST_CASE("ECSNew::Archetype Iterate")
 }
 
 
-TEST_CASE("ECSNew::ForEach")
-{
-    ECSRegistryNew ecsRegistry;
-    EntitySerializationIDGenerator entityIDGenerator;
-
-    ecsRegistry.RegisterComponentType<TestComponent>();
-
-    ECSNew ecs(ecsRegistry, entityIDGenerator);
-
-
-    for (auto [testComponent] : ecs.ForEach<TestComponent>())
-    {
-        testComponent;
-    }
-}
-
-ECSRegistryNew CreateECSRegistry()
-{
-    ECSRegistryNew ecsRegistry;
-    ecsRegistry.RegisterComponentType<TestComponent>();
-    return ecsRegistry;
-}
-
 TEST_CASE("ECSNew::CreateEntity")
 {
     ECSRegistryNew ecsRegistry = CreateECSRegistry();
     EntitySerializationIDGenerator entityIDGenerator;
-    auto testComponentTypeID = ECSRegisterComponentHelperNew::ComponentPoolID<TestComponent>;
-    REQUIRE(testComponentTypeID == 0);
     {
         // Add an entity and check that it has the correct ID and generation
         ECSNew ecs(ecsRegistry, entityIDGenerator);
@@ -313,14 +318,143 @@ TEST_CASE("ECSNew::AddComponent (T&&)")
 {
     ECSRegistryNew ecsRegistry = CreateECSRegistry();
     EntitySerializationIDGenerator entityIDGenerator;
+
     ECSNew ecs(ecsRegistry, entityIDGenerator);
     const EntityID entityID = ecs.CreateEntity();
     TestComponent testComponent{ "Test", 42 };
-    TestComponent& addedComponent = ecs.AddComponent<TestComponent>(entityID, std::move(testComponent));
-    
+    TestComponent& addedComponent = ecs.AddComponent(entityID, std::move(testComponent));
+
     REQUIRE(testComponent.name.empty()); // Moved-from state
     REQUIRE(addedComponent.name == "Test");
     REQUIRE(addedComponent.value == 42);
     const auto& entityData = ecs.GetEntityData(entityID);
-    REQUIRE(entityData.mask.Any()); // Component added
+    const DynamicBitset expectedMask = ecsRegistry.CreateComponentMaskFromTypeList<TestComponent>();
+    REQUIRE(entityData.mask == expectedMask); // Component added
+
+    const auto& archetypes = ecs.GetArchetypes();
+
+    REQUIRE(archetypes.size() == 1);
+    REQUIRE(archetypes.find(entityData.mask) != archetypes.end());
 }
+
+TEST_CASE("ECSNew::AddComponent (T&&) twice")
+{
+    ECSRegistryNew ecsRegistry = CreateECSRegistry();
+    EntitySerializationIDGenerator entityIDGenerator;
+
+    ECSNew ecs(ecsRegistry, entityIDGenerator);
+    const EntityID entityID = ecs.CreateEntity();
+    TestComponent testComponent{ "Test", 42 };
+    TestComponent testComponent2{ "Test 2", 35 };
+    TestComponent& addedComponent = ecs.AddComponent(entityID, std::move(testComponent));
+    TestComponent& addedComponent2 = ecs.AddComponent(entityID, std::move(testComponent2));
+
+    REQUIRE(&addedComponent == &addedComponent2);
+
+    REQUIRE(testComponent.name.empty()); // Moved-from state
+    REQUIRE(addedComponent.name == "Test 2");
+    REQUIRE(addedComponent.value == 35);
+    const auto& entityData = ecs.GetEntityData(entityID);
+    const DynamicBitset expectedMask = ecsRegistry.CreateComponentMaskFromTypeList<TestComponent>();
+    REQUIRE(entityData.mask == expectedMask); // Component added
+
+    const auto& archetypes = ecs.GetArchetypes();
+
+    REQUIRE(archetypes.size() == 1);
+    REQUIRE(archetypes.find(entityData.mask) != archetypes.end());
+}
+
+TEST_CASE("ECSNew::AddComponent (T&&) Multiple components")
+{
+    ECSRegistryNew ecsRegistry = CreateECSRegistry();
+    EntitySerializationIDGenerator entityIDGenerator;
+
+    ECSNew ecs(ecsRegistry, entityIDGenerator);
+    const EntityID entityID = ecs.CreateEntity();
+    TestComponent testComponent{ "Test", 42 };
+    int i{ 100 };
+    ecs.AddComponent(entityID, std::move(testComponent));
+    ecs.AddComponent(entityID, std::move(i));
+
+    TestComponent* addedComponent = ecs.GetComponent<TestComponent>(entityID);
+    int* addedInt = ecs.GetComponent<int>(entityID);
+
+    REQUIRE(testComponent.name.empty()); // Moved-from state
+    REQUIRE(addedComponent != nullptr);
+    REQUIRE(addedComponent->name == "Test");
+    REQUIRE(addedComponent->value == 42);
+    REQUIRE(addedInt != nullptr);
+    REQUIRE(*addedInt == 100);
+    const auto& entityData = ecs.GetEntityData(entityID);
+    const DynamicBitset expectedMask = ecsRegistry.CreateComponentMaskFromTypeList<TestComponent, int>();
+    REQUIRE(entityData.mask == expectedMask); // Component added
+
+    const auto& archetypes = ecs.GetArchetypes();
+
+    REQUIRE(archetypes.size() == 2);
+    REQUIRE(archetypes.contains(expectedMask));
+
+    const ECSArchetype* archetype = ecs.GetArchetype(expectedMask);
+    REQUIRE(archetype != nullptr);
+    REQUIRE(archetype->componentTypeIndices == std::vector<size_t>{ 0, 3 });
+    REQUIRE(archetype->pools.size() == 2);
+
+    const DynamicBitset oldMask = ecsRegistry.CreateComponentMaskFromTypeList<TestComponent>();
+    REQUIRE(archetypes.contains(oldMask));
+
+    const ECSArchetype* oldArchetype = ecs.GetArchetype(oldMask);
+    REQUIRE(oldArchetype != nullptr);
+    REQUIRE(oldArchetype->componentTypeIndices == std::vector<size_t>{ 0 });
+    REQUIRE(oldArchetype->pools.size() == 1);
+
+    {
+        auto& p = oldArchetype->pools[0];
+        REQUIRE(p.GetType() == std::type_index(typeid(TestComponent)));
+        auto entityIDs = p.GetEntityIDs();
+        REQUIRE(entityIDs.size() == 1);
+        REQUIRE(entityIDs[0] == EntityID{ .id = 0,.generation = 0 });
+    }
+
+    {
+        const EntityID entityID2 = ecs.CreateEntity();
+        REQUIRE(entityID2 == EntityID{ .id = 1, .generation = 0 });
+        TestComponent& addedComponent2 = ecs.AddComponent(entityID2, TestComponent{ "Test 43", 350 });
+        REQUIRE(addedComponent2.name == "Test 43");
+        REQUIRE(addedComponent2.value == 350);
+
+        REQUIRE(oldArchetype->pools.size() == 1);
+        auto& p = oldArchetype->pools[0];
+        auto components = p.GetComponents<TestComponent>();
+        REQUIRE(components.size() == 1);
+        REQUIRE(&components[0] == &addedComponent2);
+    }
+}
+
+template<typename... Types>
+[[nodiscard]] uint32_t CountIterations(ECSNew& ecs)
+{
+    uint32_t count = 0;
+    for (const std::tuple<Types...> _ : ecs.ForEach<Types...>())
+    {
+        count++;
+    }
+    return count;
+}
+
+TEST_CASE("ECSNew::ForEach Empty ECS")
+{
+    ECSRegistryNew ecsRegistry = CreateECSRegistry();
+    EntitySerializationIDGenerator entityIDGenerator;
+
+    ECSNew ecs(ecsRegistry, entityIDGenerator);
+
+    REQUIRE(CountIterations<TestComponent>(ecs) == 0);
+    REQUIRE(CountIterations<std::string>(ecs) == 0);
+    REQUIRE(CountIterations<CounterStruct>(ecs) == 0);
+    REQUIRE(CountIterations<int>(ecs) == 0);
+    REQUIRE(CountIterations<std::string, int, CounterStruct, TestComponent>(ecs) == 0);
+    REQUIRE(CountIterations<int, CounterStruct>(ecs) == 0);
+    REQUIRE(CountIterations<std::string, CounterStruct>(ecs) == 0);
+    REQUIRE(CountIterations<CounterStruct, std::string, TestComponent>(ecs) == 0);
+}
+

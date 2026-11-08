@@ -12,9 +12,11 @@
 #include "Engine/Reflection/DataTypeID.hpp"
 #include "Engine/Utility/EnumUtility.hpp"
 #include "Engine/Utility/DynamicBitset.hpp"
+#include "Engine/Utility/FundamentalFunctionDefinitions.hpp"
 
 namespace CLX
 {
+	using ComponentMaskNew = DynamicBitset;
 
 	struct ECSRegisterComponentHelperNew
 	{
@@ -35,10 +37,10 @@ namespace CLX
 
 	struct ECSComponentTypeNew final
 	{
-		ComponentPoolSBO(*createComponentPoolFunction)() = nullptr;
-		void(*copyComponentFunction)(void* destination, const void* source) = nullptr;
-		void* (*addComponentFunction)(class ECSNew& ecs, const EntityID entityID, const void* defaultValue) = nullptr;
-		void(*removeComponentFunction)(class ECSNew& ecs, const EntityID entityID) = nullptr;
+		ComponentPoolSBO(*createComponentPool)() = nullptr;
+		CopyAssignFunction copyAssign = nullptr;
+		void* (*addComponent)(class ECSNew& ecs, const EntityID entityID, const void* defaultValue) = nullptr;
+		void(*removeComponent)(class ECSNew& ecs, const EntityID entityID) = nullptr;
 		eECSComponentTraitNew traits = eECSComponentTraitNew::None;
 	};
 
@@ -77,6 +79,11 @@ namespace CLX
             return mComponentTypes[componentTypeIndex];
 		}
 
+		[[nodiscard]] const ECSComponentTypeNew& GetComponentType(size_t index) const
+		{
+			return mComponentTypes[index];
+		}
+
 		[[nodiscard]] std::span<System(* const)()> GetSystemRegistrationFunctions() const
 		{
 			return mSystemRegistrationFunctions;
@@ -97,7 +104,7 @@ namespace CLX
 			for (const std::type_index& typeIndex : mDefaultComponentTypeIndices)
 			{
 				const ECSComponentTypeNew& componentType = GetComponentType(typeIndex);
-				componentType.addComponentFunction(ecs, entityID, nullptr);
+				componentType.addComponent(ecs, entityID, nullptr);
 			}
 		}
 
@@ -105,9 +112,14 @@ namespace CLX
 			[[nodiscard]] DynamicBitset CreateComponentMaskFromTypeList() const
 		{
 			DynamicBitset mask = DynamicBitset::FromSize(GetComponentTypes().size(), false);
-			mask[GetComponentTypeIndex(typeid(Types))...] = true;
+			((mask[GetComponentTypeIndex(typeid(Types))] = true), ...);
 			return mask;
 		}
+
+        [[nodiscard]] ComponentMaskNew CreateEmptyComponentMask() const
+        {
+            return ComponentMaskNew::FromSize(GetComponentTypes().size(), false);
+        }
 
 	private:
 

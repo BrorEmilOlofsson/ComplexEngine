@@ -1261,7 +1261,7 @@ public:
 
         componentType.createComponentPoolFunction = []() -> ComponentPoolSBO
             {
-                return ComponentPoolSBO(std::type_identity<T>{});
+                return ComponentPoolSBO::Create<T>();
             };
 
         componentType.copyComponentFunction = [](void* destinationPtr, const void* sourcePtr)

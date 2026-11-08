@@ -27,7 +27,8 @@ Height GenerateHeight()
 
 eNationalAssociation GenerateNationalAssociation()
 {
-	return static_cast<eNationalAssociation>(CLX::GetRandomNumber(std::size_t{0}, EnumCount<eNationalAssociation>::value - 1));
+    auto randEngine = CLX::CreateDefaultRandomEngine();
+	return static_cast<eNationalAssociation>(CLX::GetRandomNumber(std::size_t{0}, EnumCount<eNationalAssociation>::value - 1, randEngine));
 }
 
 FootballPlayer GenerateFootballPlayer()

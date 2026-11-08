@@ -72,6 +72,11 @@ namespace CLX
             return mBits == other.mBits;
         }
 
+        [[nodiscard]] constexpr bool operator<(const DynamicBitset& other) const
+        {
+            return std::ranges::lexicographical_compare(mBits, other.mBits);
+        }
+
     private:
 
         std::vector<bool> mBits;
