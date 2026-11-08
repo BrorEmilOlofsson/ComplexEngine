@@ -7,7 +7,7 @@
 #include <type_traits>
 
 #include "ECSSystem.hpp"
-#include "ComponentPool.hpp"
+#include "ComponentPoolNew.hpp"
 #include "EntityID.hpp"
 #include "Engine/Reflection/DataTypeID.hpp"
 #include "Engine/Utility/EnumUtility.hpp"
@@ -37,7 +37,7 @@ namespace CLX
 
 	struct ECSComponentTypeNew final
 	{
-		ComponentPoolSBO(*createComponentPool)() = nullptr;
+		ComponentPoolNew(*createComponentPool)() = nullptr;
 		CopyAssignFunction copyAssign = nullptr;
 		void* (*addComponent)(class ECSNew& ecs, const EntityID entityID, const void* defaultValue) = nullptr;
 		void(*removeComponent)(class ECSNew& ecs, const EntityID entityID) = nullptr;

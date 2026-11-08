@@ -33,9 +33,9 @@ ECSRegistryNew CreateECSRegistry()
 }
 
 
-TEST_CASE("ComponentPoolSBO::AddComponent (const T&)")
+TEST_CASE("ComponentPoolNew::AddComponent (const T&)")
 {
-    ComponentPoolSBO pool(std::type_identity<CounterStruct>{});
+    ComponentPoolNew pool(std::type_identity<CounterStruct>{});
     pool.ResizeComponentIndices(10);
 
     std::shared_ptr<CounterStructCounter> counter = std::make_shared<CounterStructCounter>();
@@ -55,9 +55,9 @@ TEST_CASE("ComponentPoolSBO::AddComponent (const T&)")
     REQUIRE(counter->moveAssignmentCount == 0);
 }
 
-TEST_CASE("ComponentPoolSBO::Iterate")
+TEST_CASE("ComponentPoolNew::Iterate")
 {
-    ComponentPoolSBO pool(std::type_identity<CounterStruct>{});
+    ComponentPoolNew pool(std::type_identity<CounterStruct>{});
     pool.ResizeComponentIndices(10);
 
     std::shared_ptr<CounterStructCounter> counter = std::make_shared<CounterStructCounter>();
@@ -103,12 +103,12 @@ TEST_CASE("ECSNew::Multi Iterate")
     ECSNew ecs(ecsRegistry, entityIDGenerator);
 
 
-    std::vector<ComponentPoolSBO> componentPools =
+    std::vector<ComponentPoolNew> componentPools =
     {
-        ComponentPoolSBO(std::type_identity<CounterStruct>{}),
-        ComponentPoolSBO(std::type_identity<int>{}),
-        ComponentPoolSBO(std::type_identity<TestComponent>{}),
-        ComponentPoolSBO(std::type_identity<std::string>{}),
+        ComponentPoolNew(std::type_identity<CounterStruct>{}),
+        ComponentPoolNew(std::type_identity<int>{}),
+        ComponentPoolNew(std::type_identity<TestComponent>{}),
+        ComponentPoolNew(std::type_identity<std::string>{}),
     };
     auto& counterStructPool = componentPools[0];
     auto& intPool = componentPools[1];
@@ -177,18 +177,18 @@ TEST_CASE("ECSNew::Archetype Iterate")
     ECSNew ecs(ecsRegistry, entityIDGenerator);
 
 
-    std::vector<ComponentPoolSBO> componentPools1 =
+    std::vector<ComponentPoolNew> componentPools1 =
     {
-        ComponentPoolSBO(std::type_identity<CounterStruct>{}),
-        ComponentPoolSBO(std::type_identity<int>{}),
-        ComponentPoolSBO(std::type_identity<TestComponent>{}),
-        ComponentPoolSBO(std::type_identity<std::string>{}),
+        ComponentPoolNew(std::type_identity<CounterStruct>{}),
+        ComponentPoolNew(std::type_identity<int>{}),
+        ComponentPoolNew(std::type_identity<TestComponent>{}),
+        ComponentPoolNew(std::type_identity<std::string>{}),
     };
-    std::vector<ComponentPoolSBO> componentPools2 =
+    std::vector<ComponentPoolNew> componentPools2 =
     {
-        ComponentPoolSBO(std::type_identity<std::string>{}),
-        ComponentPoolSBO(std::type_identity<CounterStruct>{}),
-        ComponentPoolSBO(std::type_identity<TestComponent>{}),
+        ComponentPoolNew(std::type_identity<std::string>{}),
+        ComponentPoolNew(std::type_identity<CounterStruct>{}),
+        ComponentPoolNew(std::type_identity<TestComponent>{}),
     };
     auto& counterStructPool1 = componentPools1[0];
     auto& intPool1 = componentPools1[1];

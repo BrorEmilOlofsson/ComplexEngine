@@ -13,7 +13,7 @@
 #include "Engine/ECS/ECSRegistryNew.hpp"
 #include "Engine/ECS/EntityID.hpp"
 #include "Engine/ECS/EntitySerializationIDGenerator.hpp"
-#include "Engine/ECS/ComponentPool.hpp"
+#include "Engine/ECS/ComponentPoolNew.hpp"
 #include "Engine/Utility/TypeList.hpp"
 #include "Engine/Utility/DynamicBitset.hpp"
 
@@ -30,26 +30,26 @@ namespace CLX
             return static_cast<size_t>(std::distance(componentTypeIndices.begin(), it));
         }
 
-        [[nodiscard]] ComponentPoolSBO& GetPoolByTypeIndex(const size_t componentTypeIndex)
+        [[nodiscard]] ComponentPoolNew& GetPoolByTypeIndex(const size_t componentTypeIndex)
         {
             return pools[GetPoolIndex(componentTypeIndex)];
         }
 
-        [[nodiscard]] const ComponentPoolSBO& GetPoolByTypeIndex(const size_t componentTypeIndex) const
+        [[nodiscard]] const ComponentPoolNew& GetPoolByTypeIndex(const size_t componentTypeIndex) const
         {
             return pools[GetPoolIndex(componentTypeIndex)];
         }
 
         void ResizePoolIndices(const size_t entityCount)
         {
-            for (ComponentPoolSBO& pool : pools)
+            for (auto& pool : pools)
             {
                 pool.ResizeComponentIndices(entityCount);
             }
         }
 
         std::vector<size_t> componentTypeIndices;
-        std::vector<ComponentPoolSBO> pools;
+        std::vector<ComponentPoolNew> pools;
     };
 
     struct MultiComponentSentinel final
@@ -101,23 +101,15 @@ namespace CLX
 
         [[nodiscard]] constexpr bool operator==(const MultiComponentSentinel&) const
         {
-            return mIterator == typename ComponentPoolSBO::ComponentSentinel{};
+            return mIterator == typename ComponentPoolNew::ComponentSentinel{};
         }
 
-        //template<typename T>
-        //T* GetPtr()
-        //{
-        //    constexpr std::size_t typeIndex = TypeListIndex<T, Types...>::value;
-        //    auto& componentPools = *mComponentPools;
-        //    return 
-        //}
-
-        ComponentPoolSBO& GetPrimaryComponentPool()
+        ComponentPoolNew& GetPrimaryComponentPool()
         {
             return mArchetype->pools[mPrimaryIndex];
         }
 
-        static void* GetComponentPtrFromPool(ComponentPoolSBO& pool, EntityID entityID)
+        static void* GetComponentPtrFromPool(ComponentPoolNew& pool, EntityID entityID)
         {
             return pool.GetComponent(entityID);
         }
@@ -139,7 +131,7 @@ namespace CLX
         size_t mPrimaryIndex = 0;
         std::array<size_t, TypeCount> mComponentIndices{};
         std::span<const EntityID> mEntityIDs;
-        typename ComponentPoolSBO::ComponentIterator<PrimaryType> mIterator;
+        typename ComponentPoolNew::ComponentIterator<PrimaryType> mIterator;
     };
 
     template<typename... Types>
@@ -373,11 +365,11 @@ namespace CLX
                     continue;
                 }
 
-                ComponentPoolSBO& sourcePool = sourceArchetype.pools[sourcePoolIndex];
+                ComponentPoolNew& sourcePool = sourceArchetype.pools[sourcePoolIndex];
                 void* sourcePtr = sourcePool.GetComponent(entityID);
                 ASSERT(sourcePtr != nullptr, "Entity component is missing in source archetype");
 
-                ComponentPoolSBO& destinationPool = destinationArchetype.GetPoolByTypeIndex(sourceTypeIndex);
+                ComponentPoolNew& destinationPool = destinationArchetype.GetPoolByTypeIndex(sourceTypeIndex);
                 destinationPool.AddComponentMoved(entityID, sourcePtr);
                 sourcePool.RemoveComponent(entityID);   
             }
@@ -431,9 +423,9 @@ namespace CLX
 
         componentType.traits = traits;
 
-        componentType.createComponentPool = []() -> ComponentPoolSBO
+        componentType.createComponentPool = []() -> ComponentPoolNew
             {
-                return ComponentPoolSBO::Create<T>();
+                return ComponentPoolNew::Create<T>();
             };
 
         componentType.copyAssign = CreateCopyAssignFunction<T>();
