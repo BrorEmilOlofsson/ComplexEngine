@@ -18,6 +18,11 @@ struct TestComponent
     uint32_t value = 0;
 };
 
+[[nodiscard]] constexpr bool operator==(const TestComponent& lhs, const TestComponent& rhs)
+{
+    return lhs.name == rhs.name && lhs.value == rhs.value;
+}
+
 ECSRegistryNew CreateECSRegistry()
 {
     ECSRegistryNew ecsRegistry;
@@ -32,16 +37,16 @@ ECSRegistryNew CreateECSRegistry()
     return ecsRegistry;
 }
 
-
-TEST_CASE("ComponentPoolNew::AddComponent (const T&)")
+TEST_CASE("ComponentPoolNew::AddComponent (const T&) allocation")
 {
     ComponentPoolNew pool(std::type_identity<CounterStruct>{});
-    pool.ResizeComponentIndices(10);
+    pool.ResizeComponentIndices(1);
 
     std::shared_ptr<CounterStructCounter> counter = std::make_shared<CounterStructCounter>();
 
     const CounterStruct defaultComponent{ std::string("Hello"), counter };
-    auto& addedComponent = pool.AddComponent<CounterStruct>({ 0, 0 }, defaultComponent);
+    const EntityID entityID{ 0, 0 };
+    const auto& addedComponent = pool.AddComponent(entityID, defaultComponent);
 
     // Check that the component was copied
     REQUIRE(defaultComponent.GetString() == "Hello");
@@ -53,6 +58,198 @@ TEST_CASE("ComponentPoolNew::AddComponent (const T&)")
     REQUIRE(counter->copyAssignmentCount == 0);
     REQUIRE(counter->moveConstructorCount == 0);
     REQUIRE(counter->moveAssignmentCount == 0);
+}
+
+TEST_CASE("ComponentPoolNew::AddComponent (T&&) allocation")
+{
+    ComponentPoolNew pool(std::type_identity<CounterStruct>{});
+    pool.ResizeComponentIndices(1);
+
+    std::shared_ptr<CounterStructCounter> counter = std::make_shared<CounterStructCounter>();
+
+    const EntityID entityID{ 0, 0 };
+    const auto& addedComponent = pool.AddComponent(entityID, CounterStruct("Hello", counter));
+
+    REQUIRE(addedComponent.GetString() == "Hello");
+
+    REQUIRE(counter->constructorCount == 1);
+    REQUIRE(counter->destructorCount == 0);
+    REQUIRE(counter->copyConstructorCount == 0);
+    REQUIRE(counter->copyAssignmentCount == 0);
+    REQUIRE(counter->moveConstructorCount == 1);
+    REQUIRE(counter->moveAssignmentCount == 0);
+}
+
+TEST_CASE("ComponentPoolNew::AddComponent (Args&&...) allocation")
+{
+    ComponentPoolNew pool(std::type_identity<CounterStruct>{});
+    pool.ResizeComponentIndices(1);
+
+    std::shared_ptr<CounterStructCounter> counter = std::make_shared<CounterStructCounter>();
+
+    const EntityID entityID{ 0, 0 };
+    const auto& addedComponent = pool.AddComponent<CounterStruct>(entityID, counter);
+
+    REQUIRE(addedComponent.GetString() == CounterStruct::DefaultString);
+
+    REQUIRE(counter->constructorCount == 1);
+    REQUIRE(counter->destructorCount == 0);
+    REQUIRE(counter->copyConstructorCount == 0);
+    REQUIRE(counter->copyAssignmentCount == 0);
+    REQUIRE(counter->moveConstructorCount == 1);
+    REQUIRE(counter->moveAssignmentCount == 0);
+}
+
+
+TEST_CASE("ComponentPoolNew::AddComponentMoved (void*) allocation")
+{
+    ComponentPoolNew pool(std::type_identity<CounterStruct>{});
+    pool.ResizeComponentIndices(1);
+
+    std::shared_ptr<CounterStructCounter> counter = std::make_shared<CounterStructCounter>();
+
+    const EntityID entityID{ 0, 0 };
+    CounterStruct defaultComponent{ std::string("Hello"), counter };
+    const void* addedComponentPtr = pool.AddComponentMoved(entityID, &defaultComponent);
+    const CounterStruct& addedComponent = *reinterpret_cast<const CounterStruct*>(addedComponentPtr);
+
+    REQUIRE(defaultComponent.HasMoved());
+    REQUIRE(addedComponent.GetString() == "Hello");
+
+    REQUIRE(counter->constructorCount == 1);
+    REQUIRE(counter->destructorCount == 0);
+    REQUIRE(counter->copyConstructorCount == 0);
+    REQUIRE(counter->copyAssignmentCount == 0);
+    REQUIRE(counter->moveConstructorCount == 1);
+    REQUIRE(counter->moveAssignmentCount == 0);
+}
+
+TEST_CASE("ComponentPoolNew::AddComponent (const T&)")
+{
+    // Add two components
+    ComponentPoolNew pool(std::type_identity<TestComponent>{});
+    const ComponentPoolNew& constPool = pool;
+    pool.ResizeComponentIndices(1);
+
+    const EntityID entityID1{ 0, 0 };
+    {
+        const TestComponent defaultComponent{ .name = "Hello", .value = 42 };
+        const auto& addedComponent = pool.AddComponent(entityID1, defaultComponent);
+
+        auto& components = constPool.GetComponents<TestComponent>();
+        REQUIRE(components.size() == 1);
+        REQUIRE(&components[0] == &addedComponent);
+
+        auto entityIDs = pool.GetComponentIndexToEntityIDList();
+        const std::vector<EntityID> expectedEntityIDs = { entityID1 };
+        const std::vector<EntityID> e = entityIDs | std::ranges::to<std::vector>();
+        REQUIRE(e == expectedEntityIDs);
+
+        auto componentIndices = constPool.GetEntityIDsToComponentIndexList();
+        auto expectedComponentIndices = std::vector<uint32_t>{ 0 };
+        const std::vector<uint32_t> ci = componentIndices | std::ranges::to<std::vector>();
+        REQUIRE(ci == expectedComponentIndices);
+    }
+
+    pool.ResizeComponentIndices(2);
+    {
+        const EntityID entityID2{ 1, 0 };
+        const TestComponent defaultComponent2{ .name = "World", .value = 24 };
+        const auto& addedComponent = pool.AddComponent(entityID2, defaultComponent2);
+
+        auto& components = constPool.GetComponents<TestComponent>();
+        REQUIRE(components.size() == 2);
+        REQUIRE(&components[1] == &addedComponent);
+
+        const auto entityIDs = pool.GetComponentIndexToEntityIDList() | std::ranges::to<std::vector>();
+        const std::vector<EntityID> expectedEntityIDs = { entityID1, entityID2 };
+        const std::vector<EntityID> e = entityIDs ;
+        REQUIRE(e == expectedEntityIDs);
+
+        auto componentIndices = constPool.GetEntityIDsToComponentIndexList() | std::ranges::to<std::vector>();
+        auto expectedComponentIndices = std::vector<uint32_t>{ 0, 1 };
+        REQUIRE(componentIndices == expectedComponentIndices);
+    }
+}
+
+TEST_CASE("ComponentPoolNew::AddComponent + RemoveComponent")
+{
+    // Add two components + remove one + add another
+    ComponentPoolNew pool(std::type_identity<TestComponent>{});
+    const ComponentPoolNew& constPool = pool;
+    pool.ResizeComponentIndices(1);
+
+    EntityID entityID1{ 0, 0 };
+    EntityID entityID2{ 1, 0 };
+    EntityID entityID3{ 2, 0 };
+    {
+        const TestComponent defaultComponent1{ .name = "Entity 0", .value = 0 };
+        const TestComponent defaultComponent2{ .name = "Entity 1", .value = 1 };
+        const TestComponent defaultComponent3{ .name = "Entity 2", .value = 2 };
+        {
+            // Add first component
+            pool.ResizeComponentIndices(1);
+            pool.AddComponent(entityID1, defaultComponent1);
+            auto& components = constPool.GetComponents<TestComponent>();
+            const std::vector<TestComponent> expectedComponents = { defaultComponent1 };
+            REQUIRE(components == expectedComponents);
+
+            auto componentIndexToEntityIDList = pool.GetComponentIndexToEntityIDList() | std::ranges::to<std::vector>();
+            const std::vector<EntityID> expectedComponentToEntityIDList = { entityID1 };
+            REQUIRE(componentIndexToEntityIDList == expectedComponentToEntityIDList);
+
+            auto entityIDsToComponentIndexList = pool.GetEntityIDsToComponentIndexList() | std::ranges::to<std::vector>();
+            const std::vector<uint32_t> expectedEntityIDsToComponentIndexList = { 0 };
+            REQUIRE(entityIDsToComponentIndexList == expectedEntityIDsToComponentIndexList);
+        }
+        {
+            // Add second component
+            pool.ResizeComponentIndices(2);
+            pool.AddComponent(entityID2, defaultComponent2);
+            auto& components = constPool.GetComponents<TestComponent>();
+            const std::vector<TestComponent> expectedComponents = { defaultComponent1, defaultComponent2 };
+            REQUIRE(components == expectedComponents);
+
+            auto componentIndexToEntityIDList = pool.GetComponentIndexToEntityIDList() | std::ranges::to<std::vector>();
+            const std::vector<EntityID> expectedComponentToEntityIDList = { entityID1, entityID2 };
+            REQUIRE(componentIndexToEntityIDList == expectedComponentToEntityIDList);
+
+            auto entityIDsToComponentIndexList = pool.GetEntityIDsToComponentIndexList() | std::ranges::to<std::vector>();
+            const std::vector<uint32_t> expectedEntityIDsToComponentIndexList = { 0, 1 };
+            REQUIRE(entityIDsToComponentIndexList == expectedEntityIDsToComponentIndexList);
+        }
+        {
+            // Remove first component
+            pool.RemoveComponent(entityID1);
+            auto& components = constPool.GetComponents<TestComponent>();
+            const std::vector<TestComponent> expectedComponents = { defaultComponent2 };
+            REQUIRE(components == expectedComponents);
+
+            auto componentIndexToEntityIDList = pool.GetComponentIndexToEntityIDList() | std::ranges::to<std::vector>();
+            const std::vector<EntityID> expectedComponentToEntityIDList = { entityID2 };
+            REQUIRE(componentIndexToEntityIDList == expectedComponentToEntityIDList);
+
+            auto entityIDsToComponentIndexList = pool.GetEntityIDsToComponentIndexList() | std::ranges::to<std::vector>();
+            const std::vector<uint32_t> expectedEntityIDsToComponentIndexList = { ComponentPoolNew::InvalidComponentIndex, 0 };
+            REQUIRE(entityIDsToComponentIndexList == expectedEntityIDsToComponentIndexList);
+        }
+        {
+            // Add third component
+            pool.ResizeComponentIndices(3);
+            pool.AddComponent(entityID3, defaultComponent3);
+            auto& components = constPool.GetComponents<TestComponent>();
+            const std::vector<TestComponent> expectedComponents = { defaultComponent2, defaultComponent3 };
+            REQUIRE(components == expectedComponents);
+
+            auto componentIndexToEntityIDList = pool.GetComponentIndexToEntityIDList() | std::ranges::to<std::vector>();
+            const std::vector<EntityID> expectedComponentToEntityIDList = { entityID2, entityID3 };
+            REQUIRE(componentIndexToEntityIDList == expectedComponentToEntityIDList);
+
+            auto entityIDsToComponentIndexList = pool.GetEntityIDsToComponentIndexList() | std::ranges::to<std::vector>();
+            const std::vector<uint32_t> expectedEntityIDsToComponentIndexList = { ComponentPoolNew::InvalidComponentIndex, 0, 1 };
+            REQUIRE(entityIDsToComponentIndexList == expectedEntityIDsToComponentIndexList);
+        }
+    }
 }
 
 TEST_CASE("ComponentPoolNew::Iterate")
@@ -410,9 +607,8 @@ TEST_CASE("ECSNew::AddComponent (T&&) Multiple components")
     {
         auto& p = oldArchetype->pools[0];
         REQUIRE(p.GetType() == std::type_index(typeid(TestComponent)));
-        auto entityIDs = p.GetEntityIDs();
-        REQUIRE(entityIDs.size() == 1);
-        REQUIRE(entityIDs[0] == EntityID{ .id = 0,.generation = 0 });
+        auto entityIDs = p.GetComponentIndexToEntityIDList();
+        REQUIRE(entityIDs.size() == 0);
     }
 
     {
@@ -424,7 +620,7 @@ TEST_CASE("ECSNew::AddComponent (T&&) Multiple components")
 
         REQUIRE(oldArchetype->pools.size() == 1);
         auto& p = oldArchetype->pools[0];
-        auto components = p.GetComponents<TestComponent>();
+        auto& components = p.GetComponents<TestComponent>();
         REQUIRE(components.size() == 1);
         REQUIRE(&components[0] == &addedComponent2);
     }

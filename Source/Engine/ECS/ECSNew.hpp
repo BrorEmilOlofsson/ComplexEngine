@@ -76,7 +76,7 @@ namespace CLX
             , mPrimaryIndex(primaryIndex)
             , mComponentIndices(componentIndices)
             , mIterator(GetPrimaryComponentPool().Iterate<PrimaryType>().begin())
-            , mEntityIDs(GetPrimaryComponentPool().GetEntityIDs())
+            , mEntityIDs(GetPrimaryComponentPool().GetComponentIndexToEntityIDList())
         {}
 
         MultiComponentIterator& operator++()

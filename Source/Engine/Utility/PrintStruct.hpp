@@ -1,5 +1,6 @@
 #pragma once
 #include <print>
+#include "Engine/Utility/Assert.hpp"
 
 namespace CLX
 {
@@ -123,20 +124,22 @@ namespace CLX
             return *this;
         }
 
-        CounterStruct(CounterStruct&& other)
+        CounterStruct(CounterStruct&& other) noexcept
             : test(std::move(other.test))
             , mCounter(std::move(other.mCounter))
         {
+            other.mHasMoved = true;
             if (auto counterPtr = mCounter.lock())
             {
                 counterPtr->moveConstructorCount++;
             }
         }
 
-        CounterStruct& operator=(CounterStruct&& other)
+        CounterStruct& operator=(CounterStruct&& other) noexcept
         {
             test = std::move(other.test);
             mCounter = std::move(other.mCounter);
+            other.mHasMoved = true;
             if (auto counterPtr = mCounter.lock())
             {
                 counterPtr->moveAssignmentCount++;
@@ -144,19 +147,27 @@ namespace CLX
             return *this;
         }
 
-        std::weak_ptr<CounterStructCounter> GetCounter() const
+        [[nodiscard]] std::weak_ptr<CounterStructCounter> GetCounter() const
         {
             return mCounter;
         }
 
-        const std::string& GetString() const
+        [[nodiscard]] const std::string& GetString() const
         {
             return test;
         }
 
+        [[nodiscard]] bool HasMoved() const
+        {
+            return mHasMoved;
+        }
+
+        static constexpr const std::string_view DefaultString = "Default Value fdfdfsdfldfl";
+
     private:
 
-        std::string test = "fddffldskfldsfksdöfsdkjfdkjfkl";
+        std::string test = std::string(DefaultString);
         std::weak_ptr<CounterStructCounter> mCounter;
+        bool mHasMoved = false;
     };
 }
