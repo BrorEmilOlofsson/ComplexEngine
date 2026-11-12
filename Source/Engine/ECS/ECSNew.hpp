@@ -42,10 +42,11 @@ namespace CLX
 
         void ResizePoolIndices(const size_t entityCount)
         {
-            for (auto& pool : pools)
-            {
-                pool.ResizeComponentIndices(entityCount);
-            }
+            entityCount;
+            //for (auto& pool : pools)
+            //{
+            //    //pool.ResizeComponentIndices(entityCount);
+            //}
         }
 
         std::vector<size_t> componentTypeIndices;
@@ -127,7 +128,7 @@ namespace CLX
 
     private:
 
-        ECSArchetype* mArchetype;
+        ECSArchetype* mArchetype = nullptr;
         size_t mPrimaryIndex = 0;
         std::array<size_t, TypeCount> mComponentIndices{};
         std::span<const EntityID> mEntityIDs;

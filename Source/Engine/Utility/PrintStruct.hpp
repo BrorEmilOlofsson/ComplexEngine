@@ -60,36 +60,43 @@ namespace CLX
         std::string test = "fddffldskfldsfksdöfsdkjfdkjfkl";
     };
 
-    struct CounterStructCounter final
-    {
-        size_t constructorCount = 0;
-        size_t destructorCount = 0;
-        size_t copyConstructorCount = 0;
-        size_t copyAssignmentCount = 0;
-        size_t moveConstructorCount = 0;
-        size_t moveAssignmentCount = 0;
-    };
+
 
     struct CounterStruct final
     {
+        struct CounterData final
+        {
+            size_t constructorCount = 0;
+            size_t destructorCount = 0;
+            size_t copyConstructorCount = 0;
+            size_t copyAssignmentCount = 0;
+            size_t moveConstructorCount = 0;
+            size_t moveAssignmentCount = 0;
+        };
+
+        [[nodiscard]] static std::shared_ptr<CounterData> CreateCounter()
+        {
+            return std::make_shared<CounterData>();
+        }
+
         CounterStruct() = default;
 
-        CounterStruct(std::weak_ptr<CounterStructCounter> counter)
-            : mCounter(std::move(counter))
+        CounterStruct(std::weak_ptr<CounterData> counter)
+            : mCounterData(std::move(counter))
         {
-            ASSERT(mCounter.expired() == false, "CounterStruct: Counter is expired");
-            if (auto counterPtr = mCounter.lock())
+            ASSERT(mCounterData.expired() == false, "CounterStruct: Counter is expired");
+            if (auto counterPtr = mCounterData.lock())
             {
                 counterPtr->constructorCount++;
             }
         }
 
-        CounterStruct(std::string name, std::weak_ptr<CounterStructCounter> counter)
+        CounterStruct(std::string name, std::weak_ptr<CounterData> counter)
             : test(std::move(name))
-            , mCounter(std::move(counter))
+            , mCounterData(std::move(counter))
         {
-            ASSERT(mCounter.expired() == false, "CounterStruct: Counter is expired");
-            if (auto counterPtr = mCounter.lock())
+            ASSERT(mCounterData.expired() == false, "CounterStruct: Counter is expired");
+            if (auto counterPtr = mCounterData.lock())
             {
                 counterPtr->constructorCount++;
             }
@@ -97,7 +104,7 @@ namespace CLX
 
         ~CounterStruct()
         {
-            if (auto counterPtr = mCounter.lock())
+            if (auto counterPtr = mCounterData.lock())
             {
                 counterPtr->destructorCount++;
             }
@@ -105,9 +112,9 @@ namespace CLX
 
         CounterStruct(const CounterStruct& other)
             : test(other.test)
-            , mCounter(other.mCounter)
+            , mCounterData(other.mCounterData)
         {
-            if (auto counterPtr = mCounter.lock())
+            if (auto counterPtr = mCounterData.lock())
             {
                 counterPtr->copyConstructorCount++;
             }
@@ -116,8 +123,8 @@ namespace CLX
         CounterStruct& operator=(const CounterStruct& other)
         {
             test = other.test;
-            mCounter = other.mCounter;
-            if (auto counterPtr = mCounter.lock())
+            mCounterData = other.mCounterData;
+            if (auto counterPtr = mCounterData.lock())
             {
                 counterPtr->copyAssignmentCount++;
             }
@@ -126,10 +133,10 @@ namespace CLX
 
         CounterStruct(CounterStruct&& other) noexcept
             : test(std::move(other.test))
-            , mCounter(std::move(other.mCounter))
+            , mCounterData(other.mCounterData)
         {
             other.mHasMoved = true;
-            if (auto counterPtr = mCounter.lock())
+            if (auto counterPtr = mCounterData.lock())
             {
                 counterPtr->moveConstructorCount++;
             }
@@ -138,18 +145,18 @@ namespace CLX
         CounterStruct& operator=(CounterStruct&& other) noexcept
         {
             test = std::move(other.test);
-            mCounter = std::move(other.mCounter);
+            mCounterData = other.mCounterData;
             other.mHasMoved = true;
-            if (auto counterPtr = mCounter.lock())
+            if (auto counterPtr = mCounterData.lock())
             {
                 counterPtr->moveAssignmentCount++;
             }
             return *this;
         }
 
-        [[nodiscard]] std::weak_ptr<CounterStructCounter> GetCounter() const
+        [[nodiscard]] std::weak_ptr<CounterData> GetCounter() const
         {
-            return mCounter;
+            return mCounterData;
         }
 
         [[nodiscard]] const std::string& GetString() const
@@ -162,12 +169,17 @@ namespace CLX
             return mHasMoved;
         }
 
+        bool operator==(const CounterStruct& other) const
+        {
+            return test == other.test && mCounterData.lock() == other.mCounterData.lock() && mHasMoved == other.mHasMoved;
+        }
+
         static constexpr const std::string_view DefaultString = "Default Value fdfdfsdfldfl";
 
     private:
 
         std::string test = std::string(DefaultString);
-        std::weak_ptr<CounterStructCounter> mCounter;
+        std::weak_ptr<CounterData> mCounterData;
         bool mHasMoved = false;
     };
 }

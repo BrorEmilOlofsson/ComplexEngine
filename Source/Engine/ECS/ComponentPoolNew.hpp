@@ -28,7 +28,9 @@ namespace CLX
             using M = Model<T>;
             static_assert(sizeof(M) == BufferSize);
             static_assert(alignof(M) <= BufferAlignment);
-            ::new (GetConcept()) M();
+            static_assert(std::is_nothrow_move_constructible_v<M>, "Model<T> must be nothrow move constructible");
+            static_assert(std::is_nothrow_move_assignable_v<M>, "Model<T> must be nothrow move assignable");
+            std::construct_at(reinterpret_cast<M*>(GetConcept()));
         }
 
         template<typename T>
@@ -57,18 +59,27 @@ namespace CLX
         }
 
         ComponentPoolNew(ComponentPoolNew&& other) noexcept
-            : mType(other.mType)
+            : mType(std::exchange(other.mType, typeid(void)))
         {
             other.GetConcept()->Move(GetConcept());
         }
 
         ComponentPoolNew& operator=(ComponentPoolNew&& other) noexcept
         {
+            mType = std::exchange(other.mType, typeid(void));
+            GetConcept()->~Concept(); // destroy current
             ComponentPoolNew temp(std::move(other));
-            mBuffer.swap(temp.mBuffer);
-            mType = other.mType;
+            temp.GetConcept()->Move(GetConcept());
 
             return *this;
+        }
+
+        template<typename T>
+        T& AddComponent(const EntityID entityID)
+        {
+            ASSERT(mType == std::type_index(typeid(T)), "ComponentPoolNew::GetComponent: Type mismatch");
+            void* componentPtr = GetConcept()->AddComponent(entityID);
+            return *reinterpret_cast<T*>(componentPtr);
         }
 
         template<typename T>
@@ -91,7 +102,7 @@ namespace CLX
         T& AddComponent(const EntityID entityID, Args&&... args)
         {
             ASSERT(mType == std::type_index(typeid(T)), "ComponentPoolNew::GetComponent: Type mismatch");
-            return AddComponent<T>(entityID, T{std::forward<Args>(args)...});
+            return AddComponent(entityID, T{ std::forward<Args>(args)... });
         }
 
         void* AddComponentMoved(const EntityID entityID, void* defaultValuePtr)
@@ -140,19 +151,9 @@ namespace CLX
             return GetConcept()->GetComponentCount();
         }
 
-        void ResizeComponentIndices(const std::size_t size)
+        void ReserveComponents(size_t size)
         {
-            GetConcept()->ResizeComponentIndices(size);
-        }
-
-        template<typename T>
-        [[nodiscard]] std::span<T> GetComponents()
-        {
-            ASSERT(mType == std::type_index(typeid(T)), "ComponentPoolNew::GetComponents: Type mismatch");
-            void* dataPtr = GetConcept()->Data();
-            const size_t size = GetConcept()->GetComponentSize();
-            const size_t componentCount = GetConcept()->GetComponentCount();
-            return std::span<T>(reinterpret_cast<T*>(dataPtr), size * componentCount);
+            GetConcept()->ReserveComponents(size);
         }
 
         template<typename T>
@@ -176,6 +177,20 @@ namespace CLX
         [[nodiscard]] std::type_index GetType() const
         {
             return mType;
+        }
+
+        [[nodiscard]] bool IsMovedFrom() const
+        {
+            return mType == std::type_index(typeid(void));
+        }
+
+        [[nodiscard]] bool operator==(const ComponentPoolNew& other) const
+        {
+            if (mType != other.mType)
+            {
+                return false;
+            }
+            return GetConcept()->Equals(other.GetConcept());
         }
 
         template<typename T>
@@ -277,12 +292,13 @@ namespace CLX
             Concept() = default;
             virtual ~Concept() = default;
 
+            virtual void* AddComponent(EntityID entityID) = 0;
             virtual void* AddComponent(EntityID entityID, const void* defaultValuePtr) = 0;
             virtual void* AddComponentMoved(EntityID entityID, void* defaultValuePtr) = 0;
             [[nodiscard]] virtual void* GetComponent(EntityID entityID) = 0;
             [[nodiscard]] virtual const void* GetComponent(EntityID entityID) const = 0;
             virtual void RemoveComponent(const EntityID entityID) = 0;
-            virtual void ResizeComponentIndices(const size_t size) = 0;
+            virtual void ReserveComponents(const size_t size) = 0;
             [[nodiscard]] virtual void* Data() = 0;
             [[nodiscard]] virtual const void* Data() const = 0;
             [[nodiscard]] virtual size_t GetComponentSize() const = 0;
@@ -292,7 +308,9 @@ namespace CLX
             [[nodiscard]] virtual const std::vector<EntityID>& GetComponentIndexToEntityIDList() const = 0;
 
             virtual void Clone(Concept* memory) const = 0;
-            virtual void Move(Concept* memory) = 0;
+            virtual void Move(Concept* memory) noexcept = 0;
+            virtual bool Equals(const Concept* other) const = 0;
+            virtual std::type_index GetType() const = 0;
         };
 
         template<typename T>
@@ -302,60 +320,42 @@ namespace CLX
 
             Model() = default;
 
+            void* AddComponent(const EntityID entityID) override
+            {
+                return &AddComponentInternal(entityID, T{});
+            }
+
             void* AddComponent(const EntityID entityID, const void* defaultValuePtr) override
             {
-                const uint32_t previousComponentIndex = mEntityIDToComponentIndex[entityID.id];
-                if (previousComponentIndex != InvalidComponentIndex)
-                {
-                    if (defaultValuePtr)
-                    {
-                        mComponents[previousComponentIndex] = *reinterpret_cast<const T*>(defaultValuePtr);
-                    }
-                    else
-                    {
-                        mComponents[previousComponentIndex] = T{};
-                    }
-                    return &mComponents[previousComponentIndex];
-                }
-
-                const uint32_t componentIndex = static_cast<uint32_t>(mComponents.size());
-                mEntityIDToComponentIndex[entityID.id] = componentIndex;
-
-                if (defaultValuePtr)
-                {
-                    mComponents.emplace_back(*reinterpret_cast<const T*>(defaultValuePtr));
-                }
-                else
-                {
-                    mComponents.emplace_back();
-                }
-
-                ASSERT(componentIndex <= mComponentIndexToEntityID.size(), "Component index should be less than or equal to the size of mComponentIndexToEntityID");
-                if (componentIndex == mComponentIndexToEntityID.size())
-                {
-                    mComponentIndexToEntityID.emplace_back(entityID);
-                }
-                else
-                {
-                    mComponentIndexToEntityID[componentIndex] = entityID;
-                }
-                return &mComponents.back();
+                ASSERT(defaultValuePtr != nullptr, "ComponentPoolSBO::AddComponent: defaultValuePtr is nullptr");
+                return &AddComponentInternal(entityID, *reinterpret_cast<const T*>(defaultValuePtr));
             }
 
             void* AddComponentMoved(const EntityID entityID, void* defaultValuePtr) override
             {
                 ASSERT(defaultValuePtr != nullptr, "ComponentPoolSBO::AddComponentMoved: defaultValuePtr is nullptr");
+                T& defaultValue = *reinterpret_cast<T*>(defaultValuePtr);
+                return &AddComponentInternal(entityID, std::move(defaultValue));
+            }
+
+            template<typename U>
+            T& AddComponentInternal(const EntityID entityID, U&& defaultValue)
+            {
+                if (mEntityIDToComponentIndex.size() <= entityID.id)
+                {
+                    mEntityIDToComponentIndex.resize(static_cast<size_t>(entityID.id) + 1, InvalidComponentIndex);
+                }
                 const uint32_t previousComponentIndex = mEntityIDToComponentIndex[entityID.id];
                 if (previousComponentIndex != InvalidComponentIndex)
                 {
-                    mComponents[previousComponentIndex] = std::move(*reinterpret_cast<T*>(defaultValuePtr));
-                    return &mComponents[previousComponentIndex];
+                    mComponents[previousComponentIndex] = std::forward<U>(defaultValue);
+                    return mComponents[previousComponentIndex];
                 }
 
                 const uint32_t componentIndex = static_cast<uint32_t>(mComponents.size());
                 mEntityIDToComponentIndex[entityID.id] = componentIndex;
 
-                mComponents.emplace_back(std::move(*reinterpret_cast<T*>(defaultValuePtr)));
+                mComponents.emplace_back(std::forward<U>(defaultValue));
 
                 ASSERT(componentIndex <= mComponentIndexToEntityID.size(), "Component index should be less than or equal to the size of mComponentIndexToEntityID");
                 if (componentIndex == mComponentIndexToEntityID.size())
@@ -366,7 +366,7 @@ namespace CLX
                 {
                     mComponentIndexToEntityID[componentIndex] = entityID;
                 }
-                return &mComponents.back();
+                return mComponents.back();
             }
 
             [[nodiscard]] void* GetComponent(const EntityID entityID) override
@@ -402,8 +402,9 @@ namespace CLX
                 mComponentIndexToEntityID.pop_back();
             }
 
-            void ResizeComponentIndices(const std::size_t size) override
+            void ReserveComponents(const std::size_t size) override
             {
+                mComponents.reserve(size);
                 mEntityIDToComponentIndex.resize(size, InvalidComponentIndex);
             }
 
@@ -444,13 +445,36 @@ namespace CLX
 
             void Clone(Concept* memory) const override
             {
-                ::new(memory) Model(*this);
+                std::construct_at(reinterpret_cast<Model*>(memory), *this);
             }
 
-            // Should not be const?
-            void Move(Concept* memory) override
+            void Move(Concept* memory) noexcept override
             {
-                ::new(memory) Model(std::move(*this));
+                std::construct_at(reinterpret_cast<Model*>(memory), std::move(*this));
+            }
+
+            [[nodiscard]] bool Equals(const Concept* other) const override
+            {
+                if (typeid(T) != other->GetType())
+                {
+                    return false;
+                }
+                const Model* otherModel = reinterpret_cast<const Model*>(other);
+                if constexpr (std::equality_comparable<T>)
+                {
+                    return mComponents == otherModel->mComponents &&
+                        mEntityIDToComponentIndex == otherModel->mEntityIDToComponentIndex &&
+                        mComponentIndexToEntityID == otherModel->mComponentIndexToEntityID;
+                }
+                else
+                {
+                    throw std::runtime_error("ComponentPoolNew::Model<T>::Equals: Type T is not equality comparable");
+                }
+            }
+
+            [[nodiscard]] std::type_index GetType() const override
+            {
+                return std::type_index(typeid(T));
             }
 
         private:
