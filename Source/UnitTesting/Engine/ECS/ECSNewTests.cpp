@@ -199,7 +199,7 @@ TEST_CASE("ComponentPoolNew::AddComponent (const T&) with high Entity ID")
 
 TEST_CASE("ComponentPoolNew::AddComponent (const T&) with same index")
 {
-    ComponentPoolNew pool(std::type_identity<TestComponent>{});
+    ComponentPoolNew pool = ComponentPoolNew::Create<TestComponent>();
     const ComponentPoolNew& constPool = pool;
     const EntityID entityID1{ 1, 4 };
     const TestComponent defaultComponent1{ .name = "Entity 1", .value = 1 };

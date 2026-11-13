@@ -40,15 +40,6 @@ namespace CLX
             return pools[GetPoolIndex(componentTypeIndex)];
         }
 
-        void ResizePoolIndices(const size_t entityCount)
-        {
-            entityCount;
-            //for (auto& pool : pools)
-            //{
-            //    //pool.ResizeComponentIndices(entityCount);
-            //}
-        }
-
         std::vector<size_t> componentTypeIndices;
         std::vector<ComponentPoolNew> pools;
     };
@@ -334,8 +325,6 @@ namespace CLX
                         archetype.pools.push_back(mRegistry.get().GetComponentTypes()[i].createComponentPool());
                     }
                 }
-
-                it->second.ResizePoolIndices(mEntityData.size());
 
                 return it->second;
             };
