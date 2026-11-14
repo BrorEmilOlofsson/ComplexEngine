@@ -2,6 +2,7 @@
 
 #include "Engine/ECS/ECSNew.hpp"
 #include "Engine/Utility/PrintStruct.hpp"
+#include "Engine/Utility/Random.hpp"
 
 using namespace CLX;
 
@@ -35,6 +36,18 @@ ECSRegistryNew CreateECSRegistry()
     REQUIRE(ECSRegisterComponentHelperNew::ComponentPoolID<std::string> == 2);
     REQUIRE(ECSRegisterComponentHelperNew::ComponentPoolID<int> == 3);
     return ecsRegistry;
+}
+
+template<typename... Types>
+std::vector<std::optional<ComponentPoolNew>> CreateComponentPools()
+{
+    std::vector<std::optional<ComponentPoolNew>> componentPools;
+    componentPools.resize(4);
+    if constexpr (sizeof...(Types) > 0)
+    {
+        ((componentPools[ECSRegisterComponentHelperNew::ComponentPoolID<Types>] = ComponentPoolNew::Create<Types>()), ...);
+    }
+    return componentPools;
 }
 
 TEST_CASE("ComponentPoolNew::AddComponent () allocation")
@@ -545,23 +558,18 @@ TEST_CASE("ComponentPoolNew::Iterate")
 
 TEST_CASE("ECSNew::Multi Iterate")
 {
-    ECSRegistryNew ecsRegistry;
+    ECSRegistryNew ecsRegistry = CreateECSRegistry();
     EntitySerializationIDGenerator entityIDGenerator;
 
     ECSNew ecs(ecsRegistry, entityIDGenerator);
 
 
-    std::vector<ComponentPoolNew> componentPools =
-    {
-        ComponentPoolNew(std::type_identity<CounterStruct>{}),
-        ComponentPoolNew(std::type_identity<int>{}),
-        ComponentPoolNew(std::type_identity<TestComponent>{}),
-        ComponentPoolNew(std::type_identity<std::string>{}),
-    };
-    auto& counterStructPool = componentPools[0];
-    auto& intPool = componentPools[1];
-    auto& testComponentPool = componentPools[2];
-    auto& stringPool = componentPools[3];
+    std::vector<std::optional<ComponentPoolNew>> componentPools = CreateComponentPools<CounterStruct, int, TestComponent, std::string>();
+
+    auto& counterStructPool = *componentPools[ECSRegisterComponentHelperNew::ComponentPoolID<CounterStruct>];
+    auto& intPool = *componentPools[ECSRegisterComponentHelperNew::ComponentPoolID<int>];
+    auto& testComponentPool = *componentPools[ECSRegisterComponentHelperNew::ComponentPoolID<TestComponent>];
+    auto& stringPool = *componentPools[ECSRegisterComponentHelperNew::ComponentPoolID<std::string>];
 
     EntityID entityID1{ 0, 0 };
     EntityID entityID2{ 1, 0 };
@@ -582,11 +590,11 @@ TEST_CASE("ECSNew::Multi Iterate")
 
     ECSArchetype archetype
     {
-        .componentTypeIndices = { 2, 3, 0 },
+        //.componentTypeIndices = { 2, 3, 0 },
         .pools = componentPools
     };
 
-    MultiComponentView<TestComponent, std::string, CounterStruct> multiIterHelper(&archetype, { 2, 3, 0 });
+    MultiComponentView<TestComponent, std::string, CounterStruct> multiIterHelper(&archetype);
 
     int count = 0;
     for (auto [test, str, counter] : multiIterHelper)
@@ -614,33 +622,25 @@ TEST_CASE("ECSNew::Multi Iterate")
 
 TEST_CASE("ECSNew::Archetype Iterate")
 {
-    ECSRegistryNew ecsRegistry;
+    ECSRegistryNew ecsRegistry = CreateECSRegistry();
     EntitySerializationIDGenerator entityIDGenerator;
 
     ECSNew ecs(ecsRegistry, entityIDGenerator);
 
 
-    std::vector<ComponentPoolNew> componentPools1 =
-    {
-        ComponentPoolNew(std::type_identity<CounterStruct>{}),
-        ComponentPoolNew(std::type_identity<int>{}),
-        ComponentPoolNew(std::type_identity<TestComponent>{}),
-        ComponentPoolNew(std::type_identity<std::string>{}),
-    };
-    std::vector<ComponentPoolNew> componentPools2 =
-    {
-        ComponentPoolNew(std::type_identity<std::string>{}),
-        ComponentPoolNew(std::type_identity<CounterStruct>{}),
-        ComponentPoolNew(std::type_identity<TestComponent>{}),
-    };
-    auto& counterStructPool1 = componentPools1[0];
-    auto& intPool1 = componentPools1[1];
-    auto& testComponentPool1 = componentPools1[2];
-    auto& stringPool1 = componentPools1[3];
+    std::vector<std::optional<ComponentPoolNew>> componentPools1 = CreateComponentPools<CounterStruct, int, TestComponent, std::string>();
+    std::vector<std::optional<ComponentPoolNew>> componentPools2 = CreateComponentPools<CounterStruct, TestComponent, std::string>();
 
-    auto& counterStructPool2 = componentPools2[1];
-    auto& testComponentPool2 = componentPools2[2];
-    auto& stringPool2 = componentPools2[0];
+    auto& counterStructPool1 = *componentPools1[ECSRegisterComponentHelperNew::ComponentPoolID<CounterStruct>];
+    auto& intPool1 = *componentPools1[ECSRegisterComponentHelperNew::ComponentPoolID<int>];
+    auto& testComponentPool1 = *componentPools1[ECSRegisterComponentHelperNew::ComponentPoolID<TestComponent>];
+    auto& stringPool1 = *componentPools1[ECSRegisterComponentHelperNew::ComponentPoolID<std::string>];
+
+    auto& counterStructPool2 = *componentPools2[ECSRegisterComponentHelperNew::ComponentPoolID<CounterStruct>];
+    auto& testComponentPool2 = *componentPools2[ECSRegisterComponentHelperNew::ComponentPoolID<TestComponent>];
+    auto& stringPool2 = *componentPools2[ECSRegisterComponentHelperNew::ComponentPoolID<std::string>];
+
+    REQUIRE(componentPools2[ECSRegisterComponentHelperNew::ComponentPoolID<int>].has_value() == false);
 
     EntityID entityID1{ 0, 0 };
     EntityID entityID2{ 1, 0 };
@@ -670,18 +670,18 @@ TEST_CASE("ECSNew::Archetype Iterate")
 
     ECSArchetype archetype1
     {
-        .componentTypeIndices = { 2, 3, 0, 1 },
+        //.componentTypeIndices = { 2, 3, 0, 1 },
         .pools = componentPools1
     };
 
     ECSArchetype archetype2
     {
-        .componentTypeIndices = { 0, 1, 2 },
+        //.componentTypeIndices = { 0, 1, 2 },
         .pools = componentPools2
     };
 
-    MultiComponentView<std::string, CounterStruct> cView1(&archetype1, { 3, 0 });
-    MultiComponentView<std::string, CounterStruct> cView2(&archetype2, { 0, 1 });
+    MultiComponentView<std::string, CounterStruct> cView1(&archetype1);
+    MultiComponentView<std::string, CounterStruct> cView2(&archetype2);
     std::vector archetypes = { cView1, cView2 };
     ECSArchetypeView<std::string, CounterStruct> archetypeView(std::move(archetypes));
     int count = 0;
@@ -830,19 +830,21 @@ TEST_CASE("ECSNew::AddComponent (T&&) Multiple components")
 
     const ECSArchetype* archetype = ecs.GetArchetype(expectedMask);
     REQUIRE(archetype != nullptr);
-    REQUIRE(archetype->componentTypeIndices == std::vector<size_t>{ 0, 3 });
-    REQUIRE(archetype->pools.size() == 2);
+    //REQUIRE(archetype->componentTypeIndices == std::vector<size_t>{ 0, 3 });
+    REQUIRE(archetype->GetValidPoolCount() == 2);
 
     const DynamicBitset oldMask = ecsRegistry.CreateComponentMaskFromTypeList<TestComponent>();
     REQUIRE(archetypes.contains(oldMask));
 
     const ECSArchetype* oldArchetype = ecs.GetArchetype(oldMask);
     REQUIRE(oldArchetype != nullptr);
-    REQUIRE(oldArchetype->componentTypeIndices == std::vector<size_t>{ 0 });
-    REQUIRE(oldArchetype->pools.size() == 1);
+    //REQUIRE(oldArchetype->componentTypeIndices == std::vector<size_t>{ 0 });
+    REQUIRE(oldArchetype->pools.size() == 4);
+    REQUIRE(oldArchetype->GetValidPoolCount() == 1);
+    REQUIRE(oldArchetype->pools[ECSRegisterComponentHelperNew::ComponentPoolID<TestComponent>].has_value());
 
     {
-        auto& p = oldArchetype->pools[0];
+        auto& p = *oldArchetype->pools[0];
         REQUIRE(p.GetType() == std::type_index(typeid(TestComponent)));
         auto entityIDs = p.GetComponentIndexToEntityIDList();
         REQUIRE(entityIDs.size() == 0);
@@ -855,8 +857,8 @@ TEST_CASE("ECSNew::AddComponent (T&&) Multiple components")
         REQUIRE(addedComponent2.name == "Test 43");
         REQUIRE(addedComponent2.value == 350);
 
-        REQUIRE(oldArchetype->pools.size() == 1);
-        auto& p = oldArchetype->pools[0];
+        REQUIRE(oldArchetype->GetValidPoolCount() == 1);
+        auto& p = *oldArchetype->pools[0];
         auto& components = p.GetComponents<TestComponent>();
         REQUIRE(components.size() == 1);
         REQUIRE(&components[0] == &addedComponent2);
@@ -876,7 +878,7 @@ template<typename... Types>
 
 TEST_CASE("ECSNew::ForEach Empty ECS")
 {
-    ECSRegistryNew ecsRegistry = CreateECSRegistry();
+    const ECSRegistryNew ecsRegistry = CreateECSRegistry();
     EntitySerializationIDGenerator entityIDGenerator;
 
     ECSNew ecs(ecsRegistry, entityIDGenerator);
@@ -891,3 +893,78 @@ TEST_CASE("ECSNew::ForEach Empty ECS")
     REQUIRE(CountIterations<CounterStruct, std::string, TestComponent>(ecs) == 0);
 }
 
+//TEST_CASE("Test")
+//{
+//    const ECSRegistryNew ecsRegistry = CreateECSRegistry();
+//    EntitySerializationIDGenerator entityIDGenerator;
+//    ECSNew ecs(ecsRegistry, entityIDGenerator);
+//
+//    auto randomEngine = XorShift32(55);
+//
+//    for (int i = 0; i < 100; i++)
+//    {
+//        ecs.CreateEntity();
+//    }
+//
+//    for (int i = 0; i < 1000000; i++)
+//    {
+//        int operation = GetRandomNumber(0, 3, randomEngine);
+//
+//        if (operation == 0)
+//        {
+//        }
+//        else if (operation == 1)
+//        {
+//            const size_t componentIndex = GetRandomNumber(0, 3, randomEngine);
+//            const uint32_t entityIDPart = GetRandomNumber(0, 99, randomEngine);
+//            const EntityID entityID{ static_cast<uint32_t>(entityIDPart), 0 };
+//
+//            if (componentIndex == 0)
+//            {
+//                ecs.AddComponent<TestComponent>(entityID);
+//            }
+//            else if (componentIndex == 1)
+//            {
+//                ecs.AddComponent<CounterStruct>(entityID);
+//            }
+//            else if (componentIndex == 2)
+//            {
+//                ecs.AddComponent<int>(entityID);
+//            }
+//            else if (componentIndex == 3)
+//            {
+//                ecs.AddComponent<std::string>(entityID);
+//            }
+//        }
+//        else if (operation == 2)
+//        {
+//            const size_t componentIndex = GetRandomNumber(0, 3, randomEngine);
+//            const uint32_t entityIDPart = GetRandomNumber(0, 99, randomEngine);
+//            const EntityID entityID{ static_cast<uint32_t>(entityIDPart), 0 };
+//
+//            if (componentIndex == 0)
+//            {
+//                ecs.RemoveComponent<TestComponent>(entityID);
+//            }
+//            else if (componentIndex == 1)
+//            {
+//                ecs.RemoveComponent<CounterStruct>(entityID);
+//            }
+//            else if (componentIndex == 2)
+//            {
+//                ecs.RemoveComponent<int>(entityID);
+//            }
+//            else if (componentIndex == 3)
+//            {
+//                ecs.RemoveComponent<std::string>(entityID);
+//            }
+//        }
+//
+//        size_t componentIndex = GetRandomNumber(0, 3, randomEngine);
+//
+//        if (componentIndex == 0)
+//        {
+//
+//        }
+//    }
+//}

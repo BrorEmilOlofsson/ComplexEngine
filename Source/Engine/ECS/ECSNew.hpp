@@ -9,6 +9,7 @@
 #include <ranges>
 #include <map>
 #include <queue>
+#include <optional>
 
 #include "Engine/ECS/ECSRegistryNew.hpp"
 #include "Engine/ECS/EntityID.hpp"
@@ -20,29 +21,6 @@
 
 namespace CLX
 {
-
-    struct ECSArchetype final
-    {
-        [[nodiscard]] size_t GetPoolIndex(const size_t componentTypeIndex) const
-        {
-            const auto it = std::ranges::find(componentTypeIndices, componentTypeIndex);
-            ASSERT(it != componentTypeIndices.end(), "Component type is not part of this archetype");
-            return static_cast<size_t>(std::distance(componentTypeIndices.begin(), it));
-        }
-
-        [[nodiscard]] ComponentPoolNew& GetPoolByTypeIndex(const size_t componentTypeIndex)
-        {
-            return pools[GetPoolIndex(componentTypeIndex)];
-        }
-
-        [[nodiscard]] const ComponentPoolNew& GetPoolByTypeIndex(const size_t componentTypeIndex) const
-        {
-            return pools[GetPoolIndex(componentTypeIndex)];
-        }
-
-        std::vector<size_t> componentTypeIndices;
-        std::vector<ComponentPoolNew> pools;
-    };
 
     struct MultiComponentSentinel final
     {
@@ -63,12 +41,11 @@ namespace CLX
 
         MultiComponentIterator() = default;
 
-        MultiComponentIterator(ECSArchetype* archetype, size_t primaryIndex, std::array<size_t, TypeCount> componentIndices)
+        constexpr MultiComponentIterator(ECSArchetype* archetype, std::array<size_t, TypeCount> componentIndices)
             : mArchetype(archetype)
-            , mPrimaryIndex(primaryIndex)
             , mComponentIndices(componentIndices)
-            , mIterator(GetPrimaryComponentPool().Iterate<PrimaryType>().begin())
-            , mEntityIDs(GetPrimaryComponentPool().GetComponentIndexToEntityIDList())
+            , mEntityIDs(GetFirstPool().GetComponentIndexToEntityIDList())
+            , mIterator(archetype->pools[GetFirstComponentIndex()]->Iterate<PrimaryType>().begin())
         {}
 
         MultiComponentIterator& operator++()
@@ -79,10 +56,10 @@ namespace CLX
 
         [[nodiscard]] ValueType operator*() const
         {
-            EntityID entityID = GetCurrentEntityID();
+            const EntityID entityID = GetCurrentEntityID();
             return ValueType
             (
-                (*reinterpret_cast<Types*>(GetComponentPtrFromPool(mArchetype->pools[GetComponentIndex<Types>()], entityID)))...
+                (*reinterpret_cast<Types*>(GetComponentPtrFromPool(*mArchetype->pools[GetComponentIndex<Types>()], entityID)))...
             );
         }
 
@@ -96,23 +73,28 @@ namespace CLX
             return mIterator == typename ComponentPoolNew::ComponentSentinel{};
         }
 
-        ComponentPoolNew& GetPrimaryComponentPool()
-        {
-            return mArchetype->pools[mPrimaryIndex];
-        }
-
         static void* GetComponentPtrFromPool(ComponentPoolNew& pool, EntityID entityID)
         {
             return pool.GetComponent(entityID);
         }
 
-        EntityID GetCurrentEntityID() const
+        [[nodiscard]] constexpr EntityID GetCurrentEntityID() const
         {
             return mEntityIDs[mIterator.GetIndex()];
         }
 
+        [[nodiscard]] constexpr size_t GetFirstComponentIndex() const
+        {
+            return mComponentIndices[0];
+        }
+
+        [[nodiscard]] constexpr ComponentPoolNew& GetFirstPool()
+        {
+            return *mArchetype->pools[GetFirstComponentIndex()];
+        }
+
         template<typename T>
-        [[nodiscard]] size_t GetComponentIndex() const
+        [[nodiscard]] constexpr size_t GetComponentIndex() const
         {
             return mComponentIndices[TypeListIndex<T, Types...>::value];
         }
@@ -120,7 +102,6 @@ namespace CLX
     private:
 
         ECSArchetype* mArchetype = nullptr;
-        size_t mPrimaryIndex = 0;
         std::array<size_t, TypeCount> mComponentIndices{};
         std::span<const EntityID> mEntityIDs;
         typename ComponentPoolNew::ComponentIterator<PrimaryType> mIterator;
@@ -131,14 +112,22 @@ namespace CLX
     {
     public:
 
+        constexpr static std::size_t TypeCount = sizeof...(Types);
+
         MultiComponentView() = delete;
-        MultiComponentView(ECSArchetype* archetype, std::array<size_t, sizeof...(Types)> componentIndices)
-            : mArchetype(archetype), mPrimaryIndex(componentIndices[0]), mComponentIndices(componentIndices)
+        constexpr MultiComponentView(ECSArchetype* archetype)
+            : mArchetype(archetype)
+            , mComponentIndices(GetComponentIndices())
         {}
+
+        static constexpr std::array<size_t, TypeCount> GetComponentIndices()
+        {
+            return { ECSRegisterComponentHelperNew::ComponentPoolID<Types>... };
+        }
 
         [[nodiscard]] MultiComponentIterator<Types...> begin()
         {
-            return  MultiComponentIterator<Types...>(mArchetype, mPrimaryIndex, mComponentIndices);
+            return MultiComponentIterator<Types...>(mArchetype, mComponentIndices);
         }
 
         [[nodiscard]] MultiComponentSentinel end()
@@ -150,7 +139,7 @@ namespace CLX
 
         ECSArchetype* mArchetype;
         size_t mPrimaryIndex;
-        std::array<size_t, sizeof...(Types)> mComponentIndices;
+        std::array<size_t, TypeCount> mComponentIndices;
     };
 
     class ECSArchetypeSentinel final {};
@@ -248,6 +237,12 @@ namespace CLX
         T& AddComponent(EntityID entityID, T&& component);
 
         template<typename T>
+        T& AddComponent(EntityID entityID);
+
+        template<typename T>
+        void RemoveComponent(EntityID entityID);
+
+        template<typename T>
         T* GetComponent(EntityID entityID);
 
         template<typename... Types> requires (sizeof...(Types) > 0)
@@ -305,6 +300,8 @@ namespace CLX
     {
         using ComponentType = std::remove_cvref_t<T>;
 
+        ASSERT(static_cast<size_t>(entityID.id) < mEntityData.size(), "ECSNew::AddComponent: Invalid entity ID");
+
         EntityData& entityData = mEntityData[entityID.id];
         const std::size_t componentTypeIndex = mRegistry.get().GetComponentTypeIndex(typeid(ComponentType));
 
@@ -313,23 +310,14 @@ namespace CLX
                 auto [it, inserted] = mArchetypes.try_emplace(archetypeMask);
                 if (inserted)
                 {
-                    ECSArchetype& archetype = it->second;
-                    for (std::size_t i = 0; i < archetypeMask.Count(); ++i)
-                    {
-                        if (!archetypeMask[i])
-                        {
-                            continue;
-                        }
-
-                        archetype.componentTypeIndices.push_back(i);
-                        archetype.pools.push_back(mRegistry.get().GetComponentTypes()[i].createComponentPool());
-                    }
+                    ECSArchetype& newArchetype = it->second;
+                    newArchetype = mRegistry.get().CreateArchetype(archetypeMask);
                 }
 
                 return it->second;
             };
 
-        ComponentMaskNew oldMask = entityData.mask;
+        const ComponentMaskNew oldMask = entityData.mask;
         ComponentMaskNew newMask = oldMask;
         newMask[componentTypeIndex] = true;
 
@@ -337,7 +325,7 @@ namespace CLX
 
         if (oldMask == newMask)
         {
-            return destinationArchetype.GetPoolByTypeIndex(componentTypeIndex).AddComponent<ComponentType>(entityID, std::forward<T>(component));
+            return destinationArchetype.pools[componentTypeIndex]->AddComponent<ComponentType>(entityID, std::forward<T>(component));
         }
 
         if (oldMask.Any())
@@ -346,32 +334,94 @@ namespace CLX
             auto oldIt = mArchetypes.find(oldMask);
             ASSERT(oldIt != mArchetypes.end(), "Entity archetype pools are missing");
 
+
             ECSArchetype& sourceArchetype = oldIt->second;
-            for (std::size_t sourcePoolIndex = 0; sourcePoolIndex < sourceArchetype.componentTypeIndices.size(); ++sourcePoolIndex)
+            //ASSERT(sourceArchetype.componentTypeIndices.size() == oldMask.Count(), "Source archetype component type indices size does not match old mask count");
+            for (size_t componentIndex = 0; componentIndex < sourceArchetype.pools.size(); componentIndex++)
             {
-                const std::size_t sourceTypeIndex = sourceArchetype.componentTypeIndices[sourcePoolIndex];
-                if (sourceTypeIndex == componentTypeIndex)
+                std::optional<ComponentPoolNew>& sourcePoolOpt = sourceArchetype.pools[componentIndex];
+                if (!sourcePoolOpt.has_value())
                 {
                     continue;
                 }
-
-                ComponentPoolNew& sourcePool = sourceArchetype.pools[sourcePoolIndex];
+                ComponentPoolNew& sourcePool = *sourcePoolOpt;
                 void* sourcePtr = sourcePool.GetComponent(entityID);
                 ASSERT(sourcePtr != nullptr, "Entity component is missing in source archetype");
 
-                ComponentPoolNew& destinationPool = destinationArchetype.GetPoolByTypeIndex(sourceTypeIndex);
+                ComponentPoolNew& destinationPool = *destinationArchetype.pools[componentIndex];
                 destinationPool.AddComponentMoved(entityID, sourcePtr);
-                sourcePool.RemoveComponent(entityID);   
+                sourcePool.RemoveComponent(entityID);
             }
         }
 
-        ComponentType& addedComponent = destinationArchetype.GetPoolByTypeIndex(componentTypeIndex).AddComponent<ComponentType>(entityID, std::forward<T>(component));
+        ComponentType& addedComponent = destinationArchetype.pools[componentTypeIndex]->AddComponent<ComponentType>(entityID, std::forward<T>(component));
         entityData.mask = std::move(newMask);
         return addedComponent;
     }
 
     template<typename T>
-    T* ECSNew::GetComponent(EntityID entityID)
+    T& ECSNew::AddComponent(const EntityID entityID)
+    {
+        return AddComponent(entityID, T{});
+    }
+
+    template<typename T>
+    void ECSNew::RemoveComponent(const EntityID entityID)
+    {
+
+        auto ensureArchetypePools = [this](const DynamicBitset& archetypeMask) -> ECSArchetype&
+            {
+                auto [it, inserted] = mArchetypes.try_emplace(archetypeMask);
+                if (inserted)
+                {
+                    ECSArchetype& newArchetype = it->second;
+                    newArchetype = mRegistry.get().CreateArchetype(archetypeMask);
+                }
+
+                return it->second;
+            };
+
+        ASSERT(static_cast<size_t>(entityID.id) < mEntityData.size(), "ECSNew::RemoveComponent: Invalid entity ID");
+
+        const size_t componentTypeIndex = ECSRegisterComponentHelperNew::ComponentPoolID<T>;
+        EntityData& entityData = mEntityData[entityID.id];
+        if (!entityData.mask[componentTypeIndex])
+        {
+            return; // Component not present, nothing to remove
+        }
+        ComponentMaskNew oldMask = entityData.mask;
+        ECSArchetype* sourceArchetypePtr = GetArchetype(oldMask);
+        ASSERT(sourceArchetypePtr != nullptr, "Entity archetype pools are missing");
+        ECSArchetype& sourceArchetype = *sourceArchetypePtr;
+        ComponentMaskNew newMask = oldMask;
+        newMask[componentTypeIndex] = false;
+
+        sourceArchetype.pools[componentTypeIndex]->RemoveComponent(entityID);
+
+        if (newMask.Any())
+        {
+            auto& newArchetype = ensureArchetypePools(newMask);
+            for (size_t componentIndex = 0; componentIndex < sourceArchetype.pools.size(); componentIndex++)
+            {
+                std::optional<ComponentPoolNew>& sourcePoolOpt = sourceArchetype.pools[componentIndex];
+                if (!sourcePoolOpt.has_value() || componentIndex == componentTypeIndex)
+                {
+                    continue;
+                }
+                ComponentPoolNew& sourcePool = *sourcePoolOpt;
+                void* sourcePtr = sourcePool.GetComponent(entityID);
+                ASSERT(sourcePtr != nullptr, "Entity component is missing in source archetype");
+
+                ComponentPoolNew& destinationPool = *newArchetype.pools[componentIndex];
+                destinationPool.AddComponentMoved(entityID, sourcePtr);
+                sourcePool.RemoveComponent(entityID);
+            }
+        }
+        entityData.mask = std::move(newMask);
+    }
+
+    template<typename T>
+    T* ECSNew::GetComponent(const EntityID entityID)
     {
         using ComponentType = std::remove_cvref_t<T>;
         const std::size_t componentTypeIndex = mRegistry.get().GetComponentTypeIndex(typeid(ComponentType));
@@ -382,7 +432,9 @@ namespace CLX
         }
         ECSArchetype* archetype = GetArchetype(entityData.mask);
         ASSERT(archetype != nullptr, "Entity archetype pools are missing");
-        return archetype->GetPoolByTypeIndex(componentTypeIndex).GetComponent<ComponentType>(entityID);
+        std::optional<ComponentPoolNew>& pool = archetype->pools[componentTypeIndex];
+        ASSERT(pool.has_value(), "Component pool is missing for the specified component type");
+        return pool->GetComponent<ComponentType>(entityID);
     }
 
     template<typename... Types> requires (sizeof...(Types) > 0)
@@ -394,10 +446,7 @@ namespace CLX
         {
             if ((existingMask & mask) == mask)
             {
-                constexpr size_t typeCount = sizeof...(Types);
-                std::array<size_t, typeCount> componentIndices{};
-                ((componentIndices[TypeListIndex<Types, Types...>::value] = archetype.GetPoolIndex(mRegistry.get().GetComponentTypeIndex(typeid(Types)))), ...);
-                multiComponentViews.emplace_back(&archetype, componentIndices);
+                multiComponentViews.emplace_back(&archetype);
             }
         }
         return ECSArchetypeView<Types...>(std::move(multiComponentViews));
