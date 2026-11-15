@@ -36,7 +36,7 @@ namespace CLX
         static_assert(TypeCount > 0, "MultiComponentIterator requires at least one type");
         static_assert((std::same_as<Types, std::remove_reference_t<Types>> && ...), "MultiComponentIterator requires non-reference types");
 
-        using ValueType = std::tuple<std::add_lvalue_reference_t<Types>...>;
+        using ValueType = std::conditional_t<TypeCount == 1, std::add_lvalue_reference_t<std::tuple_element_t<0, std::tuple<Types...>>>, std::tuple<std::add_lvalue_reference_t<Types>...>>;
         using PrimaryType = std::tuple_element_t<0, std::tuple<Types...>>;
 
         MultiComponentIterator() = default;
@@ -149,7 +149,8 @@ namespace CLX
     {
     public:
 
-        using ValueType = std::tuple<std::add_lvalue_reference_t<Types>...>;
+        static constexpr std::size_t TypeCount = sizeof...(Types);
+        using ValueType = std::conditional_t<TypeCount == 1, std::add_lvalue_reference_t<std::tuple_element_t<0, std::tuple<Types...>>>, std::tuple<std::add_lvalue_reference_t<Types>...>>;
 
         ECSArchetypeIterator() = delete;
         ECSArchetypeIterator(std::vector<MultiComponentView<Types...>>& multiComponentIteratorViews)
@@ -446,7 +447,25 @@ namespace CLX
         {
             if ((existingMask & mask) == mask)
             {
-                multiComponentViews.emplace_back(&archetype);
+                bool hasAnyComponent = false;
+                for (size_t componentIndex = 0; componentIndex < archetype.pools.size(); componentIndex++)
+                {
+                    std::optional<ComponentPoolNew>& poolOpt = archetype.pools[componentIndex];
+                    if (!poolOpt.has_value())
+                    {
+                        continue;
+                    }
+                    ComponentPoolNew& pool = *poolOpt;
+                    if (pool.GetComponentCount() > 0)
+                    {
+                        hasAnyComponent = true;
+                        break;
+                    }
+                }
+                if (hasAnyComponent)
+                {
+                    multiComponentViews.emplace_back(&archetype);
+                }
             }
         }
         return ECSArchetypeView<Types...>(std::move(multiComponentViews));

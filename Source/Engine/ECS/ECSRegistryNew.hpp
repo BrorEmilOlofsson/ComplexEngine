@@ -45,7 +45,7 @@ namespace CLX
     };
 
     template<typename T>
-    concept IsSystem = (StaticUpdateFunctionExists<T> || StaticRenderFunctionExists<T>) && sizeof(T) == 1;
+    concept IsSystemNew = (StaticUpdateFunctionExists<T> || StaticRenderFunctionExists<T>) && sizeof(T) == 1;
 
     struct ECSArchetype final
     {
@@ -65,7 +65,7 @@ namespace CLX
         template<typename T>
         void RegisterComponentType(eECSComponentTraitNew traits = eECSComponentTraitNew::None);
 
-        template<IsSystem T>
+        template<IsSystemNew T>
         void RegisterSystem()
         {
             mSystemRegistrationFunctions.push_back([]() -> System

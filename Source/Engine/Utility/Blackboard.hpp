@@ -5,6 +5,8 @@
 #include <string_view>
 #include <stack>
 #include "Engine/Utility/FixedString.hpp"
+#include <concepts>
+#include <type_traits>
 
 namespace CLX
 {
@@ -120,11 +122,11 @@ namespace CLX
 
     using Blackboard = BasicBlackboard<std::string_view>;
 
-    template<typename T, FixedString Key>
+    template<typename T, auto Key>
     struct BlackboardKey final
     {
         using type = T;
-        static constexpr std::string_view key = Key.mData;
+        static constexpr std::string_view key = std::string_view{ Key };
     };
 
     template<typename KeyType, typename Hasher = std::hash<KeyType>>

@@ -891,6 +891,7 @@ TEST_CASE("ECSNew::ForEach Empty ECS")
     REQUIRE(CountIterations<int, CounterStruct>(ecs) == 0);
     REQUIRE(CountIterations<std::string, CounterStruct>(ecs) == 0);
     REQUIRE(CountIterations<CounterStruct, std::string, TestComponent>(ecs) == 0);
+
 }
 
 //TEST_CASE("Test")
