@@ -294,14 +294,14 @@ namespace CLX
             {
                 static AssetPath_OBJ assetPath;
                 std::string pathStr = path.string();
-                assetPath = AssetPath_OBJ(FixedString<256>(pathStr.begin(), pathStr.end()));
+                assetPath = AssetPath_OBJ(FixedString<256>::FromString(pathStr));
                 ObjectSource(assetPath, "OBJ");
             }
             else if (extension == AssetExtensions::EntityComposition)
             {
                 static AssetPath_EntityComposition assetPath;
                 std::string pathStr = path.string();
-                assetPath = AssetPath_EntityComposition(FixedString<256>(pathStr.begin(), pathStr.end()));
+                assetPath = AssetPath_EntityComposition(FixedString<256>::FromString(pathStr));
                 ObjectSource(assetPath, std::string("EntityComposition: ") + path.string());
             }
             else if (ImGui::BeginDragDropSource())

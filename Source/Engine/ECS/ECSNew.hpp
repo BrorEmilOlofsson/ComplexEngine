@@ -304,7 +304,7 @@ namespace CLX
         ASSERT(static_cast<size_t>(entityID.id) < mEntityData.size(), "ECSNew::AddComponent: Invalid entity ID");
 
         EntityData& entityData = mEntityData[entityID.id];
-        const std::size_t componentTypeIndex = mRegistry.get().GetComponentTypeIndex(typeid(ComponentType));
+        const std::size_t componentTypeIndex = mRegistry.get().GetComponentTypeIndex<ComponentType>();
 
         auto ensureArchetypePools = [this](const DynamicBitset& archetypeMask) -> ECSArchetype&
             {
@@ -384,7 +384,7 @@ namespace CLX
 
         ASSERT(static_cast<size_t>(entityID.id) < mEntityData.size(), "ECSNew::RemoveComponent: Invalid entity ID");
 
-        const size_t componentTypeIndex = ECSRegisterComponentHelperNew::ComponentPoolID<T>;
+        const size_t componentTypeIndex = mRegistry.get().GetComponentTypeIndex<T>();
         EntityData& entityData = mEntityData[entityID.id];
         if (!entityData.mask[componentTypeIndex])
         {

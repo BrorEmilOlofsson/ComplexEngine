@@ -1286,7 +1286,7 @@ namespace CLX
             const bool openPopup = ImGui::IsItemHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Right) && !openedEntityOptionsPopup;
             if (auto entityCompositionPath = ObjectTarget<AssetPath_EntityComposition>())
             {
-                EntityCompositionAssetHandle handle = assetManager.GetEntityComposition(std::filesystem::path(entityCompositionPath.value().Value().mData));
+                EntityCompositionAssetHandle handle = assetManager.GetEntityComposition(std::filesystem::path(entityCompositionPath->Value().View()));
 
                 if (compositionHandle.IsValid())
                 {

@@ -26,7 +26,7 @@ namespace CLX
             ImGui::Text("Drag Navmesh Here");
             if (auto objAsset = ObjectTarget<AssetPath_OBJ>())
             {
-                const std::filesystem::path navmeshPath = std::filesystem::path(objAsset->Value().view());
+                const std::filesystem::path navmeshPath = std::filesystem::path(objAsset->Value().View());
                 navmesh = Navmesh(NavmeshLoader::LoadMesh(navmeshPath));
                 sceneManager.GetActiveScene()->SetNavmeshPath(navmeshPath);
             }
@@ -130,7 +130,7 @@ namespace CLX
     {
         if (auto entityCompositionPath = ObjectTarget<AssetPath_EntityComposition>())
         {
-            const std::filesystem::path path(entityCompositionPath->Value().mData);
+            const std::filesystem::path path(entityCompositionPath->Value().View());
             ASSERT(path.extension() == AssetExtensions::EntityComposition, "Invalid entity composition file extension");
 
             InstantiateEntityCompositionAndSelectRoot(

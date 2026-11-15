@@ -69,16 +69,17 @@ namespace CLX
             return FixedString<N>(data, length);
         }
 
-        constexpr std::size_t size() const noexcept { return mSize; }
-        constexpr std::size_t capacity() const noexcept { return N; }
+        constexpr std::size_t Size() const noexcept { return mSize; }
+        constexpr std::size_t Capacity() const noexcept { return N; }
 
-        [[nodiscard]] constexpr const char* c_str() const noexcept { return mData.data(); }
-        [[nodiscard]] constexpr char* data() noexcept { return mData.data(); }
+        [[nodiscard]] constexpr const char* C_Str() const noexcept { return mData.data(); }
+        [[nodiscard]] constexpr char* Data() noexcept { return mData.data(); }
+        [[nodiscard]] constexpr const char* Data() const noexcept { return mData.data(); }
 
         [[nodiscard]] constexpr const char& operator[](std::size_t i) const noexcept { return mData[i]; }
         [[nodiscard]] constexpr char& operator[](std::size_t i) noexcept { return mData[i]; }
 
-        [[nodiscard]] constexpr std::string_view view() const noexcept { return std::string_view(mData.data(), mSize); }
+        [[nodiscard]] constexpr std::string_view View() const noexcept { return std::string_view(mData.data(), mSize); }
 
         constexpr auto operator<=>(const FixedString&) const noexcept = default;
 

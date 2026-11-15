@@ -79,9 +79,15 @@ namespace CLX
             return mComponentTypes;
         }
 
-        size_t GetComponentTypeIndex(const std::type_index typeIndex) const
+        [[nodiscard]] size_t GetComponentTypeIndex(const std::type_index typeIndex) const
         {
             return mComponentTypeToIDMap.at(typeIndex);
+        }
+
+        template<typename T>
+        [[nodiscard]] size_t GetComponentTypeIndex() const
+        {
+            return ECSRegisterComponentHelperNew::ComponentPoolID<T>;
         }
 
         [[nodiscard]] const ECSComponentTypeNew& GetComponentType(const std::type_index typeIndex) const
@@ -93,6 +99,12 @@ namespace CLX
         [[nodiscard]] const ECSComponentTypeNew& GetComponentType(size_t index) const
         {
             return mComponentTypes[index];
+        }
+
+        template<typename T>
+        [[nodiscard]] const ECSComponentTypeNew& GetComponentType() const
+        {
+            return mComponentTypes[GetComponentTypeIndex<T>()];
         }
 
         [[nodiscard]] std::span<System(* const)()> GetSystemRegistrationFunctions() const
